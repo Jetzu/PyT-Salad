@@ -155,6 +155,10 @@ either way — the CLI does not warn that `count` must divide L.
 `symmetry.py:149`: `if size == 0 or count <= 1: return x`. JAX still centres
 on the CA mean and still applies the clash-repulsion push. `r02` grid:
 1.36 A (plain), 2.42 A (`chain_center=True`), 2.27 A (`radius=15`).
+The same guard also covers `count > L` (`size == 0`), where JAX instead
+returns a zero-length array (`--num_aa 8 --sym c4 --replicate_count 16` runs
+fine in the port). Both are degenerate inputs; the point is only that the port
+and JAX silently disagree rather than either one complaining.
 
 ### S11. Compiled path is neither eager-equal nor bit-reproducible
 At `torch.set_float32_matmul_precision("highest")`, identical pinned

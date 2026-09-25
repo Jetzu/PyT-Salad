@@ -114,12 +114,25 @@ def build_data(rng, augment_size=15):
             atom_pos[off:off + cl] = ap
             off += cl
 
-    aa_gt = rng.integers(0, 20, n).astype(np.int32)
-    aa_gt[3] = 20
-    aa_gt[50] = 20
-    aa_gt[7] = RC.restype_order['P']
-    aa_gt[8] = RC.restype_order['C']
-    aa_gt[9] = RC.restype_order['C']
+    # ALL-MASK (20), unlike gen_loss_ref2.py's real random aa_gt: `AADecoder.
+    # train_forward` (torch: decoders.py:188) draws its OWN per-batch-item
+    # masking rate + per-residue Bernoulli ("ADM" corruption) whenever aa_gt
+    # is not already all-mask, on BOTH backends independently, with no
+    # override hook on either side (unlike the Gumbel neighbour draw, which
+    # both `Diffusion.forward` and this script's `install_fixed_uniform`
+    # DO let a caller pin). Two independent RNG streams (JAX threefry vs
+    # torch's generator) cannot be made to draw the SAME random mask, so with
+    # a real aa_gt the "aa" loss term (and, via the shared trunk `local`/`pos`
+    # features feeding aa_decoder, a large fraction of EVERY other
+    # parameter's gradient too - the mask choice is discrete and non-smooth)
+    # would differ between backends for a reason that has nothing to do with
+    # port correctness. `train_forward` short-circuits to a deterministic
+    # zero-corruption no-op when `(aa == 20).all()` - the exact convention
+    # `scripts/gen_fixtures_model.py`'s `build_data` already uses for this
+    # same reason - so this fixture uses it too, and the aa_decoder's own
+    # gradient path is consequently OUT OF SCOPE for this check (see the
+    # task report).
+    aa_gt = np.full(n, 20, np.int32)
 
     canonical = np.asarray(RC.restype_atom14_mask)[aa_gt]
     drop = rng.random((n, 14)) < 0.10
