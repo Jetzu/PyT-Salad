@@ -1,6 +1,6 @@
 # N001 · SALAD JAX to PyTorch port
 
-type: task · date: 2026-09-25 · status: open
+type: task · date: 2026-09-25 · status: open (parity DONE, speed open)
 
 ## Goal
 
@@ -64,7 +64,14 @@ Bugs found that only numerical parity could catch:
 
 ## Outcome
 
-Numerically on par. NOT yet on par for speed — see Next.
+**Numerical parity: DONE.** All four released checkpoints at the floor —
+default_vp 0.00002 A, default_vp_scaled 0.00002 A, default_ve_scaled 0.00002 A,
+multimotif_vp 0.00020 A. Geometry 38/38, stack, encoder (0.00001 A), sampling,
+all 12 loss terms (worst 2.1e-7), training-step gradient cosine 0.99999863.
+
+**Speed: 12x -> 1.37x, not yet done.** L=100, one forward on an H100:
+eager 74 ms, compiled 6.5-7.0 ms, JAX 4.73 ms at matched fp32 (3.95 ms at its
+TF32 default).
 
 ## Outputs
 
@@ -77,7 +84,7 @@ Numerically on par. NOT yet on par for speed — see Next.
 
 ## Next
 
-**Open problem: 6x too slow.** Per 100 aa design, 500 steps, H100: JAX 1.6 s, torch
+**Open problem: 1.37x too slow.** Per 100 aa design, 500 steps, H100: JAX 1.6 s, torch
 compiled 9.7 s (eager 30.9 s). One-time compile warmup is acceptable; per-design cost
 is not.
 
