@@ -212,3 +212,27 @@ Debugging note for the next person: `aatype` matching exactly is **not**
 evidence that a numeric gap is small. A TF32 reference keeps the argmax intact
 while moving coordinates by 6e-03 A. Check fixture provenance before
 bisecting the network.
+
+## 6. Reduced precision does NOT help — measured, do not retry
+
+L=100, one forward, H100 (`scripts/bench_prec.py`, job 902105):
+
+| mode | ms | 500-step | max abs dev vs fp32 |
+|---|---|---|---|
+| fp32 (`matmul="highest"`) | 7.03 | 3.52 s | - |
+| fp32 + TF32 (`matmul="high"`) | 6.93 | 3.47 s | 0.55 A |
+| autocast **bfloat16** | **19.85** | 9.93 s | 5.26 A |
+| autocast **float16** | **18.88** | 9.44 s | 4.01 A |
+
+TF32 IS available in PyTorch (`torch.set_float32_matmul_precision("high")`) and
+buys ~1.5% here, against 20% for JAX. bf16/fp16 autocast are ~3x SLOWER.
+
+Why, and why it is not surprising once the diagnosis is right: this model is
+bound by KERNEL COUNT, not FLOPs (~837 Triton kernels/forward at 2.1 us each;
+the GEMMs are only ~40% of the time and already run at ~52 TFLOP/s, near fp32
+peak). Autocast does not reduce the number of kernels - it ADDS one cast per op
+boundary - so it pays the launch cost twice over with no arithmetic saving to
+recover it. The near-zero TF32 gain predicts exactly this.
+
+Corollary for anyone optimising further: lower precision is the wrong axis.
+The lever is FEWER, BIGGER kernels. And bf16 would cost parity too (4-5 A).

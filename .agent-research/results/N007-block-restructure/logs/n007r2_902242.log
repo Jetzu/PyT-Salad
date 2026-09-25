@@ -1,0 +1,104 @@
+### Starting TaskPrologue of job 902242 on h12-06 at Fri Sep 25 11:02:47 PM CEST 2026
+Running on cores 32-63 with governor performance
+Fri Sep 25 23:02:47 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+######## PAIRSPLIT L=100
+pair-feature block x12, L=100, K=64
+  full (features + GEMMs + MLP)              2.026 ms
+  GEMMs+LN+MLP on cached features            1.307 ms   ( 64.5% of full)
+    same, only the 4 geometric GEMMs         1.051 ms   ( 51.9% of full)
+  => feature construction ~= 0.719 ms (35%), projections ~= 1.307 ms (65%)
+  build relpos only x12                      0.056 ms   (  2.8% of full)
+  build dist only x12                        0.133 ms   (  6.6% of full)
+  build dir only x12                         0.313 ms   ( 15.5% of full)
+  build rot only x12                         0.296 ms   ( 14.6% of full)
+  build pairvec only x12                     0.487 ms   ( 24.0% of full)
+  full: GPU busy 1906 us in 363 kernels (30.2 per pair block, 5.25 us mean)
+      538.5 us  x  84.0  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warps
+      508.4 us  x 187.0  triton_
+      403.9 us  x  36.0  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warps
+      223.3 us  x  12.0  sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x32x8_stage3_warps
+      170.3 us  x  12.0  sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize64x64x8_stage3_warps
+       33.6 us  x  12.0  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warps
+       26.6 us  x  18.0  Memcpy DtoD (Device -> Device)
+        1.9 us  x   2.0  void at::native::vectorized_elementwise_kernel<4, at::native::Fill
+######## E2E
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+######## DONE2
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 23:04:26 CEST 2026
+= Job-ID             : 902242 on helma
+= Job-Name           : n007_r2
+= Job-Command        : .agent-research/results/N007-block-restructure/run2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:55:00
+= Elapsed runtime    : 00:01:40
+= Total RAM usage    : 3.1 GiB of assigned 175 GiB (1.8%)
+= Node list          : h12-06
+= Subm/Elig/Start/End: 2026-09-25T23:02:42 / 2026-09-25T23:02:42 / 2026-09-25T23:02:46 / 2026-09-25T23:04:26
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.9G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  6d9h45m25s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 3288733, 8 %, 8 %, 1868 MiB, 75019 ms
+NVIDIA H100, 00000000:26:00.0, 3290803, 0 %, 0 %, 798 MiB, 806 ms
+NVIDIA H100, 00000000:26:00.0, 3291124, 3 %, 0 %, 798 MiB, 807 ms
+NVIDIA H100, 00000000:26:00.0, 3291254, 0 %, 0 %, 798 MiB, 930 ms
+NVIDIA H100, 00000000:26:00.0, 3291475, 3 %, 0 %, 798 MiB, 850 ms
+NVIDIA H100, 00000000:26:00.0, 3292140, 0 %, 0 %, 798 MiB, 800 ms
+NVIDIA H100, 00000000:26:00.0, 3292286, 0 %, 0 %, 798 MiB, 799 ms

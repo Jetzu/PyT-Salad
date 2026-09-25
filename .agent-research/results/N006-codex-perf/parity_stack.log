@@ -1,0 +1,7 @@
+loaded 576 tensors into the 6-layer stack (strict=True)
+[PASS] local       rel=5.260e-06  max|d|=1.094e-01
+[PASS] pos         rel=2.406e-06  max|d|=2.203e-04
+[PASS] trajectory  rel=2.377e-06  max|d|=2.384e-04
+[PASS] coordinates  mean=0.0000 A  max=0.0003 A
+
+OK
