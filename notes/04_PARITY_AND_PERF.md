@@ -111,6 +111,17 @@ Measured consequences (L=6 protein, fp32):
 | two proteins batched vs run separately | `pos` 2.34 A, 3/24 aatype flipped |
 | L=6 alone vs L=6 + 4 masked padding residues | `pos` 4.94 A on the *real* residues |
 
+Confirmed deterministic, not stochastic: re-running the batch test with the
+uniform field TILED so both positions read identical random numbers gives
+byte-identical results to an untiled field (batch item 0 vs item 1 = 5.844 A
+either way; standalone vs +4 masked padding = 6.731 A). A stochastic effect
+would have moved. The divergence comes from the deterministic index/spatial
+chaining, not the Gumbel draw.
+
+This is NOT the ordinary "batch>1 gives different samples" property of a
+diffusion model - that is expected and desirable. This is the same input
+producing different output depending on its offset in the flat residue axis.
+
 **Verified bit-identical in JAX on the same input** — the port is faithful and
 salad is wrong. So: *a protein run as anything other than the last item of the
 flat residue axis, or run beside masked padding, gets a different answer than it
