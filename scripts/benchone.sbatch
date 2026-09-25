@@ -7,4 +7,5 @@
 set -e
 cd /home/hpc/v181bb/v181bb10/SALAD_torch
 P=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python
-for L in 50 100 200 400 800; do $P -u scripts/bench_one.py --length $L; done
+for r in 1 2 3; do $P -u scripts/bench_one.py --length 100; done
+for L in 50 200 400; do $P -u scripts/bench_one.py --length $L; done

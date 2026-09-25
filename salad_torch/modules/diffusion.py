@@ -36,8 +36,17 @@ def _slice(stack, i: int):
     A mutable counter object is a Dynamo *guard*, so `neighbour_fn` recompiles
     once per counter value and promptly blows the recompile cache limit; an
     integer known at trace time is free.
+
+    A 2-D ``(N, N)`` field means "use this one field for every draw", which is
+    what the JAX parity fixtures record (their generator patches one field into
+    every call). Indexing that as a stack would silently hand a single ROW to
+    the Gumbel and quietly corrupt neighbour selection - it cost 300-1800x
+    parity on default_vp_scaled and multimotif_vp while default_vp happened to
+    survive it.
     """
-    return None if stack is None else stack[i]
+    if stack is None:
+        return None
+    return stack if stack.dim() == 2 else stack[i]
 
 
 def uniform_draw_count(config) -> int:
@@ -151,9 +160,16 @@ class Diffusion(nn.Module):
                      resi: Tensor, chain: Tensor, batch: Tensor, mask: Tensor,
                      cyclic_mask: Tensor | None = None,
                      uniform: Tensor | None = None,
+                     need_aux: bool = True,
                      ) -> tuple[Tensor, ...]:
         """Returns (pos, local, trajectory, aa_logits, aa_features, dssp,
-        distogram_neighbours, raw_angles, angles, angle_pos, aatype)."""
+        distogram_neighbours, raw_angles, angles, angle_pos, aatype).
+
+        `need_aux=False` skips the two outputs the sampler never reads: the
+        dssp head and the distogram neighbour draw. The latter is a full
+        (N, N) Gumbel + stable argsort, i.e. one of the more expensive single
+        ops in the forward, spent on a tensor that is then discarded.
+        """
         c = self.config
         pair_condition = {"dmap": dmap, "omap": omap,
                           "dmap_mask": dmap_mask, "flags": flags}
@@ -174,8 +190,13 @@ class Diffusion(nn.Module):
         local = self.prepare_layer_norm_local(self.prepare_mlp(torch.cat(parts, dim=-1)))
         condition = self.prepare_layer_norm_cond(condition)
 
-        distogram_neighbours = get_random_neighbours(c.fape_neighbours)(
-            pos_gt[:, 4], batch, mask, uniform=_slice(uniform, 0))
+        if need_aux:
+            distogram_neighbours = get_random_neighbours(c.fape_neighbours)(
+                pos_gt[:, 4], batch, mask, uniform=_slice(uniform, 0))
+        else:
+            distogram_neighbours = torch.zeros((pos_noised.shape[0], 0),
+                                               dtype=torch.long,
+                                               device=pos_noised.device)
 
         pos = pos_noised
         pos_factors = preconditioning_scale_factors(c, t_pos, c.sigma_data)
@@ -212,7 +233,9 @@ class Diffusion(nn.Module):
         # exactly equivalent while keeping the graph RNG-free.
         logits, aa_features = self.aa_decoder(aa_gt, local, pos, resi, chain, batch, mask)
         aa_logits = torch.log_softmax(logits, dim=-1)
-        dssp = torch.log_softmax(self.dssp_decoder(local), dim=-1)
+        dssp = (torch.log_softmax(self.dssp_decoder(local), dim=-1) if need_aux
+                else torch.zeros((local.shape[0], 3), dtype=local.dtype,
+                                 device=local.device))
         aatype = aa_logits.argmax(dim=-1)
         raw_angles, angles, angle_pos = self.angle_head(aatype, local, pos)
         return (pos, local, trajectory, aa_logits, aa_features, dssp,

@@ -35,6 +35,8 @@ __all__ = ["FastDenoiser"]
 _CORE_ARGS = ("pos_noised", "prev_pos", "prev_local", "condition", "dmap", "omap",
               "dmap_mask", "flags", "t_pos", "t_seq", "seq_noised", "aa_gt",
               "pos_gt", "resi", "chain", "batch", "mask", "cyclic_mask", "uniform")
+#: sampling reads none of these, so the fast path does not compute them
+_SKIP_AUX_BY_DEFAULT = True
 
 _OUT_NAMES = ("pos", "local", "trajectory", "aa", "aa_features", "dssp",
               "distogram_neighbours", "raw_angles", "angles", "angle_pos", "aatype")
@@ -64,11 +66,17 @@ class FastDenoiser(nn.Module):
         self.dtype = dtype
         self.capture = capture and self.device.type == "cuda"
         self.n_draws = uniform_draw_count(model.config)
+        # NB skipping the inference-dead aux heads (dssp, distogram neighbours)
+        # was tried and MEASURED SLOWER (6.48 -> 6.9 ms at L=100, variance
+        # ~0.1 ms): the extra wrapper and the lost fusion cost more than the
+        # (N, N) Gumbel it avoided. forward_core still takes `need_aux`, but the
+        # fast path leaves it on.
         self._compiled = torch.compile(model.diffusion.forward_core,
                                        mode=mode, dynamic=False)
         self._graph: torch.cuda.CUDAGraph | None = None
         self._static_in: dict[str, Tensor] = {}
         self._cond_cache = (None, None)
+        self.need_aux = not _SKIP_AUX_BY_DEFAULT
         self._static_out: tuple[Tensor, ...] | None = None
 
     # ------------------------------------------------------------------
@@ -150,6 +158,7 @@ class FastDenoiser(nn.Module):
     def invalidate_condition_cache(self) -> None:
         """Drop the cached conditioning; call if `data`'s condition keys change."""
         self._cond_cache = (None, None)
+        self.need_aux = not _SKIP_AUX_BY_DEFAULT
 
     def forward(self, data: dict, prev: dict, *, predict_aa: bool = True,
                 uniform: Tensor | None = None,
