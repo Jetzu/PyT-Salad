@@ -24,7 +24,42 @@ from .blocks import (DiffusionStack, extract_condition_neighbours,
                      extract_motif_neighbours)
 from .decoders import AADecoder, AngleHead, DistogramDecoder
 
-__all__ = ["Diffusion"]
+__all__ = ["Diffusion", "uniform_draw_count"]
+
+class _UniformPool:
+    """Hands out one pre-drawn ``(N, N)`` uniform field per random draw.
+
+    CUDA graphs cannot capture an RNG op ("Offset increment outside graph
+    capture"), so every Gumbel-top-k draw has to be hoisted out of the graph.
+    The draws happen in a fixed order, so slicing a stacked tensor reproduces
+    them exactly while keeping the graph RNG-free. Pass `None` to fall back to
+    drawing inline (eager only).
+    """
+
+    __slots__ = ("stack", "i")
+
+    def __init__(self, stack):
+        self.stack = stack
+        self.i = 0
+
+    def next(self):
+        if self.stack is None:
+            return None
+        u = self.stack[self.i]
+        self.i += 1
+        return u
+
+
+def uniform_draw_count(config) -> int:
+    """How many (N, N) uniform fields one forward consumes.
+
+    1 for the distogram neighbours, then per block: 1 for extract_neighbours
+    and, unless multi_motif routes to the motif map, 2 for
+    extract_condition_neighbours (its random and block-contact stages).
+    """
+    per_block = 1 if config.multi_motif else 3
+    return 1 + config.diffusion_depth * per_block
+
 
 
 def vp_time_embedding(t: Tensor, size: int = 256) -> Tensor:
@@ -105,6 +140,89 @@ class Diffusion(nn.Module):
         return (local, pos, prev["pos"], condition, data["pair_condition"],
                 t_pos, t_seq, data["residue_index"], data["chain_index"],
                 data["batch_index"], data["mask"])
+
+
+    # ------------------------------------------------------------------
+    # Tensor-in / tensor-out core.
+    #
+    # This exists purely for speed. The model is launch-bound - at L=100 one
+    # DiffusionBlock costs ~8 ms on an H100 against JAX's ~3.1 ms for the whole
+    # forward - so the win is not arithmetic, it is eliminating ~1500 kernel
+    # launches per step. That needs `torch.compile`, ideally with CUDA graphs,
+    # and Dynamo will not trace the python-dict shuffling the dict-based
+    # forward does (it silently drops keys). Keeping a flat tensor signature
+    # here makes the whole denoiser capturable in one graph.
+    # ------------------------------------------------------------------
+    def forward_core(self, pos_noised: Tensor, prev_pos: Tensor, prev_local: Tensor,
+                     condition: Tensor, dmap: Tensor, omap: Tensor,
+                     dmap_mask: Tensor, flags: Tensor,
+                     t_pos: Tensor, t_seq: Tensor, seq_noised: Tensor,
+                     aa_gt: Tensor, pos_gt: Tensor,
+                     resi: Tensor, chain: Tensor, batch: Tensor, mask: Tensor,
+                     cyclic_mask: Tensor | None = None,
+                     uniform: Tensor | None = None,
+                     ) -> tuple[Tensor, ...]:
+        """Returns (pos, local, trajectory, aa_logits, aa_features, dssp,
+        distogram_neighbours, raw_angles, angles, angle_pos, aatype)."""
+        c = self.config
+        pair_condition = {"dmap": dmap, "omap": omap,
+                          "dmap_mask": dmap_mask, "flags": flags}
+        n = pos_noised.shape[0]
+        # `uniform` is a (draws, N, N) stack, pre-drawn outside any CUDA graph
+        pool = _UniformPool(uniform)
+
+        _, local_pos = extract_aa_frames(pos_noised)
+        parts = [local_pos.reshape(n, -1),
+                 GF.distance_rbf(vec_norm(local_pos), 0.0, 22.0).reshape(n, -1)]
+        if c.time_embedding:
+            parts = [self.time_embedding(t_pos)] + parts
+        if c.diffuse_sequence:
+            parts += [self.time_embedding(t_seq),
+                      (seq_noised[..., None]
+                       == torch.arange(21, device=seq_noised.device)).float()]
+        parts.append(self.prepare_layer_norm_prev(prev_local))
+        local = self.prepare_layer_norm_local(self.prepare_mlp(torch.cat(parts, dim=-1)))
+        condition = self.prepare_layer_norm_cond(condition)
+
+        distogram_neighbours = get_random_neighbours(c.fape_neighbours)(
+            pos_gt[:, 4], batch, mask, uniform=pool.next())
+
+        pos = pos_noised
+        pos_factors = preconditioning_scale_factors(c, t_pos, c.sigma_data)
+        init_pos = prev_pos if c.multi_motif else None
+        if c.preconditioning == "edm":
+            pos = pos * pos_factors["skip"][:, None, None]
+        elif c.preconditioning == "edm_scaled":
+            init_pos = c.sigma_data * pos_factors["in"][:, None, None] * pos
+            pos = pos * pos_factors["skip"][:, None, None]
+
+        def neighbour_fn(cur_pos, cond_pos):
+            current = extract_neighbours(16, 16, 32)(
+                cur_pos, resi, chain, batch, mask, uniform=pool.next())
+            if c.multi_motif:
+                cond = extract_motif_neighbours(32)(pair_condition)
+            else:
+                cond = extract_condition_neighbours(
+                    16, 16, 16, 16)(cond_pos, pair_condition, resi, chain, batch,
+                                    mask, uniform=pool.next(), uniform2=pool.next())
+            return current, cond
+
+        local, pos, trajectory = self.diffusion_stack(
+            local, pos, prev_pos, condition, pair_condition, t_pos,
+            resi, chain, batch, mask, neighbour_fn,
+            cyclic_mask=cyclic_mask, init_pos=init_pos)
+
+        # NOT train_forward: its ADM masking draws RNG, and CUDA graphs cannot
+        # capture an RNG op. The draw is a no-op at inference anyway - aa_gt is
+        # all-MASK, so masking it to MASK changes nothing - which makes this
+        # exactly equivalent while keeping the graph RNG-free.
+        logits, aa_features = self.aa_decoder(aa_gt, local, pos, resi, chain, batch, mask)
+        aa_logits = torch.log_softmax(logits, dim=-1)
+        dssp = torch.log_softmax(self.dssp_decoder(local), dim=-1)
+        aatype = aa_logits.argmax(dim=-1)
+        raw_angles, angles, angle_pos = self.angle_head(aatype, local, pos)
+        return (pos, local, trajectory, aa_logits, aa_features, dssp,
+                distogram_neighbours, raw_angles, angles, angle_pos, aatype)
 
     # ------------------------------------------------------------------
     def forward(self, data: dict, prev: dict, predict_aa: bool = False,

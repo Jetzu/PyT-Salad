@@ -43,7 +43,8 @@ def extract_condition_neighbours(num_index: int, num_spatial: int,
     """
 
     def inner(pos: Tensor, pair_condition: dict, resi: Tensor, chain: Tensor,
-              batch: Tensor, mask: Tensor, uniform: Tensor | None = None) -> Tensor:
+              batch: Tensor, mask: Tensor, uniform: Tensor | None = None,
+              uniform2: Tensor | None = None) -> Tensor:
         neighbours = get_index_neighbours(num_index)(resi, chain, batch, mask)
         ca = pos[:, 1]
         dist = torch.sqrt(torch.clamp(
@@ -59,7 +60,8 @@ def extract_condition_neighbours(num_index: int, num_spatial: int,
             flags_any, flags_any.to(dist.dtype),
             torch.full_like(dist, float("inf")))
         neighbours = get_random_neighbours(num_block)(
-            block_contact_dist, batch, mask, neighbours, uniform=uniform)
+            block_contact_dist, batch, mask, neighbours,
+            uniform=uniform2 if uniform2 is not None else uniform)
         return neighbours
 
     return inner

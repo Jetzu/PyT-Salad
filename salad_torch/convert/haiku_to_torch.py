@@ -38,7 +38,8 @@ import torch
 from torch import nn
 
 __all__ = ["load_param_npz", "load_param_jax", "diffusion_block_map",
-           "build_state_dict", "load_into"]
+           "build_state_dict", "load_into", "encoder_block_map", "encoder_map",
+           "load_encoder"]
 
 # Haiku parameter leaf names, by kind
 _KINDS = {
@@ -277,6 +278,86 @@ def distogram_decoder_map() -> dict[str, tuple[str, str]]:
         "mlp.layers.0": ("lin", "mlp/linear"),
         "mlp.layers.1": ("lin", "mlp/linear_1"),
     }
+
+
+def encoder_block_map() -> dict[str, tuple[str, str]]:
+    """One `EncoderBlock` (`salad_torch/modules/encoder.py`).
+
+    `encoder_pair_features` is a plain function upstream, so - exactly like
+    `aa_decoder_pair_features` (`aa_decoder_block_map` above) - it shares the
+    enclosing `encoder_block` scope's flat `linear`/`layer_norm` counters:
+    `linear`..`linear_4`, `mlp`, then its own final LayerNorm takes the first
+    bare `layer_norm` name in the scope. The block's own two LayerNorms come
+    next in creation order (`layer_norm_1` before attention, `layer_norm_2`
+    before the update) - one lower than `aa_decoder_block_map`'s
+    `layer_norm_2`/`layer_norm_3`, because `AADecoderPairFeatures` itself
+    consumes two bare LayerNorm names (`layer_norm`, `layer_norm_1`) that
+    `EncoderPairFeatures` does not (no aa embedding term).
+    """
+    out = {
+        "pair_features.linear_relpos": ("lin", "linear"),
+        "pair_features.linear_dist": ("lin", "linear_1"),
+        "pair_features.linear_dir": ("lin", "linear_2"),
+        "pair_features.linear_rot": ("lin", "linear_3"),
+        "pair_features.linear_pairvec": ("lin", "linear_4"),
+        "pair_features.layer_norm": ("ln", "layer_norm"),
+        "pair_features.mlp.layers.0": ("lin", "mlp/linear"),
+        "pair_features.mlp.layers.1": ("lin", "mlp/linear_1"),
+        "layer_norm_1": ("ln", "layer_norm_1"),
+        "layer_norm_2": ("ln", "layer_norm_2"),
+    }
+    out.update(_attention_map("attn", "sparse_structure_attn"))
+    for port, hk in (("mlp.layers.0", "mlp/linear"), ("mlp.layers.1", "mlp/linear_1"),
+                     ("linear_update", "linear"), ("linear_gate", "linear_1"),
+                     ("linear_out", "linear_2")):
+        out[f"update.{port}"] = ("lin", f"light_global_update/{hk}")
+    return out
+
+
+def encoder_map() -> dict[str, tuple[str, str]]:
+    """Everything in the `encoder` scope directly, plus `~prepare_features`
+    (both outside the `self_cond_stack` layer-stack - see `load_encoder`)."""
+    return {
+        "vector_linear": ("lin", "~prepare_features/vector_linear"),
+        "local_mlp.layers.0": ("lin", "~prepare_features/mlp/linear"),
+        "local_mlp.layers.1": ("lin", "~prepare_features/mlp/linear_1"),
+        "local_layer_norm": ("ln", "~prepare_features/layer_norm"),
+        # position-update MLP, created directly in `encoder` (§4/§6.4) -
+        # bias=True and NOT zero-init, see Encoder's docstring
+        "update_mlp.layers.0": ("lin", "mlp/linear"),
+        "update_mlp.layers.1": ("lin", "mlp/linear_1"),
+    }
+
+
+def load_encoder(encoder: nn.Module, params: dict[str, np.ndarray], config,
+                 strict: bool = True) -> dict[str, torch.Tensor]:
+    """Load `structure_diffusion/~encode/encoder/*` into a port `Encoder`.
+
+    Present in every released checkpoint (59 leaves, identical across all 4
+    configs - none of them touch `augment_size`/`encoder_depth`/`resi_dual`/
+    `equivariance`), but `load_model` above never loads it: the Encoder builds
+    the training target `data["pos"]`, and de-novo sampling never calls it (no
+    atom14 ground truth to encode at sampling time). Separate entry point so a
+    caller that only needs to sample is not forced to also carry these weights.
+    """
+    scope = f"{_SD}/~encode/encoder"
+    state: dict[str, torch.Tensor] = {}
+
+    state.update(build_state_dict(params, encoder_map(), scope))
+
+    block_scope = f"{scope}/self_cond_stack/__layer_stack_no_state/encoder_block"
+    for layer in range(config.encoder_depth):
+        state.update(build_state_dict(
+            params, encoder_block_map(), block_scope,
+            port_prefix=f"encoder_stack.blocks.{layer}.", layer=layer))
+
+    # self_cond_stack's own final LayerNorm, outside the layer-stack
+    state.update(build_state_dict(
+        params, {"layer_norm": ("ln", "layer_norm")}, f"{scope}/self_cond_stack",
+        port_prefix="encoder_stack."))
+
+    load_into(encoder, state, strict=strict)
+    return state
 
 
 def load_model(model: nn.Module, params: dict[str, np.ndarray], config,
