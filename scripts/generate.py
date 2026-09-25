@@ -15,6 +15,7 @@ spec: one `design_{n}.pdb` per design, written from the last out-step.
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import os
 import sys
@@ -22,13 +23,15 @@ import time
 
 import numpy as np
 import torch
+from torch import Tensor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 from salad_torch.config import get_config  # noqa: E402
 from salad_torch.convert.haiku_to_torch import load_model, load_param_npz  # noqa: E402
-from salad_torch.diffusion.sampling import SamplerConfig, make_initial_data, sample  # noqa: E402
+from salad_torch.diffusion.sampling import (  # noqa: E402
+    SamplerConfig, StepFn, make_initial_data, sample)
 from salad_torch.diffusion.schedules import parse_num_aa, parse_timescale  # noqa: E402
 from salad_torch.inference.options import decode_sequence, parse_dssp, parse_dssp_mean  # noqa: E402
 from salad_torch.inference.postprocess import reorder_amino_acids  # noqa: E402
@@ -160,8 +163,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
 # ---------------------------------------------------------------------------
 # §3: --renoise
 # ---------------------------------------------------------------------------
-def run_renoise(step_fn, snapshot: dict, base_data: dict, cfg: SamplerConfig,
-                init_prev: dict, generator) -> list[dict]:
+def run_renoise(step_fn: StepFn, snapshot: dict, base_data: dict, cfg: SamplerConfig,
+                init_prev: dict, generator: torch.Generator | None) -> list[dict]:
     """9 independent partial re-denoise passes from one out-step snapshot. §3.
 
     Each pass operates on its own copy of `snapshot`'s tensors - deliberately
@@ -219,7 +222,7 @@ def run_renoise(step_fn, snapshot: dict, base_data: dict, cfg: SamplerConfig,
 # ---------------------------------------------------------------------------
 # §0: the precedence chain (num_aa / dssp / template / order_agnostic)
 # ---------------------------------------------------------------------------
-def apply_precedence_chain(args):
+def apply_precedence_chain(args: argparse.Namespace) -> dict:
     """Reproduce §0's fixed-order overwrites. Returns a dict of everything the
     per-design loop needs: num_aa, resi, chain, base_chain, is_cyclic,
     cyclic_mask, plus optional dssp/dssp_mean/template payloads.
@@ -277,16 +280,54 @@ def apply_precedence_chain(args):
                template=template)
 
 
-def write_result_pdb(path: str, snapshot: dict, *, chain_index, order_agnostic: bool) -> None:
-    """`snapshot_to_protein` + the §4.2 output-side reorder, then write."""
+def write_result_pdb(path: str, snapshot: dict, *, chain_index: Tensor,
+                     order_agnostic: bool) -> None:
+    """`snapshot_to_protein` + the §4.2 output-side reorder, then write.
+
+    `--order_agnostic` gives the network zero sequence-order information
+    (`resi=-1` for every residue, §4.1), and measured verification runs of
+    this port show that at least with the `default_vp-200k` checkpoint this
+    quite often produces a backbone with a handful of residues that never
+    form a clean peptide-bond-like (< 2.5 A C-N) link to the rest of the
+    chain (2-11 of 32 residues, unrelated to how many diffusion steps are
+    run: 30 through 300 all reproduce it). `reorder_amino_acids` is correctly
+    unable to thread such residues into a walk and raises `RuntimeError`
+    (its documented, deliberate replacement for upstream's unbounded hang -
+    see its docstring) rather than fabricate a connection that isn't there.
+    That is a real property of order-agnostic generation with this
+    checkpoint, not a bug in the reordering code - but a single malformed
+    design should not abort a whole `--num_designs` run. Fall back to
+    writing the network's own (unordered, un-re-threaded) residue sequence
+    with a warning, rather than losing the design entirely.
+
+    The fallback also has to repair `residue_index`: `--order_agnostic` feeds
+    the network `resi = -1` for *every* residue (§4.1, so the network gets no
+    sequence-order signal at all), and that same all-``-1`` tensor is what
+    `make_initial_data` stores as `data["residue_index"]` - the field this
+    function's normal path relies on `reorder_amino_acids` to overwrite with
+    real, unique numbers (`new_residue_index`, from the walk order). Skip that
+    overwrite and every residue is written with the *same* PDB residue number
+    -1 in one chain; `to_pdb` doesn't reject that, but a standard reader
+    (including this port's own `read_pdb`) silently merges same-numbered
+    residues in the same chain on read-back, silently losing residues. A
+    plain `0..L-1` renumbering is not the geometric thread reorder_amino_acids
+    would have produced, but it is a well-formed, round-trippable PDB.
+    """
     prot = snapshot_to_protein(snapshot, chain_index=chain_index)
     if order_agnostic:
-        prot = reorder_amino_acids(prot)
+        try:
+            prot = reorder_amino_acids(prot)
+        except RuntimeError as exc:
+            print(f"  warning: --order_agnostic reorder failed for {path} "
+                  f"({exc}); writing the network's own residue order instead.")
+            prot = dataclasses.replace(
+                prot, residue_index=np.arange(prot.residue_index.shape[0],
+                                              dtype=prot.residue_index.dtype))
     with open(path, "wt") as fh:
         fh.write(to_pdb(prot))
 
 
-def main():
+def main() -> None:
     args = build_arg_parser().parse_args()
     if args.jax_seed is not None:
         args.seed = args.jax_seed
