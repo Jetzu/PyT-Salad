@@ -16,7 +16,7 @@ import math
 import torch
 from torch import Tensor, nn
 
-from ..geometry.frames import extract_aa_frames
+from ..geometry.frames import aa_frames_t, apply_inverse_t, apply_t
 from ..geometry.rigid import Rigid, vec_norm
 from .basic import HkLayerNorm, HkLinear
 
@@ -31,14 +31,14 @@ class LinearToPoints(nn.Module):
         self.size = size
         self.linear = HkLinear(in_size, size * 3, bias=False, initializer=init)
 
-    def forward(self, data: Tensor, frames: Rigid) -> Tensor:
+    def forward(self, data: Tensor, rot: Tensor, trans: Tensor) -> Tensor:
         # JAX computes points in fp32 then casts back to the input dtype
         # geometry is done at fp32 or better; under autocast this keeps
         # precision, and it lets a float64 model actually run.
         dtype = data.dtype if data.dtype in (torch.float32, torch.float64) else torch.float32
         raw = self.linear(data).to(dtype)
         points = raw.reshape(*raw.shape[:-1], self.size, 3)
-        out = frames.unsqueeze_batch(1).apply_to_point(points)
+        out = apply_t(rot, trans, points, k=1)
         return out.to(data.dtype)
 
 
@@ -80,7 +80,7 @@ class SparseInvariantPointAttention(nn.Module):
             + heads * value_points
         self.project_out = HkLinear(out_width, local_size, initializer=final_init)
 
-    def forward(self, local: Tensor, pair: Tensor, frames: Rigid,
+    def forward(self, local: Tensor, pair: Tensor, rot: Tensor, trans: Tensor,
                 neighbours: Tensor, mask: Tensor) -> Tensor:
         local = self.layer_norm(local)
         n = local.shape[0]
@@ -92,7 +92,7 @@ class SparseInvariantPointAttention(nn.Module):
         q = self.layer_norm_1(q)
         k = self.layer_norm_2(k)
 
-        qkv_g = self.qkv_global(local, frames)            # (N, H*(2QP+VP), 3)
+        qkv_g = self.qkv_global(local, rot, trans)            # (N, H*(2QP+VP), 3)
         qkv_g = qkv_g.reshape(n, h, 2 * qp + vp, 3)
         q_g = qkv_g[:, :, :qp]
         k_g = qkv_g[:, :, qp:2 * qp]
@@ -119,8 +119,7 @@ class SparseInvariantPointAttention(nn.Module):
         out_pair = torch.einsum("ijh,ijc->ihc", attn, pair)
         out_scalar = torch.einsum("ijh,ijhc->ihc", attn, v[neighbours])
         out_point = torch.einsum("ijh,ijhpc->ihpc", attn, v_g[neighbours])
-        out_point = frames.unsqueeze_batch(2).apply_inverse_to_point(
-            out_point.to(frames.translation.dtype))
+        out_point = apply_inverse_t(rot, trans, out_point.to(trans.dtype), k=2)
         out_norm = vec_norm(out_point)
 
         out = self.project_out(torch.cat((
@@ -146,5 +145,5 @@ class SparseStructureAttention(nn.Module):
 
     def forward(self, local: Tensor, pos: Tensor, pair: Tensor, pair_mask: Tensor,
                 neighbours: Tensor) -> Tensor:
-        frames, _ = extract_aa_frames(pos)
-        return self.ada_point_attention(local, pair, frames, neighbours, pair_mask)
+        rot, trans, _ = aa_frames_t(pos)
+        return self.ada_point_attention(local, pair, rot, trans, neighbours, pair_mask)

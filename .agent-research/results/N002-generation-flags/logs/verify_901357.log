@@ -1,0 +1,194 @@
+### Starting TaskPrologue of job 901357 on h13-10 at Fri Sep 25 08:11:40 PM CEST 2026
+Running on cores 64-95 with governor performance
+Fri Sep 25 20:11:40 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   38C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+[OK] baseline  (5.4s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--seed', '1']
+[OK] sym_c4  (5.1s)  argv=['--num_aa', '25:25:25:25', '--num_steps', '30', '--out_steps', '25', '--sym', 'c4', '--screw_radius', '8', '--seed', '1']
+[OK] sym_c4_mean  (5.0s)  argv=['--num_aa', '25:25:25:25', '--num_steps', '30', '--out_steps', '25', '--sym', 'c4', '--screw_radius', '8', '--sym_mean', 'True', '--seed', '1']
+[OK] sym_c4_threshold  (5.0s)  argv=['--num_aa', '25:25:25:25', '--num_steps', '30', '--out_steps', '25', '--sym', 'c4', '--screw_radius', '8', '--sym_threshold', '0.5', '--seed', '1']
+[OK] sym_c4_screw  (5.1s)  argv=['--num_aa', '25:25:25:25', '--num_steps', '30', '--out_steps', '25', '--sym', 'c4', '--screw_radius', '8', '--screw_translation', '4', '--seed', '1']
+[OK] sym_explicit  (5.1s)  argv=['--num_aa', '20:20:20', '--num_steps', '30', '--out_steps', '25', '--sym', 'custom', '--replicate_count', '3', '--screw_angle', '120', '--screw_radius', '6', '--seed', '1']
+[OK] dssp_literal  (4.8s)  argv=['--dssp', 'LLLHHHHHHLLLEEEEELLL', '--num_steps', '30', '--out_steps', '25', '--seed', '1', '--num_aa', '999']
+[OK] dssp_random  (5.4s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--dssp', 'random', '--seed', '1']
+[OK] dssp_mean_fixed  (5.2s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--dssp_mean', '0.2,0.5,0.3', '--seed', '1']
+[OK] dssp_mean_random  (4.9s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--dssp_mean', 'random', '--seed', '1']
+[OK] merge_chains  (5.0s)  argv=['--num_aa', '16:16', '--num_steps', '30', '--out_steps', '25', '--merge_chains', '--seed', '1']
+[OK] nomerge_counterpart  (5.1s)  argv=['--num_aa', '16:16', '--num_steps', '30', '--out_steps', '25', '--seed', '1']
+[OK] sequence_only  (5.2s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--sequence_only', '--seed', '1']
+[OK] jax_seed_alias_a  (5.1s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--jax_seed', '777']
+[OK] jax_seed_alias_b  (5.0s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--seed', '777']
+[OK] seed_determinism_a  (5.2s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--seed', '777']
+[OK] seed_determinism_b  (4.9s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--seed', '777']
+[OK] template  (5.1s)  argv=['--num_aa', '999', '--num_steps', '30', '--out_steps', '25', '--template', '/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N002-generation-flags/out/baseline/design_0.pdb,FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', '--seed', '2']
+[OK] template_aa  (5.0s)  argv=['--num_aa', '999', '--num_steps', '30', '--out_steps', '25', '--template', '/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N002-generation-flags/out/baseline/design_0.pdb,FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', '--template_aa', '--seed', '2']
+[OK] order_agnostic  (4.9s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--order_agnostic', '--seed', '1']
+[OK] renoise  (6.0s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '20', '--renoise', '--seed', '1']
+[OK] sample_final  (5.3s)  argv=['--num_aa', '24', '--num_steps', '30', '--out_steps', '25', '--sample_final', '--seed', '1']
+[OK] sample_final_baseline  (5.0s)  argv=['--num_aa', '24', '--num_steps', '30', '--out_steps', '25', '--seed', '1']
+[OK] depth_adjust_valid  (4.6s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--depth_adjust', '3', '--seed', '1']
+[FAILED-AS-EXPECTED] depth_adjust_invalid  (3.0s)  argv=['--num_aa', '32', '--num_steps', '30', '--out_steps', '25', '--depth_adjust', '8', '--seed', '1']
+
+======================================================================
+POST-HOC CHECKS
+======================================================================
+[PASS] baseline: >=1 pdb written  ['design_0.pdb']
+[PASS] baseline/design_0.pdb: all-atom finite  
+[PASS] sym_c4: >=1 pdb written  ['design_0.pdb']
+[PASS] sym_c4/design_0.pdb: all-atom finite  
+[PASS] sym_c4_mean: >=1 pdb written  ['design_0.pdb']
+[PASS] sym_c4_mean/design_0.pdb: all-atom finite  
+[PASS] sym_c4_threshold: >=1 pdb written  ['design_0.pdb']
+[PASS] sym_c4_threshold/design_0.pdb: all-atom finite  
+[PASS] sym_c4_screw: >=1 pdb written  ['design_0.pdb']
+[PASS] sym_c4_screw/design_0.pdb: all-atom finite  
+[PASS] sym_explicit: >=1 pdb written  ['design_0.pdb']
+[PASS] sym_explicit/design_0.pdb: all-atom finite  
+[PASS] dssp_literal: >=1 pdb written  ['design_0.pdb']
+[PASS] dssp_literal/design_0.pdb: all-atom finite  
+[PASS] dssp_random: >=1 pdb written  ['design_0.pdb']
+[PASS] dssp_random/design_0.pdb: all-atom finite  
+[PASS] dssp_mean_fixed: >=1 pdb written  ['design_0.pdb']
+[PASS] dssp_mean_fixed/design_0.pdb: all-atom finite  
+[PASS] dssp_mean_random: >=1 pdb written  ['design_0.pdb']
+[PASS] dssp_mean_random/design_0.pdb: all-atom finite  
+[PASS] merge_chains: >=1 pdb written  ['design_0.pdb']
+[PASS] merge_chains/design_0.pdb: all-atom finite  
+[PASS] nomerge_counterpart: >=1 pdb written  ['design_0.pdb']
+[PASS] nomerge_counterpart/design_0.pdb: all-atom finite  
+[PASS] sequence_only: sequences.fa written  
+[PASS] jax_seed_alias_a: >=1 pdb written  ['design_0.pdb']
+[PASS] jax_seed_alias_a/design_0.pdb: all-atom finite  
+[PASS] jax_seed_alias_b: >=1 pdb written  ['design_0.pdb']
+[PASS] jax_seed_alias_b/design_0.pdb: all-atom finite  
+[PASS] seed_determinism_a: >=1 pdb written  ['design_0.pdb']
+[PASS] seed_determinism_a/design_0.pdb: all-atom finite  
+[PASS] seed_determinism_b: >=1 pdb written  ['design_0.pdb']
+[PASS] seed_determinism_b/design_0.pdb: all-atom finite  
+[PASS] template: >=1 pdb written  ['design_0.pdb']
+[PASS] template/design_0.pdb: all-atom finite  
+[PASS] template_aa: >=1 pdb written  ['design_0.pdb']
+[PASS] template_aa/design_0.pdb: all-atom finite  
+[PASS] order_agnostic: >=1 pdb written  ['design_0.pdb']
+[PASS] order_agnostic/design_0.pdb: all-atom finite  
+[PASS] renoise: >=1 pdb written  ['result_0_5_20.pdb', 'result_0_6_20.pdb', 'result_0_8_20.pdb', 'result_0_3_20.pdb', 'result_0_4_20.pdb', 'result_0_2_20.pdb', 'result_0_9_20.pdb', 'result_0_0_20.pdb', 'result_0_1_20.pdb', 'result_0_7_20.pdb']
+[PASS] renoise/result_0_5_20.pdb: all-atom finite  
+[PASS] renoise/result_0_6_20.pdb: all-atom finite  
+[PASS] renoise/result_0_8_20.pdb: all-atom finite  
+[PASS] renoise/result_0_3_20.pdb: all-atom finite  
+[PASS] renoise/result_0_4_20.pdb: all-atom finite  
+[PASS] renoise/result_0_2_20.pdb: all-atom finite  
+[PASS] renoise/result_0_9_20.pdb: all-atom finite  
+[PASS] renoise/result_0_0_20.pdb: all-atom finite  
+[PASS] renoise/result_0_1_20.pdb: all-atom finite  
+[PASS] renoise/result_0_7_20.pdb: all-atom finite  
+[PASS] sample_final: >=1 pdb written  ['design_0.pdb']
+[PASS] sample_final/design_0.pdb: all-atom finite  
+[PASS] sample_final_baseline: >=1 pdb written  ['design_0.pdb']
+[PASS] sample_final_baseline/design_0.pdb: all-atom finite  
+[PASS] depth_adjust_valid: >=1 pdb written  ['design_0.pdb']
+[PASS] depth_adjust_valid/design_0.pdb: all-atom finite  
+[PASS] renoise: 10 files (1 original + 9 renoise)  ['result_0_0_20.pdb', 'result_0_1_20.pdb', 'result_0_2_20.pdb', 'result_0_3_20.pdb', 'result_0_4_20.pdb', 'result_0_5_20.pdb', 'result_0_6_20.pdb', 'result_0_7_20.pdb', 'result_0_8_20.pdb', 'result_0_9_20.pdb']
+[PASS] renoise: >=1 renoise pass diverges from original  9/9 diverged
+[PASS] --sym_mean changes result vs mean=False  mean CA diff 9.067 A
+[PASS] --sym_threshold changes result  mean CA diff 8.242 A
+[PASS] --screw_translation changes result (screw vs pure cyclic)  mean CA diff 7.379 A
+[PASS] --dssp_mean random differs from a fixed triple  mean CA diff 4.598 A
+[PASS] --merge_chains changes result vs unmerged (same seed)  mean CA diff 0.560 A
+[PASS] --order_agnostic changes result vs baseline (same seed)  mean CA diff nan A
+[PASS] --template_aa changes result vs --template alone  mean CA diff 1.723 A
+[PASS] --sample_final changes the decoded sequence vs the ADM baseline  29% of residues decoded differently
+[PASS] --depth_adjust 3 changes result vs full-depth baseline  mean CA diff 7.435 A
+[PASS] --jax_seed 777 == --seed 777, to within plain-GPU-rerun noise  jax_seed-vs-seed max diff 4.000e-03 A, plain seed-vs-itself rerun noise 6.000e-03 A
+[PASS] --template_aa: output aatype == template aatype at conditioned positions  100% match
+
+======================================================================
+C4 SYMMETRY ACCEPTANCE TEST (--sym c4)
+======================================================================
+
+sym_c4 (mean=False, default): /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N002-generation-flags/out/sym_c4/design_0.pdb
+  chain 1 vs chain 0 rotated 90 deg: RMSD 0.0458 A, max 0.0736 A
+  chain 2 vs chain 0 rotated 180 deg: RMSD 0.0539 A, max 0.1088 A
+  chain 3 vs chain 0 rotated 270 deg: RMSD 0.0421 A, max 0.0639 A
+  overall RMSD across chains: 0.0475 A
+
+sym_c4_mean (mean=True): /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N002-generation-flags/out/sym_c4_mean/design_0.pdb
+  chain 1 vs chain 0 rotated 90 deg: RMSD 0.0617 A, max 0.1170 A
+  chain 2 vs chain 0 rotated 180 deg: RMSD 0.0918 A, max 0.1232 A
+  chain 3 vs chain 0 rotated 270 deg: RMSD 0.0633 A, max 0.1301 A
+  overall RMSD across chains: 0.0736 A
+
+sym_c4_threshold (0.5): /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N002-generation-flags/out/sym_c4_threshold/design_0.pdb
+  chain 1 vs chain 0 rotated 90 deg: RMSD 0.0458 A, max 0.0786 A
+  chain 2 vs chain 0 rotated 180 deg: RMSD 0.0715 A, max 0.1342 A
+  chain 3 vs chain 0 rotated 270 deg: RMSD 0.0409 A, max 0.0702 A
+  overall RMSD across chains: 0.0544 A
+
+======================================================================
+25 CLI runs (0 unexpected run outcome(s)), 69 checks (0 failed)
+======================================================================
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 20:13:49 CEST 2026
+= Job-ID             : 901357 on helma
+= Job-Name           : salad_flags
+= Job-Command        : .agent-research/results/N002-generation-flags/verify_flags.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:02:25
+= Total RAM usage    : 1.1 GiB of assigned 175 GiB (0.6%)
+= Node list          : h13-10
+= Subm/Elig/Start/End: 2026-09-25T20:11:10 / 2026-09-25T20:11:10 / 2026-09-25T20:11:24 / 2026-09-25T20:13:49
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.4G   104.9G   209.7G        N/A     452K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      70K      61K      81K  6d12h36m2s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 496530, 15 %, 0 %, 776 MiB, 3955 ms
+NVIDIA H100, 00000000:A6:00.0, 496576, 17 %, 0 %, 794 MiB, 3694 ms
+NVIDIA H100, 00000000:A6:00.0, 496615, 16 %, 0 %, 794 MiB, 3608 ms
+NVIDIA H100, 00000000:A6:00.0, 496657, 16 %, 0 %, 794 MiB, 3650 ms
+NVIDIA H100, 00000000:A6:00.0, 496795, 14 %, 0 %, 794 MiB, 3704 ms
+NVIDIA H100, 00000000:A6:00.0, 496912, 13 %, 0 %, 776 MiB, 3705 ms
+NVIDIA H100, 00000000:A6:00.0, 497055, 18 %, 0 %, 772 MiB, 3445 ms
+NVIDIA H100, 00000000:A6:00.0, 497099, 10 %, 0 %, 774 MiB, 3987 ms
+NVIDIA H100, 00000000:A6:00.0, 497164, 9 %, 0 %, 776 MiB, 3790 ms
+NVIDIA H100, 00000000:A6:00.0, 497233, 13 %, 0 %, 776 MiB, 3513 ms
+NVIDIA H100, 00000000:A6:00.0, 497288, 13 %, 0 %, 776 MiB, 3645 ms
+NVIDIA H100, 00000000:A6:00.0, 497396, 15 %, 0 %, 776 MiB, 3698 ms
+NVIDIA H100, 00000000:A6:00.0, 497438, 15 %, 0 %, 776 MiB, 3587 ms
+NVIDIA H100, 00000000:A6:00.0, 497549, 15 %, 0 %, 776 MiB, 3673 ms
+NVIDIA H100, 00000000:A6:00.0, 497615, 15 %, 0 %, 776 MiB, 3548 ms
+NVIDIA H100, 00000000:A6:00.0, 497662, 15 %, 0 %, 776 MiB, 3764 ms
+NVIDIA H100, 00000000:A6:00.0, 497700, 15 %, 0 %, 776 MiB, 3544 ms
+NVIDIA H100, 00000000:A6:00.0, 497738, 14 %, 0 %, 774 MiB, 3693 ms
+NVIDIA H100, 00000000:A6:00.0, 497776, 14 %, 0 %, 776 MiB, 3606 ms
+NVIDIA H100, 00000000:A6:00.0, 497838, 15 %, 0 %, 776 MiB, 3542 ms
+NVIDIA H100, 00000000:A6:00.0, 497876, 18 %, 0 %, 776 MiB, 4644 ms
+NVIDIA H100, 00000000:A6:00.0, 497928, 15 %, 0 %, 774 MiB, 3933 ms
+NVIDIA H100, 00000000:A6:00.0, 498023, 16 %, 0 %, 774 MiB, 3639 ms
+NVIDIA H100, 00000000:A6:00.0, 498172, 12 %, 0 %, 762 MiB, 3190 ms
+NVIDIA H100, 00000000:A6:00.0, 498233, 0 %, 0 %, 582 MiB, 1355 ms

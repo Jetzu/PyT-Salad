@@ -7,7 +7,7 @@ import torch
 from torch import Tensor
 
 from .rigid import Rigid, vec_norm, vec_normalized
-from .frames import extract_aa_frames
+from .frames import aa_frames_t, apply_inverse_t, extract_aa_frames
 from .segment import index_count
 
 __all__ = [
@@ -174,10 +174,10 @@ def distance_features(pos: Tensor, neighbours: Tensor, d_min: float = 0.0,
 
 def direction_features(pos: Tensor, neighbours: Tensor) -> Tensor:
     """Unit vectors to neighbour atoms, in the residue's own frame -> ``(N, K, 3A)``."""
-    frames, _ = extract_aa_frames(pos)
+    rot, trans, _ = aa_frames_t(pos)
     # neighbour atom positions expressed in frame i
     neighbour_pos = pos[neighbours]                       # (N, K, A, 3)
-    local = frames.unsqueeze_batch(2).apply_inverse_to_point(neighbour_pos)
+    local = apply_inverse_t(rot, trans, neighbour_pos, k=2)
     local = vec_normalized(local)
     n, k, a, _ = local.shape
     return local.reshape(n, k, a * 3)
@@ -192,8 +192,9 @@ def rotation_features(frames: Rigid, neighbours: Tensor) -> Tensor:
 
 
 def position_rotation_features(pos: Tensor, neighbours: Tensor) -> Tensor:
-    frames, _ = extract_aa_frames(pos)
-    return rotation_features(frames, neighbours)
+    rot, _, _ = aa_frames_t(pos)
+    rel = rot[:, None].transpose(-1, -2) @ rot[neighbours]
+    return rel.reshape(rel.shape[0], rel.shape[1], 9)
 
 
 def pair_vector_features(pos: Tensor, neighbours: Tensor, scale: float = 0.1) -> Tensor:
@@ -201,13 +202,13 @@ def pair_vector_features(pos: Tensor, neighbours: Tensor, scale: float = 0.1) ->
 
     -> ``(N, K, 12*A)``: ``[dir(2A*3), scale*coord(2A*3)]``.
     """
-    frames, _ = extract_aa_frames(pos)
+    rot, trans, _ = aa_frames_t(pos)
     n, a, _ = pos.shape
     k = neighbours.shape[1]
     self_pos = pos[:, None].expand(n, k, a, 3)            # (N, K, A, 3)
     neigh_pos = pos[neighbours]                           # (N, K, A, 3)
     both = torch.cat([self_pos, neigh_pos], dim=-2)       # (N, K, 2A, 3)
-    local = frames.unsqueeze_batch(2).apply_inverse_to_point(both)
+    local = apply_inverse_t(rot, trans, both, k=2)
     directions = vec_normalized(local).reshape(n, k, 2 * a * 3)
     coords = (scale * local).reshape(n, k, 2 * a * 3)
     return torch.cat([directions, coords], dim=-1)

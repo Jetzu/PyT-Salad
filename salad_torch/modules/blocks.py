@@ -22,7 +22,7 @@ from torch import Tensor, nn
 
 from ..diffusion.precond import preconditioning_scale_factors
 from ..geometry import features as GF
-from ..geometry.frames import extract_aa_frames
+from ..geometry.frames import aa_frames_t, apply_t
 from ..geometry.neighbours import (get_index_neighbours, get_neighbours,
                                    get_random_neighbours)
 from ..geometry.segment import index_mean
@@ -172,7 +172,7 @@ class Update(nn.Module):
 
     def forward(self, local: Tensor, pos: Tensor, chain: Tensor, batch: Tensor,
                 mask: Tensor, condition: Tensor | None = None) -> Tensor:
-        _, local_pos = extract_aa_frames(pos)
+        _, _, local_pos = aa_frames_t(pos)
         local_pos = local_pos.reshape(local_pos.shape[0], -1)
         if condition is not None:
             local = local + self.linear_condition(condition)
@@ -206,7 +206,7 @@ class EncoderUpdate(nn.Module):
 
     def forward(self, local: Tensor, pos: Tensor, chain: Tensor, batch: Tensor,
                 mask: Tensor) -> Tensor:
-        _, local_pos = extract_aa_frames(pos)
+        _, _, local_pos = aa_frames_t(pos)
         local_pos = local_pos.reshape(local_pos.shape[0], -1)
         local = local + self.mlp(local_pos)
         hidden = gelu(self.linear_gate(local)) * self.linear_update(local)
@@ -223,7 +223,7 @@ class UpdatePositions(nn.Module):
                                initializer="zeros")
 
     def forward(self, pos: Tensor, local_norm: Tensor, scale) -> Tensor:
-        frames, local_pos = extract_aa_frames(pos)
+        rot, trans, local_pos = aa_frames_t(pos)
         pos_update = self.linear(local_norm)
         if torch.is_tensor(scale):
             pos_update = scale * pos_update
@@ -231,7 +231,7 @@ class UpdatePositions(nn.Module):
             pos_update = float(scale) * pos_update
         pos_update = pos_update.reshape(*pos_update.shape[:-1], self.atom_count, 3)
         local_pos = local_pos + pos_update
-        return frames.unsqueeze_batch(1).apply_to_point(local_pos)
+        return apply_t(rot, trans, local_pos, k=1)
 
 
 class DiffusionBlock(nn.Module):

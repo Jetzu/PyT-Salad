@@ -14,7 +14,7 @@ from torch import Tensor, nn
 
 from ..diffusion.precond import preconditioning_scale_factors
 from ..geometry import features as GF
-from ..geometry.frames import extract_aa_frames
+from ..geometry.frames import aa_frames_t
 from ..geometry.neighbours import (extract_neighbours, get_index_neighbours,
                                    get_random_neighbours, get_spatial_neighbours)
 from ..geometry.rigid import vec_norm
@@ -112,7 +112,7 @@ class Diffusion(nn.Module):
         seq = data["seq_noised"]
         n = pos.shape[0]
 
-        _, local_pos = extract_aa_frames(pos)
+        _, _, local_pos = aa_frames_t(pos)
         parts = [
             local_pos.reshape(n, -1),
             GF.distance_rbf(vec_norm(local_pos), 0.0, 22.0).reshape(n, -1),
@@ -161,7 +161,7 @@ class Diffusion(nn.Module):
         # `uniform` is a (draws, N, N) stack, pre-drawn outside any CUDA graph
 
 
-        _, local_pos = extract_aa_frames(pos_noised)
+        _, _, local_pos = aa_frames_t(pos_noised)
         parts = [local_pos.reshape(n, -1),
                  GF.distance_rbf(vec_norm(local_pos), 0.0, 22.0).reshape(n, -1)]
         if c.time_embedding:
