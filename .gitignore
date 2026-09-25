@@ -1,0 +1,8 @@
+upstream/
+params
+ae_params
+salad.sif
+fixtures/*.npz
+__pycache__/
+*.pyc
+outputs/
