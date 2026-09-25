@@ -373,7 +373,10 @@ def torsion_angles_to_frames(aatype: Tensor, backb_to_global: Rigid,
     """
     default_frame, _, _, _ = _tables(aatype.device)
     m = default_frame[aatype].to(angles.dtype)            # (L, 8, 4, 4)
-    default = Rigid(m[..., :3, :3], m[..., :3, 3])
+    # plain tensors, not Rigid: Dynamo treats a user-defined object as opaque
+    # and breaks the graph on every `@`, which disables CUDA graphs for the
+    # whole compiled region. This runs inside AngleHead, so it is on the hot path.
+    default_rot, default_trans = m[..., :3, :3], m[..., :3, 3]
 
     # group 0 is the backbone itself, which never rotates -> (sin, cos) = (0, 1)
     lead = angles.shape[:-2]
@@ -387,19 +390,28 @@ def torsion_angles_to_frames(aatype: Tensor, backb_to_global: Rigid,
         torch.stack([zero, sin, cos], dim=-1),
     ], dim=-2)
     # the torsion only spins the group about its own x-axis; the origin is fixed
-    all_frames = Rigid(default.rotation @ rot_x, default.translation)
+    all_rot = default_rot @ rot_x
+    all_trans = default_trans
+
+    def _compose(ra, ta, rb, tb):
+        """(Ra, ta) . (Rb, tb) = (Ra Rb, Ra tb + ta)"""
+        return ra @ rb, torch.einsum("...ij,...j->...i", ra, tb) + ta
 
     # chi2..chi4 are defined relative to the *previous* chi, so chain them
-    chi1 = all_frames.select_batch(1, 4)
-    chi2 = chi1 @ all_frames.select_batch(1, 5)
-    chi3 = chi2 @ all_frames.select_batch(1, 6)
-    chi4 = chi3 @ all_frames.select_batch(1, 7)
-    to_backb = Rigid(
-        torch.cat([all_frames.rotation[:, :5], chi2.rotation[:, None],
-                   chi3.rotation[:, None], chi4.rotation[:, None]], dim=1),
-        torch.cat([all_frames.translation[:, :5], chi2.translation[:, None],
-                   chi3.translation[:, None], chi4.translation[:, None]], dim=1))
-    return backb_to_global.unsqueeze_batch(1) @ to_backb
+    r, t = all_rot[:, 4], all_trans[:, 4]                  # chi1
+    chain_r, chain_t = [], []
+    for g in (5, 6, 7):
+        r, t = _compose(r, t, all_rot[:, g], all_trans[:, g])
+        chain_r.append(r)
+        chain_t.append(t)
+
+    to_backb_rot = torch.cat([all_rot[:, :5]] + [x[:, None] for x in chain_r], dim=1)
+    to_backb_trans = torch.cat([all_trans[:, :5]] + [x[:, None] for x in chain_t], dim=1)
+
+    gr = backb_to_global.rotation[:, None]
+    gt = backb_to_global.translation[:, None]
+    out_rot, out_trans = _compose(gr, gt, to_backb_rot, to_backb_trans)
+    return Rigid(out_rot, out_trans)
 
 
 def frames_and_literature_positions_to_atom14_pos(aatype: Tensor,
