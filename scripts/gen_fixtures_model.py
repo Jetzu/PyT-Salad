@@ -68,7 +68,35 @@ def install_fixed_uniform(n, seed=99):
     NSB.get_random_neighbours = patched
 
 
-def build_data(length, augment_size, rng):
+def build_motif_condition(pos, rng, block=20):
+    """Real dmap / dmap_mask conditioning for `multi_motif`.
+
+    Mirrors the shape of `StructureDiffusion.prepare_condition`'s multi-motif
+    branch (NSB ~line 284-330): split the chain into contiguous segments and
+    assign each segment to one of two groups; only within-group pairs are
+    "known". Unlike that training-time code (random segment lengths, random
+    group assignment, random drop-out, all via `hk.next_rng_key`), this is a
+    plain deterministic construction - it only has to produce a *real*,
+    non-degenerate dmap_mask, not replay the stochastic reveal (that is
+    task 4's job, in `training/loop.py`).
+
+    `block` is picked so each group ends up bigger than the motif attention's
+    top-32 selection (`extract_motif_neighbours(32)`): with `length=80` and
+    `block=20` each group has 40 residues (39 same-group candidates per row),
+    so the neighbour draw must actually rank by distance instead of admitting
+    every candidate through the mask - an all-False or trivially-small-group
+    mask would not exercise that ranking at all.
+    """
+    n = pos.shape[0]
+    cb = pos[:, 4]  # atom index 4 = CB by convention (Encoder, prepare_condition)
+    dmap = np.linalg.norm(cb[:, None, :] - cb[None, :, :], axis=-1).astype(np.float32)
+    group = ((np.arange(n) // block) % 2).astype(np.int32)
+    dmap_mask = group[:, None] == group[None, :]
+    np.fill_diagonal(dmap_mask, False)
+    return dmap, dmap_mask
+
+
+def build_data(length, augment_size, rng, multi_motif=False):
     """A single-chain unconditional system of `length` residues."""
     n = length
     a = 5 + augment_size
@@ -80,7 +108,7 @@ def build_data(length, augment_size, rng):
     t = np.arange(n)[:, None]
     bb = np.concatenate([2.3 * np.cos(t * 1.7), 2.3 * np.sin(t * 1.7), 1.5 * t], -1)
     pos = (bb[:, None, :] + rng.normal(0, 1.2, (n, a, 3))).astype(np.float32)
-    return dict(
+    data = dict(
         pos=pos,
         aa_gt=np.full(n, 20, np.int32),
         seq=np.full(n, 20, np.int32),
@@ -92,6 +120,11 @@ def build_data(length, augment_size, rng):
         t_pos=np.full(n, 0.5, np.float32),
         t_seq=np.full(n, 1.0, np.float32),
     )
+    if multi_motif:
+        dmap, dmap_mask = build_motif_condition(pos, rng)
+        data["dmap"] = dmap
+        data["dmap_mask"] = dmap_mask
+    return data
 
 
 def main(config_name, param_path, out_path, length=48):
@@ -102,7 +135,7 @@ def main(config_name, param_path, out_path, length=48):
     with open(param_path, "rb") as f:
         params = pickle.load(f)
 
-    data = build_data(length, config.augment_size, rng)
+    data = build_data(length, config.augment_size, rng, multi_motif=bool(config.multi_motif))
     prev = dict(
         pos=np.zeros_like(data["pos"]),
         local=np.zeros((length, config.local_size), np.float32),

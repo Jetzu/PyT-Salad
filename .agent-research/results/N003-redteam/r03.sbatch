@@ -1,0 +1,9 @@
+#!/bin/bash -l
+#SBATCH --job-name=rt_fast
+#SBATCH --partition=h100
+#SBATCH --gres=gpu:h100:1
+#SBATCH --time=00:50:00
+#SBATCH --output=/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N003-redteam/r03_%j.log
+cd /home/hpc/v181bb/v181bb10/SALAD_torch
+export TORCHINDUCTOR_CACHE_DIR=/tmp/ti_$SLURM_JOB_ID
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python .agent-research/results/N003-redteam/r03_fast_attack.py

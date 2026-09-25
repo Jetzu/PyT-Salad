@@ -225,9 +225,13 @@ def sparse_fape(pos_gt_zeroed: Tensor, frames_gt: Rigid, trajectory_pred: Tensor
     valid = (neighbours != -1)
     mask_neighbours = valid & mask[:, None].bool() & mask[neighbours].bool()   # (L, K)
 
-    gt_local = frames_gt[:, None, None].apply_inverse_to_point(pos_gt_zeroed[neighbours])
+    # JAX `frames[..., None, None].apply_inverse_to_point(...)`: insert axes
+    # between the existing batch dims and the trailing (neighbour, atom, xyz)
+    # dims - `Rigid` has no `__getitem__` (rigid.py docstring), so this is
+    # `unsqueeze_batch(2)`, not tensor-style slicing.
+    gt_local = frames_gt.unsqueeze_batch(2).apply_inverse_to_point(pos_gt_zeroed[neighbours])
     frames_pred, _ = extract_aa_frames(trajectory_pred)                        # (D, L)
-    pred_local = frames_pred[:, :, None, None].apply_inverse_to_point(
+    pred_local = frames_pred.unsqueeze_batch(2).apply_inverse_to_point(
         trajectory_pred[:, neighbours])                                       # (D, L, K, A, 3)
 
     sq_err = torch.clamp(vec_norm2(pred_local - gt_local[None]), max=100.0)    # (D, L, K, A)
@@ -283,8 +287,8 @@ def local_loss(distance: Tensor, pair_mask: Tensor, gt_frames_14: Rigid,
     valid = (neighbours != -1)
     mask_neighbours = valid[..., None] & atom_mask[neighbours].bool()          # (L, K, 14)
 
-    gt_local = gt_frames_14[:, None, None].apply_inverse_to_point(atom_pos_gt[neighbours])
-    pred_local = frames_pred_final[:, None, None].apply_inverse_to_point(
+    gt_local = gt_frames_14.unsqueeze_batch(2).apply_inverse_to_point(atom_pos_gt[neighbours])
+    pred_local = frames_pred_final.unsqueeze_batch(2).apply_inverse_to_point(
         atom_pos_pred[neighbours])
 
     dist = vec_norm(pred_local - gt_local)                                     # UNSQUARED - see docstring

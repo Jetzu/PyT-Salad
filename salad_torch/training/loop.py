@@ -21,19 +21,22 @@ summarised in the spec's §B.7; the short version, followed here:
   `.b` bias tensors get `grad=None` every step, per
   `notes/04_PARITY_AND_PERF.md` §4).
 
-GAP flagged prominently (see also `data/dataset.py` and this module's
-`prepare_batch`): the `Encoder` network that builds the ground-truth
-20-atom "augmented" position tensor from real atom14 structures
-(`StructureDiffusion.encode`, spec-03 §1.2 step 3, "a model component, out of
-scope for this loss spec") is not implemented ANYWHERE in this checkout - not
-in `salad_torch/modules/`, not in the checkpoint converter. It has trainable
-weights that are jointly optimised with the rest of the model during real
-training, so it is squarely model-architecture work, not data/training-loop
-work, and this file does not attempt to invent it. `prepare_batch` below
-stands in with a deterministic, clearly-flagged, non-learned placeholder
-(replicate the idealised CB point into the extra `augment_size` atom slots)
-so the pipeline runs end-to-end; anyone wiring up real `default_vp` training
-MUST replace that one spot with a real `Encoder.forward` call first.
+FORMER GAP, now closed (2026-09-25): `prepare_batch` used to stand in for the
+`Encoder` network (which builds the ground-truth 20-atom "augmented" position
+tensor from real atom14 structures, `StructureDiffusion.encode`, spec-03 §1.2
+step 3) with a deterministic, non-learned placeholder that replicated the
+idealised CB point into all 15 augment slots. `salad_torch/modules/encoder.py`
+now exists and loads `strict=True` from all four released checkpoints, so
+`prepare_batch` calls a real `Encoder(config)` instead (spec-05 "call site"
+section). Its weights are jointly optimised with the rest of the model - see
+`Trainer`/`training_step` below, which fold `encoder.parameters()` into the
+same optimizer/EMA/checkpoint as `model.parameters()`, exactly as spec-05
+demands ("do not treat it as a frozen preprocessing step"): upstream carries
+both under one Haiku param tree (`structure_diffusion/~encode/encoder/...`
+alongside `structure_diffusion/diffusion/...`), and the released checkpoint
+already contains the encoder leaves (`config.py`'s "unused for de-novo
+generation, but its weights are in the file" comment) - de-novo *sampling*
+just never calls it, since there is no atom14 ground truth to encode then.
 
 A second, smaller gap: the exact stochastic recipe NSB's `prepare_condition`
 uses to decide which residues get their true amino acid / secondary structure
@@ -60,6 +63,7 @@ from ..geometry.frames import compute_pseudo_cb, positions_to_ncacocb
 from ..geometry.segment import index_mean, unique_chain
 from ..diffusion.schedules import sigma_scale_cosine
 from ..losses.total import total_loss
+from ..modules.encoder import Encoder
 from ..modules.model import apply_diffusion
 from .ema import EMA
 from .schedule import cosine_decay_schedule, warmup_schedule
@@ -157,12 +161,20 @@ def reveal_conditioning(aa_gt: Tensor, dssp_gt: Tensor, mask: Tensor,
 # ---------------------------------------------------------------------------
 # prepare_batch: raw PackedProteinStream draw -> the model+loss's `data` dict
 # ---------------------------------------------------------------------------
-def prepare_batch(raw: dict, *, augment_size: int,
+def prepare_batch(raw: dict, *, augment_size: int, encoder: nn.Module | None = None,
                   generator: torch.Generator | None = None) -> dict:
     """`StructureDiffusion.prepare_data` + `.encode` (spec-03 §1.1-1.2), plus
     this port's `dssp`/conditioning-reveal wiring. `raw` is one
     `PackedProteinStream` draw already converted to torch tensors
     (`data/collate.py: example_to_tensors`) - atom24, un-centered, un-truncated.
+
+    `encoder` is a real `modules.encoder.Encoder` instance (spec-05), run with
+    gradients ENABLED - its output becomes `data["pos"]`, the ground truth the
+    diffusion trunk is trained to denoise, so a stop-gradient here would
+    silently turn off the joint training the released checkpoints were
+    actually produced with. Required whenever `augment_size > 0` (every
+    released config); may be omitted only for a hypothetical `augment_size=0`
+    config, matching the JAX `elif`/`else` in spec-05 §1.
 
     Returns a `data` dict with every field `StructureDiffusionPredict.forward`
     and `losses.total.total_loss` need (see their docstrings for the exact
@@ -188,11 +200,18 @@ def prepare_batch(raw: dict, *, augment_size: int,
     atom_pos = torch.where(atom_mask[..., None], atom_pos, pseudo_cb[:, None, :])
 
     # -- encode (spec-03 §1.2): backbone+CB is exact; the extra `augment_size`
-    # atoms are the documented Encoder-network GAP (module docstring) --------
+    # atoms come from the real, jointly-trained Encoder (spec-05 §1) ---------
     backbone5 = positions_to_ncacocb(atom_pos)   # (L, 5, 3): N, CA, C, O, CB
     if augment_size > 0:
-        extra = backbone5[:, 4:5, :].expand(-1, augment_size, -1)
-        pos20 = torch.cat([backbone5, extra], dim=1)
+        if encoder is None:
+            raise ValueError(
+                "prepare_batch: augment_size > 0 requires a real Encoder "
+                "(spec-05 §1) - the non-learned CB-replication placeholder "
+                "was removed, it silently detached the diffusion trunk's "
+                "ground truth from the encoder's gradient")
+        enc_data = {"pos": backbone5, "residue_index": raw["residue_index"],
+                   "chain_index": chain, "batch_index": batch_index, "mask": mask}
+        _, pos20 = encoder(enc_data)
     else:
         pos20 = backbone5
 
@@ -231,10 +250,11 @@ def _draw_noise_clocks(data: dict, *, generator: torch.Generator | None = None) 
     return out
 
 
-def training_step(model: nn.Module, ema: EMA, optimizer: torch.optim.Optimizer,
+def training_step(model: nn.Module, encoder: nn.Module | None, ema: EMA,
+                  optimizer: torch.optim.Optimizer,
                   config: TrainConfig, micro_batches: list[dict], *,
                   device: torch.device, generator: torch.Generator | None = None,
-                  lr: float) -> dict[str, float]:
+                  lr: float, encoder_ema: EMA | None = None) -> dict[str, float]:
     """One optimizer step, over `1..accumulate` independent micro-batches.
 
     Each element of `micro_batches` is one `PackedProteinStream` draw (already
@@ -242,6 +262,17 @@ def training_step(model: nn.Module, ema: EMA, optimizer: torch.optim.Optimizer,
     concatenated into a shared segment-op namespace across micro-batches
     (spec §0f). Gradients are averaged across micro-batches (mean of means,
     matching `optax`'s fixed-`accumulate`-divisor online mean, spec §B.5).
+
+    `encoder` (spec-05) builds `data["pos"]` WITH gradients - it is jointly
+    trained, not a frozen preprocessing step (module docstring), so its
+    parameters get their own gradient-clip contribution and their own `EMA`
+    (`encoder_ema`) - kept a SEPARATE `EMA` instance from `ema` (rather than
+    merging both modules into one container) so `ema`'s own key namespace
+    stays exactly `model.named_parameters()`, unchanged from before this
+    module had an encoder at all - a `checkpoint-ema-*.pt` consumer that only
+    ever samples (and so never touches `encoder`) needs nothing new. Both are
+    optimized by the SAME `optimizer` (one `Adam` over both modules'
+    parameters, spec-05: "part of the same optimizer").
 
     Order matters (spec §B.2/§B.4): backward -> clip -> `ema.update` -> LR set
     -> `optimizer.step()`, so Adam's moment estimates see the CLIPPED gradient
@@ -256,7 +287,7 @@ def training_step(model: nn.Module, ema: EMA, optimizer: torch.optim.Optimizer,
 
     for raw in micro_batches:
         data = prepare_batch(raw, augment_size=model.config.augment_size,
-                             generator=generator)
+                             encoder=encoder, generator=generator)
         data = _draw_noise_clocks(data, generator=generator)
 
         # -- self-conditioning: 0 or 1 stop-gradient preview passes (§1.5) --
@@ -284,8 +315,13 @@ def training_step(model: nn.Module, ema: EMA, optimizer: torch.optim.Optimizer,
         for key, value in terms.items():
             terms_sum[key] = terms_sum.get(key, 0.0) + float(value.detach()) / n
 
-    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=config.clip)
+    clip_params = list(model.parameters())
+    if encoder is not None:
+        clip_params += list(encoder.parameters())
+    torch.nn.utils.clip_grad_norm_(clip_params, max_norm=config.clip)
     ema.update(model)          # BEFORE optimizer.step(): the documented staleness
+    if encoder is not None and encoder_ema is not None:
+        encoder_ema.update(encoder)
     optimizer.step()
     return terms_sum
 
@@ -309,24 +345,44 @@ def _atomic_save(obj: dict, path: str) -> None:
 
 
 def save_checkpoint(path: str, model: nn.Module, ema: EMA,
-                    optimizer: torch.optim.Optimizer, step: int) -> None:
-    _atomic_save({
+                    optimizer: torch.optim.Optimizer, step: int,
+                    encoder: nn.Module | None = None,
+                    encoder_ema: EMA | None = None) -> None:
+    """`encoder`/`encoder_ema` (spec-05) are saved under their own
+    `"encoder_params"`/`"encoder_ema_params"` keys - `encoder` is a separate
+    `nn.Module` from `model` (kept that way so `load_model`'s existing
+    `strict=True` sampling-only checkpoint load is untouched, see
+    `training/loop.py` module docstring), but its weights are jointly trained
+    and must survive a checkpoint/resume just like `model`'s."""
+    state = {
         "params": {k: v.detach().to(torch.float32).cpu() for k, v in model.state_dict().items()},
         "ema_params": {k: v.to(torch.float32).cpu() for k, v in ema.state_dict().items()},
         "opt_state": optimizer.state_dict(),
         "step": step,
         "rng_state": torch.get_rng_state(),
-    }, path)
+    }
+    if encoder is not None:
+        state["encoder_params"] = {k: v.detach().to(torch.float32).cpu()
+                                   for k, v in encoder.state_dict().items()}
+    if encoder_ema is not None:
+        state["encoder_ema_params"] = {k: v.to(torch.float32).cpu()
+                                       for k, v in encoder_ema.state_dict().items()}
+    _atomic_save(state, path)
 
 
 def load_checkpoint(path: str, model: nn.Module, ema: EMA,
-                    optimizer: torch.optim.Optimizer | None = None) -> int:
+                    optimizer: torch.optim.Optimizer | None = None,
+                    encoder: nn.Module | None = None,
+                    encoder_ema: EMA | None = None) -> int:
     """Returns the resumed step id, or 0 if `path` doesn't exist yet.
 
     Upstream's `load_loop_state` swallows ANY exception and starts fresh
     (spec §B.5) - deliberately NOT reproduced here (a torch port should not
     silently eat a corrupted-checkpoint error); only a missing file is treated
-    as "start fresh".
+    as "start fresh". If `encoder` is given but the checkpoint predates it
+    (no `"encoder_params"` key), that IS treated as an error: silently keeping
+    a randomly-initialised encoder while resuming a trained trunk would train
+    against a moving, uncoordinated ground truth.
     """
     if not os.path.exists(path):
         return 0
@@ -335,6 +391,16 @@ def load_checkpoint(path: str, model: nn.Module, ema: EMA,
     state = torch.load(path, map_location="cpu", weights_only=False)
     model.load_state_dict(state["params"])
     ema.load_state_dict(state["ema_params"])
+    if encoder is not None:
+        if "encoder_params" not in state:
+            raise ValueError(f"{path}: no 'encoder_params' but an encoder was given "
+                             "(checkpoint predates the Encoder wiring)")
+        encoder.load_state_dict(state["encoder_params"])
+    if encoder_ema is not None:
+        if "encoder_ema_params" not in state:
+            raise ValueError(f"{path}: no 'encoder_ema_params' but an encoder_ema was given "
+                             "(checkpoint predates the Encoder wiring)")
+        encoder_ema.load_state_dict(state["encoder_ema_params"])
     if optimizer is not None and "opt_state" in state:
         optimizer.load_state_dict(state["opt_state"])
     if "rng_state" in state:
@@ -354,6 +420,13 @@ class Trainer:
     layer so this module owns the device placement). `accumulate > 1` pulls
     that many draws per optimizer step (spec §B.5's "K independent
     forward/backward calls").
+
+    Owns a real `Encoder` (spec-05) whenever `model.config.augment_size > 0`
+    (every released config) - constructed once here and threaded through
+    `prepare_batch`/`training_step`, with its own parameters in the SAME
+    `optimizer` as `model`'s and its own `EMA`/checkpoint entry (see
+    `training_step`/`save_checkpoint` docstrings for why it is a second `EMA`
+    object rather than folded into `self.ema`).
     """
 
     def __init__(self, model: nn.Module, config: TrainConfig, batches: Iterable[dict], *,
@@ -366,10 +439,20 @@ class Trainer:
         self.tb_writer = tb_writer
         self.generator = generator
 
+        if model.config.augment_size > 0:
+            self.encoder: nn.Module | None = Encoder(model.config).to(device)
+        else:
+            self.encoder = None
+
+        params = list(model.parameters())
+        if self.encoder is not None:
+            params += list(self.encoder.parameters())
         self.optimizer = torch.optim.Adam(
-            model.parameters(), lr=config.lr, betas=(config.b1, config.b2),
+            params, lr=config.lr, betas=(config.b1, config.b2),
             eps=config.adam_eps, weight_decay=0.0)   # NEVER weight decay (spec §B.2)
         self.ema = EMA(model, decay=config.ema_weight)
+        self.encoder_ema = (EMA(self.encoder, decay=config.ema_weight)
+                           if self.encoder is not None else None)
         self.schedule = config.build_schedule()
         self.step = 0
         self._last_save_time = time.time()
@@ -383,14 +466,16 @@ class Trainer:
         return out
 
     def resume(self, path: str) -> None:
-        self.step = load_checkpoint(path, self.model, self.ema, self.optimizer)
+        self.step = load_checkpoint(path, self.model, self.ema, self.optimizer,
+                                    encoder=self.encoder, encoder_ema=self.encoder_ema)
 
     def run_step(self) -> dict[str, float]:
         micro_batches = self._next_micro_batches()
         lr = self.schedule(self.step)
-        terms = training_step(self.model, self.ema, self.optimizer, self.config,
-                              micro_batches, device=self.device,
-                              generator=self.generator, lr=lr)
+        terms = training_step(self.model, self.encoder, self.ema, self.optimizer,
+                              self.config, micro_batches, device=self.device,
+                              generator=self.generator, lr=lr,
+                              encoder_ema=self.encoder_ema)
         terms["lr"] = lr
         self.step += 1
 
@@ -402,17 +487,24 @@ class Trainer:
         if self.step % self.config.checkpoint_interval == 0:
             ckpt_dir = self.config.checkpoint_dir
             save_checkpoint(os.path.join(ckpt_dir, f"checkpoint-{self.step}.pt"),
-                            self.model, self.ema, self.optimizer, self.step)
+                            self.model, self.ema, self.optimizer, self.step,
+                            encoder=self.encoder, encoder_ema=self.encoder_ema)
             # the EMA-only file is what sampling/eval should load (spec §B.4)
-            _atomic_save({"ema_params": {k: v.to(torch.float32).cpu()
-                                        for k, v in self.ema.state_dict().items()},
-                         "step": self.step},
+            ema_only = {"ema_params": {k: v.to(torch.float32).cpu()
+                                       for k, v in self.ema.state_dict().items()},
+                       "step": self.step}
+            if self.encoder_ema is not None:
+                ema_only["encoder_ema_params"] = {
+                    k: v.to(torch.float32).cpu()
+                    for k, v in self.encoder_ema.state_dict().items()}
+            _atomic_save(ema_only,
                         os.path.join(ckpt_dir, f"checkpoint-ema-{self.step}.pt"))
 
         now = time.time()
         if now - self._last_save_time >= self.config.save_interval_seconds:
             save_checkpoint(os.path.join(self.config.checkpoint_dir, "save.pt"),
-                            self.model, self.ema, self.optimizer, self.step)
+                            self.model, self.ema, self.optimizer, self.step,
+                            encoder=self.encoder, encoder_ema=self.encoder_ema)
             self._last_save_time = now
 
         return terms

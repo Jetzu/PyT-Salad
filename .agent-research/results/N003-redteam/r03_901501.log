@@ -1,0 +1,99 @@
+### Starting TaskPrologue of job 901501 on h11-02 at Fri Sep 25 08:57:20 PM CEST 2026
+Running on cores 32-63 with governor performance
+Fri Sep 25 20:57:20 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             66W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0925 20:58:59.824000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] torch._dynamo hit config.cache_size_limit (8)
+W0925 20:58:59.824000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    function: '_slice' (/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:29)
+W0925 20:58:59.824000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    last reason: 5/0: L['i'] == 0                                                 
+W0925 20:58:59.824000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0925 20:58:59.824000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
+skipping cudagraphs due to skipping cudagraphs due to cpu device (arg5_1). Found from : 
+   File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/decoders.py", line 338, in forward
+    angle_pos, _ = single_protein_sidechains(aatype, frames, angles)
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/sidechain.py", line 444, in single_protein_sidechains
+    all_frames = torsion_angles_to_frames(aatype, frames, angles)
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/sidechain.py", line 374, in torsion_angles_to_frames
+    default_frame, _, _, _ = _tables(aatype.device)
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/sidechain.py", line 351, in _tables
+    cached = (restype_rigid_group_default_frame.to(device),
+
+
+=== A. compiled vs eager forward_core, same pinned uniform, matmul=highest ===
+[FAIL] A1 pos                               max|dpos| = 5.913e-04 A
+[ok  ] A2 aatype                            0/64 differ
+[FAIL] A3 atom_pos                          max|d| = 5.733e-04 A
+
+=== B. conditioning CHANGED between calls on one FastDenoiser ===
+[FAIL] B1 dssp_condition added              |got-correct| =    5.524 A   |got-stale| = 4.32e-04 A   (correct vs stale differ 5.524 A)
+[FAIL] B2 chain_index changed               |got-correct| =    2.529 A   |got-stale| = 6.95e+00 A   (correct vs stale differ 7.163 A)
+[FAIL] B3 dmap/template added               |got-correct| =   15.343 A   |got-stale| = 5.29e-04 A   (correct vs stale differ 15.343 A)
+[FAIL] B4 dssp_mean added                   |got-correct| =    4.934 A   |got-stale| = 6.35e-04 A   (correct vs stale differ 4.934 A)
+[ok  ] B5 two designs, different dssp       design A vs B outputs differ by 1.660e-04 A (correct answer: 11.407 A)
+
+=== C. static input buffers alias/mutate the CALLER's tensors ===
+[ok  ] C1 caller data untouched (same L)    max|d| = 0.000e+00
+[FAIL] C2 caller cyclic_mask untouched      dC['cyclic_mask'].sum() = 64 of 64 (expected 0)
+
+=== D. holding a returned tensor across the next call ===
+[ok  ] D1 held output not overwritten       max|d| = 0.000e+00 A
+
+=== E. predict_aa=False: is atom_pos built from the returned aatype? ===
+[ok  ] E1 aatype == aa_gt                   
+[FAIL] E2 atom_pos rebuilt from aa_gt       |fast - angle_head(aa_gt)| = 7.727 A   |fast - angle_head(predicted)| = 8.05e-05 A
+
+=== F. aa_condition (--template_aa) ===
+[FAIL] F1 aatype forced to aa_condition     12/64 residues ignore aa_condition
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1] failed while attempting to run meta for aten.sub.Tensor
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1] Traceback (most recent call last):
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_subclasses/fake_tensor.py", line 2013, in _dispatch_impl
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]     r = func(*args, **kwargs)
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]         ^^^^^^^^^^^^^^^^^^^^^
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_ops.py", line 716, in __call__
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]     return self._op(*args, **kwargs)
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]            ^^^^^^^^^^^^^^^^^^^^^^^^^
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 273, in _fn
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]     result = fn(*args, **kwargs)
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]              ^^^^^^^^^^^^^^^^^^^
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_prims_common/wrappers.py", line 141, in _fn
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]     result = fn(**bound.arguments)
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]              ^^^^^^^^^^^^^^^^^^^^^
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_refs/__init__.py", line 1717, in sub
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]     a, b = _maybe_broadcast(a, b)
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]            ^^^^^^^^^^^^^^^^^^^^^^
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_refs/__init__.py", line 422, in _maybe_broadcast
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]     common_shape = _broadcast_shapes(
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]                    ^^^^^^^^^^^^^^^^^^
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_refs/__init__.py", line 411, in _broadcast_shapes
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1]     raise RuntimeError(
+E0925 21:09:49.164000 2475961 site-packages/torch/_subclasses/fake_tensor.py:2017] [6/1] RuntimeError: Attempting to broadcast a dimension of length 64 at -1! Mismatching argument at index 1 had torch.Size([64, 64]); but expected shape should be broadcastable to [77, 77]
+
+=== G. length differing from construction ===
+[ok  ] G1 mismatched L (crash)              TorchRuntimeError: Failed running call_function <built-in function sub>(*(FakeTensor(..., device='cuda:0', size=(77, 77
+W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] torch._dynamo hit config.cache_size_limit (8)
+W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [9/8]    function: 'neighbour_fn' (/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:191)
+W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [9/8]    last reason: 9/0: tensor 'L['cur_pos']' size mismatch at index 0. expected 64, actual 77
+W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
+[FAIL] G2 mismatched L + sized uniform      NO ERROR; pos shape (77, 20, 3) (expected (77, 20, 3))

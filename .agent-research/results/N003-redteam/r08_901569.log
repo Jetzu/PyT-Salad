@@ -1,0 +1,44 @@
+### Starting TaskPrologue of job 901569 on h11-01 at Fri Sep 25 09:08:00 PM CEST 2026
+Running on cores 32-63 with governor performance
+Fri Sep 25 21:08:00 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   36C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0925 21:09:30.356000 2875057 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] torch._dynamo hit config.cache_size_limit (8)
+W0925 21:09:30.356000 2875057 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    function: '_slice' (/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:29)
+W0925 21:09:30.356000 2875057 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    last reason: 5/0: L['i'] == 0                                                 
+W0925 21:09:30.356000 2875057 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0925 21:09:30.356000 2875057 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
+skipping cudagraphs due to skipping cudagraphs due to cpu device (arg5_1). Found from : 
+   File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/decoders.py", line 338, in forward
+    angle_pos, _ = single_protein_sidechains(aatype, frames, angles)
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/sidechain.py", line 444, in single_protein_sidechains
+    all_frames = torsion_angles_to_frames(aatype, frames, angles)
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/sidechain.py", line 374, in torsion_angles_to_frames
+    default_frame, _, _, _ = _tables(aatype.device)
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/sidechain.py", line 351, in _tables
+    cached = (restype_rigid_group_default_frame.to(device),
+
+
+=== C. static input buffers alias/mutate the CALLER's tensors ===
+[ok  ] C1 caller data untouched (same L)    max|d| = 0.000e+00

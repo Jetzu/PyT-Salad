@@ -299,7 +299,11 @@ class Encoder(nn.Module):
         augment = vector_mean_norm(augment)
 
         local_positions = torch.cat([local_positions[:, :5], augment], dim=-2)  # (L, 20, 3)
-        positions = frames[:, None].apply_to_point(local_positions)              # (L, 20, 3) GLOBAL
+        # JAX `frames[:, None].apply_to_point(...)`: insert one axis between the
+        # batch dim and the trailing atom/xyz dims so a per-residue rigid frame
+        # broadcasts over its 20 local points - `Rigid` has no `__getitem__`
+        # (rigid.py's `unsqueeze_batch` is the documented replacement).
+        positions = frames.unsqueeze_batch(1).apply_to_point(local_positions)     # (L, 20, 3) GLOBAL
 
         # The Encoder's ONLY neighbour-selection stage: a single spatial-only
         # k=48 stage (unlike the diffusion trunk's 3-stage index+spatial+
@@ -369,6 +373,6 @@ class Encoder(nn.Module):
         augment = vector_mean_norm(augment)              # re-normalize the REFINED cloud
 
         local_positions = torch.cat([local_positions[:, :5], augment], dim=-2)  # (L, 20, 3)
-        pos = frames[:, None].apply_to_point(local_positions)                    # (L, 20, 3) GLOBAL
+        pos = frames.unsqueeze_batch(1).apply_to_point(local_positions)          # (L, 20, 3) GLOBAL
 
         return local, pos

@@ -68,6 +68,7 @@ class FastDenoiser(nn.Module):
                                        mode=mode, dynamic=False)
         self._graph: torch.cuda.CUDAGraph | None = None
         self._static_in: dict[str, Tensor] = {}
+        self._cond_cache = None
         self._static_out: tuple[Tensor, ...] | None = None
 
     # ------------------------------------------------------------------
@@ -126,10 +127,26 @@ class FastDenoiser(nn.Module):
             # raises "accessing tensor output of CUDAGraphs that has been
             # overwritten by a subsequent run"
             torch.compiler.cudagraph_mark_step_begin()
-        args = [inputs.get(k) for k in _CORE_ARGS]
+        if self._static_in:
+            # write into persistent buffers so the input ADDRESSES are stable.
+            # Fresh tensors each call show up as
+            # `cudagraph_recorded_non_static_inputs` and force a copy per input.
+            for k in _CORE_ARGS:
+                src, dst = inputs.get(k), self._static_in.get(k)
+                if src is not None and dst is not None and dst.shape == src.shape:
+                    dst.copy_(src)
+                elif src is not None:
+                    self._static_in[k] = src
+            args = [self._static_in.get(k) for k in _CORE_ARGS]
+        else:
+            args = [inputs.get(k) for k in _CORE_ARGS]
         out = self._compiled(*args)
         # clone for the same reason: these buffers are reused next call
         return tuple(o.clone() if torch.is_tensor(o) else o for o in out)
+
+    def invalidate_condition_cache(self) -> None:
+        """Drop the cached conditioning; call if `data`'s condition keys change."""
+        self._cond_cache = None
 
     def forward(self, data: dict, prev: dict, *, predict_aa: bool = True,
                 uniform: Tensor | None = None,
@@ -140,7 +157,15 @@ class FastDenoiser(nn.Module):
             uniform = torch.rand(self.n_draws, self.length, self.length,
                                  device=self.device, dtype=self.dtype,
                                  generator=generator).clamp_(1e-6, 1 - 1e-6)
-        cond = self.model.prepare_condition(data)
+        # prepare_condition is LOOP-INVARIANT: it depends only on the
+        # conditioning inputs and the chain/batch layout, none of which change
+        # across the 500 denoising steps of one design. Running it every step
+        # cost more than the whole compiled model. Cached per design; call
+        # invalidate_condition_cache() if the conditioning changes.
+        cond = getattr(self, "_cond_cache", None)
+        if cond is None:
+            cond = self.model.prepare_condition(data)
+            self._cond_cache = cond
         pc = cond["pair_condition"]
         inputs = dict(
             pos_noised=data["pos_noised"], prev_pos=prev["pos"],

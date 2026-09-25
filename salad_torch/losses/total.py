@@ -137,7 +137,9 @@ def total_loss(config, data: dict, result: dict, *,
 
     # -- all-atom UNSQUARED local FAPE (§7.8), late_mask-gated ---------------
     frames_pred_20, _ = extract_aa_frames(result["trajectory"])
-    frames_pred_final = frames_pred_20[-1]                    # == frames of result["pos"]
+    # `Rigid` has no `__getitem__` (rigid.py docstring) - `select_batch` is the
+    # documented replacement for JAX's `frames_pred_20[-1]`.
+    frames_pred_final = frames_pred_20.select_batch(0, -1)    # == frames of result["pos"]
     terms["local"] = STRUCT.local_loss(
         distance, pair_mask, gt_frames_14, data["atom_pos"], data["atom_mask"],
         frames_pred_final, result["atom_pos"], weight, late, count=c.local_neighbours)
