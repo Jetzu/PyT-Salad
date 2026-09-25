@@ -217,11 +217,39 @@ class AADecoder(nn.Module):
                          batch, mask)
         return logits.argmax(dim=-1)
 
-    def sample(self, *args, **kwargs):
-        raise NotImplementedError(
-            "AADecoder.sample is an L-step autoregressive loop (one residue "
-            "revealed per step, re-running the whole stack each time). It is "
-            "unreachable for default_vp, where config.sample_aa is unset.")
+    def sample(self, aa: Tensor, local: Tensor, pos: Tensor, resi: Tensor,
+              chain: Tensor, batch: Tensor, mask: Tensor, temperature: float,
+              generator: torch.Generator | None = None) -> Tensor:
+        """``config.sample_aa``'s categorical, random-order autoregressive decode.
+
+        Unreachable for `default_vp` (`config.sample_aa` is unset there); this
+        is what `--sample_final` (`notes/specs/06_generation_flags.md` §5.3)
+        needs. Exactly `aa.shape[0]` iterations, one residue revealed per
+        iteration, **re-running the whole decoder stack from scratch every
+        time** - not an oversight to optimise away, upstream genuinely does
+        this (there is no cheaper faithful alternative).
+
+        Every iteration draws a full `(L, 20)` categorical sample even though
+        only the newly-revealed residue's draw is kept - ported literally
+        (not "optimised" to draw a single sample) so a fixed generator
+        consumes the same amount of randomness upstream's JAX version does in
+        spirit, even though the two PRNGs can never agree bit-for-bit.
+        """
+        L = aa.shape[0]
+        aa = torch.full_like(aa, 20)
+        temp = float(temperature) if temperature else 0.1
+        for _ in range(L):
+            logits, _ = self(aa, local, pos, resi, chain, batch, mask)
+            logits = logits / temp
+            u = torch.rand(L, generator=generator, device=aa.device,
+                           dtype=local.dtype)
+            u = torch.where(aa == 20, u, torch.full_like(u, float("inf")))
+            index = int(torch.argmin(u))
+            sampled = torch.multinomial(torch.softmax(logits, dim=-1), 1,
+                                        generator=generator).squeeze(-1)
+            aa = aa.clone()
+            aa[index] = sampled[index]
+        return aa
 
 
 # --------------------------------------------------------------------------

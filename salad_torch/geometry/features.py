@@ -177,7 +177,7 @@ def direction_features(pos: Tensor, neighbours: Tensor) -> Tensor:
     frames, _ = extract_aa_frames(pos)
     # neighbour atom positions expressed in frame i
     neighbour_pos = pos[neighbours]                       # (N, K, A, 3)
-    local = frames[:, None, None].apply_inverse_to_point(neighbour_pos)
+    local = frames.unsqueeze_batch(2).apply_inverse_to_point(neighbour_pos)
     local = vec_normalized(local)
     n, k, a, _ = local.shape
     return local.reshape(n, k, a * 3)
@@ -207,7 +207,7 @@ def pair_vector_features(pos: Tensor, neighbours: Tensor, scale: float = 0.1) ->
     self_pos = pos[:, None].expand(n, k, a, 3)            # (N, K, A, 3)
     neigh_pos = pos[neighbours]                           # (N, K, A, 3)
     both = torch.cat([self_pos, neigh_pos], dim=-2)       # (N, K, 2A, 3)
-    local = frames[:, None, None].apply_inverse_to_point(both)
+    local = frames.unsqueeze_batch(2).apply_inverse_to_point(both)
     directions = vec_normalized(local).reshape(n, k, 2 * a * 3)
     coords = (scale * local).reshape(n, k, 2 * a * 3)
     return torch.cat([directions, coords], dim=-1)

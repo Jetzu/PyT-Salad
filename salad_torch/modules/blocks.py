@@ -231,7 +231,7 @@ class UpdatePositions(nn.Module):
             pos_update = float(scale) * pos_update
         pos_update = pos_update.reshape(*pos_update.shape[:-1], self.atom_count, 3)
         local_pos = local_pos + pos_update
-        return frames[..., None].apply_to_point(local_pos)
+        return frames.unsqueeze_batch(1).apply_to_point(local_pos)
 
 
 class DiffusionBlock(nn.Module):
@@ -305,8 +305,8 @@ class DiffusionStack(nn.Module):
                 resi, chain, batch, mask, neighbour_fn,
                 cyclic_mask=None, init_pos=None):
         trajectory = []
-        for block in self.blocks:
-            current_neighbours, cond_neighbours = neighbour_fn(pos, prev_pos)
+        for block_idx, block in enumerate(self.blocks):
+            current_neighbours, cond_neighbours = neighbour_fn(pos, prev_pos, block_idx)
             local, pos = block(local, pos, prev_pos, condition, pair_condition,
                                time, resi, chain, batch, mask,
                                current_neighbours, cond_neighbours,

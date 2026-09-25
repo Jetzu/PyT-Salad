@@ -18,6 +18,10 @@ Convention notes carried over from the reference:
 from __future__ import annotations
 
 import torch
+
+from typing import NamedTuple
+
+import torch
 from torch import Tensor
 
 __all__ = [
@@ -86,6 +90,13 @@ class Rigid:
     """A rigid transform: rotation ``(..., 3, 3)`` + translation ``(..., 3)``.
 
     Deliberately not an nn.Module - these are values, never parameters.
+
+    A NamedTuple was tried here, to stop Dynamo breaking the graph on operator
+    overloads (``builtin: matmul [UserDefinedObjectVariable, ...]``). It made
+    things worse: as a tuple subclass it becomes a pytree node, and inductor
+    then unflattens it with ``_make`` against the wrong arity
+    ("Expected 2 arguments, got 50") inside the compiled region. Reverted.
+    Reducing the graph-break count is still worth doing, but not this way.
     """
 
     __slots__ = ("rotation", "translation")
@@ -119,17 +130,28 @@ class Rigid:
     def __len__(self) -> int:
         return self.shape[0]
 
-    def __getitem__(self, key) -> "Rigid":
-        """Index the batch dims only, inserting axes *before* the trailing dims.
+    # NOTE: `__getitem__` is deliberately NOT overridden. On a NamedTuple it is
+    # tuple indexing, and Dynamo asserts on any non-int key, so an override
+    # would trade one graph break for a hard compile failure. The two things
+    # that indexing was used for get explicit methods instead.
 
-        This is what makes ``frames[:, None, None]`` behave the way the JAX
-        struct-of-arrays version does.
+    def unsqueeze_batch(self, k: int = 1) -> "Rigid":
+        """Insert `k` axes *after* the batch dims and *before* the trailing ones.
+
+        Replaces the JAX broadcast idiom ``frames[:, None, None]``: rotation
+        carries two trailing dims and translation one, so a naive index would
+        hit those instead of the batch axis.
         """
-        if not isinstance(key, tuple):
-            key = (key,)
-        # translation has one trailing dim, rotation has two
-        return Rigid(self.rotation[key + (slice(None), slice(None))],
-                     self.translation[key + (slice(None),)])
+        rot, trans = self.rotation, self.translation
+        for _ in range(k):
+            rot = rot.unsqueeze(-3)
+            trans = trans.unsqueeze(-2)
+        return Rigid(rot, trans)
+
+    def select_batch(self, dim: int, index: int) -> "Rigid":
+        """Pick one entry along a batch dimension (e.g. a torsion group)."""
+        return Rigid(self.rotation.select(dim, index),
+                     self.translation.select(dim, index))
 
     # -- the actual transforms -----------------------------------------
     def apply_to_point(self, point: Tensor) -> Tensor:

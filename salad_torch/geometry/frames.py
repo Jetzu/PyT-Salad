@@ -31,7 +31,7 @@ def extract_aa_frames(pos: Tensor) -> tuple[Rigid, Tensor]:
         is ``(..., A, 3)``.
     """
     frames = make_transform_from_reference(pos[..., 0, :], pos[..., 1, :], pos[..., 2, :])
-    local = frames[..., None].apply_inverse_to_point(pos)
+    local = frames.unsqueeze_batch(1).apply_inverse_to_point(pos)
     return frames, local
 
 

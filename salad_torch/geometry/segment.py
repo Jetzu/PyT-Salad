@@ -23,7 +23,8 @@ def _segments(index: Tensor) -> int:
     return int(index.max().item()) + 1 if index.numel() else 0
 
 
-def _normalise_index(index: Tensor, size: int) -> tuple[Tensor, Tensor | None]:
+def _normalise_index(index: Tensor, size: int,
+                     validate: bool = True) -> tuple[Tensor, Tensor | None]:
     """Coerce an index tensor to the shape torch's scatter ops demand.
 
     Two divergences from JAX have to be absorbed here:
@@ -38,12 +39,13 @@ def _normalise_index(index: Tensor, size: int) -> tuple[Tensor, Tensor | None]:
     range, so the common path stays allocation-free).
     """
     index = index.long()
-    if index.numel() == 0:
+    if not validate or index.numel() == 0:
         return index, None
-    hi = int(index.max().item())
-    lo = int(index.min().item())
-    if 0 <= lo and hi < size:
-        return index, None
+    # Deliberately branch-free: an `if int(index.max().item()) < size` fast path
+    # is a device->host sync AND a torch.compile graph break, and these ops run
+    # 12+ times per forward inside Update. Two cheap elementwise ops beat that
+    # comfortably. `validate_index=False` skips even those when a caller knows
+    # its indices are dense (the model's own batch/chain indices always are).
     valid = (index >= 0) & (index < size)
     return index.clamp(0, max(size - 1, 0)), valid
 

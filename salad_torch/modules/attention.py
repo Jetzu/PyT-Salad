@@ -38,7 +38,7 @@ class LinearToPoints(nn.Module):
         dtype = data.dtype if data.dtype in (torch.float32, torch.float64) else torch.float32
         raw = self.linear(data).to(dtype)
         points = raw.reshape(*raw.shape[:-1], self.size, 3)
-        out = frames[..., None].apply_to_point(points)
+        out = frames.unsqueeze_batch(1).apply_to_point(points)
         return out.to(data.dtype)
 
 
@@ -119,7 +119,7 @@ class SparseInvariantPointAttention(nn.Module):
         out_pair = torch.einsum("ijh,ijc->ihc", attn, pair)
         out_scalar = torch.einsum("ijh,ijhc->ihc", attn, v[neighbours])
         out_point = torch.einsum("ijh,ijhpc->ihpc", attn, v_g[neighbours])
-        out_point = frames[:, None, None].apply_inverse_to_point(
+        out_point = frames.unsqueeze_batch(2).apply_inverse_to_point(
             out_point.to(frames.translation.dtype))
         out_norm = vec_norm(out_point)
 

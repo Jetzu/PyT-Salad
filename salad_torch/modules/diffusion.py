@@ -26,28 +26,18 @@ from .decoders import AADecoder, AngleHead, DistogramDecoder
 
 __all__ = ["Diffusion", "uniform_draw_count"]
 
-class _UniformPool:
-    """Hands out one pre-drawn ``(N, N)`` uniform field per random draw.
+def _slice(stack, i: int):
+    """Pick draw `i` from a pre-drawn ``(draws, N, N)`` stack.
 
     CUDA graphs cannot capture an RNG op ("Offset increment outside graph
-    capture"), so every Gumbel-top-k draw has to be hoisted out of the graph.
-    The draws happen in a fixed order, so slicing a stacked tensor reproduces
-    them exactly while keeping the graph RNG-free. Pass `None` to fall back to
-    drawing inline (eager only).
+    capture"), so every Gumbel-top-k draw is hoisted out and handed in here.
+
+    NB this is indexed by an explicit integer rather than a stateful counter.
+    A mutable counter object is a Dynamo *guard*, so `neighbour_fn` recompiles
+    once per counter value and promptly blows the recompile cache limit; an
+    integer known at trace time is free.
     """
-
-    __slots__ = ("stack", "i")
-
-    def __init__(self, stack):
-        self.stack = stack
-        self.i = 0
-
-    def next(self):
-        if self.stack is None:
-            return None
-        u = self.stack[self.i]
-        self.i += 1
-        return u
+    return None if stack is None else stack[i]
 
 
 def uniform_draw_count(config) -> int:
@@ -169,7 +159,7 @@ class Diffusion(nn.Module):
                           "dmap_mask": dmap_mask, "flags": flags}
         n = pos_noised.shape[0]
         # `uniform` is a (draws, N, N) stack, pre-drawn outside any CUDA graph
-        pool = _UniformPool(uniform)
+
 
         _, local_pos = extract_aa_frames(pos_noised)
         parts = [local_pos.reshape(n, -1),
@@ -185,7 +175,7 @@ class Diffusion(nn.Module):
         condition = self.prepare_layer_norm_cond(condition)
 
         distogram_neighbours = get_random_neighbours(c.fape_neighbours)(
-            pos_gt[:, 4], batch, mask, uniform=pool.next())
+            pos_gt[:, 4], batch, mask, uniform=_slice(uniform, 0))
 
         pos = pos_noised
         pos_factors = preconditioning_scale_factors(c, t_pos, c.sigma_data)
@@ -196,15 +186,19 @@ class Diffusion(nn.Module):
             init_pos = c.sigma_data * pos_factors["in"][:, None, None] * pos
             pos = pos * pos_factors["skip"][:, None, None]
 
-        def neighbour_fn(cur_pos, cond_pos):
+        per_block = 1 if c.multi_motif else 3
+
+        def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
+            base = 1 + block_idx * per_block
             current = extract_neighbours(16, 16, 32)(
-                cur_pos, resi, chain, batch, mask, uniform=pool.next())
+                cur_pos, resi, chain, batch, mask, uniform=_slice(uniform, base))
             if c.multi_motif:
                 cond = extract_motif_neighbours(32)(pair_condition)
             else:
                 cond = extract_condition_neighbours(
                     16, 16, 16, 16)(cond_pos, pair_condition, resi, chain, batch,
-                                    mask, uniform=pool.next(), uniform2=pool.next())
+                                    mask, uniform=_slice(uniform, base + 1),
+                                    uniform2=_slice(uniform, base + 2))
             return current, cond
 
         local, pos, trajectory = self.diffusion_stack(
@@ -252,7 +246,9 @@ class Diffusion(nn.Module):
             init_pos = c.sigma_data * pos_factors["in"][:, None, None] * pos
             pos = pos * pos_factors["skip"][:, None, None]
 
-        def neighbour_fn(cur_pos, cond_pos):
+        def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
+            # the eager path takes a single (N, N) field (or None); the fast
+            # path's per-draw stack is handled in forward_core
             current = extract_neighbours(16, 16, 32)(
                 cur_pos, resi, chain, batch, mask, uniform=uniform)
             if c.multi_motif:

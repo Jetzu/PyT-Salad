@@ -390,16 +390,16 @@ def torsion_angles_to_frames(aatype: Tensor, backb_to_global: Rigid,
     all_frames = Rigid(default.rotation @ rot_x, default.translation)
 
     # chi2..chi4 are defined relative to the *previous* chi, so chain them
-    chi1 = all_frames[:, 4]
-    chi2 = chi1 @ all_frames[:, 5]
-    chi3 = chi2 @ all_frames[:, 6]
-    chi4 = chi3 @ all_frames[:, 7]
+    chi1 = all_frames.select_batch(1, 4)
+    chi2 = chi1 @ all_frames.select_batch(1, 5)
+    chi3 = chi2 @ all_frames.select_batch(1, 6)
+    chi4 = chi3 @ all_frames.select_batch(1, 7)
     to_backb = Rigid(
         torch.cat([all_frames.rotation[:, :5], chi2.rotation[:, None],
                    chi3.rotation[:, None], chi4.rotation[:, None]], dim=1),
         torch.cat([all_frames.translation[:, :5], chi2.translation[:, None],
                    chi3.translation[:, None], chi4.translation[:, None]], dim=1))
-    return backb_to_global[:, None] @ to_backb
+    return backb_to_global.unsqueeze_batch(1) @ to_backb
 
 
 def frames_and_literature_positions_to_atom14_pos(aatype: Tensor,
