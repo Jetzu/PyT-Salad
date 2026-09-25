@@ -1,0 +1,16 @@
+config: multimotif_vp
+[FAIL] pos         rel=2.986e-04  abs=3.31e-02
+[FAIL] local       rel=1.035e-03  abs=1.78e+00
+[FAIL] trajectory  rel=2.883e-04  abs=3.31e-02
+[FAIL] aa          rel=1.136e-03  abs=9.61e-03
+[FAIL] atom_pos    rel=3.879e-04  abs=4.30e-02
+[FAIL] angles      rel=2.864e-02  abs=2.86e-02  (tol 1e-03)
+[FAIL] raw_angles  rel=6.516e-03  abs=7.36e+00
+[FAIL] dssp        rel=1.902e-03  abs=1.90e-02
+[FAIL] distogram   rel=1.967e-03  abs=3.82e-01
+[FAIL] prev_pos    rel=2.986e-04  abs=3.31e-02
+[FAIL] prev_local  rel=1.035e-03  abs=1.78e+00
+[PASS] aatype      0/80 differ
+
+coordinate deviation: mean 0.00438 A, max 0.03694 A
+FAILED

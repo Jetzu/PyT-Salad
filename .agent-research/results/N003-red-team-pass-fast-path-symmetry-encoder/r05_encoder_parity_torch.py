@@ -15,7 +15,7 @@ cfg = get_config("default_vp")
 enc = Encoder(cfg).eval()
 load_encoder(enc, load_param_npz("/hnvme/workspace/v181bb10-salad/default_vp-200k.npz"), cfg, strict=True)
 
-D = np.load("/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N003-redteam/r05_encoder_ref.npz")
+D = np.load("/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N003-red-team-pass-fast-path-symmetry-encoder/r05_encoder_ref.npz")
 tags = sorted({k.split("|")[0] for k in D.files})
 ok_all = True
 for tag in tags:

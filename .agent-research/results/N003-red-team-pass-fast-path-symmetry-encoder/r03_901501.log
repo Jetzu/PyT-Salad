@@ -97,3 +97,38 @@ W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] 
 W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
 W0925 21:11:27.018000 2475961 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
 [FAIL] G2 mismatched L + sized uniform      NO ERROR; pos shape (77, 20, 3) (expected (77, 20, 3))
+
+=== H. interleaving two FastDenoiser instances ===
+[FAIL] H1 f1 reproducible                   max|d| = 5.293e-05
+[FAIL] H2 f2 reproducible                   max|d| = 2.525e-04
+[ok  ] H3 f1 == eager                       max|d| = 9.163e-05
+
+=== I. compute_distogram=True is silently dropped ===
+[FAIL] I1 distogram present                 keys: False
+
+=== J. did CUDA graphs actually engage? ===
+     cudagraph container: <torch._inductor.cudagraph_trees.TreeManagerContainer object at 0x14d9f7de8810>  tree roots: 2
+
+done
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 21:16:17 CEST 2026
+= Job-ID             : 901501 on helma
+= Job-Name           : rt_fast
+= Job-Command        : .agent-research/results/N003-redteam/r03.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:18:58
+= Total RAM usage    : 4.0 GiB of assigned 175 GiB (2.3%)
+= Node list          : h11-02
+= Subm/Elig/Start/End: 2026-09-25T20:56:52 / 2026-09-25T20:56:52 / 2026-09-25T20:57:19 / 2026-09-25T21:16:17
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.6G   104.9G   209.7G        N/A     452K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  6d11h33m34s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 2475961, 3 %, 3 %, 1834 MiB, 1133471 ms

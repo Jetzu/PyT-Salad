@@ -1,0 +1,26 @@
+### Starting TaskPrologue of job 901824 on h14-02 at Fri Sep 25 09:25:21 PM CEST 2026
+Running on cores 64-95 with governor performance
+Fri Sep 25 21:25:21 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             73W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif .agent-research/results/N004-porting-gaps/gen_gradstep_ref.py params/default_vp-200k.jax .agent-research/results/N004-porting-gaps/gradstep_default_vp.npz

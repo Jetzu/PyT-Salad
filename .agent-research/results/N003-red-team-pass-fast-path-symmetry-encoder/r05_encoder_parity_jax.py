@@ -42,5 +42,5 @@ for tag, n, ch in (("L64c1", 64, 1), ("L96c3", 96, 3), ("L16c1", 16, 1)):
     out[f"{tag}|out_pos"] = np.asarray(pos)
     print(tag, "local", np.asarray(local).shape, "pos", np.asarray(pos).shape,
           "|pos|max", float(np.abs(np.asarray(pos)).max()))
-np.savez("/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N003-redteam/r05_encoder_ref.npz", **out)
+np.savez("/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N003-red-team-pass-fast-path-symmetry-encoder/r05_encoder_ref.npz", **out)
 print("wrote r05_encoder_ref.npz")
