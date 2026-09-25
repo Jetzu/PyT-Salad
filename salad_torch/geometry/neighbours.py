@@ -116,7 +116,8 @@ def get_random_neighbours(count: int):
 
     def inner(points_or_distance: Tensor, batch: Tensor, mask: Tensor,
               neighbours: Tensor | None = None,
-              generator: torch.Generator | None = None) -> Tensor:
+              generator: torch.Generator | None = None,
+              uniform: Tensor | None = None) -> Tensor:
         x = points_or_distance
         if x.dim() == 2 and x.shape[0] == x.shape[1]:
             distance = x
@@ -124,7 +125,12 @@ def get_random_neighbours(count: int):
             distance = pair_distance(x)
         same_item = batch[:, None] == batch[None, :]
         weight = -3.0 * torch.log(distance + 1e-6)
-        uniform = torch.empty_like(weight).uniform_(1e-6, 1.0 - 1e-6, generator=generator)
+        if uniform is None:
+            uniform = torch.empty_like(weight).uniform_(
+                1e-6, 1.0 - 1e-6, generator=generator)
+        else:
+            # injected field, used to make the draw reproducible against JAX
+            uniform = uniform.to(device=weight.device, dtype=weight.dtype)
         gumbel = torch.log(-torch.log(uniform))
         weight = weight - gumbel
         distance = -weight
@@ -143,12 +149,13 @@ def extract_neighbours(num_index: int = 16, num_spatial: int = 16, num_random: i
     """
 
     def inner(pos: Tensor, resi: Tensor, chain: Tensor, batch: Tensor, mask: Tensor,
-              generator: torch.Generator | None = None) -> Tensor:
+              generator: torch.Generator | None = None,
+              uniform: Tensor | None = None) -> Tensor:
         neighbours = get_index_neighbours(num_index)(resi, chain, batch, mask)
         ca = pos[:, 1]
         neighbours = get_spatial_neighbours(num_spatial)(ca, batch, mask, neighbours)
         neighbours = get_random_neighbours(num_random)(
-            ca, batch, mask, neighbours, generator=generator)
+            ca, batch, mask, neighbours, generator=generator, uniform=uniform)
         return neighbours
 
     return inner

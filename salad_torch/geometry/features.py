@@ -99,13 +99,26 @@ def fourier_time_embedding(t: Tensor, size: int = 128, base: float = 10_000.0,
 # relative sequence position
 # --------------------------------------------------------------------------
 def sequence_relative_position(count: int = 32, one_hot: bool = True,
-                               cyclic: bool = False, identify_ends: bool = False):
+                               cyclic: bool = False, identify_ends: bool = False,
+                               pseudo_chains: bool = False):
     """Relative residue-index encoding.
 
     Bins: ``clip(resi_i - resi_j, -count, count) + count`` in ``[0, 2*count]``,
     with cross-chain / cross-batch pairs placed in the extra bin ``2*count+1``.
     ``count_total = 2*count + 2`` (= 66 for count=32).
+
+    Note the default of `one_hot` is flipped relative to upstream (which
+    defaults to False); every salad call site passes it explicitly.
+
+    `identify_ends` and `pseudo_chains` remap the bins entirely and are unused
+    by the noise_schedule_benchmark family, so they are refused rather than
+    silently ignored.
     """
+    if identify_ends or pseudo_chains:
+        raise NotImplementedError(
+            "identify_ends / pseudo_chains change count_total and the bin "
+            "layout; they are unused by the salad diffusion models and are not "
+            "ported. Implement them before enabling.")
     count_total = 2 * count + 2
 
     def inner(resi: Tensor, chain: Tensor, batch: Tensor,

@@ -88,6 +88,15 @@ def index_max(data: Tensor, index: Tensor, mask: Tensor, apply_mask: bool = True
 
 
 def index_var(data: Tensor, index: Tensor, mask: Tensor, apply_mask: bool = True) -> Tensor:
+    """Per-segment variance, broadcast back.
+
+    DELIBERATE DIVERGENCE from upstream: this computes ``E[(x-mu)^2]`` whereas
+    upstream computes ``E[x^2] - E[x]^2``. The two are algebraically equal but
+    the upstream form catastrophically cancels for large-mean data - on
+    ``x ~ N(1000, 1e-3)`` it returns *negative* variances, and `index_std` then
+    yields NaN. Nothing in the diffusion models uses these (only the
+    autoencoder/hybrid variants do), so the stable form is used here.
+    """
     mean = index_mean(data, index, mask, apply_mask=False)
     var = index_mean((data - mean) ** 2, index, mask, apply_mask=False)
     if apply_mask:
