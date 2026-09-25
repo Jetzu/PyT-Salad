@@ -1,0 +1,58 @@
+torch total loss = 85.5467834473   JAX total loss = 85.5498962402   rel = 3.639e-05
+  per-term:
+    aa                     torch= 0.000000  JAX= 0.000000  rel=0.000e+00
+    dssp                   torch= 3.891442  JAX= 3.891315  rel=3.260e-05
+    pos                    torch= 7.476458  JAX= 7.477644  rel=1.586e-04
+    pos_trajectory         torch= 7.080326  JAX= 7.081740  rel=1.998e-04
+    x                      torch= 0.000000  JAX= 0.000000  rel=0.000e+00
+    rotation               torch= 5.009518  JAX= 5.009311  rel=4.131e-05
+    rotation_trajectory    torch= 5.122480  JAX= 5.122458  rel=4.282e-06
+    fape                   torch= 29.500862  JAX= 29.500805  rel=1.940e-06
+    fape_trajectory        torch= 29.401682  JAX= 29.401470  rel=7.201e-06
+    local                  torch= 0.000000  JAX= 0.000000  rel=0.000e+00
+    distogram              torch= 2.788760  JAX= 2.789331  rel=2.047e-04
+    violation              torch= 0.000000  JAX= 0.000000  rel=0.000e+00
+torch global grad norm (pre-clip) = 934.377380   JAX = 934.477356
+
+== gradient comparison (torch vs JAX) ==                    
+  779 parameters mapped from 260 JAX leaves
+  202 params have grad=None on torch (documented Haiku-allocated-but-unused .b biases)
+  393 params have BOTH |grad| < 1e-4 (below the noise floor, includes the grad=None ones)
+  WHOLE-MODEL flattened gradient: cosine=0.99999863  norm torch=934.3773 JAX=934.4772 rel=1.069e-04
+  386 params have non-negligible gradient; per-param cosine: >0.999: 385  0.99-0.999: 1  <=0.99: 0
+  worst 8 by per-parameter cosine similarity:
+    diffusion.diffusion_stack.blocks.5.pair_2.linear_flags.w     cos= 0.995389  |g|=2.126e-03  |r|=2.032e-03
+    diffusion.diffusion_stack.blocks.5.layer_norm_4.scale        cos= 0.999358  |g|=1.045e+00  |r|=1.043e+00
+    diffusion.diffusion_stack.blocks.1.pair_2.linear_flags.w     cos= 0.999629  |g|=5.925e-03  |r|=5.928e-03
+    diffusion.diffusion_stack.blocks.4.attn_1.ada_point_attention.gamma cos= 0.999646  |g|=9.405e-02  |r|=9.418e-02
+    diffusion.diffusion_stack.blocks.2.pair_1.linear_flags.w     cos= 0.999661  |g|=1.208e-02  |r|=1.200e-02
+    diffusion.prepare_layer_norm_prev.offset                     cos= 0.999669  |g|=3.160e-01  |r|=3.196e-01
+    diffusion.diffusion_stack.blocks.5.attn_2.ada_point_attention.layer_norm_1.offset cos= 0.999700  |g|=5.737e-02  |r|=5.750e-02
+    diffusion.diffusion_stack.blocks.2.attn_2.ada_point_attention.layer_norm_1.scale cos= 0.999706  |g|=4.731e-02  |r|=4.771e-02
+
+== post-step parameter delta comparison ==                  
+  EXPECT per-element mismatches here even for a fully-correct optimizer:
+  Adam's step-1 update is m_hat/sqrt(v_hat) with (exact bias correction
+  at t=1) m_hat=g, v_hat=g^2, i.e. update ~= sign(g)*lr PER ELEMENT,
+  independent of |g|. An element whose true gradient is ~0 has its sign
+  set by ordinary fp32 noise, which Adam turns into a full +-lr step -
+  a peak-relative metric over the whole tensor is dominated by exactly
+  these elements. The gradient comparison above (cosine similarity) is
+  the metric that actually answers 'does the optimizer see the right
+  update direction'; this section is included to show WHY a raw
+  post-step weight diff is the wrong thing to assert tightness on.
+  worst 12 by peak-relative delta deviation (peak|ref_delta| shown for scale):
+    diffusion.diffusion_stack.blocks.5.attn_1.ada_point_attention.layer_norm_2.offset rel=3.220e+00  abs=7.191e-06  peak|ref_delta|=2.233e-06
+    diffusion.diffusion_stack.blocks.4.attn_2.ada_point_attention.layer_norm_2.offset rel=2.646e+00  abs=5.539e-06  peak|ref_delta|=2.093e-06
+    diffusion.diffusion_stack.blocks.0.attn_1.ada_point_attention.layer_norm_2.offset rel=2.549e+00  abs=2.710e-05  peak|ref_delta|=1.063e-05
+    diffusion.diffusion_stack.blocks.4.attn_1.ada_point_attention.layer_norm_2.offset rel=2.544e+00  abs=6.083e-06  peak|ref_delta|=2.392e-06
+    diffusion.diffusion_stack.blocks.1.attn_1.ada_point_attention.layer_norm_2.offset rel=2.143e+00  abs=1.997e-05  peak|ref_delta|=9.316e-06
+    diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm_2.offset rel=2.136e+00  abs=2.622e-06  peak|ref_delta|=1.227e-06
+    diffusion.diffusion_stack.blocks.0.pair_1.layer_norm.scale rel=1.999e+00  abs=1.999e-03  peak|ref_delta|=1.000e-03
+    diffusion.diffusion_stack.blocks.0.layer_norm_5.offset  rel=1.997e+00  abs=1.997e-03  peak|ref_delta|=1.000e-03
+    diffusion.dssp_decoder.w                                rel=1.994e+00  abs=1.994e-03  peak|ref_delta|=1.000e-03
+    diffusion.diffusion_stack.blocks.0.pair_1.mlp.layers.1.w rel=1.993e+00  abs=1.993e-03  peak|ref_delta|=1.000e-03
+    diffusion.diffusion_stack.blocks.0.pair_1.mlp.layers.0.b rel=1.992e+00  abs=1.992e-03  peak|ref_delta|=1.000e-03
+    diffusion.prepare_layer_norm_cond.offset                rel=1.990e+00  abs=1.990e-03  peak|ref_delta|=1.000e-03
+  381 / 779 params have a numerically-zero JAX delta (excluded from the rel-error ranking above except where already shown)
+  max rel over the 398 params with a nonzero JAX delta: 3.220e+00

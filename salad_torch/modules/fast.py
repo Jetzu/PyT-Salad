@@ -68,7 +68,7 @@ class FastDenoiser(nn.Module):
                                        mode=mode, dynamic=False)
         self._graph: torch.cuda.CUDAGraph | None = None
         self._static_in: dict[str, Tensor] = {}
-        self._cond_cache = None
+        self._cond_cache = (None, None)
         self._static_out: tuple[Tensor, ...] | None = None
 
     # ------------------------------------------------------------------
@@ -136,7 +136,10 @@ class FastDenoiser(nn.Module):
                 if src is not None and dst is not None and dst.shape == src.shape:
                     dst.copy_(src)
                 elif src is not None:
-                    self._static_in[k] = src
+                    # CLONE: adopting the caller's tensor as the persistent
+                    # buffer means the next call's copy_ silently mutates the
+                    # caller's data (observed: cyclic_mask flipped 0/64 -> 64/64).
+                    self._static_in[k] = src.clone()
             args = [self._static_in.get(k) for k in _CORE_ARGS]
         else:
             args = [inputs.get(k) for k in _CORE_ARGS]
@@ -146,7 +149,7 @@ class FastDenoiser(nn.Module):
 
     def invalidate_condition_cache(self) -> None:
         """Drop the cached conditioning; call if `data`'s condition keys change."""
-        self._cond_cache = None
+        self._cond_cache = (None, None)
 
     def forward(self, data: dict, prev: dict, *, predict_aa: bool = True,
                 uniform: Tensor | None = None,
@@ -162,10 +165,24 @@ class FastDenoiser(nn.Module):
         # across the 500 denoising steps of one design. Running it every step
         # cost more than the whole compiled model. Cached per design; call
         # invalidate_condition_cache() if the conditioning changes.
-        cond = getattr(self, "_cond_cache", None)
-        if cond is None:
+        # KEY the cache on the conditioning inputs. An unkeyed cache is
+        # catastrophic and silent: a second design with different dssp reuses
+        # the first design's conditioning and lands 5-15 A from the correct
+        # answer while looking perfectly healthy.
+        key = tuple(
+            (k, None if v is None else
+             (int(v.sum().item()) if v.dtype in (torch.bool, torch.int32, torch.int64)
+              else float(v.float().sum().item())))
+            for k, v in sorted(
+                (k, data.get(k)) for k in
+                ("aa_condition", "dssp_condition", "dssp_mean", "dssp_mean_mask",
+                 "dmap", "dmap_mask", "omap", "chain_contacts",
+                 "chain_index", "batch_index", "mask", "residue_index"))
+        )
+        cond, cached_key = getattr(self, "_cond_cache", (None, None))
+        if cond is None or cached_key != key:
             cond = self.model.prepare_condition(data)
-            self._cond_cache = cond
+            self._cond_cache = (cond, key)
         pc = cond["pair_condition"]
         inputs = dict(
             pos_noised=data["pos_noised"], prev_pos=prev["pos"],
@@ -184,6 +201,17 @@ class FastDenoiser(nn.Module):
         result["atom_pos"] = result.pop("angle_pos")
         result["pos_noised"] = data["pos_noised"]
         result["aa_gt"] = data["aa_gt"]
-        if not predict_aa:
-            result["aatype"] = data["aa_gt"]
+        if "aa_condition" in data:
+            result["aatype"] = torch.where(
+                data["aa_condition"] != 20, data["aa_condition"], result["aatype"])
+        if not predict_aa or "aa_condition" in data:
+            # atom_pos was built from the predicted aatype inside the graph, so
+            # it no longer matches; rebuild it rather than return an
+            # inconsistent (aatype, atom_pos) pair (measured 7.7 A apart).
+            if not predict_aa:
+                result["aatype"] = data["aa_gt"]
+            with torch.no_grad():
+                raw, ang, apos = self.model.diffusion.angle_head(
+                    result["aatype"], result["local"], result["pos"])
+            result["raw_angles"], result["angles"], result["atom_pos"] = raw, ang, apos
         return result, {"pos": result["pos"], "local": result["local"]}

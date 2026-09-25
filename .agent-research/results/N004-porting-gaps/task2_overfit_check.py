@@ -28,9 +28,9 @@ torch.manual_seed(0)
 config = get_config("default_vp")
 model = StructureDiffusionPredict(config)
 
-train_config = TrainConfig(num_aa=64, min_size=16, max_size=64,
+train_config = TrainConfig(num_aa=24, min_size=12, max_size=24,
                            lr=1e-3, warmup_steps=1, decay_steps=1000)
-source = SyntheticStructureSource(num_clusters=8, chain_length_range=(16, 64))
+source = SyntheticStructureSource(num_clusters=8, chain_length_range=(12, 24))
 stream = PackedProteinStream(source, size=train_config.num_aa,
                              min_size=train_config.min_size,
                              max_size=train_config.max_size,

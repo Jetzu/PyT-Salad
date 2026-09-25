@@ -149,3 +149,42 @@ New parity regimes checked and passing (worst deviation on unmasked rows):
 multi-batch + multi-chain + padding `pos` 7.3e-6; full motif/dssp/aa
 conditioning `pos` 9.1e-6; degenerate chain lengths `pos` 3.9e-6; all 21 aatypes
 through `single_protein_sidechains` 2.0e-7.
+
+## 5. Open: two configs sit far above the parity floor
+
+| config | max coord deviation | aatype |
+|---|---|---|
+| default_vp | 0.00002 A | 0/48 differ |
+| default_ve_scaled | 0.00002 A | 0/48 differ |
+| **default_vp_scaled** | **0.00589 A** | 0/48 differ |
+| **multimotif_vp** | **0.03694 A** | 0/80 differ |
+
+300x and 1800x the established floor. The predicted sequence is still exactly
+right in both, so the computation is substantively correct, but something
+differs and it is not yet explained.
+
+What has been RULED OUT (measured, not argued):
+- **Neighbour tie-flips.** 0/2304 and 0/5120 `distogram_neighbours` indices
+  differ from JAX. The original hypothesis was chained top-k tie-flips; it is
+  refuted for this draw.
+- **Accumulation across blocks.** The per-block trajectory divergence is
+  already 1.3e-2 at block 0 for default_vp_scaled (vs 4.2e-5 for default_vp)
+  and stays flat-to-falling: 1.3e-2, 1.7e-2, 1.9e-2, 9.5e-3, 5.7e-3, 5.6e-3.
+  It is present from the first block, so it is not compounding.
+- **Input scale.** `pos_noised` std is 18.99 for default_vp_scaled against
+  18.64 for default_vp - indistinguishable.
+- **Converter shape/count bug.** Identical mapping code path, leaf counts
+  260/260/272 as documented, all load strict=True.
+
+What that leaves: default_vp and default_vp_scaled share an identical
+architecture AND an identical forward code path (both `preconditioning="vp"`,
+both in `_VP_KINDS` so the same time embedding). The only difference is the
+weights. A block-0 discrepancy under identical code and comparable inputs
+therefore points at the weights themselves - either the converter binds some
+tensor to the wrong slot in a way that happens to be shape-compatible, or the
+JAX fixture for these two configs was generated differently. Not resolved.
+
+Next step for whoever picks this up: dump `local` after `prepare_features` and
+the block-0 pair features from both backends on the same input, and bisect from
+there. Do not assume it is precision noise - 0.037 A is 1800x the floor the
+same code achieves on the other two configs.

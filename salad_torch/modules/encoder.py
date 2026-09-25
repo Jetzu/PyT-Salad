@@ -299,7 +299,7 @@ class Encoder(nn.Module):
         augment = vector_mean_norm(augment)
 
         local_positions = torch.cat([local_positions[:, :5], augment], dim=-2)  # (L, 20, 3)
-        # JAX `frames[:, None].apply_to_point(...)`: insert one axis between the
+        # JAX `frames.unsqueeze_batch(1).apply_to_point(...)`: insert one axis between the
         # batch dim and the trailing atom/xyz dims so a per-residue rigid frame
         # broadcasts over its 20 local points - `Rigid` has no `__getitem__`
         # (rigid.py's `unsqueeze_batch` is the documented replacement).

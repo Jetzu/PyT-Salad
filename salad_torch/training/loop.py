@@ -38,14 +38,17 @@ already contains the encoder leaves (`config.py`'s "unused for de-novo
 generation, but its weights are in the file" comment) - de-novo *sampling*
 just never calls it, since there is no atom14 ground truth to encode then.
 
-A second, smaller gap: the exact stochastic recipe NSB's `prepare_condition`
-uses to decide which residues get their true amino acid / secondary structure
-REVEALED to the model as a hard condition during training (NSB:223-342) is not
-fully specified in any of specs 02/03/04 available to this writer (spec-03
-§1.3 explicitly stops short, citing "prepare_condition, not part of the
-loss"). `reveal_conditioning` below is a documented, best-effort
-reconstruction - plausible and sufficient to exercise the conditioning
-pathway, not claimed to match upstream's exact reveal-rate distribution.
+SECOND FORMER GAP, now closed (2026-09-25): the exact stochastic recipe NSB's
+`prepare_condition` uses to decide which residues get their true amino acid /
+secondary structure REVEALED to the model as a hard condition during training
+was not fully specified in specs 02/03/04 (spec-03 §1.3 explicitly stops
+short, citing "prepare_condition, not part of the loss") - `reveal_conditioning`
+used to be a plausible-but-approximate best-effort reconstruction. It is now
+transcribed directly from `Condition.get_masks` (NSB:2562-2586) and the outer
+per-item gate in `StructureDiffusion.prepare_condition` (NSB:241-258); see
+that function's docstring for the three concrete ways the old version
+differed (uniform range, the two-independent-gates structure, and the
+previously entirely-missing `dssp_mean` channel).
 """
 from __future__ import annotations
 
@@ -126,36 +129,109 @@ class TrainConfig:
 
 
 # ---------------------------------------------------------------------------
-# Conditioning reveal (the underspecified piece - see module docstring)
+# Conditioning reveal - transcribed from the actual upstream source
+# (`Condition.get_masks`, NSB:2562-2586, and the outer per-item gate in
+# `StructureDiffusion.prepare_condition`, NSB:241-258), not reconstructed from
+# spec-03 alone (which explicitly stops short of this - see module docstring's
+# former "second, smaller gap" note, now closed).
 # ---------------------------------------------------------------------------
-def reveal_conditioning(aa_gt: Tensor, dssp_gt: Tensor, mask: Tensor,
-                        batch_index: Tensor, *, generator: torch.Generator | None = None
-                        ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
-    """Best-effort reconstruction of NSB `prepare_condition`'s training-time
-    reveal (see module docstring for why this can't be exact). Per batch item:
-    a coinflip on whether to use the channel at all, then an independent
-    per-item reveal RATE ~ U(0,1) and a per-residue Bernoulli at that rate -
-    mirrored independently for `aa` and `dssp`.
+def _mask_me(group_index: Tensor, num_groups: int, *, p: float, p_min: float,
+            p_max: float, generator: torch.Generator | None = None) -> Tensor:
+    """Port of `Condition.get_masks`'s inner `mask_me` closure (NSB:2570-2578).
 
-    Returns `(aa_condition, dssp_condition, aa_mask, dssp_mask)`: the first
-    two feed the MODEL (what it's told); the last two feed `total_loss` (which
-    residues are excluded from the corresponding NLL because they were told,
-    not asked - spec-03 §1.3).
+    Three INDEPENDENT draws, exactly as upstream (three separate
+    `hk.next_rng_key()` calls there, three separate `torch.rand` calls here):
+    a per-GROUP reveal rate ``p_mask ~ U(p_min, p_max)``, a per-RESIDUE
+    Bernoulli at that rate (``bare_mask``), and a per-GROUP coinflip at
+    probability ``p`` (``keep_mask``, upstream's "global probability" gate -
+    NOT the same gate as `prepare_condition`'s own outer `use_condition`
+    below, which is a SEPARATE, later multiplication). `group_index` is
+    `batch_index` for the aa/dssp channels and `chain_index` for dssp_mean -
+    upstream uses different grouping axes for the two (NSB:2582-2584).
     """
-    device = aa_gt.device
-    num_items = int(batch_index.max().item()) + 1 if batch_index.numel() else 0
+    device = group_index.device
+    p_mask_g = p_min + (p_max - p_min) * torch.rand(
+        num_groups, generator=generator, device=device)
+    p_mask = p_mask_g[group_index]
+    bare_mask = torch.rand(group_index.shape[0], generator=generator,
+                           device=device) < p_mask
+    keep_mask_g = torch.rand(num_groups, generator=generator, device=device) < p
+    keep_mask = keep_mask_g[group_index]
+    return bare_mask & keep_mask
 
-    def _draw() -> Tensor:
-        use_item = torch.rand(num_items, generator=generator, device=device) < 0.5
-        reveal_rate = torch.rand(num_items, generator=generator, device=device)
-        per_residue = torch.rand(aa_gt.shape[0], generator=generator, device=device)
-        return use_item[batch_index] & (per_residue < reveal_rate[batch_index]) & mask.bool()
 
-    aa_mask = _draw()
-    dssp_mask = _draw()
+def reveal_conditioning(aa_gt: Tensor, dssp_gt: Tensor, mask: Tensor,
+                        chain_index: Tensor, batch_index: Tensor, *,
+                        generator: torch.Generator | None = None
+                        ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+    """`Condition.get_masks` + `StructureDiffusion.prepare_condition`'s outer
+    gate, transcribed (NSB:2562-2586, 241-258) rather than approximated.
+
+    Three channels, not two - the PRIOR version of this function had no
+    `dssp_mean` (aggregate secondary-structure-composition) conditioning at
+    all, so training never exercised that pathway. What actually differed
+    from the old best-effort reconstruction (see git history / N004 report):
+
+    1. The per-item reveal rate is ``U(0.2, 1.0)`` for aa/dssp (NEVER below
+       20% local coverage when used), not ``U(0, 1)`` - the old version could
+       draw a ~0% rate and reveal nothing even when "in use".
+    2. There are TWO independent per-batch-item p=0.5 gates multiplied
+       together, not one: `Condition.get_masks`'s own `keep_mask` (inside
+       `mask_me`, one draw per channel) AND `prepare_condition`'s outer
+       `use_condition` (one draw, SHARED by both aa_mask and dssp_mask). Net
+       effect: conditioning survives with probability 0.5*0.5 = 0.25 per
+       batch item, not 0.5, and aa/dssp are USE-CORRELATED (whether a batch
+       item gets any conditioning at all is the SAME coinflip for both
+       channels) - the old version drew that coinflip independently per
+       channel.
+    3. `dssp_mean` conditioning (grouped by CHAIN, not batch; local range
+       ``U(0.8, 1.0)`` - deliberately high, per upstream's comment "mask
+       condition ... local coverage between 20% and 80%" for aa/dssp vs this
+       higher floor for the aggregate channel) is now included; it feeds
+       `salad_torch.modules.condition.prepare_condition`'s `dssp_mean`/
+       `dssp_mean_mask` keys, previously always left at their "absent"
+       defaults during training.
+
+    Returns `(aa_condition, dssp_condition, aa_mask, dssp_mask, dssp_mean,
+    dssp_mean_mask)`: the first two and the last two feed the MODEL (what
+    it's told); `aa_mask`/`dssp_mask` ALSO feed `total_loss` (which residues
+    are excluded from the corresponding NLL because they were told, not
+    asked - spec-03 §1.3).
+    """
+    num_batch = int(batch_index.max().item()) + 1 if batch_index.numel() else 0
+    num_chain = int(chain_index.max().item()) + 1 if chain_index.numel() else 0
+    mask_b = mask.bool()
+
+    sequence_mask = _mask_me(batch_index, num_batch, p=0.5, p_min=0.2, p_max=1.0,
+                             generator=generator)
+    sse_mask = _mask_me(batch_index, num_batch, p=0.5, p_min=0.2, p_max=1.0,
+                        generator=generator)
+    sse_mean_mask = _mask_me(chain_index, num_chain, p=0.5, p_min=0.8, p_max=1.0,
+                             generator=generator)
+
+    # outer gate (NSB:248-250): ONE draw, shared by aa_mask and dssp_mask -
+    # dssp_mean_mask is NOT gated by it (upstream applies `use_condition` only
+    # to the two `Condition.__call__` return masks, not to `sse_mean_mask`,
+    # which is folded into `condition` inside `Condition.__call__` itself and
+    # is therefore already final by the time `prepare_condition` sees it).
+    use_condition = (torch.rand(num_batch, generator=generator,
+                                device=batch_index.device) < 0.5)[batch_index]
+
+    aa_mask = use_condition & sequence_mask & mask_b
+    dssp_mask = use_condition & sse_mask & mask_b
+    dssp_mean_mask = sse_mean_mask & mask_b
+
     aa_condition = torch.where(aa_mask, aa_gt, torch.full_like(aa_gt, 20))
     dssp_condition = torch.where(dssp_mask, dssp_gt, torch.full_like(dssp_gt, 3))
-    return aa_condition, dssp_condition, aa_mask, dssp_mask
+
+    # dssp_mean (NSB:2546-2548): the TRUE per-chain mean one-hot dssp
+    # composition, computed from ground truth regardless of dssp_mean_mask -
+    # the mask is applied later, at the `condition` combination step.
+    dssp_onehot = torch.nn.functional.one_hot(dssp_gt, 3).float()
+    dssp_mean = index_mean(dssp_onehot, chain_index, mask_b[:, None])
+
+    return (aa_condition, dssp_condition, aa_mask, dssp_mask,
+           dssp_mean, dssp_mean_mask)
 
 
 # ---------------------------------------------------------------------------
@@ -219,9 +295,11 @@ def prepare_batch(raw: dict, *, augment_size: int, encoder: nn.Module | None = N
     with torch.no_grad():
         dssp_gt, _, _ = assign_dssp(atom_pos, batch_index, mask)
 
-    # -- conditioning reveal (module docstring's second gap) -----------------
-    aa_condition, dssp_condition, aa_mask, dssp_mask = reveal_conditioning(
-        aa_gt, dssp_gt, mask, batch_index, generator=generator)
+    # -- conditioning reveal (transcribed from NSB - see reveal_conditioning
+    #    docstring for exactly what the prior best-effort version missed) ----
+    (aa_condition, dssp_condition, aa_mask, dssp_mask,
+    dssp_mean, dssp_mean_mask) = reveal_conditioning(
+        aa_gt, dssp_gt, mask, chain, batch_index, generator=generator)
 
     return {
         "aa_gt": aa_gt, "seq": aa_gt,
@@ -231,6 +309,7 @@ def prepare_batch(raw: dict, *, augment_size: int, encoder: nn.Module | None = N
         "pos": pos20, "dssp_gt": dssp_gt,
         "aa_condition": aa_condition, "dssp_condition": dssp_condition,
         "aa_mask": aa_mask, "dssp_mask": dssp_mask,
+        "dssp_mean": dssp_mean, "dssp_mean_mask": dssp_mean_mask,
     }
 
 

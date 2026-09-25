@@ -90,7 +90,7 @@ def main() -> int:
 
     step = [0]
 
-    def neighbour_fn(_pos, _prev_pos):
+    def neighbour_fn(_pos, _prev_pos, block_idx: int = 0):
         i = step[0]
         step[0] += 1
         return current[i], cond[i]

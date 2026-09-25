@@ -43,10 +43,16 @@ def apply_diffusion(config, data: dict, *, generator: torch.Generator | None = N
     else:
         # "vpfixed" pins the cloud std at sigma_data; "vp" uses the per-structure
         # CA spread (or an explicit --cloud_std).
-        cloud_std = c.sigma_data if c.diffusion_kind == "vpfixed" else data.get("cloud_std")
+        # an explicit cloud_std OVERRIDES, including for vpfixed - upstream
+        # (noise_schedule_benchmark.py:573-577) checks data["cloud_std"] first.
+        # Giving vpfixed priority made --cloud_std a silent no-op on default_vp.
+        cloud_std = data.get("cloud_std")
+        if cloud_std is None:
+            cloud_std = c.sigma_data if c.diffusion_kind in ("vpfixed", "flow") else None
         pos_noised = diffuse_atom_cloud(
             pos, mask, batch, t_pos, cloud_std=cloud_std,
-            flow=c.diffusion_kind in ("flow", "flow_scaled"),
+            # inference uses `kind == "flow"`, not the flow-family test
+            flow=c.diffusion_kind == "flow",
             generator=generator, noise=noise)
 
     seq_noised, corrupt_aa = diffuse_sequence(data["seq"], t_seq,

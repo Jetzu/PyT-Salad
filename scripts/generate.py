@@ -332,6 +332,14 @@ def main() -> None:
     if args.jax_seed is not None:
         args.seed = args.jax_seed
 
+    # seed EVERY source, not just torch: inference/options.py uses the stdlib
+    # `random` for --dssp/--dssp_mean "random", so --seed alone left those
+    # unreproducible (measured 15-25 A between reruns).
+    import random as _random
+    _random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+
     device = torch.device(args.device)
     config = get_config(args.config)
     if args.depth_adjust != "none":
