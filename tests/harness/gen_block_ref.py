@@ -3,6 +3,11 @@ import pickle, sys
 import numpy as np
 import jax, jax.numpy as jnp, haiku as hk
 
+# XLA:GPU lowers float32 `dot` to TF32 by default, which makes a GPU-generated
+# reference a ~1e-3-relative one - see notes/04_PARITY_AND_PERF.md section 5.
+# Bit-exact no-op on CPU.
+jax.config.update("jax_default_matmul_precision", "highest")
+
 import salad.modules.noise_schedule_benchmark as NSB
 import salad.modules.utils.geometry as G
 import salad.modules.geometric.geometric as GEO

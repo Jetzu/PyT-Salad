@@ -60,8 +60,24 @@ def main() -> int:
         if not os.path.exists(path):
             print(f"SKIP: missing {path}")
             return 0
-    D = np.load(FIX)
+    D = np.load(FIX, allow_pickle=False)
     print(f"config: {CONFIG_NAME}")
+
+    # A fixture is only a reference if it was produced in exact fp32. XLA:GPU
+    # lowers float32 dots to TF32 unless told otherwise, which moves `out_pos`
+    # by ~6e-03 A - 300x this test's floor - with `aatype` still exact, i.e. it
+    # looks like a port bug and is not one. Refuse such a fixture outright.
+    prec = str(D["jax_matmul_precision"]) if "jax_matmul_precision" in D.files else None
+    plat = str(D["jax_platform"]) if "jax_platform" in D.files else None
+    if prec is None:
+        print(f"FAIL: {FIX} predates the precision pin (no `jax_matmul_precision`). "
+              f"Regenerate it with scripts/gen_fixtures_model.py.")
+        return 1
+    if prec not in ("highest", "Precision.HIGHEST"):
+        print(f"FAIL: {FIX} was generated on {plat} with matmul precision "
+              f"{prec!r}, not 'highest' - it is not an fp32 reference.")
+        return 1
+    print(f"fixture provenance: platform={plat} matmul_precision={prec}")
 
     model = StructureDiffusionPredict(CONFIG).eval()
     load_model(model, load_param_npz(PARAMS), CONFIG, strict=True)
