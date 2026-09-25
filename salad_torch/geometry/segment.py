@@ -23,9 +23,38 @@ def _segments(index: Tensor) -> int:
     return int(index.max().item()) + 1 if index.numel() else 0
 
 
+def _normalise_index(index: Tensor, size: int) -> tuple[Tensor, Tensor | None]:
+    """Coerce an index tensor to the shape torch's scatter ops demand.
+
+    Two divergences from JAX have to be absorbed here:
+
+    * torch's ``scatter_add`` requires int64; JAX accepts any integer dtype, and
+      callers (e.g. `make_initial_data`) reasonably hand us int32.
+    * JAX silently DROPS out-of-bounds scatter writes and CLAMPS out-of-bounds
+      gathers; torch raises. That happens with non-dense chain ids - a 4-residue
+      system with chain ids {0, 5}, say.
+
+    Returns the safe index plus a validity mask (None when everything is in
+    range, so the common path stays allocation-free).
+    """
+    index = index.long()
+    if index.numel() == 0:
+        return index, None
+    hi = int(index.max().item())
+    lo = int(index.min().item())
+    if 0 <= lo and hi < size:
+        return index, None
+    valid = (index >= 0) & (index < size)
+    return index.clamp(0, max(size - 1, 0)), valid
+
+
 def index_sum(data: Tensor, index: Tensor, mask: Tensor, apply_mask: bool = True) -> Tensor:
     """Per-segment sum, broadcast back. Mirrors `geometry.index_sum`."""
+    index, valid = _normalise_index(index, data.shape[0])
     masked = torch.where(mask.bool(), data, torch.zeros_like(data))
+    if valid is not None:
+        masked = torch.where(valid.view(-1, *([1] * (data.dim() - 1))),
+                             masked, torch.zeros_like(masked))
     out = torch.zeros_like(data)
     idx = index.view(-1, *([1] * (data.dim() - 1))).expand_as(data)
     out = out.scatter_add(0, idx, masked)
@@ -40,8 +69,12 @@ def index_count(index: Tensor, mask: Tensor, apply_mask: bool = True) -> Tensor:
 
     Accumulates in the *index* dtype (integer), as upstream does.
     """
+    index, valid = _normalise_index(index, index.shape[0])
+    src = mask.to(index.dtype)
+    if valid is not None:
+        src = torch.where(valid, src, torch.zeros_like(src))
     out = torch.zeros_like(index)
-    out = out.scatter_add(0, index, mask.to(index.dtype))
+    out = out.scatter_add(0, index, src)
     result = out[index]
     if apply_mask:
         return torch.where(mask.bool(), result, torch.zeros_like(result))
@@ -75,8 +108,12 @@ def index_max(data: Tensor, index: Tensor, mask: Tensor, apply_mask: bool = True
     Upstream seeds the accumulator with ``data.min()`` (a global scalar), so
     fully-masked segments come out as that scalar. Reproduced exactly.
     """
+    index, valid = _normalise_index(index, data.shape[0])
     floor = data.min()
     masked = torch.where(mask.bool(), data, torch.full_like(data, float(floor)))
+    if valid is not None:
+        masked = torch.where(valid.view(-1, *([1] * (data.dim() - 1))),
+                             masked, torch.full_like(masked, float(floor)))
     out = torch.full_like(data, float(floor))
     idx = index.view(-1, *([1] * (data.dim() - 1))).expand_as(data)
     out = out.scatter_reduce(0, idx, masked, reduce="amax", include_self=True)
@@ -122,6 +159,7 @@ def unique_chain(chain: Tensor, batch: Tensor) -> Tensor:
     """
     if chain.numel() == 0:
         return chain
+    chain, batch = chain.long(), batch.long()
     boundary = torch.zeros_like(chain, dtype=torch.long)
     changed = (chain[1:] != chain[:-1]) | (batch[1:] != batch[:-1])
     boundary[1:] = changed.long()

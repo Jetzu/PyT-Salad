@@ -74,7 +74,7 @@ def make_initial_data(num_aa: int, residue_index: Tensor, chain_index: Tensor,
     all token 20, and both clocks are 1.0 (they are overwritten on the first
     step anyway). `atom_count` is ``5 + augment_size`` = 20 for ``default_vp``.
     """
-    i32 = dict(dtype=torch.int32, device=device)
+    i32 = dict(dtype=torch.long, device=device)
     f32 = dict(dtype=torch.float32, device=device)
     init_pos = torch.zeros((num_aa, atom_count, 3), **f32)
     init_aa_gt = torch.full((num_aa,), 20, **i32)
@@ -82,8 +82,8 @@ def make_initial_data(num_aa: int, residue_index: Tensor, chain_index: Tensor,
         "pos": init_pos,
         "aa_gt": init_aa_gt,
         "seq": init_aa_gt,
-        "residue_index": residue_index.to(device=device, dtype=torch.int32),
-        "chain_index": chain_index.to(device=device, dtype=torch.int32),
+        "residue_index": residue_index.to(device=device, dtype=torch.long),
+        "chain_index": chain_index.to(device=device, dtype=torch.long),
         "batch_index": torch.zeros_like(chain_index).to(**i32),
         "mask": torch.ones((num_aa,), dtype=torch.bool, device=device),
         "t_pos": torch.ones((num_aa,), **f32),

@@ -50,7 +50,7 @@ def apply_diffusion(config, data: dict, *, generator: torch.Generator | None = N
             generator=generator, noise=noise)
 
     seq_noised, corrupt_aa = diffuse_sequence(data["seq"], t_seq,
-                                              generator=generator, noise=seq_noise)
+                                              generator=generator, uniform=seq_noise)
     return {"pos_noised": pos_noised, "seq_noised": seq_noised,
             "t_pos": t_pos, "t_seq": t_seq, "corrupt_aa": corrupt_aa}
 

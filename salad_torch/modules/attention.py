@@ -33,7 +33,10 @@ class LinearToPoints(nn.Module):
 
     def forward(self, data: Tensor, frames: Rigid) -> Tensor:
         # JAX computes points in fp32 then casts back to the input dtype
-        raw = self.linear(data).to(torch.float32)
+        # geometry is done at fp32 or better; under autocast this keeps
+        # precision, and it lets a float64 model actually run.
+        dtype = data.dtype if data.dtype in (torch.float32, torch.float64) else torch.float32
+        raw = self.linear(data).to(dtype)
         points = raw.reshape(*raw.shape[:-1], self.size, 3)
         out = frames[..., None].apply_to_point(points)
         return out.to(data.dtype)
