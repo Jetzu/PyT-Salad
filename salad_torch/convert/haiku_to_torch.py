@@ -218,3 +218,127 @@ def load_diffusion_stack(stack: nn.Module, params: dict[str, np.ndarray],
         state.update(build_state_dict(params, mapping, scope,
                                       port_prefix=f"blocks.{layer}.", layer=layer))
     load_into(stack, state, strict=strict)
+
+
+# --------------------------------------------------------------------------
+# the remaining scopes
+# --------------------------------------------------------------------------
+_SD = "structure_diffusion"
+
+
+def condition_map() -> dict[str, tuple[str, str]]:
+    """`Condition`, at ``~prepare_condition/condition``."""
+    return {
+        "linear_aa": ("lin", "linear"),
+        "layer_norm_aa": ("ln", "layer_norm"),
+        "linear_dssp": ("lin", "linear_1"),
+        "layer_norm_dssp": ("ln", "layer_norm_1"),
+        "linear_dssp_mean": ("lin", "linear_2"),
+        "layer_norm_dssp_mean": ("ln", "layer_norm_2"),
+    }
+
+
+def aa_decoder_block_map() -> dict[str, tuple[str, str]]:
+    """One `AADecoderBlock`. Its pair features are a plain function upstream,
+    so they share the block's flat counter: linear..linear_5."""
+    out = {
+        "pair.linear_relpos": ("lin", "linear"),
+        "pair.linear_dist": ("lin", "linear_1"),
+        "pair.linear_dir": ("lin", "linear_2"),
+        "pair.linear_rot": ("lin", "linear_3"),
+        "pair.linear_pairvec": ("lin", "linear_4"),
+        # the LayerNorm is constructed before its argument, so it takes index 0
+        "pair.layer_norm_aa": ("ln", "layer_norm"),
+        "pair.linear_aa": ("lin", "linear_5"),
+        "pair.layer_norm": ("ln", "layer_norm_1"),
+        "pair.mlp.layers.0": ("lin", "mlp/linear"),
+        "pair.mlp.layers.1": ("lin", "mlp/linear_1"),
+        "layer_norm_2": ("ln", "layer_norm_2"),
+        "layer_norm_3": ("ln", "layer_norm_3"),
+    }
+    out.update(_attention_map("attn", "sparse_structure_attn"))
+    for port, hk in (("mlp.layers.0", "mlp/linear"), ("mlp.layers.1", "mlp/linear_1"),
+                     ("linear_update", "linear"), ("linear_gate", "linear_1"),
+                     ("linear_out", "linear_2")):
+        out[f"update.{port}"] = ("lin", f"light_global_update/{hk}")
+    return out
+
+
+def distogram_decoder_map() -> dict[str, tuple[str, str]]:
+    return {
+        "linear_relpos": ("lin", "linear"),
+        "linear_dist": ("lin", "linear_1"),
+        "linear_dir": ("lin", "linear_2"),
+        "linear_rot": ("lin", "linear_3"),
+        "linear_pairvec": ("lin", "linear_4"),
+        "linear_local_self": ("lin", "linear_5"),
+        "linear_local_nb": ("lin", "linear_6"),
+        "layer_norm": ("ln", "layer_norm"),
+        "mlp.layers.0": ("lin", "mlp/linear"),
+        "mlp.layers.1": ("lin", "mlp/linear_1"),
+    }
+
+
+def load_model(model: nn.Module, params: dict[str, np.ndarray], config,
+               strict: bool = True) -> dict[str, torch.Tensor]:
+    """Load a full `StructureDiffusionPredict` from a flat Haiku param dict.
+
+    Returns the assembled state dict (useful for inspection) after loading it.
+    """
+    state: dict[str, torch.Tensor] = {}
+
+    state.update(build_state_dict(
+        params, condition_map(), f"{_SD}/~prepare_condition/condition",
+        port_prefix="prepare_condition.condition."))
+
+    d = "diffusion."
+    dif = f"{_SD}/diffusion"
+
+    # trunk
+    trunk_map = diffusion_block_map(
+        multi_motif=bool(config.multi_motif), use_omap=bool(config.use_omap),
+        use_init_pos=(config.preconditioning == "edm_scaled") or bool(config.multi_motif))
+    trunk_scope = f"{dif}/diffusion_stack/__layer_stack_with_state/diffusion_block"
+    for layer in range(config.diffusion_depth):
+        state.update(build_state_dict(
+            params, trunk_map, trunk_scope,
+            port_prefix=f"{d}diffusion_stack.blocks.{layer}.", layer=layer))
+
+    # prepare_features
+    pf = f"{dif}/~prepare_features"
+    state.update(build_state_dict(params, {
+        "prepare_mlp.layers.0": ("lin", "mlp/linear"),
+        "prepare_mlp.layers.1": ("lin", "mlp/linear_1"),
+        "prepare_layer_norm_prev": ("ln", "layer_norm"),
+        "prepare_layer_norm_local": ("ln", "layer_norm_1"),
+        "prepare_layer_norm_cond": ("ln", "layer_norm_2"),
+    }, pf, port_prefix=d))
+
+    # aa decoder
+    aa = f"{dif}/aa_decoder"
+    state.update(build_state_dict(params, {
+        "linear_aa_embed": ("lin", "linear"),
+        "layer_norm": ("ln", "layer_norm"),
+        "linear_out": ("lin", "linear_1"),
+    }, aa, port_prefix=f"{d}aa_decoder."))
+    state.update(build_state_dict(params, {"layer_norm": ("ln", "layer_norm")},
+                                  f"{aa}/aa_decoder_stack",
+                                  port_prefix=f"{d}aa_decoder.aa_decoder_stack."))
+    aa_block_scope = f"{aa}/aa_decoder_stack/__layer_stack_no_state/aa_decoder_block"
+    for layer in range(config.aa_decoder_depth):
+        state.update(build_state_dict(
+            params, aa_decoder_block_map(), aa_block_scope,
+            port_prefix=f"{d}aa_decoder.aa_decoder_stack.blocks.{layer}.", layer=layer))
+
+    # heads
+    state.update(build_state_dict(params, distogram_decoder_map(),
+                                  f"{dif}/distogram_decoder",
+                                  port_prefix=f"{d}distogram_decoder."))
+    state.update(build_state_dict(params, {
+        "dssp_decoder": ("lin", "linear"),
+        "angle_head.mlp.layers.0": ("lin", "mlp/linear"),
+        "angle_head.mlp.layers.1": ("lin", "mlp/linear_1"),
+    }, dif, port_prefix=d))
+
+    load_into(model, state, strict=strict)
+    return state
