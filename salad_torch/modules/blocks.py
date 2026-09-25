@@ -30,7 +30,8 @@ from .attention import SparseStructureAttention
 from .basic import MLP, HkLayerNorm, HkLinear, gelu
 
 __all__ = ["DiffusionPairFeatures", "Update", "EncoderUpdate", "UpdatePositions",
-           "DiffusionBlock", "DiffusionStack", "extract_condition_neighbours"]
+           "DiffusionBlock", "DiffusionStack", "extract_condition_neighbours",
+           "MotifAdapterDiffusionBlock", "extract_motif_neighbours"]
 
 
 def extract_condition_neighbours(num_index: int, num_spatial: int,
@@ -292,8 +293,9 @@ class DiffusionStack(nn.Module):
                  use_init_pos: bool = False):
         super().__init__()
         self.config = config
+        block_cls = MotifAdapterDiffusionBlock if config.multi_motif else DiffusionBlock
         self.blocks = nn.ModuleList([
-            DiffusionBlock(config, local_size, atom_count, use_init_pos)
+            block_cls(config, local_size, atom_count, use_init_pos)
             for _ in range(config.diffusion_depth)
         ])
 
@@ -309,3 +311,85 @@ class DiffusionStack(nn.Module):
                                cyclic_mask=cyclic_mask, init_pos=init_pos)
             trajectory.append(pos)
         return local, pos, torch.stack(trajectory, dim=0)
+
+
+def extract_motif_neighbours(count: int):
+    """Neighbours taken straight from the motif distance map.
+
+    Unlike every other selector this ignores geometry entirely - it ranks by the
+    supplied ``dmap`` and keeps only pairs the ``dmap_mask`` marks as known, so
+    residues attend to their motif partners regardless of where the current
+    structure has put them.
+    """
+
+    def inner(pair_condition: dict) -> Tensor:
+        return get_neighbours(count)(pair_condition["dmap"],
+                                     pair_condition["dmap_mask"], None)
+
+    return inner
+
+
+class MotifAdapterDiffusionBlock(nn.Module):
+    """Trunk block for multi-motif scaffolding (`multimotif_vp`).
+
+    Differs from `DiffusionBlock` in three ways, all of which matter:
+
+    * the FIRST attention runs over motif neighbours, not sequence/spatial ones
+    * that first attention takes its frames from ``prev_pos`` while its pair
+      features come from ``pos`` - an asymmetry unique to this block
+    * both pair blocks are given ``init_pos=prev_pos`` unconditionally, so this
+      config always carries the two extra init_pos linears per pair block even
+      though its preconditioning is plain VP
+    """
+
+    def __init__(self, config, local_size: int, atom_count: int,
+                 use_init_pos: bool = True):
+        super().__init__()
+        c = self.config = config
+        p = c.pair_size
+        # always True here; the argument exists only to match DiffusionBlock
+        self.pair_1 = DiffusionPairFeatures(c, atom_count, use_init_pos=True)
+        self.layer_norm_1 = HkLayerNorm(local_size)
+        self.attn_1 = SparseStructureAttention(c, local_size, p)
+        self.pair_2 = DiffusionPairFeatures(c, atom_count, use_init_pos=True)
+        self.layer_norm_3 = HkLayerNorm(local_size)
+        self.attn_2 = SparseStructureAttention(c, local_size, p)
+        self.layer_norm_4 = HkLayerNorm(local_size)
+        self.update = Update(c, local_size, atom_count, global_update=True)
+        self.layer_norm_5 = HkLayerNorm(local_size)
+        self.update_positions = UpdatePositions(local_size, atom_count)
+
+    def forward(self, features: Tensor, pos: Tensor, prev_pos: Tensor,
+                condition: Tensor, pair_condition: dict, time: Tensor,
+                resi: Tensor, chain: Tensor, batch: Tensor, mask: Tensor,
+                current_neighbours: Tensor, cond_neighbours: Tensor,
+                cyclic_mask: Tensor | None = None,
+                init_pos: Tensor | None = None) -> tuple[Tensor, Tensor]:
+        # `cond_neighbours` carries the motif neighbours for this block; the
+        # caller supplies them so the stack keeps one neighbour_fn contract.
+        c = self.config
+        sigma = c.sigma_data
+        motif_neighbours = cond_neighbours
+
+        pair, pair_mask = self.pair_1(pos, pair_condition, motif_neighbours,
+                                      resi, chain, batch, mask,
+                                      cyclic_mask=cyclic_mask, init_pos=prev_pos)
+        # note: pair features from `pos`, attention frames from `prev_pos`
+        features = features + self.attn_1(
+            self.layer_norm_1(features), prev_pos / sigma, pair, pair_mask,
+            motif_neighbours)
+
+        pair, pair_mask = self.pair_2(pos, pair_condition, current_neighbours,
+                                      resi, chain, batch, mask,
+                                      cyclic_mask=cyclic_mask, init_pos=prev_pos)
+        features = features + self.attn_2(
+            self.layer_norm_3(features), pos / sigma, pair, pair_mask,
+            current_neighbours)
+
+        features = features + self.update(
+            self.layer_norm_4(features), pos, chain, batch, mask, condition)
+
+        local_norm = self.layer_norm_5(features)
+        out_scale = preconditioning_scale_factors(c, time[:, None], sigma)["out"]
+        pos = self.update_positions(pos, local_norm, out_scale)
+        return features, pos.to(local_norm.dtype)

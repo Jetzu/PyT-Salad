@@ -19,7 +19,9 @@ from ..geometry.neighbours import (extract_neighbours, get_index_neighbours,
                                    get_random_neighbours, get_spatial_neighbours)
 from ..geometry.rigid import vec_norm
 from .basic import MLP, HkLayerNorm, HkLinear, gelu
-from .blocks import DiffusionStack, extract_condition_neighbours
+from ..config import uses_init_pos
+from .blocks import (DiffusionStack, extract_condition_neighbours,
+                     extract_motif_neighbours)
 from .decoders import AADecoder, AngleHead, DistogramDecoder
 
 __all__ = ["Diffusion"]
@@ -48,7 +50,9 @@ class Diffusion(nn.Module):
         self.atom_count = 14 if c.encode_atom14 else 5 + c.augment_size
         a = self.atom_count
         ls = c.local_size
-        self.use_init_pos = c.preconditioning == "edm_scaled"
+        # two independent routes: EDMDiffusionStack supplies init_pos for
+        # edm_scaled, and the motif block passes init_pos=prev_pos always
+        self.use_init_pos = uses_init_pos(c)
 
         # -- prepare_features (Haiku scope `~prepare_features`) --------------
         time_width = (1 + 256) if c.time_embedding else 0
@@ -123,7 +127,7 @@ class Diffusion(nn.Module):
         cyclic_mask = data.get("cyclic_mask") if c.cyclic else None
 
         pos_factors = preconditioning_scale_factors(c, t_pos, c.sigma_data)
-        init_pos = None
+        init_pos = prev_pos if c.multi_motif else None
         if c.preconditioning == "edm":
             pos = pos * pos_factors["skip"][:, None, None]
         elif c.preconditioning == "edm_scaled":
@@ -133,8 +137,14 @@ class Diffusion(nn.Module):
         def neighbour_fn(cur_pos, cond_pos):
             current = extract_neighbours(16, 16, 32)(
                 cur_pos, resi, chain, batch, mask, uniform=uniform)
-            cond = extract_condition_neighbours(16, 16, 16, 16)(
-                cond_pos, pair_condition, resi, chain, batch, mask, uniform=uniform)
+            if c.multi_motif:
+                # the motif block's second neighbour set comes from the motif
+                # distance map, not from self-conditioning geometry
+                cond = extract_motif_neighbours(32)(pair_condition)
+            else:
+                cond = extract_condition_neighbours(16, 16, 16, 16)(
+                    cond_pos, pair_condition, resi, chain, batch, mask,
+                    uniform=uniform)
             return current, cond
 
         local, pos, trajectory = self.diffusion_stack(
