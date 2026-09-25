@@ -38,6 +38,19 @@ __all__ = [
 SymmFn = Callable[[Tensor], Tensor]
 
 
+
+def _draw(fn, shape, generator, device, dtype):
+    """Draw random numbers, tolerating a generator on a different device.
+
+    torch raises if a CPU `Generator` is handed to a CUDA op. That is an easy
+    trap for callers who make one generator up front and then move the model to
+    the GPU, so draw on the generator's own device and move the result.
+    """
+    if generator is not None and generator.device.type != torch.device(device).type:
+        return fn(shape, generator=generator, device=generator.device,
+                  dtype=dtype).to(device)
+    return fn(shape, generator=generator, device=device, dtype=dtype)
+
 def _broadcast_t(t: float | Tensor, num_residues: int,
                  like: Tensor) -> Tensor | float:
     """Reshape a time/sigma argument so it broadcasts over ``(N, A, 3)``.
@@ -125,16 +138,13 @@ def sample_atom_cloud_noise(shape: tuple[int, int, int],
     n, a, _ = shape
     if correlated_residues:
         if std_normal is None:
-            cloud = torch.randn((n, 1, 3), generator=generator, device=device,
-                                dtype=dtype)
-            residue = torch.randn((n, a, 3), generator=generator, device=device,
-                                  dtype=dtype)
+            cloud = _draw(torch.randn, (n, 1, 3), generator, device, dtype)
+            residue = _draw(torch.randn, (n, a, 3), generator, device, dtype)
         else:
             cloud, residue = std_normal
         return cloud_std * cloud + residue_std * residue
     if std_normal is None:
-        std_normal = torch.randn(shape, generator=generator, device=device,
-                                 dtype=dtype)
+        std_normal = _draw(torch.randn, shape, generator, device, dtype)
     return cloud_std * std_normal
 
 
@@ -181,8 +191,7 @@ def diffuse_coordinates_edm(x: Tensor, batch_index: Tensor, t: float | Tensor,
     Only one draw, and `mask` plays no part - not even in the centroid divisor.
     """
     if noise is None:
-        noise = torch.randn(x.shape, generator=generator, device=x.device,
-                            dtype=x.dtype)
+        noise = _draw(torch.randn, x.shape, generator, x.device, x.dtype)
     target = center_noise_on_ca(noise, batch_index)
     if symm is not None:
         target = symm(target)
@@ -205,8 +214,7 @@ def diffuse_sequence(x: Tensor, t: float | Tensor, mask_index: int = 20,
     stream, which matters if you ever chase RNG-level parity.
     """
     if uniform is None:
-        uniform = torch.rand(x.shape, generator=generator, device=x.device,
-                             dtype=torch.float32)
+        uniform = _draw(torch.rand, x.shape, generator, x.device, torch.float32)
     t_t = t if torch.is_tensor(t) else torch.as_tensor(
         t, dtype=uniform.dtype, device=uniform.device)
     corrupt_aa = uniform < t_t
