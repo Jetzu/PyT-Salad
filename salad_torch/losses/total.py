@@ -65,12 +65,25 @@ def total_loss(config, data: dict, result: dict, *,
     `losses[...]` would be logged upstream, plus `"total"`.
     """
     c = config
-    if getattr(c, "kabsch", None):
+    # Flags that change the loss but are dead for the four released configs.
+    # Refuse loudly rather than silently computing a different objective -
+    # shipped upstream configs DO set some of these (e.g.
+    # default_vp_minimal_timeless_atom14.soft_lddt, default_vp_distogram.
+    # distogram_trajectory), so a caller could reasonably hit them.
+    _UNIMPLEMENTED = {
+        "kabsch": "align ground truth onto the prediction (geometry.align.index_align)",
+        "mask_atom14": "per-atom masking; pos_loss currently divides by a fixed atom count",
+        "x_late": "restrict the atom14 term to late timesteps",
+        "soft_lddt": "soft-LDDT term",
+        "aa_trajectory": "per-block sequence loss",
+        "distogram_trajectory": "per-block distogram loss",
+    }
+    unsupported = [k for k in _UNIMPLEMENTED if getattr(c, k, None)]
+    if unsupported:
+        detail = "; ".join(f"{k}: {_UNIMPLEMENTED[k]}" for k in unsupported)
         raise NotImplementedError(
-            "c.kabsch is unset for default_vp (spec §0(a)/§4): ground-truth "
-            "alignment onto the prediction is a documented DEAD path for this "
-            "loss. Wire `geometry.align.index_align` onto pos_gt/atom_pos_gt "
-            "explicitly before enabling a config that turns kabsch on.")
+            f"config sets {unsupported}, which change the loss and are not "
+            f"ported (all are dead for the four released checkpoints). {detail}")
 
     mask = data["mask"].bool()
     batch = data["batch_index"]

@@ -44,7 +44,9 @@ def base_weight(mask: Tensor, batch: Tensor) -> Tensor:
     """
     mask_f = mask.float()
     count = index_sum(mask_f, batch, mask)  # per-item valid-residue count, broadcast back
-    num_items = int(batch.max().item()) + 1 if batch.numel() else 1
+    # keep this as a 0-d tensor: .item() forces a device->host sync every
+    # step and breaks torch.compile graphs. JAX keeps it traced.
+    num_items = (batch.max() + 1).to(mask_f.dtype) if batch.numel() else 1.0
     return mask_f / count.clamp(min=1.0) / num_items
 
 

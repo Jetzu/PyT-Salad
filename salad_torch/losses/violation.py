@@ -249,8 +249,14 @@ def between_residue_bond_loss(pred_atom_pos: Tensor, pred_atom_mask: Tensor,
 
     ca_c_n_cos = vec_dot(c_ca_unit, c_n_unit)
     ca_c_n_err = torch.sqrt(1e-6 + (ca_c_n_cos - _BETWEEN_RES_COS_ANGLES_CA_C_N[0]) ** 2)
+    # UPSTREAM QUIRK, reproduced deliberately: the tolerance here is the C-N
+    # BOND-LENGTH stddev (0.014), not the CA-C-N cosine-angle stddev (0.0311).
+    # AlphaFold-multimer does this (all_atom_multimer.py:553-554) and salad
+    # inherits it. Using the "natural" pairing doubles the flat-bottom tolerance
+    # and under-penalises this angle by ~2.1x. Do not "correct" it.
+    # (The c_n_ca branch below genuinely does use its own angle stddev.)
     ca_c_n_loss_per_residue = F.relu(
-        ca_c_n_err - tolerance_factor * _BETWEEN_RES_COS_ANGLES_CA_C_N[1])
+        ca_c_n_err - tolerance_factor * _BETWEEN_RES_BOND_LENGTH_STDDEV_C_N[0])
     m2 = this_ca_m * this_c_m * next_n_m * has_no_gap
     ca_c_n_loss = (m2 * ca_c_n_loss_per_residue).sum() / (m2.sum() + 1e-6)
 
@@ -322,7 +328,12 @@ def custom_clash_loss(pred_atom_pos: Tensor, atom_exists: Tensor, atom_radius: T
 
     # diagnostic only - not consumed by `custom_structural_violation_loss`
     per_atom_loss_sum = error.sum(dim=(0, 2)) + error.sum(dim=(1, 3))   # (L, 14)
-    per_atom_clash_mask = clash_mask.sum(dim=(0, 2)) + clash_mask.sum(dim=(1, 3))
+    # an INDICATOR (max), not a count (sum) - upstream takes the elementwise
+    # maximum of the two reductions. Nothing reads it today, but the
+    # per-residue violation branch both multiplies and divides by it, so a
+    # count here would be silently wrong for whoever wires that up.
+    per_atom_clash_mask = torch.maximum(clash_mask.amax(dim=(0, 2)),
+                                        clash_mask.amax(dim=(1, 3)))
 
     return {"mean_loss": mean_loss, "per_atom_loss_sum": per_atom_loss_sum,
            "per_atom_clash_mask": per_atom_clash_mask}

@@ -57,6 +57,10 @@ def index_kabsch(x: Tensor, y: Tensor, index: Tensor, mask: Tensor,
         `(L, 3)` per the house `index_*` convention (segment.py) - every
         residue of a given item holds that item's shared value.
     """
+    if weight is not None and weight.dim() == 1:
+        # JAX takes a (L,) weight and unsqueezes internally; accept either so a
+        # caller copying an upstream call site does not trip.
+        weight = weight[:, None]
     x_center = index_mean(x, index, mask[:, None], weight)
     y_center = index_mean(y, index, mask[:, None], weight)
     x = x - x_center
