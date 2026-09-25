@@ -21,6 +21,18 @@ import jax
 import jax.numpy as jnp
 import haiku as hk
 
+# ---------------------------------------------------------------------------
+# PRECISION PIN - do not remove.
+#
+# XLA:GPU lowers float32 `dot` to TF32 (10 mantissa bits) by default. A fixture
+# generated on a GPU is therefore NOT an fp32 reference: measured on
+# default_vp, an H100 run deviates from the identical CPU run by 5.98e-03 A in
+# `out_pos` and 1.22e-02 A in the block-0 trajectory - 300x the fp32 parity
+# floor - while `aatype` still matches exactly, so nothing looks wrong.
+# Two fixtures were generated that way and spent a day being debugged as a port
+# bug. `highest` collapses the same GPU-vs-CPU gap to 7.6e-06 A.
+jax.config.update("jax_default_matmul_precision", "highest")
+
 import salad.modules.noise_schedule_benchmark as NSB
 import salad.modules.utils.geometry as G
 from salad.aflib.model.geometry import Vec3Array
@@ -179,6 +191,13 @@ def main(config_name, param_path, out_path, length=48):
 
     # --- 3. the pinned uniform field the port must replay --------------------
     out["fixed_uniform"] = FIXED_U
+
+    # --- 4. provenance: what backend/precision produced these numbers --------
+    # tests/test_model_parity.py refuses a fixture that is not fp32-exact.
+    out["jax_platform"] = np.asarray(
+        jax.devices()[0].platform, dtype=object).astype("U")
+    out["jax_matmul_precision"] = np.asarray(
+        str(jax.config.jax_default_matmul_precision), dtype=object).astype("U")
 
     np.savez(out_path, **out)
     print(f"wrote {out_path}: {len(out)} arrays  (length={length}, config={config_name})")

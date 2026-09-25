@@ -13,6 +13,12 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
+# XLA:GPU lowers float32 `dot` to TF32 by default, which makes a GPU-generated
+# reference a ~1e-3-relative one - see notes/04_PARITY_AND_PERF.md section 5.
+# Bit-exact no-op on CPU.
+jax.config.update("jax_default_matmul_precision", "highest")
+
+
 from salad.aflib.model.geometry import Vec3Array, Rot3Array, Rigid3Array
 import salad.modules.utils.geometry as G
 import salad.modules.geometric.geometric as GM

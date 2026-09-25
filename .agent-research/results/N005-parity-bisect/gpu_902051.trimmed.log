@@ -1,0 +1,373 @@
+### Starting TaskPrologue of job 902051 on h14-02 at Fri Sep 25 10:22:48 PM CEST 2026
+Running on cores 32-63 with governor performance
+Fri Sep 25 22:22:48 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ R=.agent-research/results/N005-parity-bisect
++ P=/hnvme/workspace/v181bb10-salad/params
++ nvidia-smi -L
+GPU 0: NVIDIA H100 (UUID: GPU-0f866a45-6b65-31d8-41d5-ed0164ce8226)
++ for c in default_vp default_vp_scaled default_ve_scaled
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py default_vp /hnvme/workspace/v181bb10-salad/params/default_vp-200k.jax .agent-research/results/N005-parity-bisect/gpu_default_vp.npz 48
+wrote .agent-research/results/N005-parity-bisect/gpu_default_vp.npz: 35 arrays  (length=48, config=default_vp)
+   fixed_uniform                      (48, 48) float32
+   in_aa_gt                           (48,) int32
+   in_batch_index                     (48,) int32
+   in_chain_index                     (48,) int32
+   in_cyclic_mask                     (48,) bool
+   in_mask                            (48,) bool
+   in_pos                             (48, 20, 3) float32
+   in_prev_local                      (48, 128) float32
+   in_prev_pos                        (48, 20, 3) float32
+   in_residue_index                   (48,) int32
+   in_seq                             (48,) int32
+   in_t_pos                           (48,) float32
+   in_t_seq                           (48,) float32
+   noised_corrupt_aa                  (48,) bool
+   noised_pos_noised                  (48, 20, 3) float32
+   noised_seq_noised                  (48,) int32
+   noised_t_pos                       (48,) float32
+   noised_t_seq                       (48,) float32
+   out_aa                             (48, 20) float32
+   out_aa_features                    (48, 128) float32
+   out_aa_gt                          (48,) int32
+   out_aatype                         (48,) int32
+   out_angles                         (48, 7, 2) float32
+   out_atom_pos                       (48, 14, 3) float32
+   out_corrupt_aa                     (48,) bool
+   out_distogram                      (48, 48, 64) float32
+   out_distogram_neighbours           (48, 48) int32
+   out_dssp                           (48, 3) float32
+   out_local                          (48, 128) float32
+   out_pos                            (48, 20, 3) float32
+   out_pos_noised                     (48, 20, 3) float32
+   out_prev_local                     (48, 128) float32
+   out_prev_pos                       (48, 20, 3) float32
+   out_raw_angles                     (48, 7, 2) float32
+   out_trajectory                     (6, 48, 20, 3) float32
++ APPTAINERENV_JAX_DEFAULT_MATMUL_PRECISION=highest
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py default_vp /hnvme/workspace/v181bb10-salad/params/default_vp-200k.jax .agent-research/results/N005-parity-bisect/gpuhi_default_vp.npz 48
+wrote .agent-research/results/N005-parity-bisect/gpuhi_default_vp.npz: 35 arrays  (length=48, config=default_vp)
+   fixed_uniform                      (48, 48) float32
+   in_aa_gt                           (48,) int32
+   in_batch_index                     (48,) int32
+   in_chain_index                     (48,) int32
+   in_cyclic_mask                     (48,) bool
+   in_mask                            (48,) bool
+   in_pos                             (48, 20, 3) float32
+   in_prev_local                      (48, 128) float32
+   in_prev_pos                        (48, 20, 3) float32
+   in_residue_index                   (48,) int32
+   in_seq                             (48,) int32
+   in_t_pos                           (48,) float32
+   in_t_seq                           (48,) float32
+   noised_corrupt_aa                  (48,) bool
+   noised_pos_noised                  (48, 20, 3) float32
+   noised_seq_noised                  (48,) int32
+   noised_t_pos                       (48,) float32
+   noised_t_seq                       (48,) float32
+   out_aa                             (48, 20) float32
+   out_aa_features                    (48, 128) float32
+   out_aa_gt                          (48,) int32
+   out_aatype                         (48,) int32
+   out_angles                         (48, 7, 2) float32
+   out_atom_pos                       (48, 14, 3) float32
+   out_corrupt_aa                     (48,) bool
+   out_distogram                      (48, 48, 64) float32
+   out_distogram_neighbours           (48, 48) int32
+   out_dssp                           (48, 3) float32
+   out_local                          (48, 128) float32
+   out_pos                            (48, 20, 3) float32
+   out_pos_noised                     (48, 20, 3) float32
+   out_prev_local                     (48, 128) float32
+   out_prev_pos                       (48, 20, 3) float32
+   out_raw_angles                     (48, 7, 2) float32
+   out_trajectory                     (6, 48, 20, 3) float32
++ for c in default_vp default_vp_scaled default_ve_scaled
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py default_vp_scaled /hnvme/workspace/v181bb10-salad/params/default_vp_scaled-200k.jax .agent-research/results/N005-parity-bisect/gpu_default_vp_scaled.npz 48
+wrote .agent-research/results/N005-parity-bisect/gpu_default_vp_scaled.npz: 35 arrays  (length=48, config=default_vp_scaled)
+   fixed_uniform                      (48, 48) float32
+   in_aa_gt                           (48,) int32
+   in_batch_index                     (48,) int32
+   in_chain_index                     (48,) int32
+   in_cyclic_mask                     (48,) bool
+   in_mask                            (48,) bool
+   in_pos                             (48, 20, 3) float32
+   in_prev_local                      (48, 128) float32
+   in_prev_pos                        (48, 20, 3) float32
+   in_residue_index                   (48,) int32
+   in_seq                             (48,) int32
+   in_t_pos                           (48,) float32
+   in_t_seq                           (48,) float32
+   noised_corrupt_aa                  (48,) bool
+   noised_pos_noised                  (48, 20, 3) float32
+   noised_seq_noised                  (48,) int32
+   noised_t_pos                       (48,) float32
+   noised_t_seq                       (48,) float32
+   out_aa                             (48, 20) float32
+   out_aa_features                    (48, 128) float32
+   out_aa_gt                          (48,) int32
+   out_aatype                         (48,) int32
+   out_angles                         (48, 7, 2) float32
+   out_atom_pos                       (48, 14, 3) float32
+   out_corrupt_aa                     (48,) bool
+   out_distogram                      (48, 48, 64) float32
+   out_distogram_neighbours           (48, 48) int32
+   out_dssp                           (48, 3) float32
+   out_local                          (48, 128) float32
+   out_pos                            (48, 20, 3) float32
+   out_pos_noised                     (48, 20, 3) float32
+   out_prev_local                     (48, 128) float32
+   out_prev_pos                       (48, 20, 3) float32
+   out_raw_angles                     (48, 7, 2) float32
+   out_trajectory                     (6, 48, 20, 3) float32
++ APPTAINERENV_JAX_DEFAULT_MATMUL_PRECISION=highest
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py default_vp_scaled /hnvme/workspace/v181bb10-salad/params/default_vp_scaled-200k.jax .agent-research/results/N005-parity-bisect/gpuhi_default_vp_scaled.npz 48
+wrote .agent-research/results/N005-parity-bisect/gpuhi_default_vp_scaled.npz: 35 arrays  (length=48, config=default_vp_scaled)
+   fixed_uniform                      (48, 48) float32
+   in_aa_gt                           (48,) int32
+   in_batch_index                     (48,) int32
+   in_chain_index                     (48,) int32
+   in_cyclic_mask                     (48,) bool
+   in_mask                            (48,) bool
+   in_pos                             (48, 20, 3) float32
+   in_prev_local                      (48, 128) float32
+   in_prev_pos                        (48, 20, 3) float32
+   in_residue_index                   (48,) int32
+   in_seq                             (48,) int32
+   in_t_pos                           (48,) float32
+   in_t_seq                           (48,) float32
+   noised_corrupt_aa                  (48,) bool
+   noised_pos_noised                  (48, 20, 3) float32
+   noised_seq_noised                  (48,) int32
+   noised_t_pos                       (48,) float32
+   noised_t_seq                       (48,) float32
+   out_aa                             (48, 20) float32
+   out_aa_features                    (48, 128) float32
+   out_aa_gt                          (48,) int32
+   out_aatype                         (48,) int32
+   out_angles                         (48, 7, 2) float32
+   out_atom_pos                       (48, 14, 3) float32
+   out_corrupt_aa                     (48,) bool
+   out_distogram                      (48, 48, 64) float32
+   out_distogram_neighbours           (48, 48) int32
+   out_dssp                           (48, 3) float32
+   out_local                          (48, 128) float32
+   out_pos                            (48, 20, 3) float32
+   out_pos_noised                     (48, 20, 3) float32
+   out_prev_local                     (48, 128) float32
+   out_prev_pos                       (48, 20, 3) float32
+   out_raw_angles                     (48, 7, 2) float32
+   out_trajectory                     (6, 48, 20, 3) float32
++ for c in default_vp default_vp_scaled default_ve_scaled
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py default_ve_scaled /hnvme/workspace/v181bb10-salad/params/default_ve_scaled-200k.jax .agent-research/results/N005-parity-bisect/gpu_default_ve_scaled.npz 48
+wrote .agent-research/results/N005-parity-bisect/gpu_default_ve_scaled.npz: 35 arrays  (length=48, config=default_ve_scaled)
+   fixed_uniform                      (48, 48) float32
+   in_aa_gt                           (48,) int32
+   in_batch_index                     (48,) int32
+   in_chain_index                     (48,) int32
+   in_cyclic_mask                     (48,) bool
+   in_mask                            (48,) bool
+   in_pos                             (48, 20, 3) float32
+   in_prev_local                      (48, 128) float32
+   in_prev_pos                        (48, 20, 3) float32
+   in_residue_index                   (48,) int32
+   in_seq                             (48,) int32
+   in_t_pos                           (48,) float32
+   in_t_seq                           (48,) float32
+   noised_corrupt_aa                  (48,) bool
+   noised_pos_noised                  (48, 20, 3) float32
+   noised_seq_noised                  (48,) int32
+   noised_t_pos                       (48,) float32
+   noised_t_seq                       (48,) float32
+   out_aa                             (48, 20) float32
+   out_aa_features                    (48, 128) float32
+   out_aa_gt                          (48,) int32
+   out_aatype                         (48,) int32
+   out_angles                         (48, 7, 2) float32
+   out_atom_pos                       (48, 14, 3) float32
+   out_corrupt_aa                     (48,) bool
+   out_distogram                      (48, 48, 64) float32
+   out_distogram_neighbours           (48, 48) int32
+   out_dssp                           (48, 3) float32
+   out_local                          (48, 128) float32
+   out_pos                            (48, 20, 3) float32
+   out_pos_noised                     (48, 20, 3) float32
+   out_prev_local                     (48, 128) float32
+   out_prev_pos                       (48, 20, 3) float32
+   out_raw_angles                     (48, 7, 2) float32
+   out_trajectory                     (6, 48, 20, 3) float32
++ APPTAINERENV_JAX_DEFAULT_MATMUL_PRECISION=highest
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py default_ve_scaled /hnvme/workspace/v181bb10-salad/params/default_ve_scaled-200k.jax .agent-research/results/N005-parity-bisect/gpuhi_default_ve_scaled.npz 48
+wrote .agent-research/results/N005-parity-bisect/gpuhi_default_ve_scaled.npz: 37 arrays  (length=48, config=default_ve_scaled)
+   fixed_uniform                      (48, 48) float32
+   in_aa_gt                           (48,) int32
+   in_batch_index                     (48,) int32
+   in_chain_index                     (48,) int32
+   in_cyclic_mask                     (48,) bool
+   in_mask                            (48,) bool
+   in_pos                             (48, 20, 3) float32
+   in_prev_local                      (48, 128) float32
+   in_prev_pos                        (48, 20, 3) float32
+   in_residue_index                   (48,) int32
+   in_seq                             (48,) int32
+   in_t_pos                           (48,) float32
+   in_t_seq                           (48,) float32
+   jax_matmul_precision               () <U7
+   jax_platform                       () <U3
+   noised_corrupt_aa                  (48,) bool
+   noised_pos_noised                  (48, 20, 3) float32
+   noised_seq_noised                  (48,) int32
+   noised_t_pos                       (48,) float32
+   noised_t_seq                       (48,) float32
+   out_aa                             (48, 20) float32
+   out_aa_features                    (48, 128) float32
+   out_aa_gt                          (48,) int32
+   out_aatype                         (48,) int32
+   out_angles                         (48, 7, 2) float32
+   out_atom_pos                       (48, 14, 3) float32
+   out_corrupt_aa                     (48,) bool
+   out_distogram                      (48, 48, 64) float32
+   out_distogram_neighbours           (48, 48) int32
+   out_dssp                           (48, 3) float32
+   out_local                          (48, 128) float32
+   out_pos                            (48, 20, 3) float32
+   out_pos_noised                     (48, 20, 3) float32
+   out_prev_local                     (48, 128) float32
+   out_prev_pos                       (48, 20, 3) float32
+   out_raw_angles                     (48, 7, 2) float32
+   out_trajectory                     (6, 48, 20, 3) float32
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py multimotif_vp /hnvme/workspace/v181bb10-salad/params/multimotif_vp-200k.jax .agent-research/results/N005-parity-bisect/gpu_multimotif_vp.npz 80
+wrote .agent-research/results/N005-parity-bisect/gpu_multimotif_vp.npz: 39 arrays  (length=80, config=multimotif_vp)
+   fixed_uniform                      (80, 80) float32
+   in_aa_gt                           (80,) int32
+   in_batch_index                     (80,) int32
+   in_chain_index                     (80,) int32
+   in_cyclic_mask                     (80,) bool
+   in_dmap                            (80, 80) float32
+   in_dmap_mask                       (80, 80) bool
+   in_mask                            (80,) bool
+   in_pos                             (80, 20, 3) float32
+   in_prev_local                      (80, 128) float32
+   in_prev_pos                        (80, 20, 3) float32
+   in_residue_index                   (80,) int32
+   in_seq                             (80,) int32
+   in_t_pos                           (80,) float32
+   in_t_seq                           (80,) float32
+   jax_matmul_precision               () <U7
+   jax_platform                       () <U3
+   noised_corrupt_aa                  (80,) bool
+   noised_pos_noised                  (80, 20, 3) float32
+   noised_seq_noised                  (80,) int32
+   noised_t_pos                       (80,) float32
+   noised_t_seq                       (80,) float32
+   out_aa                             (80, 20) float32
+   out_aa_features                    (80, 128) float32
+   out_aa_gt                          (80,) int32
+   out_aatype                         (80,) int32
+   out_angles                         (80, 7, 2) float32
+   out_atom_pos                       (80, 14, 3) float32
+   out_corrupt_aa                     (80,) bool
+   out_distogram                      (80, 64, 64) float32
+   out_distogram_neighbours           (80, 64) int32
+   out_dssp                           (80, 3) float32
+   out_local                          (80, 128) float32
+   out_pos                            (80, 20, 3) float32
+   out_pos_noised                     (80, 20, 3) float32
+   out_prev_local                     (80, 128) float32
+   out_prev_pos                       (80, 20, 3) float32
+   out_raw_angles                     (80, 7, 2) float32
+   out_trajectory                     (6, 80, 20, 3) float32
++ APPTAINERENV_JAX_DEFAULT_MATMUL_PRECISION=highest
++ apptainer run --bind /hnvme:/hnvme --bind /home/hpc/v181bb/v181bb10/SALAD_torch:/home/hpc/v181bb/v181bb10/SALAD_torch salad.sif scripts/gen_fixtures_model.py multimotif_vp /hnvme/workspace/v181bb10-salad/params/multimotif_vp-200k.jax .agent-research/results/N005-parity-bisect/gpuhi_multimotif_vp.npz 80
+wrote .agent-research/results/N005-parity-bisect/gpuhi_multimotif_vp.npz: 39 arrays  (length=80, config=multimotif_vp)
+   fixed_uniform                      (80, 80) float32
+   in_aa_gt                           (80,) int32
+   in_batch_index                     (80,) int32
+   in_chain_index                     (80,) int32
+   in_cyclic_mask                     (80,) bool
+   in_dmap                            (80, 80) float32
+   in_dmap_mask                       (80, 80) bool
+   in_mask                            (80,) bool
+   in_pos                             (80, 20, 3) float32
+   in_prev_local                      (80, 128) float32
+   in_prev_pos                        (80, 20, 3) float32
+   in_residue_index                   (80,) int32
+   in_seq                             (80,) int32
+   in_t_pos                           (80,) float32
+   in_t_seq                           (80,) float32
+   jax_matmul_precision               () <U7
+   jax_platform                       () <U3
+   noised_corrupt_aa                  (80,) bool
+   noised_pos_noised                  (80, 20, 3) float32
+   noised_seq_noised                  (80,) int32
+   noised_t_pos                       (80,) float32
+   noised_t_seq                       (80,) float32
+   out_aa                             (80, 20) float32
+   out_aa_features                    (80, 128) float32
+   out_aa_gt                          (80,) int32
+   out_aatype                         (80,) int32
+   out_angles                         (80, 7, 2) float32
+   out_atom_pos                       (80, 14, 3) float32
+   out_corrupt_aa                     (80,) bool
+   out_distogram                      (80, 64, 64) float32
+   out_distogram_neighbours           (80, 64) int32
+   out_dssp                           (80, 3) float32
+   out_local                          (80, 128) float32
+   out_pos                            (80, 20, 3) float32
+   out_pos_noised                     (80, 20, 3) float32
+   out_prev_local                     (80, 128) float32
+   out_prev_pos                       (80, 20, 3) float32
+   out_raw_angles                     (80, 7, 2) float32
+   out_trajectory                     (6, 80, 20, 3) float32
++ echo DONE
+DONE
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 22:26:17 CEST 2026
+= Job-ID             : 902051 on helma
+= Job-Name           : salad_n005
+= Job-Command        : .agent-research/results/N005-parity-bisect/gpu_check.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:25:00
+= Elapsed runtime    : 00:03:30
+= Total RAM usage    : 6.0 GiB of assigned 175 GiB (3.4%)
+= Node list          : h14-02
+= Subm/Elig/Start/End: 2026-09-25T22:22:45 / 2026-09-25T22:22:45 / 2026-09-25T22:22:46 / 2026-09-25T22:26:16
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  6d10h23m34s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 2342606, 0 %, 0 %, 72106 MiB, 30861 ms
+NVIDIA H100, 00000000:26:00.0, 2356929, 0 %, 0 %, 72104 MiB, 19428 ms
+NVIDIA H100, 00000000:26:00.0, 2365846, 0 %, 0 %, 72106 MiB, 30739 ms
+NVIDIA H100, 00000000:26:00.0, 2379281, 0 %, 0 %, 72104 MiB, 19516 ms
+NVIDIA H100, 00000000:26:00.0, 2388056, 0 %, 0 %, 72106 MiB, 30361 ms
+NVIDIA H100, 00000000:26:00.0, 2401742, 1 %, 0 %, 72104 MiB, 19126 ms
+NVIDIA H100, 00000000:26:00.0, 2410131, 0 %, 0 %, 72104 MiB, 18980 ms
+NVIDIA H100, 00000000:26:00.0, 2417179, 0 %, 0 %, 72104 MiB, 18751 ms

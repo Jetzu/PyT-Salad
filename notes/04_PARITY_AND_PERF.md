@@ -150,41 +150,65 @@ multi-batch + multi-chain + padding `pos` 7.3e-6; full motif/dssp/aa
 conditioning `pos` 9.1e-6; degenerate chain lengths `pos` 3.9e-6; all 21 aatypes
 through `single_protein_sidechains` 2.0e-7.
 
-## 5. Open: two configs sit far above the parity floor
+## 5. RESOLVED: the two "failing" configs were TF32 fixtures
 
 | config | max coord deviation | aatype |
 |---|---|---|
 | default_vp | 0.00002 A | 0/48 differ |
 | default_ve_scaled | 0.00002 A | 0/48 differ |
-| **default_vp_scaled** | **0.00589 A** | 0/48 differ |
-| **multimotif_vp** | **0.03694 A** | 0/80 differ |
+| default_vp_scaled | 0.00002 A | 0/48 differ |
+| multimotif_vp | 0.00020 A | 0/80 differ |
 
-300x and 1800x the established floor. The predicted sequence is still exactly
-right in both, so the computation is substantively correct, but something
-differs and it is not yet explained.
+All four are now at the fp32 floor. The earlier 0.00589 A / 0.03694 A were
+**not** a port defect: `fixtures/model_default_vp_scaled.npz` and
+`fixtures/model_multimotif_vp.npz` were generated on an H100
+(`.agent-research/results/N004-porting-gaps/gen_fixtures_task1.sbatch`,
+`--partition=h100 --gres=gpu:h100:1`) while the two passing fixtures were
+generated on the CPU login node. **XLA:GPU lowers float32 `dot` to TF32
+(10 mantissa bits) by default**, so those two fixtures are a ~1e-3-relative
+reference, not an fp32 one.
 
-What has been RULED OUT (measured, not argued):
-- **Neighbour tie-flips.** 0/2304 and 0/5120 `distogram_neighbours` indices
-  differ from JAX. The original hypothesis was chained top-k tie-flips; it is
-  refuted for this draw.
-- **Accumulation across blocks.** The per-block trajectory divergence is
-  already 1.3e-2 at block 0 for default_vp_scaled (vs 4.2e-5 for default_vp)
-  and stays flat-to-falling: 1.3e-2, 1.7e-2, 1.9e-2, 9.5e-3, 5.7e-3, 5.6e-3.
-  It is present from the first block, so it is not compounding.
-- **Input scale.** `pos_noised` std is 18.99 for default_vp_scaled against
-  18.64 for default_vp - indistinguishable.
-- **Converter shape/count bug.** Identical mapping code path, leaf counts
-  260/260/272 as documented, all load strict=True.
+Measured, same inputs, same params, same container (N005):
 
-What that leaves: default_vp and default_vp_scaled share an identical
-architecture AND an identical forward code path (both `preconditioning="vp"`,
-both in `_VP_KINDS` so the same time embedding). The only difference is the
-weights. A block-0 discrepancy under identical code and comparable inputs
-therefore points at the weights themselves - either the converter binds some
-tensor to the wrong slot in a way that happens to be shape-compatible, or the
-JAX fixture for these two configs was generated differently. Not resolved.
+| run | out_pos vs CPU | traj block 0 | aatype |
+|---|---|---|---|
+| default_vp on H100, default precision | 5.98e-03 | 1.22e-02 | 0 differ |
+| default_vp on H100, `highest` | 7.63e-06 | 2.38e-05 | 0 differ |
+| default_vp_scaled on H100, default | 5.95e-03 | 1.38e-02 | 0 differ |
+| default_vp_scaled on H100, `highest` | 3.41e-05 | 2.21e-04 | 0 differ |
+| default_ve_scaled on H100, default | 3.53e-03 | 1.86e-03 | 0 differ |
 
-Next step for whoever picks this up: dump `local` after `prepare_features` and
-the block-0 pair features from both backends on the same input, and bisect from
-there. Do not assume it is precision noise - 0.037 A is 1800x the floor the
-same code achieves on the other two configs.
+`default_vp` - the config that always passed - reproduces the whole "failure"
+signature when its fixture is regenerated on a GPU. The gap was never a
+property of `vp_scaled`/`multimotif`, only of which machine wrote the fixture.
+Two further facts from the same experiment:
+
+- Two H100 runs of the same config at default precision differ from **each
+  other** by 4.47e-03 A (XLA autotuning picks different dot kernels), so a
+  GPU-generated fixture is not even self-reproducible.
+- The port itself was always correct. Dumping every DiffusionBlock
+  intermediate on both sides against a CPU JAX run with the stored fixture's
+  `noised_*` injected (`.agent-research/results/N005-parity-bisect/`), torch
+  matched to 9.27e-06 A in `final_pos` and <=2.1e-05 in every block-0 tensor -
+  the same floor as `default_vp`. The neighbour index arrays
+  (`current_neighbours`, `cond_neighbours`) matched exactly, 0/3072 per block.
+- The trunk is contractive, not chaotic: a 1e-5 perturbation at
+  `prepare_features` output leaves ~1e-5 at `out_pos`. There is no
+  amplification to hide behind.
+
+**Guards now in place**
+
+- `scripts/gen_fixtures_model.py` sets
+  `jax.config.update("jax_default_matmul_precision", "highest")` before any
+  computation. Verified a bit-exact no-op on CPU (all four fixtures byte-for-byte
+  unchanged) and it collapses the H100 gap by ~800x.
+- Every fixture now records `jax_platform` and `jax_matmul_precision`.
+- `tests/test_model_parity.py` refuses any fixture whose recorded precision is
+  not `highest`, and any fixture predating the pin. Verified: pointed at the old
+  H100 file it exits 1 with an explanatory message instead of reporting a
+  300x parity failure.
+
+Debugging note for the next person: `aatype` matching exactly is **not**
+evidence that a numeric gap is small. A TF32 reference keeps the argmax intact
+while moving coordinates by 6e-03 A. Check fixture provenance before
+bisecting the network.
