@@ -1,0 +1,60 @@
+### Starting TaskPrologue of job 904012 on h11-24 at Sat Sep 26 12:59:53 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 12:59:53 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   39C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-24 Sat Sep 26 12:59:53 PM CEST 2026
+########## R7: non-matmul arithmetic on the lean step
+D weighted_critical_path_fp32 = 0.2581 ms (sum over the longest chain of max(c_launch=1.166 us, node_flops/66.9 TFLOPs))
+D weighted_critical_path_tf32 = 0.2390 ms (sum over the longest chain of max(c_launch=1.166 us, node_flops/494.7 TFLOPs))
+D NON-MATMUL arithmetic: 228.53 M output elements, 0.3484 GFLOP charged -> 0.0052 ms at fp32 peak
+D flop-annotation coverage: 303/303 matmul nodes (0/N means node.meta['val'] was absent and the weighted path degenerates to D x c_launch)
+D graph_matmul_flops=10.0122 GFLOP -> 0.1496 ms at fp32 peak, 0.0202 ms at tf32 peak
+D aten_call_nodes=9448  barrier_nodes=779  CRITICAL_PATH_barriers=205  critical_path_all_ops=1757
+########## R2: does ncu work here?
+/apps/SPACK/0.23.0/opt/linux-almalinux9-x86_64_v4/gcc-11.4.1/cuda-12.6.2-vbdp42yzhdfbmub242scq4oxzy2bno5g/bin/ncu
+NVIDIA (R) Nsight Compute Command Line Profiler
+Copyright (c) 2018-2024 NVIDIA Corporation
+Version 2024.3.2.0 (build 34861637) (public-release)
+### done Sat Sep 26 01:00:24 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 13:00:24 CEST 2026
+= Job-ID             : 904012 on helma
+= Job-Name           : n016_r7
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor/run_r7.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:40:00
+= Elapsed runtime    : 00:00:31
+= Total RAM usage    : 1.8 GiB of assigned 175 GiB (1.0%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T12:59:45 / 2026-09-26T12:59:45 / 2026-09-26T12:59:53 / 2026-09-26T13:00:24
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      74K      61K      81K  5d19h49m27s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 1904343, 0 %, 0 %, 794 MiB, 27727 ms

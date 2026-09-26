@@ -1,0 +1,167 @@
+### Starting TaskPrologue of job 903967 on h11-24 at Sat Sep 26 12:42:18 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 12:42:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   39C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-24  Sat Sep 26 12:42:18 PM CEST 2026
+########## P,F,B,D  exact, L=100  (one process)
+B   aten.div.Tensor                              x197     321.68 MiB out_elems  39.84 M
+B   aten.index.Tensor                            x238     321.26 MiB out_elems  78.85 M
+B   aten.pow.Tensor_Scalar                       x26      304.72 MiB out_elems  39.94 M
+B   aten.neg.default                             x37      207.89 MiB out_elems  27.25 M
+B   aten.exp.default                             x13      206.05 MiB out_elems  27.01 M
+F   --- mm/bmm shapes on a lean step ---
+F     bmm    ((100, 3, 3), (100, 3, 20))                  x67
+F     bmm    ((1, 100, 128), (1, 128, 512))               x24
+F     bmm    ((1, 100, 128), (1, 128, 768))               x12
+F     bmm    ((1, 100, 128), (1, 128, 576))               x12
+F     bmm    ((100, 3, 3), (100, 3, 192))                 x12
+F     bmm    ((100, 3, 3), (100, 3, 64))                  x12
+F     bmm    ((1, 100, 1024), (1, 1024, 128))             x12
+F     bmm    ((1, 100, 512), (1, 512, 128))               x7
+F     bmm    ((1, 6400, 400), (1, 400, 64))               x6
+F     bmm    ((100, 3, 3), (100, 3, 1280))                x6
+F     bmm    ((1, 6400, 60), (1, 60, 64))                 x6
+F     bmm    ((6400, 3, 3), (6400, 3, 3))                 x6
+F     bmm    ((1, 6400, 9), (1, 9, 64))                   x6
+F     bmm    ((100, 3, 3), (100, 3, 2560))                x6
+F     bmm    ((1, 6400, 240), (1, 240, 64))               x6
+F     bmm    ((1, 6400, 64), (1, 64, 128))                x6
+F     bmm    ((1, 6400, 128), (1, 128, 64))               x6
+F     bmm    ((1, 6400, 64), (1, 64, 8))                  x6
+F     bmm    ((800, 1, 32), (800, 32, 64))                x6
+F     bmm    ((100, 8, 64), (100, 64, 64))                x6
+F     bmm    ((800, 1, 64), (800, 64, 32))                x6
+F     bmm    ((800, 1, 64), (800, 64, 24))                x6
+F     bmm    ((1, 4800, 400), (1, 400, 64))               x6
+F     bmm    ((100, 3, 3), (100, 3, 960))                 x6
+F     bmm    ((1, 4800, 60), (1, 60, 64))                 x6
+F     bmm    ((4800, 3, 3), (4800, 3, 3))                 x6
+F     bmm    ((1, 4800, 9), (1, 9, 64))                   x6
+F     bmm    ((100, 3, 3), (100, 3, 1920))                x6
+F     bmm    ((1, 4800, 240), (1, 240, 64))               x6
+F     bmm    ((1, 4800, 64), (1, 64, 128))                x6
+F full: matmul_FLOPs=11.6033 GFLOP  aten_ops=12655  unfused_traffic=11823.7 MiB  output_elements=1504.12 M
+B graph_input_bytes=1.401 MiB graph_output_bytes=0.209 MiB
+B     (of the input, `uniform` alone is 0.725 MiB)
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor/x_census.py", line 192, in <module>
+    fn(*ARGS_LEAN)
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 465, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/hnvme/workspace/v181bb10-salad/n016-floor/salad_torch/modules/diffusion.py", line 210, in forward_core
+    def forward_core(self, pos_noised: Tensor, prev_pos: Tensor, prev_local: Tensor,
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 632, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1100, in forward
+    return compiled_fn(full_args)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 321, in runtime_wrapper
+    all_outs = call_func_at_runtime_with_args(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/utils.py", line 124, in call_func_at_runtime_with_args
+    out = normalize_as_list(f(args))
+                            ^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 667, in inner_fn
+    outs = compiled_fn(args)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 488, in wrapper
+    return compiled_fn(runtime_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/utils.py", line 98, in g
+    return f(*args)
+           ^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/fx/_lazy_graph_module.py", line 126, in _lazy_forward
+    return self(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/fx/graph_module.py", line 784, in call_wrapped
+    return self._wrapped_call(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/fx/graph_module.py", line 361, in __call__
+    raise e
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/fx/graph_module.py", line 348, in __call__
+    return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<eval_with_key>.1 from /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/fx/experimental/proxy_tensor.py:1171 in wrapped", line 2018, in forward
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_ops.py", line 716, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contiguous subspaces). Use .reshape(...) instead.
+########## K  exact, L=100  (fresh process)
+CFG default_vp L=100 preset=exact local=128 pair=64 depth=6 heads=8 key=32 factor=4 atoms=20 tf32=highest
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+K preset=exact need_aa=False kernels=946 gpu_busy_ms=3.5241
+K   GEMM (cuBLAS)      359 kernels  2.1664 ms   6.03 us each
+K   Triton             524 kernels  1.2712 ms   2.43 us each
+K   memcpy/memset       61 kernels  0.0817 ms   1.34 us each
+K   other                2 kernels  0.0049 ms   2.43 us each
+K preset=exact need_aa=True kernels=1202 gpu_busy_ms=4.3459
+K   GEMM (cuBLAS)      476 kernels  2.7208 ms   5.72 us each
+K   Triton             645 kernels  1.5167 ms   2.35 us each
+K   memcpy/memset       79 kernels  0.1035 ms   1.31 us each
+K   other                2 kernels  0.0049 ms   2.43 us each
+########## K  fast,  L=100  (fresh process)
+CFG default_vp L=100 preset=fast local=128 pair=64 depth=6 heads=8 key=32 factor=4 atoms=20 tf32=high
+K preset=fast need_aa=False kernels=934 gpu_busy_ms=2.9390
+K   GEMM (cuBLAS)      347 kernels  1.5865 ms   4.57 us each
+K   Triton             524 kernels  1.2660 ms   2.42 us each
+K   memcpy/memset       61 kernels  0.0817 ms   1.34 us each
+K   other                2 kernels  0.0048 ms   2.42 us each
+K preset=fast need_aa=True kernels=1185 gpu_busy_ms=3.6584
+K   GEMM (cuBLAS)      459 kernels  2.0227 ms   4.41 us each
+K   Triton             645 kernels  1.5276 ms   2.37 us each
+K   memcpy/memset       79 kernels  0.1033 ms   1.31 us each
+K   other                2 kernels  0.0048 ms   2.42 us each
+### done Sat Sep 26 12:51:37 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 12:51:37 CEST 2026
+= Job-ID             : 903967 on helma
+= Job-Name           : n016_cens
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor/run_census.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:09:19
+= Total RAM usage    : 3.9 GiB of assigned 175 GiB (2.2%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T12:42:17 / 2026-09-26T12:42:17 / 2026-09-26T12:42:18 / 2026-09-26T12:51:37
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      73K      61K      81K  5d19h58m14s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 1875641, 0 %, 0 %, 798 MiB, 25716 ms
+NVIDIA H100, 00000000:A6:00.0, 1875959, 7 %, 8 %, 1294 MiB, 313616 ms
+NVIDIA H100, 00000000:A6:00.0, 1887298, 2 %, 2 %, 1046 MiB, 210335 ms

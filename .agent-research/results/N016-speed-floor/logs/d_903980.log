@@ -1,0 +1,119 @@
+### Starting TaskPrologue of job 903980 on h11-24 at Sat Sep 26 12:46:13 PM CEST 2026
+Running on cores 32-63 with governor performance
+Sat Sep 26 12:46:13 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-24 Sat Sep 26 12:46:13 PM CEST 2026
+########## P,F,B  exact L=100 (full output, no tail)
+CFG default_vp L=100 preset=exact local=128 pair=64 depth=6 heads=8 key=32 factor=4 atoms=20 tf32=highest
+P total_model_params=9984957 (38.09 MiB fp32)
+P   diffusion.diffusion_stack                 6940200 (  26.47 MiB)
+P   diffusion.aa_decoder                      1867204 (   7.12 MiB)
+P   diffusion.prepare_mlp                      949376 (   3.62 MiB)
+P   diffusion.angle_head                       139278 (   0.53 MiB)
+P   diffusion.distogram_decoder                 83136 (   0.32 MiB)
+P   diffusion.dssp_decoder                        387 (   0.00 MiB)
+P   diffusion.prepare_layer_norm_prev             256 (   0.00 MiB)
+P   diffusion.prepare_layer_norm_local            256 (   0.00 MiB)
+P   diffusion.prepare_layer_norm_cond             256 (   0.00 MiB)
+P LEAN-STEP live params ~= 7890344 (30.10 MiB); dead on a lean step 2090005 (7.97 MiB)
+F lean: matmul_FLOPs=10.0140 GFLOP  aten_ops=10075  unfused_traffic=10268.4 MiB  output_elements=1306.17 M
+B   aten.permute.default                         x1695   2547.70 MiB out_elems 333.93 M
+B   aten.view.default                            x1478   1707.09 MiB out_elems 223.75 M
+B   aten.unsqueeze.default                       x1472    813.62 MiB out_elems 106.73 M
+B   aten.bmm.default                             x351     737.75 MiB out_elems  49.84 M
+B   aten._unsafe_view.default                    x144     548.90 MiB out_elems  71.95 M
+B   aten.clone.default                           x151     545.74 MiB out_elems  71.53 M
+B   aten.sub.Tensor                              x436     380.58 MiB out_elems  64.06 M
+B   aten.mul.Tensor                              x572     377.25 MiB out_elems  39.82 M
+B   aten.add.Tensor                              x380     366.38 MiB out_elems  38.56 M
+B   aten.div.Tensor                              x197     321.68 MiB out_elems  39.84 M
+B   aten.index.Tensor                            x238     321.26 MiB out_elems  78.85 M
+B   aten.pow.Tensor_Scalar                       x26      304.72 MiB out_elems  39.94 M
+B   aten.neg.default                             x37      207.89 MiB out_elems  27.25 M
+B   aten.exp.default                             x13      206.05 MiB out_elems  27.01 M
+F   --- mm/bmm shapes on a lean step ---
+F     bmm    ((100, 3, 3), (100, 3, 20))                  x67
+F     bmm    ((1, 100, 128), (1, 128, 512))               x24
+F     bmm    ((1, 100, 128), (1, 128, 768))               x12
+F     bmm    ((1, 100, 128), (1, 128, 576))               x12
+F     bmm    ((100, 3, 3), (100, 3, 192))                 x12
+F     bmm    ((100, 3, 3), (100, 3, 64))                  x12
+F     bmm    ((1, 100, 1024), (1, 1024, 128))             x12
+F     bmm    ((1, 100, 512), (1, 512, 128))               x7
+F     bmm    ((1, 6400, 400), (1, 400, 64))               x6
+F     bmm    ((100, 3, 3), (100, 3, 1280))                x6
+F     bmm    ((1, 6400, 60), (1, 60, 64))                 x6
+F     bmm    ((6400, 3, 3), (6400, 3, 3))                 x6
+F     bmm    ((1, 6400, 9), (1, 9, 64))                   x6
+F     bmm    ((100, 3, 3), (100, 3, 2560))                x6
+F     bmm    ((1, 6400, 240), (1, 240, 64))               x6
+F     bmm    ((1, 6400, 64), (1, 64, 128))                x6
+F     bmm    ((1, 6400, 128), (1, 128, 64))               x6
+F     bmm    ((1, 6400, 64), (1, 64, 8))                  x6
+F     bmm    ((800, 1, 32), (800, 32, 64))                x6
+F     bmm    ((100, 8, 64), (100, 64, 64))                x6
+F     bmm    ((800, 1, 64), (800, 64, 32))                x6
+F     bmm    ((800, 1, 64), (800, 64, 24))                x6
+F     bmm    ((1, 4800, 400), (1, 400, 64))               x6
+F     bmm    ((100, 3, 3), (100, 3, 960))                 x6
+F     bmm    ((1, 4800, 60), (1, 60, 64))                 x6
+F     bmm    ((4800, 3, 3), (4800, 3, 3))                 x6
+F     bmm    ((1, 4800, 9), (1, 9, 64))                   x6
+F     bmm    ((100, 3, 3), (100, 3, 1920))                x6
+F     bmm    ((1, 4800, 240), (1, 240, 64))               x6
+F     bmm    ((1, 4800, 64), (1, 64, 128))                x6
+F full: matmul_FLOPs=11.6033 GFLOP  aten_ops=12655  unfused_traffic=11823.7 MiB  output_elements=1504.12 M
+B graph_input_bytes=1.401 MiB graph_output_bytes=0.209 MiB
+B     (of the input, `uniform` alone is 0.725 MiB)
+########## D  exact L=100 (fresh process)
+CFG default_vp L=100 preset=exact local=128 pair=64 depth=6 heads=8 key=32 factor=4 atoms=20 tf32=highest
+D note: traced graph captured, execution of the raw fx module raised (RuntimeError: view size is not compatible with input tensor's size and stride (at least one di) - harmless here
+D aten_call_nodes=9448  barrier_nodes=779  CRITICAL_PATH_barriers=205  critical_path_all_ops=1757
+D level_widths(min/med/max)=6/19/2064  levels=206
+D barrier op histogram: bmm=303, sum=251, mean=75, var=75, scatter_add=24, sort=20, index_put=19, _softmax=12
+D top non-barrier ops: permute=1455, unsqueeze=1328, view=1303, slice=674, mul=572, sub=388, add=380, index=238, clamp=226, div=197
+D longest-barrier-chain (205): sum -> sum -> sum -> bmm -> sum -> bmm -> bmm -> mean -> mean -> mean -> bmm -> mean -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> mean -> bmm -> mean -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> bmm -> scatter_add -> bmm -> mean -> bmm -> bmm -> sum -> index_put -> sort -> index_put -> sort -> bmm -> sum -> bmm -> mean -> bmm -> bmm -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> mean -> bmm -> mean -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> bmm -> scatter_add -> bmm -> mean -> bmm -> bmm -> sum -> index_put -> sort -> index_put -> sort -> bmm -> sum -> bmm -> mean -> bmm -> bmm -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> mean -> bmm -> mean -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> bmm -> scatter_add -> bmm -> mean -> bmm -> bmm -> sum -> index_put -> sort -> index_put -> sort -> bmm -> sum -> bmm -> mean -> bmm -> bmm -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> mean -> bmm -> mean -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> bmm -> scatter_add -> bmm -> mean -> bmm -> bmm -> sum -> index_put -> sort -> index_put -> sort -> bmm -> sum -> bmm -> mean -> bmm -> bmm -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> mean -> bmm -> mean -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> bmm -> scatter_add -> bmm -> mean -> bmm -> bmm -> sum -> index_put -> sort -> index_put -> sort -> bmm -> sum -> bmm -> mean -> bmm -> bmm -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> mean -> bmm -> mean -> bmm -> _softmax -> bmm -> bmm -> sum -> bmm -> mean -> bmm -> scatter_add -> bmm -> mean -> bmm -> bmm
+### done Sat Sep 26 12:46:46 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 12:46:46 CEST 2026
+= Job-ID             : 903980 on helma
+= Job-Name           : n016_d
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor/run_d.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:40:00
+= Elapsed runtime    : 00:00:33
+= Total RAM usage    : 1.9 GiB of assigned 175 GiB (1.1%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T12:46:12 / 2026-09-26T12:46:12 / 2026-09-26T12:46:13 / 2026-09-26T12:46:46
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      73K      61K      81K  5d20h3m5s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1886688, 1 %, 0 %, 798 MiB, 5936 ms
+NVIDIA H100, 00000000:26:00.0, 1886889, 0 %, 0 %, 794 MiB, 22397 ms

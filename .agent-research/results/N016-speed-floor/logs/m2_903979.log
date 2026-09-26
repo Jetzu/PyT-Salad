@@ -1,0 +1,67 @@
+### Starting TaskPrologue of job 903979 on h13-11 at Sat Sep 26 12:46:18 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 12:46:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+nvcc: /apps/SPACK/0.23.0/opt/linux-almalinux9-x86_64_v4/gcc-11.4.1/cuda-12.6.2-vbdp42yzhdfbmub242scq4oxzy2bno5g/bin/nvcc  CUDA_HOME=/apps/SPACK/0.23.0/opt/linux-almalinux9-x86_64_v4/gcc-11.4.1/cuda-12.6.2-vbdp42yzhdfbmub242scq4oxzy2bno5g
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/utils/cpp_extension.py:1964: UserWarning: TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
+If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'].
+  warnings.warn(
+M2 blocks=132  threads=128  iters=1     total=     4.88 us  per_barrier_marginal=    nan us
+M2 blocks=132  threads=128  iters=64    total=   125.10 us  per_barrier_marginal= 1.9082 us
+M2 blocks=132  threads=128  iters=256   total=   493.90 us  per_barrier_marginal= 1.9177 us
+M2 blocks=132  threads=128  iters=1024  total=  1969.25 us  per_barrier_marginal= 1.9202 us
+M2 blocks=132  threads=256  iters=1     total=     4.50 us  per_barrier_marginal=    nan us
+M2 blocks=132  threads=256  iters=64    total=   124.70 us  per_barrier_marginal= 1.9080 us
+M2 blocks=132  threads=256  iters=256   total=   492.21 us  per_barrier_marginal= 1.9126 us
+M2 blocks=132  threads=256  iters=1024  total=  1961.90 us  per_barrier_marginal= 1.9134 us
+M2 blocks=264  threads=128  iters=1     total=     4.83 us  per_barrier_marginal=    nan us
+M2 blocks=264  threads=128  iters=64    total=   134.67 us  per_barrier_marginal= 2.0610 us
+M2 blocks=264  threads=128  iters=256   total=   531.38 us  per_barrier_marginal= 2.0649 us
+M2 blocks=264  threads=128  iters=1024  total=  2118.92 us  per_barrier_marginal= 2.0666 us
+M2 blocks=264  threads=256  iters=1     total=     4.65 us  per_barrier_marginal=    nan us
+M2 blocks=264  threads=256  iters=64    total=   136.08 us  per_barrier_marginal= 2.0862 us
+M2 blocks=264  threads=256  iters=256   total=   536.85 us  per_barrier_marginal= 2.0871 us
+M2 blocks=264  threads=256  iters=1024  total=  2141.02 us  per_barrier_marginal= 2.0883 us
+# m2 done in 43.0s
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 12:47:04 CEST 2026
+= Job-ID             : 903979 on helma
+= Job-Name           : n016_m2
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor/run_m2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N016-speed-floor
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:25:00
+= Elapsed runtime    : 00:01:23
+= Total RAM usage    : 3.3 GiB of assigned 175 GiB (1.9%)
+= Node list          : h13-11
+= Subm/Elig/Start/End: 2026-09-26T12:45:41 / 2026-09-26T12:45:41 / 2026-09-26T12:45:41 / 2026-09-26T12:47:04
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      73K      61K      81K  5d20h2m47s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 314753, 0 %, 0 %, 612 MiB, 43252 ms
