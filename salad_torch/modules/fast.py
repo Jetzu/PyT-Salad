@@ -24,13 +24,15 @@ this is for.
 """
 from __future__ import annotations
 
+from typing import Sequence
+
 import torch
 from torch import Tensor, nn
 
 from .. import opt
 from .diffusion import uniform_draw_count
 
-__all__ = ["FastDenoiser", "PRESETS"]
+__all__ = ["FastDenoiser", "GroupFastDenoiser", "PRESETS", "autosize_group"]
 
 #: `SALAD_OPT_DETSEG=1` forces the deterministic segment reduction on for every
 #: preset; captured here because `FastDenoiser` writes `opt.DET_SEGMENT`.
@@ -430,14 +432,15 @@ class FastDenoiser(nn.Module):
         return self
 
     # ------------------------------------------------------------------
-    def _run(self, inputs: dict[str, Tensor], need_aa: bool = True,
-             pair_cond: bool = True) -> tuple[Tensor, ...]:
-        if self.capture and not self.manual_graph:
-            # tells inductor a new iteration has begun, so it may reuse the
-            # cudagraph's buffers; without it, holding on to a previous output
-            # raises "accessing tensor output of CUDAGraphs that has been
-            # overwritten by a subsequent run"
-            torch.compiler.cudagraph_mark_step_begin()
+    def _copy_in(self, inputs: dict[str, Tensor]) -> None:
+        """Write `inputs` into the persistent buffers the graph was captured on.
+
+        Factored out of `_run` unchanged so `GroupFastDenoiser` can drive N
+        members' buffers before a single grouped replay (N019). The single-
+        design path calls it from exactly where the loop used to live, so its
+        behaviour - including the N010/S2 length refusal and the clone-on-
+        first-sight - is byte-for-byte what it was.
+        """
         if self._static_in:
             # write into persistent buffers so the input ADDRESSES are stable.
             # Fresh tensors each call show up as
@@ -464,6 +467,17 @@ class FastDenoiser(nn.Module):
                     # buffer means the next call's copy_ silently mutates the
                     # caller's data (observed: cyclic_mask flipped 0/64 -> 64/64).
                     self._static_in[k] = src.clone()
+
+    def _run(self, inputs: dict[str, Tensor], need_aa: bool = True,
+             pair_cond: bool = True) -> tuple[Tensor, ...]:
+        if self.capture and not self.manual_graph:
+            # tells inductor a new iteration has begun, so it may reuse the
+            # cudagraph's buffers; without it, holding on to a previous output
+            # raises "accessing tensor output of CUDAGraphs that has been
+            # overwritten by a subsequent run"
+            torch.compiler.cudagraph_mark_step_begin()
+        if self._static_in:
+            self._copy_in(inputs)
             args = self._args(need_aa, pair_cond)
         else:
             args = ([inputs.get(k) for k in _CORE_ARGS]
@@ -486,6 +500,34 @@ class FastDenoiser(nn.Module):
         """Drop the cached conditioning; call if `data`'s condition keys change."""
         self._cond_cache = (None, None)
         self._pc_active = None
+        self._cond_pinned = False
+
+    def pin_condition(self, data: dict) -> bool:
+        """Compute `prepare_condition(data)` once and stop re-keying it (N019).
+
+        The content hash in `_prepare_inputs` runs `.cpu()` on every
+        conditioning tensor **on every step**, i.e. a device->host sync per
+        step per design. That is affordable against one 3.5 ms forward and it
+        is not affordable N times inside a grouped step, where the whole point
+        is that the host must stay ahead of a single 13 ms replay.
+
+        Pinning is exactly equivalent, not an approximation: `sample()` writes
+        only ``pos``/``seq``/``atom_pos``/``aatype``/``t_pos``/``t_seq``/
+        ``latent`` into `data`, and the hash keys on none of those - so from
+        step 1 on the cache always hits anyway and the hash is pure cost. It
+        is therefore safe for exactly as long as the caller promises not to
+        change the conditioning without calling `invalidate_condition_cache`,
+        which is the same promise `_cond_cache` already documents.
+
+        Returns the P4/P5 `pair_cond` gate for this design.
+        """
+        cond = self.model.prepare_condition(data)
+        self._cond_cache = (cond, "__pinned__")
+        pc = cond["pair_condition"]
+        self._pc_active = bool(self.config.multi_motif) or bool(
+            pc["dmap_mask"].any().item() or pc["flags"].any().item())
+        self._cond_pinned = True
+        return self._pc_active or not self.allow_pair_cond_skip
 
     def forward(self, data: dict, prev: dict, *, predict_aa: bool = True,
                 need_aa: bool = True,
@@ -503,11 +545,33 @@ class FastDenoiser(nn.Module):
         `predict_aa` is unrelated and unchanged: it selects whose amino acids
         the sidechains are built from.
         """
+        inputs, pair_cond = self._prepare_inputs(
+            data, prev, uniform=uniform, generator=generator)
+        out = self._run(inputs, need_aa=need_aa, pair_cond=pair_cond)
+        return self._postprocess(out, data, need_aa=need_aa,
+                                 predict_aa=predict_aa)
+
+    # ------------------------------------------------------------------
+    # forward() split in three (N019) so `GroupFastDenoiser` can interleave
+    # N members' host-side work around ONE grouped replay. The bodies are
+    # verbatim what `forward` used to run, in the same order.
+    # ------------------------------------------------------------------
+    def _prepare_inputs(self, data: dict, prev: dict, *,
+                        uniform: Tensor | None = None,
+                        generator: torch.Generator | None = None,
+                        ) -> tuple[dict, bool]:
         if uniform is None:
             # drawn OUTSIDE the graph, then copied into the static buffer
             uniform = torch.rand(self.n_draws, self.length, self.length,
                                  device=self.device, dtype=self.dtype,
                                  generator=generator).clamp_(1e-6, 1 - 1e-6)
+        if getattr(self, "_cond_pinned", False):
+            # `pin_condition` has already computed this design's conditioning
+            # and its P4/P5 gate; skip the per-step hash entirely (N019).
+            cond = self._cond_cache[0]
+            pc = cond["pair_condition"]
+            pair_cond = self._pc_active or not self.allow_pair_cond_skip
+            return self._pack_inputs(data, prev, cond, pc, uniform), pair_cond
         # prepare_condition is LOOP-INVARIANT: it depends only on the
         # conditioning inputs and the chain/batch layout, none of which change
         # across the 500 denoising steps of one design. Running it every step
@@ -553,7 +617,11 @@ class FastDenoiser(nn.Module):
             self._pc_active = bool(self.config.multi_motif) or bool(
                 pc["dmap_mask"].any().item() or pc["flags"].any().item())
         pair_cond = self._pc_active or not self.allow_pair_cond_skip
-        inputs = dict(
+        return self._pack_inputs(data, prev, cond, pc, uniform), pair_cond
+
+    def _pack_inputs(self, data: dict, prev: dict, cond: dict, pc: dict,
+                     uniform: Tensor) -> dict:
+        return dict(
             pos_noised=data["pos_noised"], prev_pos=prev["pos"],
             prev_local=prev["local"], condition=cond["condition"],
             dmap=pc["dmap"], omap=pc["omap"],
@@ -565,7 +633,10 @@ class FastDenoiser(nn.Module):
             cyclic_mask=data.get("cyclic_mask") if self.config.cyclic else None,
             uniform=uniform,
         )
-        out = self._run(inputs, need_aa=need_aa, pair_cond=pair_cond)
+        return inputs, pair_cond
+
+    def _postprocess(self, out: tuple, data: dict, *, need_aa: bool,
+                     predict_aa: bool) -> tuple[dict, dict]:
         if not need_aa:
             result = dict(zip(_OUT_NAMES_LEAN, out))
             result["pos_noised"] = data["pos_noised"]
@@ -589,3 +660,416 @@ class FastDenoiser(nn.Module):
                     result["aatype"], result["local"], result["pos"])
             result["raw_angles"], result["angles"], result["atom_pos"] = raw, ang, apos
         return result, {"pos": result["pos"], "local": result["local"]}
+
+
+# ======================================================================
+# N019 - N independent designs in ONE CUDA graph
+# ======================================================================
+#: Hard ceiling on the auto-chosen group size. It is a *safety* cap on the
+#: search, not a tuned value: `--group_size N` overrides it in both
+#: directions, and `autosize` almost always lands below it. Kept modest so a
+#: first run on an unknown card cannot spend minutes capturing a graph that
+#: will not fit.
+_AUTOSIZE_CAP = 16
+#: Fraction of FREE device memory `autosize` is willing to spend on the
+#: grouped graph's activation pool. The rest is headroom for the sampler's own
+#: per-design tensors, the snapshots, fragmentation and whatever else shares
+#: the card.
+_AUTOSIZE_MEM_FRACTION = 0.6
+
+
+def memory_bound_group(per_member_bytes: int | None, device=None,
+                       cap: int = _AUTOSIZE_CAP) -> int:
+    """How many members FREE device memory can hold. Portable, no card in it.
+
+    ``1 + free_bytes * _AUTOSIZE_MEM_FRACTION / per_member_bytes``, clamped to
+    `cap`. `per_member_bytes` is MEASURED on the real model by
+    `GroupFastDenoiser._probe_member_cost`, never estimated from a shape, and
+    the fraction leaves the rest of the card to the sampler's own per-design
+    tensors, the snapshots, fragmentation and anything else sharing the GPU.
+
+    On a 24 GB consumer card this, not occupancy, is normally what decides the
+    group size - which is the whole reason it is measured.
+    """
+    if not per_member_bytes or per_member_bytes <= 0:
+        return cap
+    try:
+        free_bytes, _total = torch.cuda.mem_get_info(device)
+    except Exception:
+        return 1
+    return max(1, min(cap, 1 + int(free_bytes * _AUTOSIZE_MEM_FRACTION
+                                   // per_member_bytes)))
+
+
+#: The group sizes `auto` will try, in order. A ladder rather than every
+#: integer because each rung costs a capture, and the curve is smooth.
+_AUTOSIZE_LADDER = (1, 2, 3, 4, 6, 8, 12, 16, 24, 32)
+#: `auto` stops climbing when a rung improves per-design time by less than
+#: this. Not a performance constant - a stopping rule.
+_AUTOSIZE_MIN_GAIN = 0.03
+
+
+class GroupFastDenoiser(nn.Module):
+    """`group_size` independent designs advanced through ONE captured graph.
+
+    This is **not** a batch axis. salad's flat residue layout would let you
+    concatenate designs along it with `batch_index`, and that is a different
+    thing with different arithmetic. Here each member keeps its own complete
+    set of static input buffers and its own copy of `forward_core`; the
+    members are recorded into one `torch.cuda.CUDAGraph` on
+    ``group_size`` separate streams, so a single `replay()` submits all of
+    them and the driver overlaps whichever of their kernels it likes.
+
+    Each member therefore computes **exactly** what it would compute alone -
+    same kernels, same shapes, same inputs, no shared reduction - and the only
+    thing that changes is that the GPU is no longer idle between one design's
+    serialised launches. N016 measured a single L=100 forward leaving an H100
+    roughly 55 % idle.
+
+    Portability, because this is squarely the kind of optimisation that gets
+    over-fitted to one card:
+
+    * `group_size` is a runtime parameter (`autosize_group` derives a default
+      from ``multi_processor_count`` and free VRAM), never a constant;
+    * ``group_size=1`` captures a single-stream body byte-for-byte identical
+      to `FastDenoiser`'s, so degrading to "no grouping" is the same code
+      path, not a fallback branch;
+    * everything here is plain `torch.cuda.Stream` + `torch.cuda.CUDAGraph` +
+      `torch.compile`. No architecture-gated kernels, no PTX, nothing Hopper-
+      specific. Inductor autotunes the member forward for whatever card it
+      lands on;
+    * a capture that runs out of memory halves the group and retries, down to
+      1, rather than failing the run.
+    """
+
+    def __init__(self, model, length: int, group_size: int | str = "auto",
+                 device="cuda", mode: str = "default",
+                 dtype=torch.float32, preset: str = "exact",
+                 autosize_cap: int = _AUTOSIZE_CAP):
+        super().__init__()
+        self.length = int(length)
+        self.device = torch.device(device)
+        if self.device.type != "cuda":
+            raise ValueError("GroupFastDenoiser needs a CUDA device")
+        self.preset = preset
+        self._requested = group_size
+        self._autosize_cap = int(autosize_cap)
+        if mode == "reduce-overhead":
+            # Same mutual exclusion `FastDenoiser.__init__` documents, and it
+            # bites harder here: in reduce-overhead inductor manages its own
+            # cudagraphs, and recording an explicit capture on top raises
+            # "Cannot prepare for replay during capturing stage". The group
+            # OWNS the capture, so the member forward must be a plain compile.
+            mode = "default"
+        # The FIRST member does all the process-global setup (TF32, DETSEG,
+        # aggressive_fusion, BATCH_COND) and owns the ONE compiled callable;
+        # every other member borrows it, so inductor compiles once and the
+        # members differ only in which buffers they point at.
+        self._head = FastDenoiser(model, self.length, device=self.device,
+                                  mode=mode, dtype=dtype, capture=False,
+                                  manual_graph=False, preset=preset)
+        self.model = model
+        self.config = model.config
+        self.members: list[FastDenoiser] = [self._head]
+        self.group_size = 1
+        self._graphs: dict[tuple[bool, bool], tuple] = {}
+        #: measured, per member: activation high-water of one compiled forward
+        self.per_member_bytes: int | None = None
+        #: filled in by `warmup`, reported by `scripts/generate.py`
+        self.peak_bytes: int | None = None
+
+    # ------------------------------------------------------------------
+    def _add_members(self, n: int) -> None:
+        head = self._head
+        while len(self.members) < n:
+            m = FastDenoiser(head.model, self.length, device=self.device,
+                             mode="default", dtype=head.dtype, capture=False,
+                             manual_graph=False, preset=self.preset)
+            # ONE compiled callable for the whole group: a second
+            # `torch.compile` wrapper would get its own code cache and
+            # recompile the identical graph from scratch.
+            m._compiled = head._compiled
+            m._static_in = m._blank_inputs()
+            self.members.append(m)
+        del self.members[n:]
+        self.group_size = n
+
+    def _probe_member_cost(self, pair_cond: bool = True) -> int:
+        """Activation high-water of ONE compiled forward, measured not guessed.
+
+        Takes the `pair_cond` the run will actually use: probing the other
+        variant would compile a third graph nobody replays (~a minute).
+
+        It also has a second job, and the order in `warmup` is load-bearing
+        because of it: this is the FULL-AA path (``need_aa=True``), so running
+        it first populates `salad_torch.geometry.sidechain._DEVICE_CACHE`,
+        which is lazily filled on first use and - being a python global read
+        inside the traced region - would otherwise flip a Dynamo guard and
+        trigger a recompile the first time the angle head ran. A recompile
+        during a `torch.cuda.graph` capture is a raise or garbage. `_autotune`
+        and every `_capture` run after this, so by then the table exists.
+        """
+        head = self._head
+        args = head._args(True, bool(pair_cond))
+        with torch.no_grad():
+            # compile + autotune first: measuring the FIRST call would fold
+            # inductor's benchmarking scratch into the per-member footprint
+            # and propose an absurdly small group.
+            head._compiled(*args)
+        torch.cuda.synchronize()
+        base = torch.cuda.memory_allocated(self.device)
+        torch.cuda.reset_peak_memory_stats(self.device)
+        with torch.no_grad():
+            head._compiled(*args)
+        torch.cuda.synchronize()
+        peak = torch.cuda.max_memory_allocated(self.device)
+        # a floor, so a mis-measurement can never divide by ~0 and propose a
+        # thousand-member group
+        return max(int(peak - base), 1 << 20)
+
+    # ------------------------------------------------------------------
+    def _capture(self, need_aa: bool, pair_cond: bool, iters: int = 3):
+        """Record `group_size` member forwards into one graph, one per stream."""
+        compiled = self._head._compiled
+        argsets = [m._args(need_aa, pair_cond) for m in self.members]
+        n = self.group_size
+        streams = ([torch.cuda.Stream(device=self.device) for _ in range(n)]
+                   if n > 1 else None)
+
+        def body():
+            if streams is None:
+                # group_size == 1: the SAME single-stream body `FastDenoiser`
+                # captures. Not a special case for speed - a guarantee that
+                # "no grouping" is not a different computation.
+                return [compiled(*argsets[0])]
+            cur = torch.cuda.current_stream()
+            for s in streams:
+                s.wait_stream(cur)
+            outs = []
+            for i in range(n):
+                with torch.cuda.stream(streams[i]):
+                    outs.append(compiled(*argsets[i]))
+            for s in streams:
+                cur.wait_stream(s)
+            return outs
+
+        with torch.no_grad():
+            # THREE warm calls before the side-stream warm, the same count
+            # `FastDenoiser._build` uses and for the same reason: a partially
+            # warmed callable captures a *recompile*, which is either a raise
+            # or silent garbage. Every member is warmed, not just the head -
+            # they share one compiled callable but each has its own buffers.
+            for _ in range(iters):
+                body()
+            torch.cuda.synchronize()
+            # CUDA graph capture of multi-stream work must itself be warmed up
+            # on a non-default stream first, or the capture sees allocator
+            # state it did not record.
+            side = torch.cuda.Stream(device=self.device)
+            side.wait_stream(torch.cuda.current_stream())
+            with torch.cuda.stream(side):
+                body()
+            torch.cuda.current_stream().wait_stream(side)
+            torch.cuda.synchronize()
+            graph = torch.cuda.CUDAGraph()
+            # DELIBERATELY not sharing one memory pool across the
+            # (need_aa=True, need_aa=False) variants, although that would
+            # roughly halve the graph's footprint and footprint is the binding
+            # limit on a 24 GB consumer card. Graphs that share a pool are
+            # only safe when they are replayed in their capture order, and
+            # this sampler replays the lean variant ~200 times and the full
+            # one once, interleaved - exactly the pattern the shared-pool
+            # idiom does not cover. Silent corruption is not worth the GiB;
+            # `warmup` reports the real peak so a caller can size the group
+            # against what it actually costs.
+            with torch.cuda.graph(graph):
+                outs = body()
+        return graph, outs
+
+    def _build(self, need_aa: bool, pair_cond: bool) -> None:
+        key = (need_aa, pair_cond)
+        if key in self._graphs:
+            return
+        while True:
+            try:
+                self._graphs[key] = self._capture(need_aa, pair_cond)
+                return
+            except RuntimeError as exc:
+                # `torch.cuda.OutOfMemoryError` is a RuntimeError subclass,
+                # but a capture that runs out of memory inside the graph's
+                # private pool has also been seen to surface as a plain
+                # RuntimeError carrying the driver's text - and the text is
+                # all there is to go on. Anything else re-raises untouched.
+                if not isinstance(exc, torch.cuda.OutOfMemoryError) and \
+                        "out of memory" not in str(exc).lower():
+                    raise
+                if self.group_size <= 1:
+                    raise
+                new_n = max(1, self.group_size // 2)
+                print(f"  group capture OOM at group_size={self.group_size}; "
+                      f"retrying at {new_n}")
+                # every previously captured variant was recorded against the
+                # old member count, so they all have to go with it
+                self._graphs.clear()
+                self._add_members(new_n)
+                torch.cuda.empty_cache()
+
+    def warmup(self, pair_cond: bool | None = None,
+               need_aa_variants: Sequence[bool] = (True, False)
+               ) -> "GroupFastDenoiser":
+        """Choose the group size, compile once, capture the variants."""
+        self._head._static_in = self._head._blank_inputs()
+        want_pc = True if pair_cond is None else bool(pair_cond)
+        self.per_member_bytes = self._probe_member_cost(want_pc)
+        if isinstance(self._requested, str):
+            if self._requested != "auto":
+                raise ValueError(f"group_size must be an int or 'auto', "
+                                 f"got {self._requested!r}")
+            n = self._autotune(want_pc)
+        else:
+            n = max(1, int(self._requested))
+        return self._capture_variants(n, pair_cond, need_aa_variants)
+
+    def _autotune(self, pair_cond: bool, reps: int = 30) -> int:
+        """MEASURE the group size on this device. No formula, no calibration.
+
+        The win is spare GPU capacity, and how much of that a card has depends
+        on its SM count, its clocks, its memory system and the driver - not on
+        any one number that can be written down here. An analytic rule fitted
+        to the H100 this was developed on is precisely the H100
+        specialisation the design is supposed to avoid, and it would be wrong
+        in an unknown direction on a 4090, a 5090 or whatever comes next.
+
+        So `auto` climbs `_AUTOSIZE_LADDER`, captures the graph at each rung
+        (a capture, NOT a recompile - the compiled forward is shared, so a
+        rung costs seconds), times the replay that the sampler actually
+        spends ~99 % of its steps in, and stops when a rung buys less than
+        `_AUTOSIZE_MIN_GAIN` per design or when memory says stop. The whole
+        search is a handful of seconds against a one-time compile of a
+        minute or more, and it adapts to the card by construction.
+
+        Degrading to 1 is a normal outcome, not a failure: on a card with no
+        spare capacity - or at a length where one design already fills it -
+        the first rung wins and the caller gets the ordinary single-design
+        computation.
+        """
+        cap = min(self._autosize_cap,
+                  memory_bound_group(self.per_member_bytes, self.device,
+                                     cap=self._autosize_cap))
+        # time the variant the sampler actually spends ~99 % of its steps in
+        probe_need_aa = not self._head.lean_steps
+        best_n, best_per = 1, None
+        for n in _AUTOSIZE_LADDER:
+            if n > cap:
+                break
+            try:
+                self._graphs.clear()
+                self._add_members(n)
+                torch.cuda.empty_cache()
+                graph, _outs = self._capture(probe_need_aa, pair_cond)
+            except RuntimeError as exc:
+                if not isinstance(exc, torch.cuda.OutOfMemoryError) and \
+                        "out of memory" not in str(exc).lower():
+                    raise
+                break
+            for _ in range(5):
+                graph.replay()
+            torch.cuda.synchronize()
+            s, e = torch.cuda.Event(True), torch.cuda.Event(True)
+            s.record()
+            for _ in range(reps):
+                graph.replay()
+            e.record()
+            torch.cuda.synchronize()
+            per = s.elapsed_time(e) / reps / n
+            del graph, _outs
+            if best_per is None or per < best_per * (1.0 - _AUTOSIZE_MIN_GAIN):
+                best_n, best_per = n, per
+            else:
+                # this rung did not pay for itself; the curve is monotone
+                # enough that the next one will not either
+                break
+        self._graphs.clear()
+        torch.cuda.empty_cache()
+        return best_n
+
+    def resize(self, n: int, pair_cond: bool | None = None,
+               need_aa_variants: Sequence[bool] = (True, False)
+               ) -> "GroupFastDenoiser":
+        """Re-capture at a different group size, reusing the compiled forward.
+
+        The trailing partial group of a `--num_designs` run needs this: a
+        group of 3 cannot replay a graph recorded for 8. It costs one capture
+        (seconds), not one compile (a minute) - `self._head._compiled` and
+        every member's buffers survive.
+        """
+        return self._capture_variants(max(1, int(n)), pair_cond,
+                                      need_aa_variants)
+
+    def _capture_variants(self, n: int, pair_cond, need_aa_variants
+                          ) -> "GroupFastDenoiser":
+        self._graphs.clear()
+        self._add_members(n)
+        torch.cuda.empty_cache()
+        want_pc = True if pair_cond is None else bool(pair_cond)
+        torch.cuda.reset_peak_memory_stats(self.device)
+        for need_aa in need_aa_variants:
+            if need_aa or self._head.lean_steps:
+                self._build(bool(need_aa), want_pc)
+        self.peak_bytes = int(torch.cuda.max_memory_reserved(self.device))
+        return self
+
+    # ------------------------------------------------------------------
+    def invalidate_condition_cache(self) -> None:
+        for m in self.members:
+            m.invalidate_condition_cache()
+
+    def pin_conditions(self, datas: Sequence[dict]) -> bool:
+        """Pin each member's conditioning and return the group's `pair_cond`.
+
+        The gate is OR-ed over the members because one graph carries one
+        variant of it. That is not a numerical compromise: `pair_cond=True` is
+        the FULL computation and P4/P5 (`salad_torch.opt.SKIP_PAIR_COND`) are
+        defined as dropping terms that are exactly zero for a design without
+        pair conditioning - so a member that would have run with the skip gets
+        the same answer without it, in a different reduction order over K.
+        With ``group_size=1`` the OR is the member's own gate and nothing
+        changes at all.
+        """
+        gates = [m.pin_condition(d) for m, d in zip(self.members, datas)]
+        return any(gates)
+
+    def forward(self, datas: Sequence[dict], prevs: Sequence[dict], *,
+                predict_aa: bool = True, need_aa: bool = True,
+                pair_cond: bool | None = None,
+                generators: Sequence[torch.Generator] | None = None,
+                ) -> tuple[list[dict], list[dict]]:
+        n = self.group_size
+        if len(datas) != n or len(prevs) != n:
+            raise ValueError(f"expected {n} designs, got {len(datas)} / "
+                             f"{len(prevs)}")
+        gens = list(generators) if generators is not None else [None] * n
+        gate = pair_cond
+        for i, m in enumerate(self.members):
+            inputs, g = m._prepare_inputs(datas[i], prevs[i], generator=gens[i])
+            gate = g if gate is None else (gate or g)
+            m._copy_in(inputs)
+        key = (need_aa, bool(gate))
+        if key not in self._graphs:
+            self._build(need_aa, bool(gate))
+            # a capture-time OOM may have shrunk the group under us
+            if self.group_size != n:
+                raise RuntimeError(
+                    f"group size dropped {n} -> {self.group_size} while "
+                    f"capturing {key}; restart the run at the smaller size")
+        graph, outs = self._graphs[key]
+        graph.replay()
+        results, new_prevs = [], []
+        for i, m in enumerate(self.members):
+            # clone: the next replay overwrites these buffers
+            out = tuple(o.clone() if torch.is_tensor(o) else o for o in outs[i])
+            r, p = m._postprocess(out, datas[i], need_aa=need_aa,
+                                  predict_aa=predict_aa)
+            results.append(r)
+            new_prevs.append(p)
+        return results, new_prevs

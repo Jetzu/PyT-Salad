@@ -1,0 +1,97 @@
+### Starting TaskPrologue of job 904098 on h11-17 at Sat Sep 26 01:56:23 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 13:56:23 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   40C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-17 Sat Sep 26 01:56:23 PM CEST 2026
+GPU NVIDIA H100 132 SM 93.3 GiB torch 2.5.1+cu121
+########## A. curve smoke, exact L=100, N=1
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CURVE preset=exact L=100 N=1 requested=1 replay_lean_ms=3.2624 replay_lean_per_design_ms=3.2624 replay_full_ms=4.1377 host_step_ms=3.5068 host_step_per_design_ms=3.5068 sec_per_design=1.4036 peak_reserved_MiB=1046.0 per_member_MiB=150.0 warmup_s=339.3 sm=132 totmem_GiB=93.34 mem_bound_N=16
+########## B. curve smoke, exact L=100, N=4
+CURVE preset=exact L=100 N=4 requested=4 replay_lean_ms=7.1735 replay_lean_per_design_ms=1.7934 replay_full_ms=8.7867 host_step_ms=8.2566 host_step_per_design_ms=2.0642 sec_per_design=0.8261 peak_reserved_MiB=1792.0 per_member_MiB=149.4 warmup_s=64.8 sm=132 totmem_GiB=93.34 mem_bound_N=16
+########## C. curve smoke, exact L=100, N=auto
+CURVE preset=exact L=100 N=8 requested=auto replay_lean_ms=12.6638 replay_lean_per_design_ms=1.5830 replay_full_ms=15.1769 host_step_ms=14.8722 host_step_per_design_ms=1.8590 sec_per_design=0.7439 peak_reserved_MiB=3974.0 per_member_MiB=149.4 warmup_s=71.3 sm=132 totmem_GiB=93.34 mem_bound_N=16
+########## D. identity smoke (short schedule), group 1 vs 4, DETSEG=1
+ARGV generate.py --fast --preset exact --config default_vp --num_aa 100 --num_designs 4 --seed 42 --out_path /tmp/904098.helma/n019-904098/det_g1 --params /hnvme/workspace/v181bb10-salad/default_vp-200k.npz --group_size 1 --num_steps 40 --out_steps 30
+device: NVIDIA H100
+config default_vp  L=100  steps=40 out_steps=(30,)
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+grouped fast path (exact, group_size=1) compiled + captured in 189s (one-time); peak reserved 0.69 GiB, ~0.146 GiB/design
+  group_size 1: this is the ordinary single-design computation, run through the grouped machinery - the reference a larger group must reproduce.
+  design 0:    0.1s/design  CA-CA 3.746 A (min 3.013 max 4.254)  Rg 17.2 A  -> /tmp/904098.helma/n019-904098/det_g1/design_0.pdb
+  group of 1: 0.1s wall (0.124s/design)
+  design 1:    0.1s/design  CA-CA 3.625 A (min 2.995 max 4.250)  Rg 14.3 A  -> /tmp/904098.helma/n019-904098/det_g1/design_1.pdb
+  group of 1: 0.1s wall (0.111s/design)
+  design 2:    0.1s/design  CA-CA 3.728 A (min 3.296 max 4.422)  Rg 21.2 A  -> /tmp/904098.helma/n019-904098/det_g1/design_2.pdb
+  group of 1: 0.1s wall (0.111s/design)
+  design 3:    0.1s/design  CA-CA 3.752 A (min 2.822 max 4.307)  Rg 15.3 A  -> /tmp/904098.helma/n019-904098/det_g1/design_3.pdb
+  group of 1: 0.1s wall (0.111s/design)
+
+4 designs of 100 aa in groups of 1: median 0.111s/design, total 0.5s (design-time only)
+IDENTITY_RUN_DONE /tmp/904098.helma/n019-904098/det_g1
+ARGV generate.py --fast --preset exact --config default_vp --num_aa 100 --num_designs 4 --seed 42 --out_path /tmp/904098.helma/n019-904098/det_g4 --params /hnvme/workspace/v181bb10-salad/default_vp-200k.npz --group_size 4 --num_steps 40 --out_steps 30
+device: NVIDIA H100
+config default_vp  L=100  steps=40 out_steps=(30,)
+grouped fast path (exact, group_size=4) compiled + captured in 62s (one-time); peak reserved 1.74 GiB, ~0.146 GiB/design
+  design 0:    0.1s/design  CA-CA 3.746 A (min 3.013 max 4.254)  Rg 17.2 A  -> /tmp/904098.helma/n019-904098/det_g4/design_0.pdb
+  design 1:    0.1s/design  CA-CA 3.625 A (min 2.995 max 4.250)  Rg 14.3 A  -> /tmp/904098.helma/n019-904098/det_g4/design_1.pdb
+  design 2:    0.1s/design  CA-CA 3.728 A (min 3.296 max 4.422)  Rg 21.2 A  -> /tmp/904098.helma/n019-904098/det_g4/design_2.pdb
+  design 3:    0.1s/design  CA-CA 3.752 A (min 2.822 max 4.307)  Rg 15.3 A  -> /tmp/904098.helma/n019-904098/det_g4/design_3.pdb
+  group of 4: 0.3s wall (0.069s/design)
+
+4 designs of 100 aa in groups of 4: median 0.069s/design, total 0.1s (design-time only)
+IDENTITY_RUN_DONE /tmp/904098.helma/n019-904098/det_g4
+CMP DETSEG_g1_vs_g4 design_0.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g4 design_1.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g4 design_2.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g4 design_3.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP_SUMMARY DETSEG_g1_vs_g4: n=4 worst=0.000000e+00 A () bit_identical=4/4 aatype_diff=0/400
+### done Sat Sep 26 02:09:08 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 14:09:08 CEST 2026
+= Job-ID             : 904098 on helma
+= Job-Name           : n019_smoke
+= Job-Command        : .agent-research/results/N019-multidesign-occupancy/run_smoke.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:13:09
+= Total RAM usage    : 4.5 GiB of assigned 175 GiB (2.6%)
+= Node list          : h11-17
+= Subm/Elig/Start/End: 2026-09-26T13:55:31 / 2026-09-26T13:55:31 / 2026-09-26T13:55:59 / 2026-09-26T14:09:08
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.9G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      75K      61K      81K  5d18h40m43s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 675462, 8 %, 8 %, 1800 MiB, 347287 ms
+NVIDIA H100, 00000000:A6:00.0, 680250, 2 %, 0 %, 2562 MiB, 67446 ms
+NVIDIA H100, 00000000:A6:00.0, 680588, 7 %, 2 %, 4764 MiB, 75016 ms
+NVIDIA H100, 00000000:A6:00.0, 680951, 0 %, 0 %, 1454 MiB, 196779 ms
+NVIDIA H100, 00000000:A6:00.0, 681664, 0 %, 0 %, 2562 MiB, 63305 ms

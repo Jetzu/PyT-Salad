@@ -1,0 +1,66 @@
+### Starting TaskPrologue of job 904125 on h14-09 at Sat Sep 26 02:10:18 PM CEST 2026
+Running on cores 0-31 with governor performance
+Sat Sep 26 14:10:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   36C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h14-09 Sat Sep 26 02:10:18 PM CEST 2026 preset=exact L=200
+GPU NVIDIA H100 132 SM 93.1 GiB
+CURVE preset=exact L=200 N=1 requested=1 replay_lean_ms=4.5104 replay_lean_per_design_ms=4.5104 replay_full_ms=5.5658 host_step_ms=4.7420 host_step_per_design_ms=4.7420 sec_per_design=1.8979 peak_reserved_MiB=1586.0 per_member_MiB=299.2 warmup_s=373.2 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=2 requested=2 replay_lean_ms=7.0286 replay_lean_per_design_ms=3.5143 replay_full_ms=8.4908 host_step_ms=7.4652 host_step_per_design_ms=3.7326 sec_per_design=1.4938 peak_reserved_MiB=1744.0 per_member_MiB=300.1 warmup_s=64.5 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=3 requested=3 replay_lean_ms=9.5665 replay_lean_per_design_ms=3.1888 replay_full_ms=11.4384 host_step_ms=10.3978 host_step_per_design_ms=3.4659 sec_per_design=1.3870 peak_reserved_MiB=2564.0 per_member_MiB=300.1 warmup_s=64.9 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=4 requested=4 replay_lean_ms=12.1266 replay_lean_per_design_ms=3.0316 replay_full_ms=14.3922 host_step_ms=13.2458 host_step_per_design_ms=3.3114 sec_per_design=1.3251 peak_reserved_MiB=3404.0 per_member_MiB=300.1 warmup_s=64.3 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=6 requested=6 replay_lean_ms=17.6355 replay_lean_per_design_ms=2.9393 replay_full_ms=20.8281 host_step_ms=19.3658 host_step_per_design_ms=3.2276 sec_per_design=1.2916 peak_reserved_MiB=5044.0 per_member_MiB=300.1 warmup_s=64.7 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=8 requested=8 replay_lean_ms=23.3574 replay_lean_per_design_ms=2.9197 replay_full_ms=27.5140 host_step_ms=25.6727 host_step_per_design_ms=3.2091 sec_per_design=1.2842 peak_reserved_MiB=6698.0 per_member_MiB=300.1 warmup_s=65.4 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=12 requested=12 replay_lean_ms=35.3836 replay_lean_per_design_ms=2.9486 replay_full_ms=41.7512 host_step_ms=38.8962 host_step_per_design_ms=3.2413 sec_per_design=1.2971 peak_reserved_MiB=10012.0 per_member_MiB=300.1 warmup_s=65.9 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=16 requested=16 replay_lean_ms=47.6458 replay_lean_per_design_ms=2.9779 replay_full_ms=56.2398 host_step_ms=51.8544 host_step_per_design_ms=3.2409 sec_per_design=1.2969 peak_reserved_MiB=13248.0 per_member_MiB=300.1 warmup_s=65.4 sm=132 totmem_GiB=93.09 mem_bound_N=16
+CURVE preset=exact L=200 N=6 requested=auto replay_lean_ms=17.5806 replay_lean_per_design_ms=2.9301 replay_full_ms=20.7550 host_step_ms=19.3854 host_step_per_design_ms=3.2309 sec_per_design=1.2929 peak_reserved_MiB=5564.0 per_member_MiB=300.1 warmup_s=75.2 sm=132 totmem_GiB=93.09 mem_bound_N=16
+### done Sat Sep 26 02:27:05 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 14:27:05 CEST 2026
+= Job-ID             : 904125 on helma
+= Job-Name           : n019_curve
+= Job-Command        : .agent-research/results/N019-multidesign-occupancy/run_curve.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:00:00
+= Elapsed runtime    : 00:16:51
+= Total RAM usage    : 3.7 GiB of assigned 175 GiB (2.1%)
+= Node list          : h14-09
+= Subm/Elig/Start/End: 2026-09-26T14:10:12 / 2026-09-26T14:10:12 / 2026-09-26T14:10:14 / 2026-09-26T14:27:05
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.9G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      74K      61K      81K  5d18h22m46s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 2844386, 8 %, 8 %, 2336 MiB, 383824 ms
+NVIDIA H100, 00000000:06:00.0, 2862282, 2 %, 0 %, 2502 MiB, 68264 ms
+NVIDIA H100, 00000000:06:00.0, 2863004, 3 %, 1 %, 3324 MiB, 69293 ms
+NVIDIA H100, 00000000:06:00.0, 2864154, 4 %, 1 %, 4168 MiB, 69485 ms
+NVIDIA H100, 00000000:06:00.0, 2865448, 6 %, 2 %, 5816 MiB, 71121 ms
+NVIDIA H100, 00000000:06:00.0, 2866806, 8 %, 4 %, 7478 MiB, 73112 ms
+NVIDIA H100, 00000000:06:00.0, 2867935, 11 %, 6 %, 10808 MiB, 77265 ms
+NVIDIA H100, 00000000:06:00.0, 2869189, 15 %, 8 %, 14056 MiB, 79327 ms
+NVIDIA H100, 00000000:06:00.0, 2870441, 9 %, 4 %, 6340 MiB, 81400 ms

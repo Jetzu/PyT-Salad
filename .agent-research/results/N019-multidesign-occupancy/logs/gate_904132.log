@@ -1,0 +1,109 @@
+### Starting TaskPrologue of job 904132 on h12-06 at Sat Sep 26 02:13:21 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 14:13:21 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h12-06 Sat Sep 26 02:13:21 PM CEST 2026 preset=exact ndesigns=8
+  group of 1: 1.4s wall (1.426s/design)
+  design 7:    1.4s/design  CA-CA 3.869 A (min 3.363 max 4.439)  Rg 18.9 A  -> /tmp/904132.helma/n019g-904132/det_g1/design_7.pdb
+  group of 1: 1.4s wall (1.427s/design)
+
+8 designs of 100 aa in groups of 1: median 1.427s/design, total 11.4s (design-time only)
+IDENTITY_RUN_DONE /tmp/904132.helma/n019g-904132/det_g1
+  design 6:    0.7s/design  CA-CA 640.596 A (min 31.428 max 1301.534)  Rg 551.3 A  -> /tmp/904132.helma/n019g-904132/det_g8/design_6.pdb
+  design 7:    0.7s/design  CA-CA 3.869 A (min 3.363 max 4.439)  Rg 18.9 A  -> /tmp/904132.helma/n019g-904132/det_g8/design_7.pdb
+  group of 8: 6.0s wall (0.750s/design)
+
+8 designs of 100 aa in groups of 8: median 0.750s/design, total 0.7s (design-time only)
+IDENTITY_RUN_DONE /tmp/904132.helma/n019g-904132/det_g8
+CMP DETSEG_g1_vs_g8 design_0.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g8 design_1.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g8 design_2.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g8 design_3.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g8 design_4.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g8 design_5.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g8 design_6.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP DETSEG_g1_vs_g8 design_7.npz: max|dpos|=0.000e+00 A  bit_identical=True  aatype_diff=0/100
+CMP_SUMMARY DETSEG_g1_vs_g8: n=8 worst=0.000000e+00 A () bit_identical=8/8 aatype_diff=0/800
+  group of 1: 1.4s wall (1.384s/design)
+  design 7:    1.4s/design  CA-CA 3.847 A (min 3.420 max 4.408)  Rg 22.5 A  -> /tmp/904132.helma/n019g-904132/at_g1/design_7.pdb
+  group of 1: 1.4s wall (1.384s/design)
+
+8 designs of 100 aa in groups of 1: median 1.384s/design, total 11.1s (design-time only)
+IDENTITY_RUN_DONE /tmp/904132.helma/n019g-904132/at_g1
+  group of 1: 1.3s wall (1.273s/design)
+  design 7:    1.3s/design  CA-CA 3.864 A (min 3.551 max 4.567)  Rg 22.1 A  -> /tmp/904132.helma/n019g-904132/at_g1b/design_7.pdb
+  group of 1: 1.3s wall (1.273s/design)
+
+8 designs of 100 aa in groups of 1: median 1.273s/design, total 10.2s (design-time only)
+IDENTITY_RUN_DONE /tmp/904132.helma/n019g-904132/at_g1b
+  design 6:    0.7s/design  CA-CA 3.943 A (min 3.530 max 4.487)  Rg 21.1 A  -> /tmp/904132.helma/n019g-904132/at_g8/design_6.pdb
+  design 7:    0.7s/design  CA-CA 3.793 A (min 3.411 max 4.260)  Rg 14.2 A  -> /tmp/904132.helma/n019g-904132/at_g8/design_7.pdb
+  group of 8: 5.9s wall (0.737s/design)
+
+8 designs of 100 aa in groups of 8: median 0.737s/design, total 0.7s (design-time only)
+IDENTITY_RUN_DONE /tmp/904132.helma/n019g-904132/at_g8
+CMP ATOMICS_FLOOR_g1_vs_g1 design_0.npz: max|dpos|=9.894e+02 A  bit_identical=False  aatype_diff=68/100
+CMP ATOMICS_FLOOR_g1_vs_g1 design_1.npz: max|dpos|=1.316e+03 A  bit_identical=False  aatype_diff=75/100
+CMP ATOMICS_FLOOR_g1_vs_g1 design_2.npz: max|dpos|=4.393e+01 A  bit_identical=False  aatype_diff=63/100
+CMP ATOMICS_FLOOR_g1_vs_g1 design_3.npz: max|dpos|=3.006e+01 A  bit_identical=False  aatype_diff=64/100
+CMP ATOMICS_FLOOR_g1_vs_g1 design_4.npz: max|dpos|=2.120e+01 A  bit_identical=False  aatype_diff=59/100
+CMP ATOMICS_FLOOR_g1_vs_g1 design_5.npz: max|dpos|=1.248e+03 A  bit_identical=False  aatype_diff=63/100
+CMP ATOMICS_FLOOR_g1_vs_g1 design_6.npz: max|dpos|=4.155e+01 A  bit_identical=False  aatype_diff=58/100
+CMP ATOMICS_FLOOR_g1_vs_g1 design_7.npz: max|dpos|=4.276e+01 A  bit_identical=False  aatype_diff=66/100
+CMP_SUMMARY ATOMICS_FLOOR_g1_vs_g1: n=8 worst=1.315816e+03 A (design_1.npz) bit_identical=0/8 aatype_diff=516/800
+CMP ATOMICS_g1_vs_g8 design_0.npz: max|dpos|=9.789e+02 A  bit_identical=False  aatype_diff=64/100
+CMP ATOMICS_g1_vs_g8 design_1.npz: max|dpos|=1.427e+03 A  bit_identical=False  aatype_diff=67/100
+CMP ATOMICS_g1_vs_g8 design_2.npz: max|dpos|=4.582e+01 A  bit_identical=False  aatype_diff=63/100
+CMP ATOMICS_g1_vs_g8 design_3.npz: max|dpos|=9.178e+02 A  bit_identical=False  aatype_diff=75/100
+CMP ATOMICS_g1_vs_g8 design_4.npz: max|dpos|=2.574e+01 A  bit_identical=False  aatype_diff=64/100
+CMP ATOMICS_g1_vs_g8 design_5.npz: max|dpos|=1.294e+03 A  bit_identical=False  aatype_diff=59/100
+CMP ATOMICS_g1_vs_g8 design_6.npz: max|dpos|=3.747e+01 A  bit_identical=False  aatype_diff=63/100
+CMP ATOMICS_g1_vs_g8 design_7.npz: max|dpos|=5.988e+01 A  bit_identical=False  aatype_diff=72/100
+CMP_SUMMARY ATOMICS_g1_vs_g8: n=8 worst=1.427004e+03 A (design_1.npz) bit_identical=0/8 aatype_diff=527/800
+### done Sat Sep 26 02:26:38 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 14:26:38 CEST 2026
+= Job-ID             : 904132 on helma
+= Job-Name           : n019_gate
+= Job-Command        : .agent-research/results/N019-multidesign-occupancy/run_gate.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 02:00:00
+= Elapsed runtime    : 00:16:24
+= Total RAM usage    : 4.6 GiB of assigned 175 GiB (2.6%)
+= Node list          : h12-06
+= Subm/Elig/Start/End: 2026-09-26T14:10:12 / 2026-09-26T14:10:12 / 2026-09-26T14:10:14 / 2026-09-26T14:26:38
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.1G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      74K      61K      81K  5d18h23m13s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 132105, 10 %, 8 %, 1554 MiB, 367685 ms
+NVIDIA H100, 00000000:A6:00.0, 141813, 8 %, 3 %, 4282 MiB, 70732 ms
+NVIDIA H100, 00000000:A6:00.0, 142446, 5 %, 0 %, 1700 MiB, 205597 ms
+NVIDIA H100, 00000000:A6:00.0, 143370, 14 %, 2 %, 1454 MiB, 72262 ms
+NVIDIA H100, 00000000:A6:00.0, 143964, 9 %, 3 %, 4280 MiB, 68771 ms

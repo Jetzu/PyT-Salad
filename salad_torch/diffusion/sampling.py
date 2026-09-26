@@ -35,7 +35,7 @@ from torch import Tensor
 
 from .schedules import parse_timescale
 
-__all__ = ["SamplerConfig", "sample", "make_initial_data"]
+__all__ = ["SamplerConfig", "sample", "sample_group", "make_initial_data"]
 
 #: ``step_fn(data, prev, generator) -> (update, prev)``.
 StepFn = Callable[[dict, dict, torch.Generator | None], tuple[dict, dict]]
@@ -192,4 +192,97 @@ def sample(step_fn: StepFn, data: dict, prev: dict, cfg: SamplerConfig, *,
             # list, which inference/sampling.py:90 is not.
             if step == out_steps[-1]:
                 break
+    return results
+
+
+def sample_group(step_fn_group: Callable, datas: Sequence[dict],
+                 prevs: Sequence[dict], cfg: SamplerConfig, *,
+                 generators: Sequence[torch.Generator | None] | None = None,
+                 ) -> list[list[dict]]:
+    """`sample`, advancing N INDEPENDENT designs in lockstep (N019).
+
+    Returns one snapshot list per design, in the order given - i.e. exactly
+    what calling `sample` N times would return, design for design.
+
+    The loop below is `sample`'s, verbatim, with every per-design statement
+    moved inside a ``for i in range(n)``. That is the whole trick and it is
+    why it is safe: **nothing is shared between designs.** The schedule is a
+    function of `step` alone, so `raw_t`, `scaled_t_pos`, `scaled_t_seq`,
+    `is_out_step` and the termination test are identical for every member and
+    are computed once; everything that carries state - ``pos``, ``prev``,
+    ``seq``, the snapshots, and the random draws behind `step_fn_group` - is
+    per design. Design *i* sees precisely the inputs it would have seen alone.
+
+    What the caller must supply is a per-design `generator`. The ordinary
+    `generate.py` loop draws every design off ONE generator in sequence, and
+    that ordering cannot survive being advanced in lockstep (design 0 would no
+    longer consume the whole stream before design 1 starts). So the grouped
+    entry point derives an independent, seed-derived generator per design -
+    which also means ``--group_size 1`` and ``--group_size 8`` are the same
+    designs, and that is what makes the identity gate checkable at all.
+
+    The exotic hooks `sample` carries (`post_step_fn` for ``--sym``,
+    `final_step_fn` for ``--sample_final``) are deliberately NOT supported
+    here: both mutate the step in ways the capture cannot see, and
+    `scripts/generate.py` routes those flags to the ordinary path instead.
+    """
+    n = len(datas)
+    if len(prevs) != n:
+        raise ValueError(f"{n} data dicts but {len(prevs)} prev dicts")
+    gens = list(generators) if generators is not None else [None] * n
+    if len(gens) != n:
+        raise ValueError(f"{n} data dicts but {len(gens)} generators")
+
+    out_steps = list(cfg.out_steps)
+    if out_steps and out_steps != sorted(out_steps):
+        warnings.warn(
+            f"out_steps {out_steps} is not ascending; upstream breaks on the "
+            f"last element as written ({out_steps[-1]}), so later steps are "
+            f"never reached. Reproducing that.", stacklevel=2)
+
+    timescale_pos = parse_timescale(cfg.timescale_pos)
+    timescale_seq = (None if cfg.timescale_seq is None
+                     else parse_timescale(cfg.timescale_seq))
+
+    datas = [dict(d) for d in datas]
+    init_prevs = list(prevs)
+    prevs = list(prevs)
+    denominator = cfg.raw_t_denominator or cfg.num_steps
+
+    results: list[list[dict]] = [[] for _ in range(n)]
+    for step in range(cfg.start_steps, cfg.num_steps):
+        raw_t = 1 - step / denominator
+        scaled_t_pos = timescale_pos(raw_t)
+        scaled_t_seq = 1.0 if timescale_seq is None else timescale_seq(raw_t)
+        for i in range(n):
+            datas[i]["t_pos"] = scaled_t_pos * torch.ones_like(datas[i]["t_pos"])
+            datas[i]["t_seq"] = scaled_t_seq * torch.ones_like(datas[i]["t_seq"])
+            if raw_t < cfg.prev_threshold:
+                prevs[i] = init_prevs[i]
+
+        is_out_step = step in out_steps
+        need_aa = is_out_step if cfg.lean_steps else True
+        updates, prevs = step_fn_group(datas, prevs, gens, need_aa=need_aa)
+
+        for i in range(n):
+            data, update = datas[i], updates[i]
+            data["pos"] = update["pos"]
+            if "aa" in update:
+                data["seq"] = update["aa"].argmax(dim=-1)
+            if "atom_pos" in update:
+                data["atom_pos"] = update["atom_pos"]
+            if "aatype" in update:
+                data["aatype"] = update["aatype"]
+            if "latent" in data and "latent" in update:
+                data["latent"] = update["latent"]
+
+            if is_out_step:
+                snapshot = {k: data[k] for k in _SNAPSHOT_KEYS if k in data}
+                snapshot["step"] = step
+                snapshot["raw_t"] = raw_t
+                snapshot["result"] = update
+                snapshot["aa_logits"] = update["aa"]
+                results[i].append(snapshot)
+        if is_out_step and step == out_steps[-1]:
+            break
     return results

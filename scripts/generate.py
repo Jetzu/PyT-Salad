@@ -32,7 +32,7 @@ from salad_torch import opt as salad_opt  # noqa: E402
 from salad_torch.config import get_config  # noqa: E402
 from salad_torch.convert.haiku_to_torch import load_model, load_param_npz  # noqa: E402
 from salad_torch.diffusion.sampling import (  # noqa: E402
-    SamplerConfig, StepFn, make_initial_data, sample)
+    SamplerConfig, StepFn, make_initial_data, sample, sample_group)
 from salad_torch.diffusion.schedules import parse_num_aa, parse_timescale  # noqa: E402
 from salad_torch.inference.options import decode_sequence, parse_dssp, parse_dssp_mean  # noqa: E402
 from salad_torch.inference.postprocess import reorder_amino_acids  # noqa: E402
@@ -75,6 +75,28 @@ def build_arg_parser() -> argparse.ArgumentParser:
                          "frameworks' PRNGs are unrelated, so this only gives "
                          "reproducibility within one backend.")
     ap.add_argument("--timing_json", default="")
+    ap.add_argument("--group_size", default="",
+                    help="N019. Advance N INDEPENDENT designs through ONE "
+                         "CUDA graph instead of one at a time. Needs --fast. "
+                         "Not a batch axis and not a shared trajectory: each "
+                         "design keeps its own buffers, its own noise and its "
+                         "own seed-derived RNG stream, and computes exactly "
+                         "what it would compute alone - the only thing that "
+                         "changes is that the GPU stops idling between one "
+                         "design's serialised kernel launches. Unset (the "
+                         "default) keeps the existing one-design-at-a-time "
+                         "loop byte-for-byte. 'auto' picks N from THIS "
+                         "device's SM count and free VRAM "
+                         "by MEASURING it on this device - it captures the "
+                         "graph at 1, 2, 3, 4, ... and stops when a rung "
+                         "stops paying, which costs seconds against the "
+                         "one-time compile; an "
+                         "integer pins it; 1 is the grouped machinery with a "
+                         "group of one, which is the reference a grouped run "
+                         "must reproduce design-for-design. The win comes "
+                         "from idle SMs, so it is largest on a big card with "
+                         "a short protein and shrinks towards 1x on a small "
+                         "card or a long one.")
 
     # -- §1: symmetry -------------------------------------------------
     sym = ap.add_argument_group("symmetry (notes/specs/06_generation_flags.md §1)")
@@ -297,6 +319,60 @@ def apply_precedence_chain(args: argparse.Namespace) -> dict:
                template=template)
 
 
+def make_design_data(args: argparse.Namespace, pc: dict, num_aa: int,
+                     resi: Tensor, chain: Tensor, is_cyclic: bool,
+                     cyclic_mask: Tensor, device: torch.device
+                     ) -> tuple[dict, dict]:
+    """One design's ``(data, init_prev)``: the per-design body of the loop.
+
+    Lifted out verbatim so the grouped path (--group_size) builds its N
+    designs through exactly the code the ordinary loop builds its one with.
+    Order matters and is preserved: `--dssp random` / `--dssp_mean random`
+    draw from the stdlib RNG here, so calling this once per design in design
+    order reproduces the sequence of draws the ordinary loop makes.
+    """
+    data, prev = make_initial_data(
+        num_aa, resi, chain, cyclic_mask if is_cyclic else None, device=device)
+    if args.cloud_std:
+        data["cloud_std"] = torch.full((num_aa,), float(args.cloud_std), device=device)
+
+    if pc["dssp_fixed"] is not None:
+        data["dssp_condition"] = pc["dssp_fixed"].to(device)
+    elif pc["dssp_fn"] is not None:
+        data["dssp_condition"] = pc["dssp_fn"](num_aa).to(device)
+    if pc["dssp_mean_fixed"] is not None:
+        data["dssp_mean"] = pc["dssp_mean_fixed"].to(device)
+    elif pc["dssp_mean_fn"] is not None:
+        data["dssp_mean"] = pc["dssp_mean_fn"]().to(device)
+    if pc["template"] is not None:
+        data["dmap"] = pc["template"]["dmap"].to(device)
+        data["omap"] = pc["template"]["omap"].to(device)
+        data["dmap_mask"] = pc["template"]["dmap_mask"].to(device)
+        if args.template_aa:
+            data["aa_condition"] = pc["template"]["aa_condition"].to(device)
+    return data, prev
+
+
+def design_generator(device: torch.device, seed: int, design: int
+                     ) -> torch.Generator:
+    """The RNG stream design `design` gets in a grouped run.
+
+    The ordinary loop runs every design off ONE generator in sequence, so
+    design 1's noise depends on how many draws design 0 made. That ordering
+    cannot be preserved when designs advance in lockstep, so the grouped path
+    gives each design an independent, seed-derived stream instead. The
+    consequence is the property the whole feature is gated on: design `i` of a
+    ``--group_size 8`` run and design `i` of a ``--group_size 1`` run are the
+    same design, because they are fed the same stream.
+
+    The multiplier is an odd constant purely so consecutive seeds do not hand
+    consecutive designs overlapping streams; there is nothing tuned about it.
+    """
+    g = torch.Generator(device=device)
+    g.manual_seed((int(seed) * 1_000_003 + int(design)) & 0x7FFF_FFFF_FFFF_FFFF)
+    return g
+
+
 def write_result_pdb(path: str, snapshot: dict, *, chain_index: Tensor,
                      order_agnostic: bool) -> None:
     """`snapshot_to_protein` + the §4.2 output-side reorder, then write.
@@ -342,6 +418,142 @@ def write_result_pdb(path: str, snapshot: dict, *, chain_index: Tensor,
                                               dtype=prot.residue_index.dtype))
     with open(path, "wt") as fh:
         fh.write(to_pdb(prot))
+
+
+def run_grouped(args, config, model, cfg: SamplerConfig, pc: dict, num_aa: int,
+                resi: Tensor, chain: Tensor, base_chain: Tensor,
+                is_cyclic: bool, cyclic_mask: Tensor,
+                device: torch.device) -> None:
+    """`--group_size`: N designs per captured graph (N019).
+
+    The design-facing behaviour is the ordinary one - ``design_{n}.pdb``, the
+    same stats line, the same `--timing_json` - and the only thing that
+    differs is that `--num_designs` is consumed in groups instead of one at a
+    time. A trailing partial group is run as its own, smaller group rather
+    than padded with throwaway designs, so `--num_designs 10 --group_size 4`
+    costs 4+4+2 and writes 10 designs, not 12.
+    """
+    from salad_torch.modules.fast import GroupFastDenoiser
+
+    if not args.fast:
+        raise SystemExit("--group_size needs --fast (it groups the captured "
+                         "graph; there is nothing to group on the eager path)")
+    if device.type != "cuda":
+        raise SystemExit("--group_size needs a CUDA device")
+    for flag in ("sym", "renoise", "sequence_only", "sample_final"):
+        if getattr(args, flag) not in ("", False, None):
+            raise SystemExit(
+                f"--group_size is incompatible with --{flag}: it steps every "
+                f"design of the group through one captured replay, and "
+                f"--{flag} inserts per-design host work between the noising "
+                f"and the denoising that the capture cannot see. Drop "
+                f"--group_size to get the ordinary path back.")
+
+    want = args.group_size.strip().lower()
+    if want != "auto":
+        try:
+            want = int(want)
+        except ValueError:
+            raise SystemExit(f"--group_size must be 'auto' or an integer, "
+                             f"got {args.group_size!r}")
+        if want < 1:
+            raise SystemExit("--group_size must be >= 1")
+
+    t_warm = time.perf_counter()
+    pc_hint = bool(config.multi_motif or pc["template"] is not None
+                   or int(chain.max()) > 0)
+    group = GroupFastDenoiser(model.predict, num_aa, group_size=want,
+                              device=device, preset=args.preset).warmup(
+                                  pair_cond=pc_hint)
+    n = group.group_size
+    peak_gb = (group.peak_bytes or 0) / 2 ** 30
+    per_gb = (group.per_member_bytes or 0) / 2 ** 30
+    if want == "auto":
+        props = torch.cuda.get_device_properties(device)
+        print(f"group_size auto -> {n} on {props.name} "
+              f"({props.multi_processor_count} SMs, "
+              f"{props.total_memory / 2**30:.1f} GiB)")
+    print(f"grouped fast path ({args.preset}, group_size={n}) compiled + "
+          f"captured in {time.perf_counter() - t_warm:.0f}s (one-time); "
+          f"peak reserved {peak_gb:.2f} GiB, ~{per_gb:.3f} GiB/design")
+    if n == 1:
+        print("  group_size 1: this is the ordinary single-design "
+              "computation, run through the grouped machinery - the "
+              "reference a larger group must reproduce.")
+
+    os.makedirs(args.out_path, exist_ok=True)
+    stats, times, group_wall = [], [], []
+    written = 0
+    for start in range(0, args.num_designs, n):
+        members = list(range(start, min(start + n, args.num_designs)))
+        if len(members) != n:
+            # trailing partial group: recapture at the smaller size rather
+            # than run throwaway designs. One extra capture, not one extra
+            # compile - the compiled forward is shared.
+            group.resize(len(members), pair_cond=pc_hint)
+        group.invalidate_condition_cache()
+        datas, prevs, gens = [], [], []
+        for d in members:
+            data, prev = make_design_data(args, pc, num_aa, resi, chain,
+                                          is_cyclic, cyclic_mask, device)
+            datas.append(data)
+            prevs.append(prev)
+            gens.append(design_generator(device, args.seed, d))
+        gate = group.pin_conditions(datas)
+
+        def step_fn_group(ds, ps, gs, *, need_aa=True, _gate=gate):
+            with torch.no_grad():
+                noised = [apply_diffusion(config, d, generator=g)
+                          for d, g in zip(ds, gs)]
+                fed = [dict(d, **nz) for d, nz in zip(ds, noised)]
+                return group(fed, ps, need_aa=need_aa, pair_cond=_gate,
+                             generators=gs)
+
+        torch.cuda.synchronize()
+        t0 = time.perf_counter()
+        snaps_per_design = sample_group(step_fn_group, datas, prevs, cfg,
+                                        generators=gens)
+        torch.cuda.synchronize()
+        elapsed = time.perf_counter() - t0
+        # one entry PER DESIGN, not per group - the summary line below sums
+        # this to get the run's total GPU time, and a per-group entry made a
+        # group of 8 report a total of one design's worth.
+        times.extend([elapsed / len(members)] * len(members))
+        group_wall.append(elapsed)
+
+        for d, snaps in zip(members, snaps_per_design):
+            snap = {k: (v.cpu() if torch.is_tensor(v) else v)
+                    for k, v in snaps[-1].items()}
+            path = os.path.join(args.out_path, f"design_{d}.pdb")
+            write_result_pdb(path, snap, chain_index=base_chain,
+                             order_agnostic=args.order_agnostic)
+            ca = snap["pos"][:, 1].numpy()
+            d_ca = np.linalg.norm(ca[1:] - ca[:-1], axis=-1)
+            rg = float(np.sqrt(((ca - ca.mean(0)) ** 2).sum(-1).mean()))
+            stats.append(dict(ca_ca_mean=float(d_ca.mean()),
+                              ca_ca_min=float(d_ca.min()),
+                              ca_ca_max=float(d_ca.max()), rg=rg,
+                              seconds=elapsed / len(members)))
+            written += 1
+            print(f"  design {d}: {elapsed / len(members):6.1f}s/design  "
+                  f"CA-CA {d_ca.mean():.3f} A (min {d_ca.min():.3f} "
+                  f"max {d_ca.max():.3f})  Rg {rg:.1f} A  -> {path}")
+        print(f"  group of {len(members)}: {elapsed:.1f}s wall "
+              f"({elapsed / len(members):.3f}s/design)")
+
+    t = np.array(times)
+    print(f"\n{written} designs of {num_aa} aa in groups of up to {n}: "
+          f"median {np.median(t):.3f}s/design, "
+          f"{sum(group_wall):.1f}s of GPU time for all {written} "
+          f"(compile/capture excluded)")
+    if args.timing_json:
+        with open(args.timing_json, "w") as fh:
+            json.dump(dict(backend="torch", config=args.config, num_aa=num_aa,
+                           num_steps=args.num_steps, device=str(device),
+                           compile=args.compile, group_size=n,
+                           peak_reserved_bytes=group.peak_bytes,
+                           per_member_bytes=group.per_member_bytes,
+                           stats=stats), fh, indent=2)
 
 
 def main() -> None:
@@ -423,6 +635,11 @@ def main() -> None:
           f"out_steps={cfg.out_steps}"
           + (f"  sym={sym.group}(count={sym.replicate_count})" if sym.active else ""))
 
+    if args.group_size:
+        run_grouped(args, config, model, cfg, pc, num_aa, resi, chain,
+                    base_chain, is_cyclic, cyclic_mask, device)
+        return
+
     fast_denoiser = None
     if args.fast:
         if device.type != "cuda":
@@ -454,25 +671,8 @@ def main() -> None:
         # while the "fast" preset TRUSTS this call.
         if fast_denoiser is not None:
             fast_denoiser.invalidate_condition_cache()
-        data, prev = make_initial_data(
-            num_aa, resi, chain, cyclic_mask if is_cyclic else None, device=device)
-        if args.cloud_std:
-            data["cloud_std"] = torch.full((num_aa,), float(args.cloud_std), device=device)
-
-        if pc["dssp_fixed"] is not None:
-            data["dssp_condition"] = pc["dssp_fixed"].to(device)
-        elif pc["dssp_fn"] is not None:
-            data["dssp_condition"] = pc["dssp_fn"](num_aa).to(device)
-        if pc["dssp_mean_fixed"] is not None:
-            data["dssp_mean"] = pc["dssp_mean_fixed"].to(device)
-        elif pc["dssp_mean_fn"] is not None:
-            data["dssp_mean"] = pc["dssp_mean_fn"]().to(device)
-        if pc["template"] is not None:
-            data["dmap"] = pc["template"]["dmap"].to(device)
-            data["omap"] = pc["template"]["omap"].to(device)
-            data["dmap_mask"] = pc["template"]["dmap_mask"].to(device)
-            if args.template_aa:
-                data["aa_condition"] = pc["template"]["aa_condition"].to(device)
+        data, prev = make_design_data(args, pc, num_aa, resi, chain,
+                                      is_cyclic, cyclic_mask, device)
 
         # -- Hook A: init_pos symmetrisation (§1.4), once ------------------
         if sym.active:

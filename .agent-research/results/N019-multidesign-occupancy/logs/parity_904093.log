@@ -1,0 +1,79 @@
+### Starting TaskPrologue of job 904093 on h14-09 at Sat Sep 26 01:52:16 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 13:52:16 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             66W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h14-09 Sat Sep 26 01:52:17 PM CEST 2026
+63f1bb4d04a4f0d8dc027c6906cdf6ca  salad_torch/modules/fast.py
+5cbcca793c2869db6b8d0718f10cddbb  salad_torch/diffusion/sampling.py
+ca3b19fb1d6be5650d7aa773709f9ba1  scripts/generate.py
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00020 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0003 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] [PASS] final/noise-floor ratio = 9.5x
+[test_sampling_parity] generated CA-CA: mean 3.762 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=0
+### done Sat Sep 26 01:52:59 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 13:52:59 CEST 2026
+= Job-ID             : 904093 on helma
+= Job-Name           : n019_parity
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N019-multidesign-occupancy/run_parity.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:30:00
+= Elapsed runtime    : 00:01:15
+= Total RAM usage    : 1.1 GiB of assigned 175 GiB (0.6%)
+= Node list          : h14-09
+= Subm/Elig/Start/End: 2026-09-26T13:51:44 / 2026-09-26T13:51:44 / 2026-09-26T13:51:44 / 2026-09-26T13:52:59
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      75K      61K      81K  5d18h56m52s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]

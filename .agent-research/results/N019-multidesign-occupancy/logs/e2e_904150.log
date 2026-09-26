@@ -1,0 +1,107 @@
+### Starting TaskPrologue of job 904150 on h11-17 at Sat Sep 26 02:32:38 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 14:32:38 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-17 Sat Sep 26 02:32:38 PM CEST 2026 preset=exact L=100 nd=8 best=8
+===== A. legacy --fast (today's production path), 8 designs
+fast path (exact) compiled + captured in 343s (one-time)
+  design 0:    1.4s  CA-CA 3.894 A (min 3.421 max 4.615)  Rg 19.6 A  -> /tmp/904150.helma/n019e-904150/legacy/design_0.pdb
+  design 1:    1.3s  CA-CA 652.898 A (min 115.685 max 1376.750)  Rg 558.4 A  -> /tmp/904150.helma/n019e-904150/legacy/design_1.pdb
+  design 2:    1.3s  CA-CA 3.892 A (min 3.208 max 4.664)  Rg 20.2 A  -> /tmp/904150.helma/n019e-904150/legacy/design_2.pdb
+  design 3:    1.3s  CA-CA 3.871 A (min 3.456 max 4.472)  Rg 26.7 A  -> /tmp/904150.helma/n019e-904150/legacy/design_3.pdb
+  design 4:    1.3s  CA-CA 611.683 A (min 43.522 max 1382.996)  Rg 555.5 A  -> /tmp/904150.helma/n019e-904150/legacy/design_4.pdb
+  design 5:    1.3s  CA-CA 3.969 A (min 3.302 max 4.644)  Rg 20.7 A  -> /tmp/904150.helma/n019e-904150/legacy/design_5.pdb
+  design 6:    1.3s  CA-CA 649.920 A (min 72.264 max 1561.699)  Rg 573.6 A  -> /tmp/904150.helma/n019e-904150/legacy/design_6.pdb
+  design 7:    1.3s  CA-CA 3.911 A (min 3.649 max 4.497)  Rg 23.6 A  -> /tmp/904150.helma/n019e-904150/legacy/design_7.pdb
+8 designs of 100 aa: median 1.3s, total 10.7s
+===== B. --group_size 1 (grouped machinery, group of one)
+grouped fast path (exact, group_size=1) compiled + captured in 61s (one-time); peak reserved 0.69 GiB, ~0.146 GiB/design
+  group_size 1: this is the ordinary single-design computation, run through the grouped machinery - the reference a larger group must reproduce.
+  design 0:    1.4s/design  CA-CA 3.938 A (min 3.484 max 4.390)  Rg 31.4 A  -> /tmp/904150.helma/n019e-904150/g1/design_0.pdb
+  group of 1: 1.4s wall (1.400s/design)
+  design 1:    1.4s/design  CA-CA 629.327 A (min 81.247 max 1468.722)  Rg 551.4 A  -> /tmp/904150.helma/n019e-904150/g1/design_1.pdb
+  group of 1: 1.4s wall (1.385s/design)
+  design 2:    1.4s/design  CA-CA 3.925 A (min 3.473 max 4.466)  Rg 25.4 A  -> /tmp/904150.helma/n019e-904150/g1/design_2.pdb
+  group of 1: 1.4s wall (1.385s/design)
+  design 3:    1.4s/design  CA-CA 3.859 A (min 3.163 max 4.307)  Rg 22.3 A  -> /tmp/904150.helma/n019e-904150/g1/design_3.pdb
+  group of 1: 1.4s wall (1.385s/design)
+  design 4:    1.4s/design  CA-CA 660.026 A (min 55.918 max 1281.303)  Rg 563.4 A  -> /tmp/904150.helma/n019e-904150/g1/design_4.pdb
+  group of 1: 1.4s wall (1.385s/design)
+  design 5:    1.4s/design  CA-CA 524.103 A (min 15.112 max 1398.631)  Rg 491.4 A  -> /tmp/904150.helma/n019e-904150/g1/design_5.pdb
+  group of 1: 1.4s wall (1.385s/design)
+  design 6:    1.4s/design  CA-CA 3.939 A (min 3.282 max 4.637)  Rg 20.6 A  -> /tmp/904150.helma/n019e-904150/g1/design_6.pdb
+  group of 1: 1.4s wall (1.385s/design)
+  design 7:    1.4s/design  CA-CA 3.953 A (min 3.614 max 4.612)  Rg 20.1 A  -> /tmp/904150.helma/n019e-904150/g1/design_7.pdb
+  group of 1: 1.4s wall (1.385s/design)
+8 designs of 100 aa in groups of 1: median 1.385s/design, total 11.1s (design-time only)
+===== C. --group_size 8
+grouped fast path (exact, group_size=8) compiled + captured in 62s (one-time); peak reserved 3.40 GiB, ~0.146 GiB/design
+  design 0:    0.7s/design  CA-CA 605.289 A (min 9.896 max 1372.312)  Rg 513.3 A  -> /tmp/904150.helma/n019e-904150/gN/design_0.pdb
+  design 1:    0.7s/design  CA-CA 653.055 A (min 77.820 max 1475.798)  Rg 569.6 A  -> /tmp/904150.helma/n019e-904150/gN/design_1.pdb
+  design 2:    0.7s/design  CA-CA 3.940 A (min 3.305 max 4.472)  Rg 22.8 A  -> /tmp/904150.helma/n019e-904150/gN/design_2.pdb
+  design 3:    0.7s/design  CA-CA 3.883 A (min 3.381 max 4.460)  Rg 22.5 A  -> /tmp/904150.helma/n019e-904150/gN/design_3.pdb
+  design 4:    0.7s/design  CA-CA 3.879 A (min 3.296 max 4.570)  Rg 25.1 A  -> /tmp/904150.helma/n019e-904150/gN/design_4.pdb
+  design 5:    0.7s/design  CA-CA 3.895 A (min 3.365 max 4.410)  Rg 28.8 A  -> /tmp/904150.helma/n019e-904150/gN/design_5.pdb
+  design 6:    0.7s/design  CA-CA 3.936 A (min 3.412 max 4.394)  Rg 22.0 A  -> /tmp/904150.helma/n019e-904150/gN/design_6.pdb
+  design 7:    0.7s/design  CA-CA 3.851 A (min 3.344 max 4.551)  Rg 21.4 A  -> /tmp/904150.helma/n019e-904150/gN/design_7.pdb
+  group of 8: 5.9s wall (0.740s/design)
+8 designs of 100 aa in groups of 8: median 0.740s/design, total 0.7s (design-time only)
+===== D. --group_size auto
+group_size auto -> 8 on NVIDIA H100 (132 SMs, 93.3 GiB)
+grouped fast path (exact, group_size=8) compiled + captured in 67s (one-time); peak reserved 3.87 GiB, ~0.146 GiB/design
+  design 0:    0.7s/design  CA-CA 3.923 A (min 3.456 max 4.564)  Rg 23.0 A  -> /tmp/904150.helma/n019e-904150/gauto/design_0.pdb
+  design 1:    0.7s/design  CA-CA 670.834 A (min 80.442 max 1411.078)  Rg 570.8 A  -> /tmp/904150.helma/n019e-904150/gauto/design_1.pdb
+  design 2:    0.7s/design  CA-CA 3.871 A (min 3.397 max 4.660)  Rg 20.8 A  -> /tmp/904150.helma/n019e-904150/gauto/design_2.pdb
+  design 3:    0.7s/design  CA-CA 3.850 A (min 3.400 max 4.408)  Rg 21.0 A  -> /tmp/904150.helma/n019e-904150/gauto/design_3.pdb
+  design 4:    0.7s/design  CA-CA 552.384 A (min 10.196 max 1253.077)  Rg 497.1 A  -> /tmp/904150.helma/n019e-904150/gauto/design_4.pdb
+  design 5:    0.7s/design  CA-CA 657.046 A (min 18.184 max 1744.096)  Rg 561.9 A  -> /tmp/904150.helma/n019e-904150/gauto/design_5.pdb
+  design 6:    0.7s/design  CA-CA 679.921 A (min 44.757 max 1561.962)  Rg 577.1 A  -> /tmp/904150.helma/n019e-904150/gauto/design_6.pdb
+  design 7:    0.7s/design  CA-CA 3.876 A (min 3.582 max 4.440)  Rg 23.3 A  -> /tmp/904150.helma/n019e-904150/gauto/design_7.pdb
+  group of 8: 5.9s wall (0.739s/design)
+8 designs of 100 aa in groups of 8: median 0.739s/design, total 0.7s (design-time only)
+### done Sat Sep 26 02:42:27 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 14:42:27 CEST 2026
+= Job-ID             : 904150 on helma
+= Job-Name           : n019_e2e
+= Job-Command        : .agent-research/results/N019-multidesign-occupancy/run_e2e.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 02:00:00
+= Elapsed runtime    : 00:10:14
+= Total RAM usage    : 4.4 GiB of assigned 175 GiB (2.5%)
+= Node list          : h11-17
+= Subm/Elig/Start/End: 2026-09-26T14:32:13 / 2026-09-26T14:32:13 / 2026-09-26T14:32:13 / 2026-09-26T14:42:27
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.9G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      74K      61K      81K  5d18h7m24s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 691717, 10 %, 8 %, 1560 MiB, 361775 ms
+NVIDIA H100, 00000000:A6:00.0, 696563, 15 %, 1 %, 1454 MiB, 73660 ms
+NVIDIA H100, 00000000:A6:00.0, 696789, 8 %, 3 %, 4280 MiB, 69005 ms
+NVIDIA H100, 00000000:A6:00.0, 697382, 12 %, 4 %, 4764 MiB, 75122 ms
