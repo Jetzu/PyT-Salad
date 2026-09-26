@@ -163,11 +163,48 @@ feature, 10.2 MiB, written and immediately consumed), so the overwhelming
 majority should be L2 hits: **0.149 ms**. If it were all HBM it would be
 0.331 ms and memory, not serialisation, would be the binding term.
 
-So the three terms at L=100 are **0.150 (arithmetic) / 0.149 (L2 traffic) /
-0.239–0.258 (serialisation)** — all the same order. The bound is therefore
-reasonably *tight*, not a vacuous one: no single term dominates by more than
-1.7×, which is unusual and worth noting, because it means there is no one thing
-to fix at the floor.
+### 2.2c Measured: what the current implementation really moves (job 904053)
+
+Nsight Compute, NVTX-scoped to one lean forward, 885 of the ~946 kernels inside
+the range, aggregated as `sum(Invocations x average)` per kernel group by
+`parse_ncu.py` (raw output in `logs/ncu_raw.txt`). The worktree this job ran
+from was removed afterwards, so provenance is established indirectly: the job
+exited 0 with no `ModuleNotFoundError`, which it could not have done had
+`sys.path`'s worktree root been absent, and its 885 launches match the
+946-kernel census for HEAD rather than the batched-GEMM working tree.
+
+```
+dram__bytes_read.sum    TOTAL   890.94 MiB   [per-group min-sum 675.4, max-sum 1129.2]
+dram__bytes_write.sum   TOTAL     0.16 MiB   <- counter not populated here, see below
+lts__t_bytes.sum        TOTAL  4814.85 MiB
+```
+
+Three readings, all load-bearing:
+
+1. **L2 hit rate is 81.5 %** (`1 - 891/4815`). The L2 argument in §2.2b is no
+   longer only an argument: this workload's locality really does keep four
+   fifths of its traffic off DRAM.
+2. **The forward moves 4.81 GiB through L2 — 5.2× the 926.9 MiB minimum.** That
+   is a quantified fusion headroom, measured rather than estimated.
+3. **Neither level is near saturation.** 4.81 GiB in 3.52 ms of GPU-busy is
+   1.37 TB/s of L2 traffic, **21 % of the measured 6.53 TB/s**; 891 MiB of DRAM
+   reads is 0.318 ms of a 3.52 ms step, **9 %**. The model is not memory bound
+   at either level, exactly as the launch/occupancy diagnosis predicts.
+
+Applying the *measured* 81.5 % hit rate to the 926.9 MiB minimum gives 172 MiB
+of DRAM (0.061 ms) and 926.9 MiB of L2 (0.149 ms), so **the traffic term of the
+bound is 0.149 ms and §10 R2 resolves in the bound's favour.**
+
+`dram__bytes_write.sum` came back 0.00 for every one of the 96 groups, which is
+the counter not being collected on this driver rather than a result — dirty L2
+lines must be written back eventually. Even assuming writes equal reads, DRAM
+would be ~1.74 GiB = 0.62 ms, still 18 % of the step and still not binding.
+
+So the four terms at L=100 are **0.150 (matmul arithmetic) / 0.005 (non-matmul)
+/ 0.149 (L2 traffic) / 0.239–0.258 (serialisation)** — all the same order. The
+bound is therefore reasonably *tight*, not a vacuous one: no single term
+dominates by more than 1.7×, which means there is no one thing to fix at the
+floor.
 
 ### 2.3 Serialisation — hard, and it is the one that binds (B1)
 
@@ -483,7 +520,8 @@ milliseconds and adding them would be the N009 mistake in a new costume.
 | **H1** | **serialisation: 205 critical-path barriers × 1.166 µs, weighted by peak arithmetic** | **0.258 ms** | **HARD** | irreducible without changing trunk depth |
 | H2 | arithmetic at fp32 peak (already inside H1) | 0.150 ms | HARD | TF32 relaxes it to 0.020 ms — and that is `fast` |
 | H3 | external HBM traffic (31.7 MiB params + I/O at 2.94 TB/s) | 0.011 ms | HARD | 0.3 % of the step |
-| H4 | irreducible intermediate traffic (926.9 MiB across barrier ops) | 0.149 ms at L2 rate, 0.331 ms if it spills to HBM | HARD | the term nearest to displacing H1 — see §2.2b and §10/R2 |
+| H4 | irreducible intermediate traffic (926.9 MiB across barrier ops) | 0.149 ms at the L2 rate; the 81.5 % hit rate is **measured** (§2.2c) | HARD | the term nearest to displacing H1, but it does not |
+| E7 | traffic above the minimum: the forward moves 4.81 GiB through L2, **5.2× the 926.9 MiB minimum** | not directly a time (L2 runs at 21 % of its rate) | soft | the measured size of the fusion prize; overlaps E6 / P8 |
 
 ## 9. Ranked gap list — `fast` (3.007 ms wall → 0.239 ms bound)
 
@@ -499,7 +537,7 @@ Identical structure; `fast` has one extra lever and one fewer term.
 | F6 | trunk depth 6 → 3 (distillation) | **bound 0.239 → 0.120 ms** | model change | the ONLY lever that lowers `fast`'s bound |
 | H1' | serialisation | 0.239 ms | HARD | — |
 | H2' | arithmetic at TF32 peak | 0.020 ms | HARD | 0.7 % of the step |
-| H3' | irreducible intermediate traffic | 0.149 ms (L2) | HARD | identical to `exact`'s — precision does not change tensor counts, only their width, and both presets keep fp32 tensors |
+| H3' | irreducible intermediate traffic | 0.149 ms (L2, hit rate 81.5 % measured) | HARD | identical to `exact`'s — precision does not change tensor counts, only their width, and both presets keep fp32 tensors |
 
 ### E4 / F4 in full — cuBLAS's fixed cost is a library choice, not hardware
 
@@ -605,31 +643,30 @@ serial across 6 blocks, so `D >= ~90` and the bound never goes below
 **~0.105 ms** on any argument I can construct. **Range: 0.105–0.258 ms.**
 Everything else in this document survives anywhere in that range.
 
-**R2 — the memory term hinges on L2 hit rate, which I bounded but did not
-measure.** §2.2b measures the irreducible *materialised* traffic at
-**926.9 MiB/step**. At the measured L2 rate (6.53 TB/s) that is 0.149 ms and
-does not bind; at the measured HBM rate (2.94 TB/s) it is **0.331 ms and it
-does bind**, which would raise the bound from 0.258 to ~0.33 ms. The physical
-argument for L2 is strong (60 MiB of L2, largest single tensor 10.2 MiB,
-produced and consumed adjacently) but it is an argument, not a measurement.
+**R2 — the memory term hinged on L2 hit rate. NOW MEASURED, and it resolves in
+the bound's favour.** §2.2b puts the irreducible *materialised* traffic at
+**926.9 MiB/step**: 0.149 ms if L2-resident, **0.331 ms if it all went to HBM**,
+in which case memory rather than serialisation would bind. Nsight Compute on one
+lean forward (job 904053, §2.2c) measures an **81.5 % L2 hit rate** — 891 MiB of
+DRAM reads against 4.81 GiB of L2 traffic. Applied to the 926.9 MiB minimum that
+is 172 MiB of DRAM (0.061 ms) and 0.149 ms of L2, so the traffic term is
+**0.149 ms** and the bound stays at 0.258 ms.
 
-The measurement that settles it is `ncu --metrics dram__bytes_read.sum,
-dram__bytes_write.sum`, NVTX-scoped to one lean forward; the harness is
-`x_ncu.py` / `run_r2b.sbatch`. **It did not land here.** Two attempts failed for
-mechanical reasons, both recorded: job 904016, where Nsight killed inductor's
-compile worker pool (`BrokenProcessPool` — fix is
-`TORCHINDUCTOR_COMPILE_THREADS=1`), and job 904019, where the NVTX filter was
-written as a start/end range (`--nvtx-include "measure"`) while the script uses
-push/pop, so *"No kernels were profiled"*; the push/pop form needs the trailing
-slash, `--nvtx-include "measure/"`. Job 904032 runs the corrected combination
-and its log is `logs/r2c_904032.log` — **whoever picks this up should read that
-log first.**
+What survives of the objection: `dram__bytes_write.sum` returned 0.00 for all 96
+kernel groups — the counter is not collected on this driver, so the DRAM figure
+is **reads only**. Assuming writes equal reads still leaves DRAM at 0.62 ms of a
+3.52 ms step, so the conclusion is robust, but the write number is genuinely
+unmeasured. And the hit rate is measured on the *current* 4.81 GiB of traffic; a
+minimal implementation's locality could differ in either direction.
 
-**This is the term I would attack first if I were the red team.** The worst case
-for me moves the bound from 0.258 to ~0.33 ms, i.e. by 1.3×, not by an order of
-magnitude — the headline (>10× above the floor on both presets) survives it
-either way.
-
+Three earlier attempts failed mechanically and are kept as a record of the
+recipe: 904016 (Nsight kills inductor's compile worker pool — fix
+`TORCHINDUCTOR_COMPILE_THREADS=1`), 904019 (`--nvtx-include "measure"` is a
+start/end range while the script uses push/pop — it needs the trailing slash),
+904032 (metrics collected but stripped by the log filter). A fourth trap is in
+the data itself: ncu prints per-*group* averages with an `Invocations` count, so
+summing the printed averages undercounts the forward by ~8x. `parse_ncu.py` does
+it correctly.
 **R3 — `c_launch = 1.166 µs` is this driver on this node.** It is the marginal
 replay cost of a 1-element `add_` in a captured graph, stable over 128–2048
 kernels and measured twice. Device-side graph launch (CUDA 12 `cudaGraphLaunch`
@@ -702,22 +739,24 @@ are direct measurements with their harnesses in this directory.
 |---|---|---|
 | measured lean step, L=100 | 3.573 ms | 3.007 ms |
 | **bound (headline)** | **0.258 ms** | **0.239 ms** |
-| worst case if R2 lands (all 927 MiB goes to HBM) | ~0.33 ms | ~0.33 ms |
+| worst case if R2 had landed (all 927 MiB to HBM) — **measured away**, §2.2c | ~0.33 ms | ~0.33 ms |
 | best case if R1 lands (maximal cross-op fusion, D≈90) | ~0.15 ms | ~0.11 ms |
-| **defensible range** | **0.15 – 0.33 ms** | **0.11 – 0.33 ms** |
+| **defensible range** | **0.15 – 0.26 ms** | **0.11 – 0.26 ms** |
 | capacity floor of today's kernels | ~1.66 ms | ~1.39 ms |
 | bound at L=400 | 0.599 ms | 0.241 ms |
 
-Even at the pessimistic end of the range the model is **>10× above its floor**
-on both presets, which is the claim that has to survive; the headline number is
-0.26 ms and the honest interval is 0.15–0.33 ms.
+Even at the pessimistic end the model is **>13× above its floor** on both
+presets, which is the claim that has to survive; the headline number is 0.26 ms
+and the honest interval is 0.15–0.26 ms — R2, the only term that could have
+pushed it up, was measured and did not.
 
 Three sentences:
 
 1. **The floor is a serialisation floor, not a FLOP or bandwidth floor.** At
    L=100 matmul arithmetic is 0.150 ms, non-matmul arithmetic 0.005 ms,
    external HBM traffic 0.011 ms and irreducible intermediate traffic 0.149 ms
-   (L2-resident); the 205 unavoidable global barriers on the critical path are
+   (L2-resident at a **measured** 81.5 % hit rate); the 205 unavoidable global
+   barriers on the critical path are
    0.24–0.26 ms, and everything above that is implementation. All four terms
    are the same order, so the bound is tight rather than vacuous.
 2. **`exact` and `fast` have the same per-step floor** (within 7 %), because
@@ -741,6 +780,7 @@ Three sentences:
 | `x_baseline.py` | production wall time split into captured replay + python wrapper |
 | `x_triton_gemm.py` | M8 cuBLAS vs inductor Triton template at the model's shapes |
 | `x_concurrency.py` | M9 *k* independent forwards in one graph on *k* streams |
+| `x_ncu.py`, `parse_ncu.py` | R2: DRAM and L2 traffic of one lean forward under Nsight Compute, and the aggregation that does not undercount it 8× |
 | `run_*.sbatch`, `logs/` | one process per configuration, one length per process |
 
 Jobs: 903966 (void — eager-loop timing, see §9), 903967, 903971, 903977,

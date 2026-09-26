@@ -51,7 +51,8 @@ occupancy behaviour, which has no CPU analogue.
 | 903996 | Triton vs cuBLAS | narrow projections 1.21-1.37x faster on Triton AND bit-identical at fp32; wide ones slower |
 | 903998 / 904007 | concurrency | 8 independent forwards in one graph cost 3.6x one: **2.22x (exact) / 2.26x (fast)** at L=100, only 1.27x at L=400 |
 | 904007 | D at L=400 | D = 205 exactly - the depth is length-independent; arithmetic takes over near L~208 |
-| 904016 | min materialised traffic + ncu DRAM bytes | (red-team item R2) |
+| 904016 | min materialised traffic | 926.9 MiB must cross the hierarchy for ANY kernel-level implementation of this dataflow -> 0.149 ms at the L2 rate, 0.331 ms if it spilled to HBM |
+| 904053 | ncu DRAM/L2 traffic (R2) | **81.5 % L2 hit rate measured** (891 MiB DRAM reads vs 4.81 GiB L2), so the traffic term is 0.149 ms and the bound holds; the forward moves **5.2x the minimum** traffic, and L2 runs at 21 % / DRAM at 9 % of their rates |
 
 ## Outcome
 
@@ -63,6 +64,10 @@ The two presets have essentially the SAME per-step floor because every
 relaxation `fast` is allowed attacks a term that was never binding; the two
 diverge only above L~208, where fp32 arithmetic takes over (L=400: 0.599 vs
 0.241 ms).
+
+R2, the one term that could have displaced serialisation, was MEASURED and did
+not: ncu puts the L2 hit rate at 81.5 %, so the 926.9 MiB minimum costs 0.149 ms
+(L2) / 0.061 ms (DRAM), not 0.331 ms. Defensible range is 0.15-0.26 ms.
 
 Second floor, same kernels: the **capacity floor** measured by saturating the
 GPU with 8 concurrent forwards is ~1.66 ms (exact) / ~1.39 ms (fast). So the
@@ -82,11 +87,8 @@ peak, nothing left inside it" - measured inside a graph it is 16.19 us =
 gap lists and a section naming what a red team can still break), plus
 `x_micro.py`, `x_micro2.py`, `x_census.py`, `x_baseline.py`, `x_triton_gemm.py`,
 `x_concurrency.py`, `x_ncu.py`, `run_*.sbatch`, `logs/`.
-Worktree: removed once, then RECREATED for job 904053 (the outstanding ncu
-run - see Next #5). Remove it again with
-`git worktree remove --force /hnvme/workspace/v181bb10-salad/n016-floor` once
-`logs/ncu_raw.txt` has been read; /hnvme is inode-capped and in grace. To
-reproduce from scratch, the
+Worktree REMOVED (job 904053 has landed and /hnvme is inode-capped and in
+grace). To reproduce, the
 scripts hardcode `ROOT = /hnvme/workspace/v181bb10-salad/n016-floor`; recreate
 it with
 
@@ -104,13 +106,11 @@ does not exist on the compute nodes.
 2. Multi-stream capture of ONE forward's independent work (latency form of the same).
 3. Per-shape Triton/cuBLAS selection for the narrow projections (~0.12 ms, bit-exact at fp32).
 4. Capture N sampler steps per graph to remove the 0.178 ms wrapper.
-5. R2 (traffic) is the one term a red team should attack first - see RESULTS.md
-   section 10. The ncu measurement that settles it is STILL OUTSTANDING after
-   three mechanical failures (904016 BrokenProcessPool, 904019 wrong NVTX filter
-   form, 904032 metrics collected but eaten by the log filter). Job 904053 has
-   the corrected recipe - `module load cuda/12.6.2`,
-   `TORCHINDUCTOR_COMPILE_THREADS=1`, `--nvtx-include "measure/"` WITH the
-   trailing slash, and NO grep on the output - and writes
-   `logs/ncu_raw.txt`. Read that file; if `dram__bytes_read.sum +
-   dram__bytes_write.sum` per lean forward is well under ~760 MB the bound of
-   0.258 ms stands, and if it is near 927 MiB the bound rises to ~0.33 ms.
+5. R2 is CLOSED (job 904053). What is left open there is only
+   `dram__bytes_write.sum`, which this driver returns as 0.00 for every kernel
+   group - the DRAM figure is reads only. Working ncu recipe, for reuse:
+   `module load cuda/12.6.2`, `TORCHINDUCTOR_COMPILE_THREADS=1` (else Nsight
+   kills inductor's compile worker pool), `--nvtx-include "measure/"` WITH the
+   trailing slash (push/pop, not a start/end range), no grep on the output, and
+   aggregate with `parse_ncu.py` - ncu prints per-GROUP averages plus an
+   `Invocations` count, so summing the printed averages undercounts by ~8x.
