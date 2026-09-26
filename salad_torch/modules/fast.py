@@ -219,7 +219,15 @@ class FastDenoiser(nn.Module):
             chain=torch.zeros(L, device=d, dtype=torch.long),
             batch=torch.zeros(L, device=d, dtype=torch.long),
             mask=torch.ones(L, device=d, dtype=torch.bool),
-            cyclic_mask=None,
+            # A cyclic config MUST get a real buffer here, not None. The graph
+            # is captured against these addresses, so a `cyclic_mask` that
+            # first appears at call time has nowhere to be written: before
+            # N010/S2 it was silently dropped (the capture had traced the
+            # None branch), and after it, it raises. Capturing an all-False
+            # mask and copying the real one in is the fix - it changes no
+            # arithmetic, `sequence_relative_position` reads the buffer.
+            cyclic_mask=(torch.zeros(L, device=d, dtype=torch.bool)
+                         if self.config.cyclic else None),
             # every Gumbel draw, pre-drawn: CUDA graphs cannot capture an RNG op
             uniform=torch.rand(self.n_draws, L, L, device=d, dtype=f)
                          .clamp_(1e-6, 1 - 1e-6),
@@ -300,7 +308,10 @@ class FastDenoiser(nn.Module):
                 if src is not None and dst is not None and dst.shape == src.shape:
                     dst.copy_(src)
                 elif src is not None:
-                    if self._graph is not None:
+                    if self._graphs:
+                        # `self._graphs`, not the former single `self._graph`:
+                        # N009 keeps one captured graph per
+                        # (need_aa, pair_cond).
                         # A captured graph reads the addresses fixed at capture
                         # time, so swapping a buffer here does nothing and the
                         # replay returns the OLD length's output (red team

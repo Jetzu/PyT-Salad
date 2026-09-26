@@ -167,7 +167,15 @@ class DiffusionPairFeatures(nn.Module):
         index = torch.arange(n, device=pos.device)
 
         if pair_condition is not None:
-            pc = {k: v[index[:, None], neighbours] for k, v in pair_condition.items()}
+            # Only the three keys `forward` actually consumes. `omap` is the
+            # fourth entry of `pair_condition` and it is read by NOTHING here:
+            # the orientation embedding is `linear_omap`, which only exists
+            # when `config.use_omap` is set, and no released checkpoint sets
+            # it (see convert/haiku_to_torch._pair_feature_names). Gathering
+            # it anyway cost one dead (N, K, 9) gather per pair block, twelve
+            # per forward. Bit-exact to drop: the result was discarded.
+            pc = {k: pair_condition[k][index[:, None], neighbours]
+                  for k in ("dmap", "dmap_mask", "flags")}
         else:
             pc = None
 

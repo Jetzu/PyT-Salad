@@ -65,8 +65,39 @@ bug B1). `index_put_` with duplicate indices is documented non-deterministic on
 CUDA. The usable gate is the SINGLE FORWARD against a noise-floor control,
 which is what `x_equiv.py` does.
 
+### Ladder, L=100, one forward (full = reporting step, lean = the other 499)
+| rung | full ms | lean ms | job |
+|---|---|---|---|
+| N007 baseline (manual CUDA graph, 30 Dynamo graphs) | 4.966 / 4.941 | 4.489 / 4.485 | 903079 |
+| + P0 graph-break fix | 4.886 / 4.870 | 4.006 / 4.015 | 903105 |
+| + P3 one-hot -> gather | 4.713 | 3.906 | 903105 |
+| + P6 hoist neighbour stages | 4.650 | 3.828 | 903105 |
+| + P4+P5 skip dead pair conditioning, K 64->48 | **4.385** | **3.564** | 903126 |
+| (control) need_aux=0 | 4.378 | 3.572 | 903126 |
+End to end `generate.py --num_aa 100 --fast`: **1.5 s/design** (was ~2.1 s).
+
 ## Outcome
+4.95 -> **4.39 ms** on a reporting step and **3.56 ms** on the 400 steps that
+do not report, at the unchanged parity floor. 2.0 ms is NOT reachable on the
+exact path: see `README.md` / notes/04 section 7 for the kernel breakdown.
+Two findings beyond the plan: the `DotDict` graph-break (P0) and the CUDA
+nondeterminism that voids every trajectory-level test (`P2_NOTE.md`).
 
 ## Outputs
+- `.agent-research/results/N009-speed-proposals/` - README, `P2_NOTE.md`,
+  `x_equiv.py`, `x_nondet.py`, `x_kernels.py`, the sbatch ladders, `logs/`
+- `notes/04_PARITY_AND_PERF.md` section 7
+- jobs 903079, 903105, 903106, 903126, 903136, 903138 (h100, <1 GPU-h each)
 
 ## Next
+- P7 (batch the condition branch across the 6 blocks) is ~0.2-0.4 ms for 2-3
+  days and risks the parity budget on a batched GEMM - not taken on the exact
+  path. P8 (a Triton pair-feature kernel) is the only thing that reaches 2.0 ms
+  and is explicitly "materially different" numerics, so it belongs to `fast`.
+- `--seed` does not pin a CUDA `--fast` run (`index_mean` -> scatter_add).
+  Deserves its own item; fixing it changes summation order, so it needs a
+  parity re-baseline.
+- The conditioning cache still costs host syncs per step. An identity +
+  `_version` key (holding a reference to the keyed tensors so ids cannot be
+  recycled) would be exact and sync-free, and would remove the need for the
+  `fast` preset `trust_cond_cache` shortcut.

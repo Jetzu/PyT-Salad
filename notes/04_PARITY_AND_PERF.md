@@ -236,3 +236,204 @@ recover it. The near-zero TF32 gain predicts exactly this.
 
 Corollary for anyone optimising further: lower precision is the wrong axis.
 The lever is FEWER, BIGGER kernels. And bf16 would cost parity too (4-5 A).
+
+## 7. N009: the `exact` inference preset (2026-09-26)
+
+Executing the N007 plan's ranked proposals under one rule: hold the parity
+floor. All numbers are **one denoiser forward at L=100**, `default_vp-200k`,
+H100, fp32 `matmul_precision="highest"`, manual whole-forward CUDA graph, one
+length per process. `full` = a step that also runs the AA decoder + angle head
+(what a *reporting* step costs); `lean` = `need_aa=False` (what the other 499
+steps of a 500-step design cost).
+
+### 7.1 The finding the plan did not have: `DotDict` breaks the Dynamo graph
+
+`DotDict.__getattr__ = dict.get`. Dynamo's `_getattr_static` raises
+`AttributeError` on that, gives up, and **breaks the graph at every
+`config.<key>` read inside the compiled region**. `torch._dynamo.explain` on
+`forward_core`:
+
+| | graphs | breaks |
+|---|---|---|
+| before | 30 | 29 |
+| after hoisting every hot config read into plain attributes | **1** | **0** |
+
+Secondary cause in the same family: the `_slice(uniform, i)` helper was
+compiled as its own frame and specialised on `i`, so 19 draws blew Dynamo's
+default `cache_size_limit` of 8 and everything past the eighth broke. One
+`torch.unbind` up front removes it.
+
+The model was correct, "compiled", CUDA-graphed - and in thirty pieces.
+`fast.py`'s own docstring claimed graph breaks were 0. **Rule: never read
+`self.config` inside a `forward` on the compiled path. Hoist it in `__init__`,
+and check with `torch._dynamo.explain` rather than by reading the code.**
+
+### 7.2 The ladder (each rung adds to the one above)
+
+| rung | what | full ms | lean ms |
+|---|---|---|---|
+| N007 baseline | manual CUDA graph, 30 Dynamo graphs | 4.966 / 4.941 | 4.489 / 4.485 |
+| + **P0** | the graph-break fix above (bit-exact) | 4.886 / 4.870 | 4.006 / 4.015 |
+| + **P3** | one-hot x matrix -> row gather (bit-exact) | 4.713 | 3.906 |
+| + **P6** | hoist the loop-invariant neighbour stages (bit-exact) | 4.650 | 3.828 |
+| + **P4+P5** | skip the dead pair-conditioning work, K 64->48 | **4.390** | **3.574** |
+
+(four repeats of the last rung across two jobs: full 4.390 / 4.384 / 4.365 /
+4.385, lean 3.574 / 3.569 / 3.556 / 3.564.)
+
+P0 is worth almost nothing on a full step and **0.48 ms on a lean one** - the
+broken graph was costing most of its fusion in the trunk, which is all a lean
+step runs. P2 is the full->lean column itself: **0.82 ms** at the shipping
+config (it was 0.48 ms before P0).
+
+End to end, `generate.py --num_aa 100 --fast`: **1.5 s per design**, from
+~2.1 s. `--preset exact` is the default; `--preset fast` is N011's.
+
+### 7.3 P1 was already subsumed, and is now moot
+
+The angle head's CPU sidechain tables made *inductor* refuse to cudagraph that
+partition. The manual whole-forward capture does not care, which is why the
+launch gap was already closed at 4.95 ms - and after P2 the angle head does not
+execute at all on 400 of a run's 401 steps. Not implemented; no longer worth an
+hour.
+
+### 7.4 `need_aux=False` is still a dead end - re-measured post-P0
+
+4.378 vs 4.385 ms full, 3.572 vs 3.564 lean. The dssp head and the distogram
+neighbour draw cost nothing measurable even with the graph unbroken. Leave
+them on.
+
+### 7.5 THE CUDA DENOISER IS NOT REPRODUCIBLE - read before any PDB diff
+
+Two runs of the same command with the same `--seed` produce **different
+proteins**. Measured with the control that matters (job 903106: `allon` vs
+`allon2`, identical flags, identical seed - DIFFERS on all three designs).
+
+Source, measured (job 903136):
+
+```
+index_put_ stage chaining reproducible over 20 reps : True
+selected neighbour indices reproducible             : True  (0 differing slots)
+index_mean reproducible                             : False  max|d| 1.639e-07
+```
+
+Bug B1 (section 4) was the prime suspect and is **refuted** - it reproduces
+exactly. The source is `index_sum`/`index_mean` -> `scatter_add`, whose CUDA
+atomicAdd ordering varies at 1.6e-7, twice per block, six blocks deep. And it
+does not stay at 1.6e-7: each block's `pos` feeds the next block's neighbour
+selection, and a stable argsort over near-ties flips *discretely* under a 1e-7
+nudge. One forward, run twice, identical input:
+
+```
+NOISE FLOOR: the identical call run twice differs by 1.755e-02 on cuda
+                                                     0.000e+00 on cpu
+```
+
+**The CUDA forward's own run-to-run noise is ~900x the 2e-5 CPU parity floor.**
+Consequences, in order of importance:
+
+1. A trajectory diff, a PDB diff or an absolute GPU tolerance measures the
+   backend, not the change. Assert against an identical-input rerun.
+2. The parity fixtures being CPU-generated (section 5) is not just about TF32;
+   it is the only reason the 2e-5 floor is measurable at all.
+3. `--seed` does not pin a CUDA `--fast` run. Fixing that means a deterministic
+   segment reduction, which needs its own parity re-baseline.
+
+### 7.6 What each proposal is worth numerically, on the gate that works
+
+CPU is deterministic, so the single forward there is the real test, and there
+every proposal is **bit-identical**:
+
+| | CPU | CUDA, vs the 1.755e-02 noise floor |
+|---|---|---|
+| P2 `need_aa=False`, 1 chain | `torch.equal` True | 1.514e-02 = 0.86x |
+| P2 `need_aa=False`, 2 chains | `torch.equal` True | 1.307e-02 = 0.74x |
+| P4 dmap/flags terms dropped | `torch.equal` True | 0.000e+00 |
+| P4+P5 `pair_cond=False`, K 64->48 | `torch.equal` True | 1.611e-02 = 0.92x |
+
+P3 and P6 live in the shared modules, so `tests/test_model_parity.py` covers
+them directly; it did not move (0.00002 / 0.00020 A on all four configs).
+
+P4/P5 carry a **runtime gate**: `FastDenoiser` derives "this design has no pair
+conditioning" from the real `dmap_mask`/`flags`, never from the config. Taking
+the skip when `flags` IS set moves `pos` by 2.1e+02 A - `flags` channel 0 is
+"different chains", so anything multi-chain, any template dmap and any explicit
+`chain_contacts` switches it off by itself.
+
+### 7.7 Inductor kernel-merging knobs: one small win, one hard crash
+
+| knob | full ms | lean ms | |
+|---|---|---|---|
+| (none) | 4.385 | 3.564 | shipping |
+| `aggressive_fusion=1` | 4.302 | 3.503 | -1.9 % / -1.7 % |
+| `combo_kernels=1` | — | — | **crashes** |
+
+`combo_kernels` (horizontal fusion - exactly the "merge independent launches"
+lever this model wants) raises in inductor codegen on the stable-argsort node:
+
+```
+Error in codegen for ComputedBuffer(... Sort(... stable=True ...))
+```
+
+torch 2.5.1. Not available to us while neighbour selection is a stable argsort,
+which it must be (section 1).
+
+`aggressive_fusion` is real but small, and it is a PROCESS-GLOBAL inductor flag
+whose numerical effect cannot be resolved on CUDA - the backend's own noise
+floor (section 7.5) is 1.755e-02, three orders of magnitude above anything a
+fusion decision could move. **Not shipped in `exact`.** If someone wants it,
+the gate is a bit-equality check of the compiled forward on CPU, where the
+floor is 0.
+
+### 7.8 The floor, named (kernel census, L=100, `x_kernels.py`)
+
+| | kernels | GPU-busy | |
+|---|---|---|---|
+| reporting step (`need_aa=True`) | 1202 | 4.351 ms | |
+| — GEMM (cuBLAS) | 419 | 2.616 ms | **6.24 us each** |
+| — Triton (fused pointwise/reduction) | 645 | 1.519 ms | 2.36 us each |
+| — sort / argsort | 57 | 0.107 ms | 1.87 us each |
+| — other | 79 | 0.103 ms | 1.31 us each |
+| lean step (`need_aa=False`) | **946** | **3.521 ms** | |
+| — GEMM (cuBLAS) | 321 | 2.096 ms | 6.53 us each |
+| — Triton | 524 | 1.269 ms | 2.42 us each |
+| — other + DtoD copies | 101 | 0.157 ms | |
+
+The lean step's individual top kernels:
+
+```
+triton_ (all fused pointwise/reduction, incl. the stable argsorts)  524x  1.269 ms
+sm80_xmma_gemm_f32f32..._nn_n_tilesize32x32x8                       120x  0.838 ms
+sm80_xmma_gemm_f32f32..._nn_n_tilesize64x64x8                        24x  0.270 ms
+sm80_xmma_gemm_f32f32..._tt_n_tilesize64x64x8                        18x  0.269 ms
+sm80_xmma_gemm_f32f32..._tt_n_tilesize32x32x8                        31x  0.194 ms
+cutlass_80_simt_sgemm_64x64_8x5_nn_align1                            30x  0.137 ms
+gemv2N_kernel                                                        24x  0.078 ms
+Memcpy DtoD                                                          57x  0.073 ms
+splitKreduce_kernel                                                  38x  0.070 ms
+```
+
+(The argsorts do not appear separately: inductor lowers `torch.argsort(
+stable=True)` to a Triton `Sort` node, so they are inside the 524.)
+
+**60 % of a lean step is 321 cuBLAS launches at 6.5 us each, against a 0.21 ms
+arithmetic floor.** N007 section 2 already measured why: the two wide
+projections (`dist` 400->64, `pairvec` 240->64) run at ~51 TFLOP/s, ~76 % of
+the H100's fp32 FFMA peak, and the narrow ones (`dir` 60, `rot` 9) cost the
+*same* 6.4 us because they are pure launch latency. There is nothing left
+inside them.
+
+So **2.0 ms is not reachable on the exact path.** Getting there needs ~1.5 ms
+off the GEMM stage, i.e. ~240 of the 321 launches gone. The two candidates:
+
+* **P7** (batch the condition branch's six blocks into one `bmm`) removes at
+  most 30 of them, ~0.19 ms, for 2-3 days - and a `bmm(batch=6)` may pick a
+  different tile or split-K, which spends parity budget for 5 % of a step.
+* **P8** (one Triton kernel per pair block, features computed in registers)
+  is the only change that removes launches by the hundred, and the N007 plan
+  classifies it "materially different" numerics by construction: it reassociates
+  an 842-term dot product into whatever its tiling does. That is the `fast`
+  preset's licence, not this one's.
+
+The honest exact floor is **~3.4-3.5 ms** for a lean step, ~1.5 s for a
+100-residue design.

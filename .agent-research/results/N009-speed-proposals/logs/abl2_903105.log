@@ -34,3 +34,16 @@ RESULT base2        L=100   GATHER=0 HOIST=0 NOPC=0 AUX=1 IND=[]  eager    0.00 
 RESULT +P3          L=100   GATHER=1 HOIST=0 NOPC=0 AUX=1 IND=[]  eager    0.00  full  4.713 ms  lean  3.906 ms   500-step   1.95 s   compile   219 s
 /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
   warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, True), (True, True)]
+RESULT +P6          L=100   GATHER=1 HOIST=1 NOPC=0 AUX=1 IND=[]  eager    0.00  full  4.650 ms  lean  3.828 ms   500-step   1.91 s   compile   292 s
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT +P4P5        L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  4.390 ms  lean  3.574 ms   500-step   1.79 s   compile   285 s
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT all2         L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  4.384 ms  lean  3.569 ms   500-step   1.79 s   compile    71 s
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT all3         L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  4.365 ms  lean  3.556 ms   500-step   1.78 s   compile    71 s
+=== other lengths, shipping config
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
