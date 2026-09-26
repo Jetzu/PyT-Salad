@@ -96,7 +96,9 @@ inventing new harnesses; container work via short h100 sbatch jobs (all
   True` - the Encoder is genuinely jointly trained, not a frozen
   preprocessing step (spec-05's explicit requirement).
 - **Task 3**: jobs 901824 (aa_gt real random - see below) then 901845
-  (aa_gt all-MASK, the fix) generated `gradstep_default_vp.npz` (real
+  (aa_gt all-MASK, the fix) generated `gradstep_default_vp.npz` (181 MB,
+  moved out of the notebook to `/hnvme/workspace/v181bb10-salad/n004_evidence/
+  gradstep_default_vp.npz` per the >5MB rule) (real
   `default_vp-200k` weights, 2-batch-item/3-chain/padded fixture from
   `tests/harness/gen_loss_ref2.py`, REAL training entry point composition:
   `StructureDiffusionInference.prepare_condition` + `Diffusion(predict_aa=
@@ -167,8 +169,10 @@ empty, safe to ignore/remove):
   Task 1 parity run output
 - `task2_overfit_check.py` - Task 2 self-check (Trainer overfit)
 - `gen_gradstep_ref.py`, `gen_gradstep_task3.sbatch`, `gradstep_901824.log`
-  (superseded, real aa_gt), `gradstep_901845.log` (final, all-mask aa_gt),
-  `gradstep_default_vp.npz` - Task 3 JAX reference
+  (superseded, real aa_gt), `gradstep_901845.log` (final, all-mask aa_gt) -
+  Task 3 JAX reference generation; the reference array itself,
+  `gradstep_default_vp.npz`, is at `/hnvme/workspace/v181bb10-salad/
+  n004_evidence/gradstep_default_vp.npz` (>5MB, moved out of the notebook)
 - `task3_check_gradstep.py`, `task3_gradstep_result.txt` - Task 3 comparison
   + full output
 
