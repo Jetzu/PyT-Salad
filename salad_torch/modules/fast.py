@@ -302,6 +302,42 @@ class FastDenoiser(nn.Module):
         # deterministic reduction, on the H100 itself - so `exact` takes it.
         import torch._inductor.config as _ind
         _ind.aggressive_fusion = bool(p.get("aggressive_fusion")) and opt.AGGRESSIVE_FUSION
+        # N017/O1. Inductor's inference pipeline has no CSE pass: `joint_graph_passes`
+        # runs remove_noop_ops, the pattern matcher and constant folding, and that is
+        # all. So the denoiser rebuilds the SAME Gram-Schmidt frame 61 times per
+        # forward (`aa_frames_t` -> `rot_from_two_vectors`, 4-5 launches each on an
+        # (N, 3) tensor): three times inside every `DiffusionPairFeatures`, again in
+        # `Update`, again in `UpdatePositions`, and `attn_2`'s `prev_pos/sigma` frame
+        # is identical in all six blocks. 31 are exact duplicates. Running
+        # `fx_graph_cse` over the post-dispatch graph deletes them: -50 kernels at
+        # EVERY length (the duplication is a property of the graph, not the shape),
+        # i.e. -2.5 to -2.9 % of a lean step at L=50/100/200.
+        #
+        # BIT-IDENTICAL, not approximately: CSE deletes re-executions of pure ops
+        # with identical arguments and reassociates nothing. Verified bitwise on CPU
+        # (deterministic by construction) over all eleven `forward_core` outputs at
+        # L=64 and L=100 in two independent jobs - max|d| = 0.0 exactly. That is the
+        # right control here: the four checkpoint parity tests run the EAGER path and
+        # cannot see a compile-time graph change at all.
+        #
+        # Do NOT substitute `_ind.freezing = True`. It runs this same CSE and measures
+        # identically (677 kernels, 3.05-3.07 ms) and it is the DOCUMENTED knob, but
+        # it also constant-folds the parameters and runs its own layout passes, and
+        # those DO move the numbers: measured pos 8.8e-06, raw_angles 1.5e-03 on the
+        # same CPU control. Both sit UNDER the 2e-05 A parity floor, so freezing
+        # would pass `test_model_parity` while quietly not being fp32-exact.
+        try:
+            from torch._functorch.compile_utils import fx_graph_cse as _cse
+
+            def _cse_pass(graph):
+                graph.owning_module.graph = _cse(graph)
+
+            _ind.joint_custom_post_pass = _cse_pass
+        except (ImportError, AttributeError):
+            # Private torch path. A version bump that moves it must degrade to the
+            # plain compile, never fail the denoiser. After a torch upgrade, check
+            # whether the newer inductor CSEs on its own - if it does, delete this.
+            pass
         # P7, same contract: the preset chooses, `SALAD_OPT_BATCHCOND=0` can
         # only veto. Also process-global, and also set before the compile.
         opt.BATCH_COND = bool(p.get("batch_cond_pair")) and _ENV_BATCH_COND

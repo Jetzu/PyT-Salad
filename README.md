@@ -23,7 +23,8 @@ bioRxiv 2025.01.31.635780.
 | all four released checkpoints | load with `strict=True` |
 | sampling loop | generates proteins; verified against the chaos noise floor |
 | training losses | all 12 terms implemented, gradients match JAX (cosine 0.99999863) |
-| data pipeline + training loop | in progress |
+| training loop | complete and verified; batches by bin-packing, like upstream |
+| real-PDB datasource | implemented, **untested** - no preprocessed `.npz` tree on the dev machine |
 | **performance** | **1.09-4.7x FASTER than JAX** (see below) |
 
 ## Performance
