@@ -50,6 +50,28 @@ _ENV_BATCH_COND = opt.BATCH_COND
 #:
 #: A preset that is allowed to move the numbers belongs in this table too, as
 #: its own entry; do not loosen "exact".
+try:
+    from torch._functorch.compile_utils import fx_graph_cse as _fx_graph_cse
+except (ImportError, AttributeError):  # pragma: no cover - private torch path
+    # A version bump that moves it must degrade to the plain compile, never fail
+    # the denoiser. After a torch upgrade, check whether the newer inductor CSEs
+    # on its own - if it does, delete this and the pass below.
+    _fx_graph_cse = None
+
+
+def _cse_graph_pass(graph):
+    """N017/O1's CSE pass. MODULE level on purpose - see `FastDenoiser.__init__`.
+
+    Inductor pickles `joint_custom_post_pass` into its on-disk FX-graph cache
+    key. A closure is unpicklable, inductor swallows the resulting
+    "Can't pickle local object" and silently disables that cache.
+    """
+    graph.owning_module.graph = _fx_graph_cse(graph)
+
+
+_cse_graph_pass = _cse_graph_pass if _fx_graph_cse is not None else None
+
+
 PRESETS: dict[str, dict] = {
     "exact": dict(
         # skip the AA decoder + dssp + angle head on steps whose outputs are
@@ -326,18 +348,16 @@ class FastDenoiser(nn.Module):
         # those DO move the numbers: measured pos 8.8e-06, raw_angles 1.5e-03 on the
         # same CPU control. Both sit UNDER the 2e-05 A parity floor, so freezing
         # would pass `test_model_parity` while quietly not being fp32-exact.
-        try:
-            from torch._functorch.compile_utils import fx_graph_cse as _cse
-
-            def _cse_pass(graph):
-                graph.owning_module.graph = _cse(graph)
-
-            _ind.joint_custom_post_pass = _cse_pass
-        except (ImportError, AttributeError):
-            # Private torch path. A version bump that moves it must degrade to the
-            # plain compile, never fail the denoiser. After a torch upgrade, check
-            # whether the newer inductor CSEs on its own - if it does, delete this.
-            pass
+        # `_cse_graph_pass` is defined at MODULE level, not as a closure here, and
+        # that is load-bearing: inductor pickles `joint_custom_post_pass` as part
+        # of the on-disk FX-graph cache key. A closure raises "Can't pickle local
+        # object" during that hash, inductor swallows it, and the FX-graph cache
+        # is silently disabled - every `--fast` process then pays a full 4-8 minute
+        # recompile with no cross-process reuse (N022 caught this; the lower-level
+        # Triton kernel cache still helps on a repeat length, which is why it only
+        # shows up as slow cold starts rather than as an error).
+        if _cse_graph_pass is not None:
+            _ind.joint_custom_post_pass = _cse_graph_pass
         # P7, same contract: the preset chooses, `SALAD_OPT_BATCHCOND=0` can
         # only veto. Also process-global, and also set before the compile.
         opt.BATCH_COND = bool(p.get("batch_cond_pair")) and _ENV_BATCH_COND

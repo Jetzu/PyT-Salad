@@ -290,7 +290,46 @@ compilation). `--timing_json` writes a timing breakdown to the given path.
 
 ---
 
-## 8. Environment flags
+## 8. Compile time, and making it happen only once
+
+`--fast` compiles and captures the denoiser before the first step. Measured cold
+at L=100: **~310 s**. That is a one-time cost, not a per-design one — but it is
+paid again for every new *(torch version, GPU architecture, length)* combination,
+and by default it is paid again on **every machine and every job**.
+
+That is because inductor caches to `TORCHINDUCTOR_CACHE_DIR`, which defaults to
+`/tmp/torchinductor_$USER`. On most clusters — and in most containers — `/tmp` is
+node-local and discarded between jobs, so the cache never survives to be reused.
+
+**Point it at storage that persists and is visible from wherever you run:**
+
+```bash
+export TORCHINDUCTOR_CACHE_DIR="$YOUR_PERSISTENT_SCRATCH/torchinductor"
+```
+
+Use whatever your site calls that — `$WORK`, `$SCRATCH`, `$XDG_CACHE_HOME`, a
+project directory, a mounted volume. Do not use a path that is node-local (often
+`/tmp` and sometimes `/scratch`), or you get the default behaviour back.
+
+Budget **~3,800 files and ~280 MB per compiled length**. On an inode-quota'd
+filesystem that adds up quickly across lengths, so pick a filesystem with inode
+headroom rather than the fastest one.
+
+With a persistent cache dir, the first run on a given length pays ~310 s and
+every later run — in any process, on any node with the same GPU architecture —
+starts warm.
+
+Two things that make the cold compile longer, worth knowing:
+
+* Matmul templates (`SALAD_OPT_GEMMTPL=1`) roughly double it, ~310 s → ~740 s.
+* Compilation already uses 32 worker threads by default; there is nothing to
+  gain by raising it.
+
+> **Note for torch < 2.6.** The `torch.compiler.save_cache_artifacts()` /
+> `load_cache_artifacts()` bundle API ("Mega-Cache") is not available, so a
+> prebuilt cache cannot be shipped alongside the code. On a newer torch it can.
+
+## 9. Environment flags
 
 Individual optimisations, for debugging. All default **on** except `DETSEG`, and
 `--preset` sets them for you — reach for these only to bisect a problem.
@@ -310,7 +349,7 @@ Setting any to `0`/`false`/`no`/`off` disables it.
 
 ---
 
-## 9. Hardware notes
+## 10. Hardware notes
 
 Developed and measured on an H100. Nothing in the code is architecture-specific
 — no Hopper intrinsics, no inline PTX, no hand-written CUDA, no hardcoded block
@@ -337,7 +376,7 @@ There is real headroom left; see `notes/04_PARITY_AND_PERF.md`.
 
 ---
 
-## 10. Things that will bite you
+## 11. Things that will bite you
 
 **Padding is not safe, and batch position changes the answer.** A `-1` "no
 neighbour" sentinel un-masks the last residue, which is then selected twice and
