@@ -22,9 +22,32 @@ bioRxiv 2025.01.31.635780.
 | **whole denoiser, released weights** | **0.00002 A max, identical predicted sequence** |
 | all four released checkpoints | load with `strict=True` |
 | sampling loop | generates proteins; verified against the chaos noise floor |
-| training losses | all 12 terms implemented, gradients clean |
+| training losses | all 12 terms implemented, gradients match JAX (cosine 0.99999863) |
 | data pipeline + training loop | in progress |
-| performance | 5-9x slower than JAX; see `notes/04_PARITY_AND_PERF.md` |
+| **performance** | **1.09-4.7x FASTER than JAX** (see below) |
+
+## Performance
+
+Measured on an H100 at L=100, against the JAX original on the same node.
+
+| | per step | per design | vs JAX |
+|---|---|---|---|
+| JAX salad | 4.73 ms | 1.56 s | — |
+| `--fast --preset exact` | 3.18 ms | 1.34 s | 1.16x |
+| `--fast --preset fast` | 3.01 ms | 0.60 s | 2.6x |
+| `--fast --preset fast --group_size auto` | 3.01 ms | **0.334 s** | **4.7x** |
+
+`exact` holds the 0.00002 A parity floor. `fast` adds TF32 and a halved
+sampling schedule, validated at 160 designs per arm as statistically
+indistinguishable from `exact` on bond geometry, radius of gyration, secondary
+structure and clash rate. `--group_size` advances N independent designs through
+one CUDA graph and is **bit-identical** to generating them one at a time.
+
+Both presets still sit >12x above this model's measured theoretical floor
+(0.258 ms/step): it is kernel-launch-bound, not arithmetic- or bandwidth-bound.
+Details and the remaining gap list are in `notes/04_PARITY_AND_PERF.md`.
+
+**[Full flag reference: `docs/USAGE.md`](docs/USAGE.md)**
 
 ## Layout
 
@@ -43,6 +66,21 @@ notes/specs/           the implementation specs the port was written from
 ```
 
 ## Quick start
+
+Generate eight 100-residue designs:
+
+```bash
+python scripts/generate.py \
+    --config default_vp --params params/default_vp-200k.jax \
+    --num_aa 100 --num_designs 8 \
+    --fast --preset fast --group_size auto \
+    --out_path outputs/my_designs
+```
+
+Every flag — conditioning, symmetry, schedules, reproducibility — is documented
+in **[`docs/USAGE.md`](docs/USAGE.md)**.
+
+From Python:
 
 ```python
 import torch
