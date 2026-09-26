@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "--config",
+    "default_vp",
+    "--params",
+    "/hnvme/workspace/v181bb10-salad/default_vp-200k.npz",
+    "--num_designs",
+    "1",
+    "--num_steps",
+    "3",
+    "--out_steps",
+    "2",
+    "--device",
+    "cuda",
+    "--num_aa",
+    "800",
+    "--renoise",
+    "--out_path",
+    "/hnvme/workspace/v181bb10-salad/n022tree/_probe/scratch_designs/renoise_L800"
+  ],
+  "status": "ok",
+  "error": null,
+  "wall_s": 1.773470163345337,
+  "peak_allocated_bytes": 1784011776,
+  "peak_reserved_bytes": 2413821952,
+  "compile_capture_s": null,
+  "group_n_actual": null,
+  "self_reported_peak_reserved_gib": null,
+  "label": "renoise_L800",
+  "entry": "generate"
+}

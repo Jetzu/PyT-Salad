@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "--config",
+    "default_vp",
+    "--device",
+    "cuda",
+    "--max-steps",
+    "2",
+    "--num-aa",
+    "1024",
+    "--checkpoint-dir",
+    "/hnvme/workspace/v181bb10-salad/n022tree/_probe/scratch_designs/train_ckpt_1024"
+  ],
+  "status": "ok",
+  "error": null,
+  "wall_s": 5.544865846633911,
+  "peak_allocated_bytes": 23133982208,
+  "peak_reserved_bytes": 26120028160,
+  "label": "train_1024",
+  "entry": "train"
+}

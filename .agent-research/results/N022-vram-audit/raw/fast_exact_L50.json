@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "--config",
+    "default_vp",
+    "--params",
+    "/hnvme/workspace/v181bb10-salad/default_vp-200k.npz",
+    "--num_designs",
+    "1",
+    "--num_steps",
+    "3",
+    "--out_steps",
+    "2",
+    "--device",
+    "cuda",
+    "--num_aa",
+    "50",
+    "--fast",
+    "--preset",
+    "exact",
+    "--out_path",
+    "/hnvme/workspace/v181bb10-salad/n022tree/_probe/scratch_designs/fast_exact_L50"
+  ],
+  "status": "ok",
+  "error": null,
+  "wall_s": 333.9903521537781,
+  "peak_allocated_bytes": 409892864,
+  "peak_reserved_bytes": 641728512,
+  "compile_capture_s": 333,
+  "group_n_actual": null,
+  "self_reported_peak_reserved_gib": null,
+  "label": "fast_exact_L50",
+  "entry": "generate"
+}
