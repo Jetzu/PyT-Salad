@@ -82,8 +82,17 @@ peak, nothing left inside it" - measured inside a graph it is 16.19 us =
 gap lists and a section naming what a red team can still break), plus
 `x_micro.py`, `x_micro2.py`, `x_census.py`, `x_baseline.py`, `x_triton_gemm.py`,
 `x_concurrency.py`, `x_ncu.py`, `run_*.sbatch`, `logs/`.
-Worktree: `/hnvme/workspace/v181bb10-salad/n016-floor` (remove with
-`git worktree remove` when the item is closed).
+Worktree REMOVED (/hnvme is inode-capped and in grace). To reproduce, the
+scripts hardcode `ROOT = /hnvme/workspace/v181bb10-salad/n016-floor`; recreate
+it with
+
+    git worktree add --detach /hnvme/workspace/v181bb10-salad/n016-floor a8533a7
+    ln -sfn /home/hpc/v181bb/v181bb10/SALAD_torch/params  <that>/params
+    ln -sfn /home/hpc/v181bb/v181bb10/SALAD_torch/fixtures <that>/fixtures
+
+and `module load cuda/12.6.2` for the two jobs that JIT-build a CUDA extension
+(M2/M6, the grid barrier) - nvcc is NOT in the triad env and /usr/local/cuda
+does not exist on the compute nodes.
 
 ## Next
 
