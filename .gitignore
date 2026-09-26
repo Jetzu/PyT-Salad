@@ -6,3 +6,5 @@ fixtures/*.npz
 __pycache__/
 *.pyc
 outputs/
+# Codex agents sometimes clone the repo into their results folder; never track it
+.agent-research/results/*/latest/
