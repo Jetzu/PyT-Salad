@@ -1,0 +1,79 @@
+### Starting TaskPrologue of job 903992 on h14-04 at Sat Sep 26 01:00:45 PM CEST 2026
+Running on cores 0-31 with governor ondemand
+Sat Sep 26 13:00:46 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   36C    P0             66W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+6d36435085525e4ba5a7eb776e9a926d  salad_torch/modules/blocks.py
+eb91545d7af1afc000d973c9d2cfd7bf  salad_torch/geometry/segment.py
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "base_r1", "L": 100, "cfg": "default_vp", "compile_s": 341.4176618261263, "full_ms": 3.9580485861127577, "lean_ms": 3.15257265077283, "census": {"triton": [381.0, 1068.3789000000081], "gemm": [308.0, 1893.0471000000025], "memcpy": [36.0, 42.3498000000013], "other": [2.0, 1.958400000001052]}, "kernels": 727.0, "gpu_busy_us": 3005.7342000000126, "replay_us": 2984.1680908203125, "pos_sum": -574.375302106142, "pos_absmax": 10.644844055175781}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "idxm_r1", "L": 100, "cfg": "default_vp", "compile_s": 342.99800974619575, "full_ms": 3.963681946819027, "lean_ms": 3.1561287158789737, "census": {"triton": [390.0, 1070.3450000000003], "gemm": [308.0, 1892.7183999999902], "memcpy": [36.0, 41.948599999997626], "other": [2.0, 1.9871999999994614]}, "kernels": 736.0, "gpu_busy_us": 3006.9991999999875, "replay_us": 2985.9381103515625, "pos_sum": -535.3168000243604, "pos_absmax": 10.155496597290039}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "cse_r1", "L": 100, "cfg": "default_vp", "compile_s": 300.2026934849564, "full_ms": 3.867553865226607, "lean_ms": 3.07224066539978, "census": {"triton": [338.0, 1003.6381000000026], "gemm": [301.0, 1877.1288999999988], "memcpy": [36.0, 42.37680000000462], "other": [2.0, 1.9616000000005216]}, "kernels": 677.0, "gpu_busy_us": 2925.1054000000067, "replay_us": 2902.5479125976562, "pos_sum": -128.16919959709048, "pos_absmax": 10.52337646484375}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "frz_r1", "L": 100, "cfg": "default_vp", "compile_s": 306.7559335420374, "full_ms": 3.8722668852036195, "lean_ms": 3.073644735074292, "census": {"triton": [338.0, 1005.0918999999919], "gemm": [301.0, 1881.9225000000067], "memcpy": [36.0, 42.4358999999982], "other": [2.0, 1.971100000000456]}, "kernels": 677.0, "gpu_busy_us": 2931.4213999999974, "replay_us": 2902.7261352539062, "pos_sum": -340.28027359582484, "pos_absmax": 10.635022163391113}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "both_r1", "L": 100, "cfg": "default_vp", "compile_s": 297.4246194900479, "full_ms": 3.870403083662192, "lean_ms": 3.0658733022088804, "census": {"triton": [339.0, 1000.6910999999867], "gemm": [301.0, 1879.1917000000035], "memcpy": [36.0, 42.48729999999989], "other": [2.0, 1.9742999999996755]}, "kernels": 678.0, "gpu_busy_us": 2924.34439999999, "replay_us": 2898.4188842773438, "pos_sum": -65.49572429805994, "pos_absmax": 10.346321105957031}
+RESULT {"tag": "base_r2", "L": 100, "cfg": "default_vp", "compile_s": 70.31343243503943, "full_ms": 3.969619547327359, "lean_ms": 3.15474399831146, "census": {"triton": [381.0, 1071.9837999999904], "gemm": [308.0, 1899.9118999999957], "memcpy": [36.0, 42.1157999999989], "other": [2.0, 1.9840000000004694]}, "kernels": 727.0, "gpu_busy_us": 3015.9954999999854, "replay_us": 2986.240234375, "pos_sum": 9.304475147277117, "pos_absmax": 10.713903427124023}
+RESULT {"tag": "idxm_r2", "L": 100, "cfg": "default_vp", "compile_s": 65.86143929790705, "full_ms": 3.970157184327642, "lean_ms": 3.1582949333824217, "census": {"triton": [390.0, 1074.1497000000138], "gemm": [308.0, 1894.290499999991], "memcpy": [36.0, 42.285499999996205], "other": [2.0, 1.9711999999993168]}, "kernels": 736.0, "gpu_busy_us": 3012.6969000000004, "replay_us": 2989.6661376953125, "pos_sum": -305.63544523343444, "pos_absmax": 10.494434356689453}
+RESULT {"tag": "cse_r2", "L": 100, "cfg": "default_vp", "compile_s": 66.20432085497305, "full_ms": 3.857605865535637, "lean_ms": 3.063699164583037, "census": {"triton": [338.0, 997.6546999999953], "gemm": [301.0, 1877.1830000000045], "memcpy": [36.0, 42.270499999995806], "other": [2.0, 2.028800000000797]}, "kernels": 677.0, "gpu_busy_us": 2919.136999999997, "replay_us": 2896.1807250976562, "pos_sum": -619.7341553317383, "pos_absmax": 10.339262008666992}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "frz_r2", "L": 100, "cfg": "default_vp", "compile_s": 165.98006039415486, "full_ms": 3.8651228494321304, "lean_ms": 3.0503329510490103, "census": {"triton": [338.0, 992.8047999999897], "gemm": [301.0, 1868.1858000000095], "memcpy": [36.0, 42.18709999999862], "other": [2.0, 1.9646999999991521]}, "kernels": 677.0, "gpu_busy_us": 2905.142399999997, "replay_us": 2881.8106079101562, "pos_sum": -526.4701923634857, "pos_absmax": 10.554913520812988}
+RESULT {"tag": "both_r2", "L": 100, "cfg": "default_vp", "compile_s": 66.36536165396683, "full_ms": 3.8588858325965703, "lean_ms": 3.0669109662994742, "census": {"triton": [339.0, 1000.055400000004], "gemm": [301.0, 1877.4339999999986], "memcpy": [36.0, 42.51200000000333], "other": [2.0, 1.9775000000006913]}, "kernels": 678.0, "gpu_busy_us": 2921.978900000007, "replay_us": 2897.7069091796875, "pos_sum": -466.8244969472289, "pos_absmax": 10.91425895690918}
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 13:35:56 CEST 2026
+= Job-ID             : 903992 on helma
+= Job-Name           : n017_bench
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N017-triton-audit/bench.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:00:00
+= Elapsed runtime    : 00:45:34
+= Total RAM usage    : 4.0 GiB of assigned 175 GiB (2.3%)
+= Node list          : h14-04
+= Subm/Elig/Start/End: 2026-09-26T12:50:22 / 2026-09-26T12:50:22 / 2026-09-26T12:50:22 / 2026-09-26T13:35:56
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      73K      61K      81K  5d19h13m55s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 1158622, 8 %, 8 %, 1558 MiB, 351929 ms
+NVIDIA H100, 00000000:06:00.0, 1344014, 8 %, 8 %, 1558 MiB, 352718 ms
+NVIDIA H100, 00000000:06:00.0, 1445293, 8 %, 9 %, 1406 MiB, 307966 ms
+NVIDIA H100, 00000000:06:00.0, 1613221, 8 %, 8 %, 1406 MiB, 314507 ms
+NVIDIA H100, 00000000:06:00.0, 1766968, 9 %, 9 %, 1406 MiB, 305245 ms
+NVIDIA H100, 00000000:06:00.0, 1935988, 1 %, 0 %, 1250 MiB, 73678 ms
+NVIDIA H100, 00000000:06:00.0, 1966479, 1 %, 0 %, 1252 MiB, 69206 ms
+NVIDIA H100, 00000000:06:00.0, 2000039, 1 %, 0 %, 1258 MiB, 69476 ms
+NVIDIA H100, 00000000:06:00.0, 2039912, 0 %, 0 %, 1260 MiB, 173629 ms
+NVIDIA H100, 00000000:06:00.0, 2109164, 1 %, 0 %, 1258 MiB, 69794 ms

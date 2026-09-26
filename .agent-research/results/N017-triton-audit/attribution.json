@@ -1,0 +1,38 @@
+{
+ "by_stage": {
+  "<triton unmatched>": {
+   "count": 524.0,
+   "us": 1244.9916999999823
+  },
+  "<cublas>": {
+   "count": 359.0,
+   "us": 2144.241499999993
+  },
+  "<memcpy>": {
+   "count": 36.0,
+   "us": 44.169299999997335
+  },
+  "<aten:void at::native::vectorized_elementwise_>": {
+   "count": 2.0,
+   "us": 2.0030999999987897
+  }
+ },
+ "by_detail": {
+  "<cublas>": {
+   "count": 359.0,
+   "us": 2144.241499999993
+  },
+  "<memcpy>": {
+   "count": 36.0,
+   "us": 44.169299999997335
+  },
+  "<aten:void at::native::vectorized_elementwise_>": {
+   "count": 2.0,
+   "us": 2.0030999999987897
+  }
+ },
+ "per_kernel": [],
+ "unmatched": [
+  "triton_"
+ ]
+}

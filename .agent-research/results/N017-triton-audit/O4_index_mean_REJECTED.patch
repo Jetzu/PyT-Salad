@@ -1,0 +1,34 @@
+--- /home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/segment.py	2026-09-26 09:38:03.697082350 +0200
++++ n017live/salad_torch/geometry/segment.py	2026-09-26 12:49:46.000000000 +0200
+@@ -17,6 +17,10 @@
+ 
+ from .. import opt
+ 
++#: N017 prototype switch (`N017_IDXMEAN=0` restores the (N, F) ones_like).
++import os as _os
++_N017_IDXMEAN = _os.environ.get("N017_IDXMEAN", "1") not in ("0", "false", "")
++
+ __all__ = ["index_sum", "index_mean", "index_max", "index_var", "index_std",
+            "index_count", "unique_chain", "det_segment_sum"]
+ 
+@@ -117,7 +121,19 @@
+     """
+     mask_b = mask.bool()
+     if weight is None:
+-        weight = torch.ones_like(data)
++        # N017. The denominator is a per-segment COUNT: the same number in
++        # every feature column. Summing an (N, 1) column of ones gives that
++        # number exactly as summing an (N, F) block of them (a sum of 1.0s is
++        # exact in fp32 far past any N this model sees), and `index_sum`
++        # broadcasts the result back anyway - so the (N, F) `ones_like` buys
++        # nothing and costs a scatter_add + a gather on an (N, F) tensor
++        # instead of an (N, 1) one, twice per `Update`.
++        # Bit-exact: `data * 1.0 == data`, and the quotient is unchanged.
++        if _N017_IDXMEAN:
++            weight = torch.ones((data.shape[0],) + (1,) * (data.dim() - 1),
++                                device=data.device, dtype=data.dtype)
++        else:
++            weight = torch.ones_like(data)
+     else:
+         weight = weight.expand_as(data)
+     # upstream mutates `data *= weight`; we must not touch the caller's tensor

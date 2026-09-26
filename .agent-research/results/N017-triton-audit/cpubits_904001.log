@@ -1,0 +1,44 @@
+### Starting TaskPrologue of job 904001 on h32-44 at Sat Sep 26 12:53:43 CEST 2026
+Running on cores 0-47 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+wrote /tmp/n017_base_64.pt tensors 11
+wrote /tmp/n017_cse_64.pt tensors 11
+wrote /tmp/n017_idxm_64.pt tensors 11
+wrote /tmp/n017_ipa_64.pt tensors 11
+<stdin>:2: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+<stdin>:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+CPUBITS L=64 cse   bit_identical=True  max|d|=0.000e+00
+CPUBITS L=64 idxm  bit_identical=True  max|d|=0.000e+00
+CPUBITS L=64 ipa   bit_identical=False  max|d|=3.540e-03
+wrote /tmp/n017_base_100.pt tensors 11
+wrote /tmp/n017_cse_100.pt tensors 11
+wrote /tmp/n017_idxm_100.pt tensors 11
+wrote /tmp/n017_ipa_100.pt tensors 11
+<stdin>:2: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+<stdin>:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+CPUBITS L=100 cse   bit_identical=True  max|d|=0.000e+00
+CPUBITS L=100 idxm  bit_identical=True  max|d|=0.000e+00
+CPUBITS L=100 ipa   bit_identical=False  max|d|=4.608e-03
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 13:07:50 CEST 2026
+= Job-ID             : 904001 on helma
+= Job-Name           : n017_cpubits
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N017-triton-audit/cpubits.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 01:00:00
+= Elapsed runtime    : 00:14:09
+= Total RAM usage    : 9.6 GiB of assigned 91 GiB (10.5%)
+= Node list          : h32-44
+= Subm/Elig/Start/End: 2026-09-26T12:53:33 / 2026-09-26T12:53:33 / 2026-09-26T12:53:41 / 2026-09-26T13:07:50
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+    /home/vault           774.0G  1048.6G  2097.2G        N/A     122K     200K     400K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      74K      61K      81K  5d19h42m1s !!!
+======================

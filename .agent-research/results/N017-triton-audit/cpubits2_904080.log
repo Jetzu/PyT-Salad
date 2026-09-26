@@ -1,0 +1,42 @@
+### Starting TaskPrologue of job 904080 on h32-44 at Sat Sep 26 13:37:47 CEST 2026
+Running on cores 0-47 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+wrote /tmp/n017b_base.pt tensors 11
+wrote /tmp/n017b_cse.pt tensors 11
+wrote /tmp/n017b_frz.pt tensors 11
+<stdin>:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+<stdin>:6: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+CPUBITS2 L=100 cse  bit_identical=True
+CPUBITS2 L=100 frz  bit_identical=False
+   pos                    max|d|=8.821e-06
+   local                  max|d|=5.493e-04
+   trajectory             max|d|=8.821e-06
+   aa                     max|d|=2.384e-06
+   aa_features            max|d|=7.749e-07
+   dssp                   max|d|=5.960e-06
+   raw_angles             max|d|=1.526e-03
+   angles                 max|d|=2.296e-05
+   angle_pos              max|d|=8.047e-06
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 13:42:52 CEST 2026
+= Job-ID             : 904080 on helma
+= Job-Name           : n017_cpubits2
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N017-triton-audit/cpubits2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 01:00:00
+= Elapsed runtime    : 00:05:15
+= Total RAM usage    : 9.8 GiB of assigned 91 GiB (10.8%)
+= Node list          : h32-44
+= Subm/Elig/Start/End: 2026-09-26T13:37:36 / 2026-09-26T13:37:36 / 2026-09-26T13:37:37 / 2026-09-26T13:42:52
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+    /home/vault           774.0G  1048.6G  2097.2G        N/A     122K     200K     400K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      73K      61K      81K  5d19h6m59s !!!
+======================

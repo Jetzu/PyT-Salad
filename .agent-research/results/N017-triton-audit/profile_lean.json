@@ -1,0 +1,2168 @@
+{
+ "captured": [
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 120.0,
+   "us_total": 830.8039999999994,
+   "us_each": 6.923366666666661
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 24.0,
+   "us_total": 268.8750999999942,
+   "us_each": 11.203129166666425
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 18.0,
+   "us_total": 266.19390000000124,
+   "us_each": 14.78855000000007
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 31.0,
+   "us_total": 191.09380000000436,
+   "us_each": 6.164316129032399
+  },
+  {
+   "name": "void cutlass::Kernel<cutlass_80_simt_sgemm_64x64_8x5_nn_align1>(cutlass_80_simt_sgemm_64x64_8x5_nn_align1::Params)",
+   "count": 30.0,
+   "us_total": 140.1630999999983,
+   "us_each": 4.672103333333276
+  },
+  {
+   "name": "void gemv2N_kernel<int, int, float, float, float, float, 128, 4, 4, 4, 1, false, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float> >(cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float>)",
+   "count": 24.0,
+   "us_total": 76.41910000000185,
+   "us_each": 3.1841291666667435
+  },
+  {
+   "name": "void splitKreduce_kernel<32, 16, int, float, float, float, float, true, false, false>(cublasSplitKParams<float>, float const*, float const*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*)",
+   "count": 38.0,
+   "us_total": 67.10780000000109,
+   "us_each": 1.7659947368421338
+  },
+  {
+   "name": "triton_poi_fused_clone_19",
+   "count": 6.0,
+   "us_total": 62.65919999999751,
+   "us_each": 10.443199999999585
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 18.0,
+   "us_total": 62.49580000000101,
+   "us_each": 3.4719888888889447
+  },
+  {
+   "name": "triton_per_fused_sort_3",
+   "count": 19.0,
+   "us_total": 62.31279999999674,
+   "us_each": 3.2796210526314074
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 12.0,
+   "us_total": 49.82680000000014,
+   "us_each": 4.152233333333345
+  },
+  {
+   "name": "triton_per_fused_add_bitwise_and_cat_clamp_eq_full_like_index_mean_mul_ne_rsqrt_sub_var_where_53",
+   "count": 6.0,
+   "us_total": 49.17449999999867,
+   "us_each": 8.195749999999778
+  },
+  {
+   "name": "triton_poi_fused_cat_29",
+   "count": 6.0,
+   "us_total": 47.986800000000265,
+   "us_each": 7.997800000000044
+  },
+  {
+   "name": "std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float, float, false, true, false, false, 5, false, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float> >(cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float>)",
+   "count": 12.0,
+   "us_total": 46.65269999999937,
+   "us_each": 3.8877249999999473
+  },
+  {
+   "name": "triton_poi_fused_add_clone_index_mean_mul_rsqrt_sub_var_54",
+   "count": 6.0,
+   "us_total": 44.11549999999848,
+   "us_each": 7.352583333333079
+  },
+  {
+   "name": "memcpy32_post",
+   "count": 36.0,
+   "us_total": 44.08290000000161,
+   "us_each": 1.2245250000000447
+  },
+  {
+   "name": "void cutlass::Kernel<cutlass_80_simt_sgemm_128x32_8x5_nn_align1>(cutlass_80_simt_sgemm_128x32_8x5_nn_align1::Params)",
+   "count": 7.0,
+   "us_total": 40.95350000000135,
+   "us_each": 5.850500000000193
+  },
+  {
+   "name": "triton_poi_fused_clone_index_pow_sub_58",
+   "count": 6.0,
+   "us_total": 39.97049999999963,
+   "us_each": 6.661749999999938
+  },
+  {
+   "name": "triton_poi_fused_cat_52",
+   "count": 6.0,
+   "us_total": 39.38879999999995,
+   "us_each": 6.564799999999991
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 6.0,
+   "us_total": 38.57880000000041,
+   "us_each": 6.429800000000069
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_split_k_kernel__5x_cublas",
+   "count": 12.0,
+   "us_total": 35.95480000000157,
+   "us_each": 2.996233333333464
+  },
+  {
+   "name": "triton_poi_fused_gelu_mul_ones_like_scatter_add_where_zeros_like_68",
+   "count": 6.0,
+   "us_total": 32.911500000002114,
+   "us_each": 5.485250000000352
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_51",
+   "count": 6.0,
+   "us_total": 26.55040000000031,
+   "us_each": 4.425066666666718
+  },
+  {
+   "name": "triton_per_fused_add_index_mean_mul_rsqrt_sub_var_32",
+   "count": 6.0,
+   "us_total": 24.678000000002612,
+   "us_each": 4.113000000000436
+  },
+  {
+   "name": "triton_poi_fused_gelu_mul_scatter_add_where_zeros_like_67",
+   "count": 24.0,
+   "us_total": 23.628100000001815,
+   "us_each": 0.9845041666667422
+  },
+  {
+   "name": "triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_46",
+   "count": 6.0,
+   "us_total": 19.955199999999422,
+   "us_each": 3.3258666666665704
+  },
+  {
+   "name": "triton_poi_fused_clone_39",
+   "count": 6.0,
+   "us_total": 19.513699999999652,
+   "us_each": 3.2522833333332755
+  },
+  {
+   "name": "triton_poi_fused_cat_42",
+   "count": 12.0,
+   "us_total": 18.48609999999953,
+   "us_each": 1.5405083333332945
+  },
+  {
+   "name": "triton_poi_fused_clone_55",
+   "count": 6.0,
+   "us_total": 17.971299999997065,
+   "us_each": 2.995216666666177
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_17",
+   "count": 12.0,
+   "us_total": 16.883700000002364,
+   "us_each": 1.406975000000197
+  },
+  {
+   "name": "triton_poi_fused_add_gelu_33",
+   "count": 6.0,
+   "us_total": 16.81899999999846,
+   "us_each": 2.8031666666664097
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_mul_sub_sum_where_59",
+   "count": 6.0,
+   "us_total": 16.56949999999897,
+   "us_each": 2.761583333333162
+  },
+  {
+   "name": "triton_poi_fused_add_gelu_56",
+   "count": 6.0,
+   "us_total": 16.262100000001464,
+   "us_each": 2.7103500000002443
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_split_k_kernel__5x_cublas",
+   "count": 6.0,
+   "us_total": 16.185600000001067,
+   "us_each": 2.697600000000178
+  },
+  {
+   "name": "triton_per_fused_mean_var_18",
+   "count": 12.0,
+   "us_total": 16.105199999998877,
+   "us_each": 1.3420999999999064
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_45",
+   "count": 6.0,
+   "us_total": 15.08819999999837,
+   "us_each": 2.514699999999728
+  },
+  {
+   "name": "triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_76",
+   "count": 4.0,
+   "us_total": 14.892900000000646,
+   "us_each": 3.7232250000001614
+  },
+  {
+   "name": "triton_poi_fused_index_sub_47",
+   "count": 6.0,
+   "us_total": 14.325900000000411,
+   "us_each": 2.3876500000000687
+  },
+  {
+   "name": "triton_poi_fused_clone_div_31",
+   "count": 6.0,
+   "us_total": 13.106800000001432,
+   "us_each": 2.1844666666669053
+  },
+  {
+   "name": "triton_per_fused__softmax_60",
+   "count": 6.0,
+   "us_total": 12.937400000000844,
+   "us_each": 2.156233333333474
+  },
+  {
+   "name": "triton_per_fused__softmax_36",
+   "count": 6.0,
+   "us_total": 12.803399999999101,
+   "us_each": 2.13389999999985
+  },
+  {
+   "name": "triton_poi_fused_clone_div_48",
+   "count": 6.0,
+   "us_total": 12.09000000000151,
+   "us_each": 2.0150000000002515
+  },
+  {
+   "name": "triton_poi_fused_stack_25",
+   "count": 7.0,
+   "us_total": 10.959799999999177,
+   "us_each": 1.5656857142855967
+  },
+  {
+   "name": "triton_poi_fused_add_34",
+   "count": 6.0,
+   "us_total": 10.815699999997832,
+   "us_each": 1.8026166666663055
+  },
+  {
+   "name": "void cutlass::Kernel<cutlass_80_simt_sgemm_128x64_8x5_nn_align1>(cutlass_80_simt_sgemm_128x64_8x5_nn_align1::Params)",
+   "count": 1.0,
+   "us_total": 10.704100000000107,
+   "us_each": 10.704100000000107
+  },
+  {
+   "name": "triton_poi_fused_add_clamp_div_gelu_index_mul_where_zeros_like_69",
+   "count": 6.0,
+   "us_total": 10.515200000001595,
+   "us_each": 1.7525333333335993
+  },
+  {
+   "name": "triton_poi_fused_index_50",
+   "count": 6.0,
+   "us_total": 10.364699999999448,
+   "us_each": 1.727449999999908
+  },
+  {
+   "name": "triton_poi_fused_add_71",
+   "count": 6.0,
+   "us_total": 10.332699999999885,
+   "us_each": 1.7221166666666476
+  },
+  {
+   "name": "triton_poi_fused_add_57",
+   "count": 6.0,
+   "us_total": 10.137799999999288,
+   "us_each": 1.6896333333332147
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_24",
+   "count": 7.0,
+   "us_total": 9.829700000001457,
+   "us_each": 1.4042428571430654
+  },
+  {
+   "name": "triton_poi_fused_index_27",
+   "count": 6.0,
+   "us_total": 9.606799999998975,
+   "us_each": 1.6011333333331625
+  },
+  {
+   "name": "triton_poi_fused_add_gelu_65",
+   "count": 6.0,
+   "us_total": 9.538799999999629,
+   "us_each": 1.589799999999938
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_23",
+   "count": 7.0,
+   "us_total": 8.905600000000414,
+   "us_each": 1.2722285714286306
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_22",
+   "count": 7.0,
+   "us_total": 8.745199999998249,
+   "us_each": 1.2493142857140356
+  },
+  {
+   "name": "triton_poi_fused_cat_16",
+   "count": 6.0,
+   "us_total": 8.64589999999689,
+   "us_each": 1.4409833333328153
+  },
+  {
+   "name": "triton_poi_fused_stack_100",
+   "count": 6.0,
+   "us_total": 8.572900000000391,
+   "us_each": 1.4288166666667317
+  },
+  {
+   "name": "triton_poi_fused__softmax_where_zeros_like_37",
+   "count": 6.0,
+   "us_total": 8.511999999997352,
+   "us_each": 1.4186666666662253
+  },
+  {
+   "name": "triton_poi_fused_full_like_index_index_put_ne_where_73",
+   "count": 5.0,
+   "us_total": 8.30750000000171,
+   "us_each": 1.661500000000342
+  },
+  {
+   "name": "triton_poi_fused_sub_41",
+   "count": 7.0,
+   "us_total": 8.214399999999978,
+   "us_each": 1.1734857142857111
+  },
+  {
+   "name": "triton_poi_fused_cat_full_like_index_index_put_ne_where_74",
+   "count": 5.0,
+   "us_total": 8.153699999999708,
+   "us_each": 1.6307399999999417
+  },
+  {
+   "name": "triton_poi_fused_clone_38",
+   "count": 6.0,
+   "us_total": 8.000100000000339,
+   "us_each": 1.3333500000000564
+  },
+  {
+   "name": "triton_poi_fused_clone_26",
+   "count": 6.0,
+   "us_total": 7.920100000001639,
+   "us_each": 1.32001666666694
+  },
+  {
+   "name": "triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_21",
+   "count": 2.0,
+   "us_total": 7.663900000000785,
+   "us_each": 3.8319500000003925
+  },
+  {
+   "name": "triton_poi_fused_stack_119",
+   "count": 6.0,
+   "us_total": 7.661000000002514,
+   "us_each": 1.2768333333337523
+  },
+  {
+   "name": "triton_poi_fused_clone_49",
+   "count": 6.0,
+   "us_total": 7.647799999999779,
+   "us_each": 1.2746333333332964
+  },
+  {
+   "name": "triton_poi_fused_clone_62",
+   "count": 6.0,
+   "us_total": 7.52009999999982,
+   "us_each": 1.25334999999997
+  },
+  {
+   "name": "triton_poi_fused__softmax_where_zeros_like_61",
+   "count": 6.0,
+   "us_total": 7.504099999998834,
+   "us_each": 1.250683333333139
+  },
+  {
+   "name": "triton_poi_fused_clone_64",
+   "count": 6.0,
+   "us_total": 7.3916999999990365,
+   "us_each": 1.2319499999998393
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sum_116",
+   "count": 6.0,
+   "us_total": 7.142499999999927,
+   "us_each": 1.1904166666666545
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_70",
+   "count": 3.0,
+   "us_total": 6.591899999999805,
+   "us_each": 2.197299999999935
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_86",
+   "count": 3.0,
+   "us_total": 6.575900000000956,
+   "us_each": 2.1919666666669855
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_117",
+   "count": 6.0,
+   "us_total": 6.385099999999329,
+   "us_each": 1.0641833333332216
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_118",
+   "count": 6.0,
+   "us_total": 6.352799999999116,
+   "us_each": 1.0587999999998525
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_43",
+   "count": 3.0,
+   "us_total": 6.227300000000378,
+   "us_each": 2.0757666666667927
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_152",
+   "count": 1.0,
+   "us_total": 5.980800000000272,
+   "us_each": 5.980800000000272
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_83",
+   "count": 1.0,
+   "us_total": 5.952099999999746,
+   "us_each": 5.952099999999746
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_66",
+   "count": 3.0,
+   "us_total": 5.8561000000004695,
+   "us_each": 1.9520333333334898
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_35",
+   "count": 1.0,
+   "us_total": 5.839999999999918,
+   "us_each": 5.839999999999918
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_136",
+   "count": 1.0,
+   "us_total": 5.798399999999856,
+   "us_each": 5.798399999999856
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_92",
+   "count": 3.0,
+   "us_total": 5.628799999999956,
+   "us_each": 1.8762666666666519
+  },
+  {
+   "name": "triton_per_fused__to_copy_abs_add_bitwise_and_clamp_div_eq_full_like_log_mul_neg_sort_sqrt_sub_sum_where_0",
+   "count": 1.0,
+   "us_total": 5.3022999999996046,
+   "us_each": 5.3022999999996046
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_93",
+   "count": 2.0,
+   "us_total": 4.915200000000641,
+   "us_each": 2.4576000000003204
+  },
+  {
+   "name": "triton_poi_fused_clone_105",
+   "count": 1.0,
+   "us_total": 4.832200000000649,
+   "us_each": 4.832200000000649
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_120",
+   "count": 1.0,
+   "us_total": 4.783999999999741,
+   "us_each": 4.783999999999741
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_122",
+   "count": 1.0,
+   "us_total": 4.678399999999693,
+   "us_each": 4.678399999999693
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_102",
+   "count": 1.0,
+   "us_total": 4.582400000000052,
+   "us_each": 4.582400000000052
+  },
+  {
+   "name": "triton_poi_fused_clone_153",
+   "count": 1.0,
+   "us_total": 4.569599999999809,
+   "us_each": 4.569599999999809
+  },
+  {
+   "name": "triton_poi_fused_clone_84",
+   "count": 1.0,
+   "us_total": 4.454400000000851,
+   "us_each": 4.454400000000851
+  },
+  {
+   "name": "triton_poi_fused_sub_9",
+   "count": 3.0,
+   "us_total": 4.35840000000203,
+   "us_each": 1.4528000000006764
+  },
+  {
+   "name": "triton_poi_fused_clone_137",
+   "count": 1.0,
+   "us_total": 4.233900000000721,
+   "us_each": 4.233900000000721
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_151",
+   "count": 1.0,
+   "us_total": 4.0544999999999165,
+   "us_each": 4.0544999999999165
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_82",
+   "count": 1.0,
+   "us_total": 4.019000000000233,
+   "us_each": 4.019000000000233
+  },
+  {
+   "name": "triton_poi_fused_clone_40",
+   "count": 1.0,
+   "us_total": 3.8943000000003396,
+   "us_each": 3.8943000000003396
+  },
+  {
+   "name": "triton_poi_fused_stack_8",
+   "count": 3.0,
+   "us_total": 3.7152000000001864,
+   "us_each": 1.2384000000000621
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_28",
+   "count": 1.0,
+   "us_total": 3.6351999999994407,
+   "us_each": 3.6351999999994407
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_mul_pow_sub_sum_where_104",
+   "count": 1.0,
+   "us_total": 3.612799999999879,
+   "us_each": 3.612799999999879
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_7",
+   "count": 3.0,
+   "us_total": 3.5711999999994988,
+   "us_each": 1.190399999999833
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_6",
+   "count": 3.0,
+   "us_total": 3.4846999999990658,
+   "us_each": 1.1615666666663553
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_135",
+   "count": 1.0,
+   "us_total": 3.4368000000001304,
+   "us_each": 3.4368000000001304
+  },
+  {
+   "name": "triton_poi_fused_clone_123",
+   "count": 1.0,
+   "us_total": 3.424000000000342,
+   "us_each": 3.424000000000342
+  },
+  {
+   "name": "triton_poi_fused_add_sub_126",
+   "count": 2.0,
+   "us_total": 3.3279999999997925,
+   "us_each": 1.6639999999998962
+  },
+  {
+   "name": "triton_poi_fused_add_sub_159",
+   "count": 2.0,
+   "us_total": 3.263999999999487,
+   "us_each": 1.6319999999997434
+  },
+  {
+   "name": "triton_poi_fused_add_sub_109",
+   "count": 2.0,
+   "us_total": 3.148800000000301,
+   "us_each": 1.5744000000001506
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_113",
+   "count": 1.0,
+   "us_total": 3.1487999999999374,
+   "us_each": 3.1487999999999374
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_155",
+   "count": 2.0,
+   "us_total": 3.116599999999471,
+   "us_each": 1.5582999999997356
+  },
+  {
+   "name": "triton_poi_fused_index_sub_103",
+   "count": 1.0,
+   "us_total": 3.1039999999996324,
+   "us_each": 3.1039999999996324
+  },
+  {
+   "name": "triton_poi_fused_add_sub_91",
+   "count": 2.0,
+   "us_total": 3.1038000000005015,
+   "us_each": 1.5519000000002507
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_107",
+   "count": 2.0,
+   "us_total": 3.007999999999902,
+   "us_each": 1.503999999999951
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_44",
+   "count": 2.0,
+   "us_total": 3.0079000000002907,
+   "us_each": 1.5039500000001453
+  },
+  {
+   "name": "triton_poi_fused_sub_143",
+   "count": 2.0,
+   "us_total": 2.9184000000002923,
+   "us_each": 1.4592000000001462
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_87",
+   "count": 2.0,
+   "us_total": 2.8321000000004917,
+   "us_each": 1.4160500000002458
+  },
+  {
+   "name": "triton_poi_fused_sub_125",
+   "count": 2.0,
+   "us_total": 2.8255999999991217,
+   "us_each": 1.4127999999995609
+  },
+  {
+   "name": "triton_poi_fused_stack_158",
+   "count": 2.0,
+   "us_total": 2.8221999999995204,
+   "us_each": 1.4110999999997602
+  },
+  {
+   "name": "triton_poi_fused_stack_90",
+   "count": 2.0,
+   "us_total": 2.7488000000004376,
+   "us_each": 1.3744000000002188
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_139",
+   "count": 2.0,
+   "us_total": 2.7326999999987494,
+   "us_each": 1.3663499999993747
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_pow_sqrt_sub_sum_where_1",
+   "count": 1.0,
+   "us_total": 2.6303999999999177,
+   "us_each": 2.6303999999999177
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_89",
+   "count": 2.0,
+   "us_total": 2.5792000000004465,
+   "us_each": 1.2896000000002232
+  },
+  {
+   "name": "triton_poi_fused_stack_142",
+   "count": 2.0,
+   "us_total": 2.5471000000005914,
+   "us_each": 1.2735500000002957
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_141",
+   "count": 2.0,
+   "us_total": 2.470400000000063,
+   "us_each": 1.2352000000000316
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_157",
+   "count": 2.0,
+   "us_total": 2.4257000000003246,
+   "us_each": 1.2128500000001623
+  },
+  {
+   "name": "triton_poi_fused_cat_full_like_index_index_put_ne_where_4",
+   "count": 1.0,
+   "us_total": 2.4128000000010617,
+   "us_each": 2.4128000000010617
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_112",
+   "count": 1.0,
+   "us_total": 2.3967999999998937,
+   "us_each": 2.3967999999998937
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_101",
+   "count": 1.0,
+   "us_total": 2.3457999999993717,
+   "us_each": 2.3457999999993717
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_88",
+   "count": 2.0,
+   "us_total": 2.3008000000015274,
+   "us_each": 1.1504000000007637
+  },
+  {
+   "name": "triton_poi_fused_stack_162",
+   "count": 1.0,
+   "us_total": 2.2943000000012033,
+   "us_each": 2.2943000000012033
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_156",
+   "count": 2.0,
+   "us_total": 2.294300000000112,
+   "us_each": 1.147150000000056
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_15",
+   "count": 1.0,
+   "us_total": 2.2590999999998984,
+   "us_each": 2.2590999999998984
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_108",
+   "count": 2.0,
+   "us_total": 2.2047999999987953,
+   "us_each": 1.1023999999993976
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_140",
+   "count": 2.0,
+   "us_total": 2.1726999999991676,
+   "us_each": 1.0863499999995838
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_81",
+   "count": 1.0,
+   "us_total": 2.1631999999994607,
+   "us_each": 2.1631999999994607
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_95",
+   "count": 1.0,
+   "us_total": 2.147100000000137,
+   "us_each": 2.147100000000137
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_94",
+   "count": 1.0,
+   "us_total": 2.092700000000241,
+   "us_each": 2.092700000000241
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_150",
+   "count": 1.0,
+   "us_total": 2.0833000000005995,
+   "us_each": 2.0833000000005995
+  },
+  {
+   "name": "triton_poi_fused_index_sub_134",
+   "count": 1.0,
+   "us_total": 2.0158000000002176,
+   "us_each": 2.0158000000002176
+  },
+  {
+   "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<long>, at::detail::Array<char*, 1> >(int, at::native::FillFunctor<long>, at::detail::Array<char*, 1>)",
+   "count": 2.0,
+   "us_total": 1.9679000000009181,
+   "us_each": 0.9839500000004591
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_145",
+   "count": 1.0,
+   "us_total": 1.9615999999999076,
+   "us_each": 1.9615999999999076
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_75",
+   "count": 1.0,
+   "us_total": 1.936000000000422,
+   "us_each": 1.936000000000422
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_160",
+   "count": 1.0,
+   "us_total": 1.932799999999952,
+   "us_each": 1.932799999999952
+  },
+  {
+   "name": "triton_poi_fused_full_like_index_index_put_lt_ne_where_2",
+   "count": 1.0,
+   "us_total": 1.913600000000315,
+   "us_each": 1.913600000000315
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_114",
+   "count": 1.0,
+   "us_total": 1.9135999999991327,
+   "us_each": 1.9135999999991327
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_98",
+   "count": 1.0,
+   "us_total": 1.8657999999998993,
+   "us_each": 1.8657999999998993
+  },
+  {
+   "name": "triton_poi_fused_index_sub_30",
+   "count": 1.0,
+   "us_total": 1.8526999999998224,
+   "us_each": 1.8526999999998224
+  },
+  {
+   "name": "triton_poi_fused_clamp_mul_sqrt_sub_sum_129",
+   "count": 1.0,
+   "us_total": 1.7951999999999315,
+   "us_each": 1.7951999999999315
+  },
+  {
+   "name": "triton_poi_fused_cat_5",
+   "count": 1.0,
+   "us_total": 1.7726999999995314,
+   "us_each": 1.7726999999995314
+  },
+  {
+   "name": "triton_poi_fused_clamp_mul_sqrt_sub_sum_20",
+   "count": 1.0,
+   "us_total": 1.7566999999998187,
+   "us_each": 1.7566999999998187
+  },
+  {
+   "name": "triton_poi_fused_stack_149",
+   "count": 1.0,
+   "us_total": 1.7279000000006817,
+   "us_each": 1.7279000000006817
+  },
+  {
+   "name": "triton_poi_fused_stack_80",
+   "count": 1.0,
+   "us_total": 1.727900000000227,
+   "us_each": 1.727900000000227
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_10",
+   "count": 1.0,
+   "us_total": 1.7215000000002874,
+   "us_each": 1.7215000000002874
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_72",
+   "count": 1.0,
+   "us_total": 1.6928000000001702,
+   "us_each": 1.6928000000001702
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_110",
+   "count": 1.0,
+   "us_total": 1.6833000000011453,
+   "us_each": 1.6833000000011453
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_144",
+   "count": 1.0,
+   "us_total": 1.6670999999999367,
+   "us_each": 1.6670999999999367
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_128",
+   "count": 1.0,
+   "us_total": 1.6222999999999956,
+   "us_each": 1.6222999999999956
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_148",
+   "count": 1.0,
+   "us_total": 1.6160000000004402,
+   "us_each": 1.6160000000004402
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_63",
+   "count": 1.0,
+   "us_total": 1.6064999999995961,
+   "us_each": 1.6064999999995961
+  },
+  {
+   "name": "triton_poi_fused_stack_133",
+   "count": 1.0,
+   "us_total": 1.5936000000000603,
+   "us_each": 1.5936000000000603
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_79",
+   "count": 1.0,
+   "us_total": 1.590499999999429,
+   "us_each": 1.590499999999429
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_132",
+   "count": 1.0,
+   "us_total": 1.5552000000001498,
+   "us_each": 1.5552000000001498
+  },
+  {
+   "name": "triton_poi_fused_cat_13",
+   "count": 1.0,
+   "us_total": 1.4656999999999243,
+   "us_each": 1.4656999999999243
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_146",
+   "count": 1.0,
+   "us_total": 1.4431999999990694,
+   "us_each": 1.4431999999990694
+  },
+  {
+   "name": "triton_poi_fused_div_sub_97",
+   "count": 1.0,
+   "us_total": 1.443099999999913,
+   "us_each": 1.443099999999913
+  },
+  {
+   "name": "triton_poi_fused_sub_124",
+   "count": 1.0,
+   "us_total": 1.3983999999999468,
+   "us_each": 1.3983999999999468
+  },
+  {
+   "name": "triton_poi_fused_gelu_14",
+   "count": 1.0,
+   "us_total": 1.3983000000000174,
+   "us_each": 1.3983000000000174
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_77",
+   "count": 1.0,
+   "us_total": 1.37599999999984,
+   "us_each": 1.37599999999984
+  },
+  {
+   "name": "triton_poi_fused_add_121",
+   "count": 1.0,
+   "us_total": 1.3664999999995415,
+   "us_each": 1.3664999999995415
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_96",
+   "count": 1.0,
+   "us_total": 1.3570000000008349,
+   "us_each": 1.3570000000008349
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_147",
+   "count": 1.0,
+   "us_total": 1.331199999999626,
+   "us_each": 1.331199999999626
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_99",
+   "count": 1.0,
+   "us_total": 1.324900000000889,
+   "us_each": 1.324900000000889
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_131",
+   "count": 1.0,
+   "us_total": 1.318399999999474,
+   "us_each": 1.318399999999474
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_78",
+   "count": 1.0,
+   "us_total": 1.3055999999991854,
+   "us_each": 1.3055999999991854
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_130",
+   "count": 1.0,
+   "us_total": 1.2767999999994573,
+   "us_each": 1.2767999999994573
+  },
+  {
+   "name": "triton_poi_fused_cat_11",
+   "count": 1.0,
+   "us_total": 1.2447000000000572,
+   "us_each": 1.2447000000000572
+  },
+  {
+   "name": "triton_poi_fused_sub_85",
+   "count": 1.0,
+   "us_total": 1.2224000000001525,
+   "us_each": 1.2224000000001525
+  },
+  {
+   "name": "triton_poi_fused_sub_154",
+   "count": 1.0,
+   "us_total": 1.2223000000001776,
+   "us_each": 1.2223000000001776
+  },
+  {
+   "name": "triton_poi_fused_sub_138",
+   "count": 1.0,
+   "us_total": 1.2194000000003142,
+   "us_each": 1.2194000000003142
+  },
+  {
+   "name": "triton_poi_fused_sub_106",
+   "count": 1.0,
+   "us_total": 1.1902000000008228,
+   "us_each": 1.1902000000008228
+  },
+  {
+   "name": "triton_poi_fused_sub_115",
+   "count": 1.0,
+   "us_total": 1.1777000000003681,
+   "us_each": 1.1777000000003681
+  },
+  {
+   "name": "triton_poi_fused_cat_12",
+   "count": 1.0,
+   "us_total": 1.1712999999998828,
+   "us_each": 1.1712999999998828
+  },
+  {
+   "name": "triton_poi_fused_add_161",
+   "count": 1.0,
+   "us_total": 1.1169000000011693,
+   "us_each": 1.1169000000011693
+  },
+  {
+   "name": "triton_poi_fused_div_sub_111",
+   "count": 1.0,
+   "us_total": 1.0976000000000568,
+   "us_each": 1.0976000000000568
+  },
+  {
+   "name": "triton_poi_fused_add_127",
+   "count": 1.0,
+   "us_total": 1.084799999999086,
+   "us_each": 1.084799999999086
+  }
+ ],
+ "noncaptured": [
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 120.0,
+   "us_total": 837.8034000000287,
+   "us_each": 6.981695000000239
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 24.0,
+   "us_total": 268.8051000000151,
+   "us_each": 11.200212500000628
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 18.0,
+   "us_total": 268.8012999999968,
+   "us_each": 14.933405555555378
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 31.0,
+   "us_total": 193.78510000000645,
+   "us_each": 6.251132258064724
+  },
+  {
+   "name": "void cutlass::Kernel<cutlass_80_simt_sgemm_64x64_8x5_nn_align1>(cutlass_80_simt_sgemm_64x64_8x5_nn_align1::Params)",
+   "count": 30.0,
+   "us_total": 133.12559999999516,
+   "us_each": 4.4375199999998385
+  },
+  {
+   "name": "void gemv2N_kernel<int, int, float, float, float, float, 128, 4, 4, 4, 1, false, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float> >(cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float>)",
+   "count": 24.0,
+   "us_total": 79.06569999998487,
+   "us_each": 3.294404166666036
+  },
+  {
+   "name": "void splitKreduce_kernel<32, 16, int, float, float, float, float, true, false, false>(cublasSplitKParams<float>, float const*, float const*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*)",
+   "count": 38.0,
+   "us_total": 69.75999999999856,
+   "us_each": 1.8357894736841727
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 18.0,
+   "us_total": 65.61230000001783,
+   "us_each": 3.6451277777787685
+  },
+  {
+   "name": "triton_per_fused_sort_3",
+   "count": 19.0,
+   "us_total": 64.028700000005,
+   "us_each": 3.369931578947632
+  },
+  {
+   "name": "triton_poi_fused_clone_19",
+   "count": 6.0,
+   "us_total": 63.16469999999599,
+   "us_each": 10.527449999999332
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 12.0,
+   "us_total": 52.05410000000334,
+   "us_each": 4.337841666666945
+  },
+  {
+   "name": "triton_per_fused_add_bitwise_and_cat_clamp_eq_full_like_index_mean_mul_ne_rsqrt_sub_var_where_53",
+   "count": 6.0,
+   "us_total": 48.80999999999676,
+   "us_each": 8.13499999999946
+  },
+  {
+   "name": "triton_poi_fused_cat_29",
+   "count": 6.0,
+   "us_total": 48.46730000000112,
+   "us_each": 8.077883333333519
+  },
+  {
+   "name": "std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float, float, false, true, false, false, 5, false, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float> >(cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float>)",
+   "count": 12.0,
+   "us_total": 47.92669999999989,
+   "us_each": 3.9938916666666575
+  },
+  {
+   "name": "Memcpy DtoD (Device -> Device)",
+   "count": 36.0,
+   "us_total": 45.38470000001412,
+   "us_each": 1.2606861111115033
+  },
+  {
+   "name": "triton_poi_fused_add_clone_index_mean_mul_rsqrt_sub_var_54",
+   "count": 6.0,
+   "us_total": 45.36279999999961,
+   "us_each": 7.560466666666601
+  },
+  {
+   "name": "triton_poi_fused_clone_index_pow_sub_58",
+   "count": 6.0,
+   "us_total": 41.99379999999983,
+   "us_each": 6.998966666666638
+  },
+  {
+   "name": "triton_poi_fused_cat_52",
+   "count": 6.0,
+   "us_total": 40.83180000000507,
+   "us_each": 6.805300000000845
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas",
+   "count": 6.0,
+   "us_total": 39.574099999995134,
+   "us_each": 6.595683333332522
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_split_k_kernel__5x_cublas",
+   "count": 12.0,
+   "us_total": 38.89899999999916,
+   "us_each": 3.241583333333263
+  },
+  {
+   "name": "void cutlass::Kernel<cutlass_80_simt_sgemm_128x32_8x5_nn_align1>(cutlass_80_simt_sgemm_128x32_8x5_nn_align1::Params)",
+   "count": 7.0,
+   "us_total": 38.707299999996756,
+   "us_each": 5.529614285713823
+  },
+  {
+   "name": "triton_poi_fused_gelu_mul_ones_like_scatter_add_where_zeros_like_68",
+   "count": 6.0,
+   "us_total": 28.71979999999876,
+   "us_each": 4.786633333333127
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_51",
+   "count": 6.0,
+   "us_total": 27.250599999996304,
+   "us_each": 4.54176666666605
+  },
+  {
+   "name": "triton_per_fused_add_index_mean_mul_rsqrt_sub_var_32",
+   "count": 6.0,
+   "us_total": 25.378599999993547,
+   "us_each": 4.229766666665592
+  },
+  {
+   "name": "triton_poi_fused_gelu_mul_scatter_add_where_zeros_like_67",
+   "count": 24.0,
+   "us_total": 23.31449999999777,
+   "us_each": 0.971437499999907
+  },
+  {
+   "name": "triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_46",
+   "count": 6.0,
+   "us_total": 20.352000000003454,
+   "us_each": 3.392000000000576
+  },
+  {
+   "name": "triton_poi_fused_clone_39",
+   "count": 6.0,
+   "us_total": 19.98689999999947,
+   "us_each": 3.3311499999999112
+  },
+  {
+   "name": "triton_poi_fused_cat_42",
+   "count": 12.0,
+   "us_total": 19.47559999999271,
+   "us_each": 1.6229666666660592
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_17",
+   "count": 12.0,
+   "us_total": 18.454300000004697,
+   "us_each": 1.5378583333337246
+  },
+  {
+   "name": "triton_per_fused_mean_var_18",
+   "count": 12.0,
+   "us_total": 18.393600000008973,
+   "us_each": 1.5328000000007478
+  },
+  {
+   "name": "triton_poi_fused_add_gelu_33",
+   "count": 6.0,
+   "us_total": 17.839800000002604,
+   "us_each": 2.9733000000004344
+  },
+  {
+   "name": "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_split_k_kernel__5x_cublas",
+   "count": 6.0,
+   "us_total": 17.82679999999859,
+   "us_each": 2.971133333333099
+  },
+  {
+   "name": "triton_poi_fused_clone_55",
+   "count": 6.0,
+   "us_total": 17.71190000000711,
+   "us_each": 2.951983333334518
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_mul_sub_sum_where_59",
+   "count": 6.0,
+   "us_total": 17.171000000005733,
+   "us_each": 2.861833333334289
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_45",
+   "count": 6.0,
+   "us_total": 15.625499999999828,
+   "us_each": 2.6042499999999715
+  },
+  {
+   "name": "triton_poi_fused_add_gelu_56",
+   "count": 6.0,
+   "us_total": 15.33139999999762,
+   "us_each": 2.5552333333329367
+  },
+  {
+   "name": "triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_76",
+   "count": 4.0,
+   "us_total": 14.85110000000277,
+   "us_each": 3.7127750000006925
+  },
+  {
+   "name": "triton_poi_fused_index_sub_47",
+   "count": 6.0,
+   "us_total": 14.67520000000518,
+   "us_each": 2.4458666666675297
+  },
+  {
+   "name": "triton_per_fused__softmax_60",
+   "count": 6.0,
+   "us_total": 13.573999999993111,
+   "us_each": 2.2623333333321853
+  },
+  {
+   "name": "triton_per_fused__softmax_36",
+   "count": 6.0,
+   "us_total": 13.452699999999913,
+   "us_each": 2.2421166666666523
+  },
+  {
+   "name": "triton_poi_fused_clone_div_31",
+   "count": 6.0,
+   "us_total": 13.161800000006224,
+   "us_each": 2.1936333333343705
+  },
+  {
+   "name": "triton_poi_fused_clone_div_48",
+   "count": 6.0,
+   "us_total": 11.964900000002718,
+   "us_each": 1.9941500000004528
+  },
+  {
+   "name": "triton_poi_fused_stack_25",
+   "count": 7.0,
+   "us_total": 11.583700000001453,
+   "us_each": 1.6548142857144934
+  },
+  {
+   "name": "triton_poi_fused_index_50",
+   "count": 6.0,
+   "us_total": 10.90879999999338,
+   "us_each": 1.81813333333223
+  },
+  {
+   "name": "triton_poi_fused_add_71",
+   "count": 6.0,
+   "us_total": 10.857600000001094,
+   "us_each": 1.8096000000001822
+  },
+  {
+   "name": "triton_poi_fused_add_clamp_div_gelu_index_mul_where_zeros_like_69",
+   "count": 6.0,
+   "us_total": 10.761899999993238,
+   "us_each": 1.793649999998873
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_24",
+   "count": 7.0,
+   "us_total": 10.569900000004509,
+   "us_each": 1.5099857142863584
+  },
+  {
+   "name": "void cutlass::Kernel<cutlass_80_simt_sgemm_128x64_8x5_nn_align1>(cutlass_80_simt_sgemm_128x64_8x5_nn_align1::Params)",
+   "count": 1.0,
+   "us_total": 10.124699999999326,
+   "us_each": 10.124699999999326
+  },
+  {
+   "name": "triton_poi_fused_add_34",
+   "count": 6.0,
+   "us_total": 9.961299999996891,
+   "us_each": 1.6602166666661484
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_23",
+   "count": 7.0,
+   "us_total": 9.939000000003034,
+   "us_each": 1.4198571428575764
+  },
+  {
+   "name": "triton_poi_fused_index_27",
+   "count": 6.0,
+   "us_total": 9.551999999997406,
+   "us_each": 1.5919999999995678
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_22",
+   "count": 7.0,
+   "us_total": 9.385299999998598,
+   "us_each": 1.3407571428569425
+  },
+  {
+   "name": "triton_poi_fused_add_gelu_65",
+   "count": 6.0,
+   "us_total": 9.295700000004535,
+   "us_each": 1.5492833333340892
+  },
+  {
+   "name": "triton_poi_fused_add_57",
+   "count": 6.0,
+   "us_total": 9.267099999993707,
+   "us_each": 1.5445166666656178
+  },
+  {
+   "name": "triton_poi_fused__softmax_where_zeros_like_37",
+   "count": 6.0,
+   "us_total": 9.244700000005242,
+   "us_each": 1.540783333334207
+  },
+  {
+   "name": "triton_poi_fused_full_like_index_index_put_ne_where_73",
+   "count": 5.0,
+   "us_total": 8.956800000000294,
+   "us_each": 1.7913600000000587
+  },
+  {
+   "name": "triton_poi_fused_cat_16",
+   "count": 6.0,
+   "us_total": 8.918399999994971,
+   "us_each": 1.486399999999162
+  },
+  {
+   "name": "triton_poi_fused_sub_41",
+   "count": 7.0,
+   "us_total": 8.671600000002126,
+   "us_each": 1.2388000000003039
+  },
+  {
+   "name": "triton_poi_fused_cat_full_like_index_index_put_ne_where_74",
+   "count": 5.0,
+   "us_total": 8.624199999998837,
+   "us_each": 1.7248399999997672
+  },
+  {
+   "name": "triton_poi_fused_stack_100",
+   "count": 6.0,
+   "us_total": 8.473500000000332,
+   "us_each": 1.412250000000055
+  },
+  {
+   "name": "triton_poi_fused_clone_38",
+   "count": 6.0,
+   "us_total": 8.33310000000015,
+   "us_each": 1.388850000000025
+  },
+  {
+   "name": "triton_poi_fused_clone_64",
+   "count": 6.0,
+   "us_total": 8.169199999995726,
+   "us_each": 1.361533333332621
+  },
+  {
+   "name": "triton_poi_fused_stack_119",
+   "count": 6.0,
+   "us_total": 8.166599999997015,
+   "us_each": 1.3610999999995026
+  },
+  {
+   "name": "triton_poi_fused_clone_49",
+   "count": 6.0,
+   "us_total": 7.961700000001383,
+   "us_each": 1.3269500000002306
+  },
+  {
+   "name": "triton_poi_fused__softmax_where_zeros_like_61",
+   "count": 6.0,
+   "us_total": 7.945600000002105,
+   "us_each": 1.3242666666670175
+  },
+  {
+   "name": "triton_poi_fused_clone_26",
+   "count": 6.0,
+   "us_total": 7.897500000000309,
+   "us_each": 1.3162500000000514
+  },
+  {
+   "name": "triton_poi_fused_clone_62",
+   "count": 6.0,
+   "us_total": 7.77910000000229,
+   "us_each": 1.2965166666670485
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sum_116",
+   "count": 6.0,
+   "us_total": 7.5042000000068585,
+   "us_each": 1.250700000001143
+  },
+  {
+   "name": "triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_21",
+   "count": 2.0,
+   "us_total": 7.372600000000693,
+   "us_each": 3.6863000000003465
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_117",
+   "count": 6.0,
+   "us_total": 6.950500000002466,
+   "us_each": 1.1584166666670777
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_118",
+   "count": 6.0,
+   "us_total": 6.899099999993814,
+   "us_each": 1.149849999998969
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_86",
+   "count": 3.0,
+   "us_total": 6.764799999999013,
+   "us_each": 2.2549333333330046
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_70",
+   "count": 3.0,
+   "us_total": 6.399900000000253,
+   "us_each": 2.133300000000084
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_43",
+   "count": 3.0,
+   "us_total": 6.300600000000259,
+   "us_each": 2.100200000000086
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_83",
+   "count": 1.0,
+   "us_total": 6.099100000002909,
+   "us_each": 6.099100000002909
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_152",
+   "count": 1.0,
+   "us_total": 6.063999999998487,
+   "us_each": 6.063999999998487
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_136",
+   "count": 1.0,
+   "us_total": 5.967899999998008,
+   "us_each": 5.967899999998008
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_35",
+   "count": 1.0,
+   "us_total": 5.9103999999996635,
+   "us_each": 5.9103999999996635
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_66",
+   "count": 3.0,
+   "us_total": 5.331199999995988,
+   "us_each": 1.7770666666653294
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_92",
+   "count": 3.0,
+   "us_total": 5.219099999997161,
+   "us_each": 1.7396999999990537
+  },
+  {
+   "name": "triton_per_fused__to_copy_abs_add_bitwise_and_clamp_div_eq_full_like_log_mul_neg_sort_sqrt_sub_sum_where_0",
+   "count": 1.0,
+   "us_total": 5.171200000001204,
+   "us_each": 5.171200000001204
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_120",
+   "count": 1.0,
+   "us_total": 5.1232000000025435,
+   "us_each": 5.1232000000025435
+  },
+  {
+   "name": "triton_poi_fused_clone_105",
+   "count": 1.0,
+   "us_total": 4.883100000000468,
+   "us_each": 4.883100000000468
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_index_mul_pow_sub_sum_where_122",
+   "count": 1.0,
+   "us_total": 4.860699999999815,
+   "us_each": 4.860699999999815
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_93",
+   "count": 2.0,
+   "us_total": 4.7615000000026155,
+   "us_each": 2.3807500000013078
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_102",
+   "count": 1.0,
+   "us_total": 4.665600000000358,
+   "us_each": 4.665600000000358
+  },
+  {
+   "name": "triton_poi_fused_clone_153",
+   "count": 1.0,
+   "us_total": 4.649599999998463,
+   "us_each": 4.649599999998463
+  },
+  {
+   "name": "triton_poi_fused_clone_84",
+   "count": 1.0,
+   "us_total": 4.4797999999992495,
+   "us_each": 4.4797999999992495
+  },
+  {
+   "name": "triton_poi_fused_sub_9",
+   "count": 3.0,
+   "us_total": 4.368200000000366,
+   "us_each": 1.4560666666667885
+  },
+  {
+   "name": "triton_poi_fused_clone_137",
+   "count": 1.0,
+   "us_total": 4.262399999998161,
+   "us_each": 4.262399999998161
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_151",
+   "count": 1.0,
+   "us_total": 4.239999999999782,
+   "us_each": 4.239999999999782
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_82",
+   "count": 1.0,
+   "us_total": 4.195199999999931,
+   "us_each": 4.195199999999931
+  },
+  {
+   "name": "triton_poi_fused_stack_8",
+   "count": 3.0,
+   "us_total": 4.159600000000251,
+   "us_each": 1.3865333333334169
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_7",
+   "count": 3.0,
+   "us_total": 4.137900000002037,
+   "us_each": 1.379300000000679
+  },
+  {
+   "name": "triton_poi_fused_clone_40",
+   "count": 1.0,
+   "us_total": 3.974500000000171,
+   "us_each": 3.974500000000171
+  },
+  {
+   "name": "triton_per_fused__softmax_add_div_full_like_mul_pow_sub_sum_where_104",
+   "count": 1.0,
+   "us_total": 3.8686999999988982,
+   "us_each": 3.8686999999988982
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_6",
+   "count": 3.0,
+   "us_total": 3.7760999999965863,
+   "us_each": 1.258699999998862
+  },
+  {
+   "name": "triton_poi_fused_add_sub_126",
+   "count": 2.0,
+   "us_total": 3.5935000000014043,
+   "us_each": 1.7967500000007022
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_28",
+   "count": 1.0,
+   "us_total": 3.5520000000000893,
+   "us_each": 3.5520000000000893
+  },
+  {
+   "name": "triton_poi_fused_clone_123",
+   "count": 1.0,
+   "us_total": 3.446500000003289,
+   "us_each": 3.446500000003289
+  },
+  {
+   "name": "triton_poi_fused_add_sub_159",
+   "count": 2.0,
+   "us_total": 3.440100000005259,
+   "us_each": 1.7200500000026295
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_107",
+   "count": 2.0,
+   "us_total": 3.373000000000684,
+   "us_each": 1.686500000000342
+  },
+  {
+   "name": "triton_poi_fused_cat_sub_135",
+   "count": 1.0,
+   "us_total": 3.344000000000233,
+   "us_each": 3.344000000000233
+  },
+  {
+   "name": "triton_poi_fused_add_sub_109",
+   "count": 2.0,
+   "us_total": 3.3250000000009097,
+   "us_each": 1.6625000000004548
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_113",
+   "count": 1.0,
+   "us_total": 3.2479999999997746,
+   "us_each": 3.2479999999997746
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_155",
+   "count": 2.0,
+   "us_total": 3.234899999998743,
+   "us_each": 1.6174499999993714
+  },
+  {
+   "name": "triton_poi_fused_index_sub_103",
+   "count": 1.0,
+   "us_total": 3.1903000000022077,
+   "us_each": 3.1903000000022077
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_87",
+   "count": 2.0,
+   "us_total": 3.078199999998378,
+   "us_each": 1.539099999999189
+  },
+  {
+   "name": "triton_poi_fused_sub_143",
+   "count": 2.0,
+   "us_total": 3.0749999999990907,
+   "us_each": 1.5374999999995453
+  },
+  {
+   "name": "triton_poi_fused_add_sub_91",
+   "count": 2.0,
+   "us_total": 3.072099999998045,
+   "us_each": 1.5360499999990225
+  },
+  {
+   "name": "triton_poi_fused_stack_158",
+   "count": 2.0,
+   "us_total": 3.03990000000249,
+   "us_each": 1.519950000001245
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_44",
+   "count": 2.0,
+   "us_total": 2.998200000002407,
+   "us_each": 1.4991000000012036
+  },
+  {
+   "name": "triton_poi_fused_sub_125",
+   "count": 2.0,
+   "us_total": 2.9952000000022965,
+   "us_each": 1.4976000000011482
+  },
+  {
+   "name": "triton_poi_fused_stack_142",
+   "count": 2.0,
+   "us_total": 2.90879999999961,
+   "us_each": 1.454399999999805
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_139",
+   "count": 2.0,
+   "us_total": 2.90549999999912,
+   "us_each": 1.45274999999956
+  },
+  {
+   "name": "triton_poi_fused_stack_90",
+   "count": 2.0,
+   "us_total": 2.8770000000004985,
+   "us_each": 1.4385000000002492
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_156",
+   "count": 2.0,
+   "us_total": 2.7585999999990234,
+   "us_each": 1.3792999999995117
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_89",
+   "count": 2.0,
+   "us_total": 2.7328999999994266,
+   "us_each": 1.3664499999997133
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_140",
+   "count": 2.0,
+   "us_total": 2.723099999999795,
+   "us_each": 1.3615499999998975
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_88",
+   "count": 2.0,
+   "us_total": 2.6557000000000697,
+   "us_each": 1.3278500000000348
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_141",
+   "count": 2.0,
+   "us_total": 2.6493999999967857,
+   "us_each": 1.3246999999983928
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_112",
+   "count": 1.0,
+   "us_total": 2.601600000000508,
+   "us_each": 2.601600000000508
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_157",
+   "count": 2.0,
+   "us_total": 2.58560000000125,
+   "us_each": 1.292800000000625
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_pow_sqrt_sub_sum_where_1",
+   "count": 1.0,
+   "us_total": 2.531100000000811,
+   "us_each": 2.531100000000811
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_108",
+   "count": 2.0,
+   "us_total": 2.4832999999984167,
+   "us_each": 1.2416499999992083
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_101",
+   "count": 1.0,
+   "us_total": 2.4096000000028654,
+   "us_each": 2.4096000000028654
+  },
+  {
+   "name": "triton_poi_fused_cat_full_like_index_index_put_ne_where_4",
+   "count": 1.0,
+   "us_total": 2.3777000000005044,
+   "us_each": 2.3777000000005044
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_95",
+   "count": 1.0,
+   "us_total": 2.2752999999975145,
+   "us_each": 2.2752999999975145
+  },
+  {
+   "name": "triton_poi_fused_stack_162",
+   "count": 1.0,
+   "us_total": 2.220700000004399,
+   "us_each": 2.220700000004399
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_81",
+   "count": 1.0,
+   "us_total": 2.1918999999995323,
+   "us_each": 2.1918999999995323
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_15",
+   "count": 1.0,
+   "us_total": 2.1887999999994916,
+   "us_each": 2.1887999999994916
+  },
+  {
+   "name": "triton_poi_fused_add_index_sub_150",
+   "count": 1.0,
+   "us_total": 2.182300000000578,
+   "us_each": 2.182300000000578
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_94",
+   "count": 1.0,
+   "us_total": 2.147200000000157,
+   "us_each": 2.147200000000157
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_145",
+   "count": 1.0,
+   "us_total": 2.070400000000336,
+   "us_each": 2.070400000000336
+  },
+  {
+   "name": "triton_poi_fused_index_sub_134",
+   "count": 1.0,
+   "us_total": 2.0480000000017755,
+   "us_each": 2.0480000000017755
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_75",
+   "count": 1.0,
+   "us_total": 2.031999999999698,
+   "us_each": 2.031999999999698
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_114",
+   "count": 1.0,
+   "us_total": 2.006299999996736,
+   "us_each": 2.006299999996736
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_98",
+   "count": 1.0,
+   "us_total": 1.9807000000006156,
+   "us_each": 1.9807000000006156
+  },
+  {
+   "name": "triton_poi_fused_index_sub_30",
+   "count": 1.0,
+   "us_total": 1.9489000000015948,
+   "us_each": 1.9489000000015948
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_160",
+   "count": 1.0,
+   "us_total": 1.8687999999996463,
+   "us_each": 1.8687999999996463
+  },
+  {
+   "name": "triton_poi_fused_clamp_mul_sqrt_sub_sum_129",
+   "count": 1.0,
+   "us_total": 1.8528000000005704,
+   "us_each": 1.8528000000005704
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_72",
+   "count": 1.0,
+   "us_total": 1.849600000000919,
+   "us_each": 1.849600000000919
+  },
+  {
+   "name": "triton_poi_fused_stack_149",
+   "count": 1.0,
+   "us_total": 1.8464999999978318,
+   "us_each": 1.8464999999978318
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_144",
+   "count": 1.0,
+   "us_total": 1.8431000000011408,
+   "us_each": 1.8431000000011408
+  },
+  {
+   "name": "triton_poi_fused_clamp_mul_sqrt_sub_sum_20",
+   "count": 1.0,
+   "us_total": 1.8431000000007771,
+   "us_each": 1.8431000000007771
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_110",
+   "count": 1.0,
+   "us_total": 1.8366999999992004,
+   "us_each": 1.8366999999992004
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_10",
+   "count": 1.0,
+   "us_total": 1.8144999999987022,
+   "us_each": 1.8144999999987022
+  },
+  {
+   "name": "triton_poi_fused_stack_80",
+   "count": 1.0,
+   "us_total": 1.801499999999487,
+   "us_each": 1.801499999999487
+  },
+  {
+   "name": "triton_poi_fused_full_like_index_index_put_lt_ne_where_2",
+   "count": 1.0,
+   "us_total": 1.7857999999989715,
+   "us_each": 1.7857999999989715
+  },
+  {
+   "name": "triton_poi_fused_cat_5",
+   "count": 1.0,
+   "us_total": 1.7727000000003272,
+   "us_each": 1.7727000000003272
+  },
+  {
+   "name": "triton_poi_fused_stack_133",
+   "count": 1.0,
+   "us_total": 1.7248000000028696,
+   "us_each": 1.7248000000028696
+  },
+  {
+   "name": "triton_poi_fused_add_bitwise_and_clamp_eq_full_like_log_mul_neg_sqrt_sub_sum_where_128",
+   "count": 1.0,
+   "us_total": 1.7215000000001965,
+   "us_each": 1.7215000000001965
+  },
+  {
+   "name": "triton_per_fused_add_mean_mul_rsqrt_sub_var_63",
+   "count": 1.0,
+   "us_total": 1.7121000000022377,
+   "us_each": 1.7121000000022377
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_132",
+   "count": 1.0,
+   "us_total": 1.696000000001004,
+   "us_each": 1.696000000001004
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_148",
+   "count": 1.0,
+   "us_total": 1.6578000000001338,
+   "us_each": 1.6578000000001338
+  },
+  {
+   "name": "triton_poi_fused_div_linalg_cross_sub_79",
+   "count": 1.0,
+   "us_total": 1.6193000000004758,
+   "us_each": 1.6193000000004758
+  },
+  {
+   "name": "triton_poi_fused_div_sub_97",
+   "count": 1.0,
+   "us_total": 1.5618000000001302,
+   "us_each": 1.5618000000001302
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_146",
+   "count": 1.0,
+   "us_total": 1.5134999999985665,
+   "us_each": 1.5134999999985665
+  },
+  {
+   "name": "triton_poi_fused_gelu_14",
+   "count": 1.0,
+   "us_total": 1.4944000000024515,
+   "us_each": 1.4944000000024515
+  },
+  {
+   "name": "triton_poi_fused_add_121",
+   "count": 1.0,
+   "us_total": 1.488200000001052,
+   "us_each": 1.488200000001052
+  },
+  {
+   "name": "triton_poi_fused_sub_124",
+   "count": 1.0,
+   "us_total": 1.487900000000991,
+   "us_each": 1.487900000000991
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_99",
+   "count": 1.0,
+   "us_total": 1.48469999999852,
+   "us_each": 1.48469999999852
+  },
+  {
+   "name": "triton_poi_fused_mul_sub_sum_96",
+   "count": 1.0,
+   "us_total": 1.4782999999997628,
+   "us_each": 1.4782999999997628
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_147",
+   "count": 1.0,
+   "us_total": 1.4655000000002474,
+   "us_each": 1.4655000000002474
+  },
+  {
+   "name": "triton_poi_fused_cat_13",
+   "count": 1.0,
+   "us_total": 1.4496000000006006,
+   "us_each": 1.4496000000006006
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_sum_77",
+   "count": 1.0,
+   "us_total": 1.44639999999863,
+   "us_each": 1.44639999999863
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_78",
+   "count": 1.0,
+   "us_total": 1.4368000000020402,
+   "us_each": 1.4368000000020402
+  },
+  {
+   "name": "triton_poi_fused_div_mul_sub_131",
+   "count": 1.0,
+   "us_total": 1.4177000000012412,
+   "us_each": 1.4177000000012412
+  },
+  {
+   "name": "triton_poi_fused_clamp_div_mul_sqrt_sub_sum_130",
+   "count": 1.0,
+   "us_total": 1.356600000002436,
+   "us_each": 1.356600000002436
+  },
+  {
+   "name": "triton_poi_fused_add_161",
+   "count": 1.0,
+   "us_total": 1.3536000000010973,
+   "us_each": 1.3536000000010973
+  },
+  {
+   "name": "triton_poi_fused_div_sub_111",
+   "count": 1.0,
+   "us_total": 1.347099999998136,
+   "us_each": 1.347099999998136
+  },
+  {
+   "name": "triton_poi_fused_add_127",
+   "count": 1.0,
+   "us_total": 1.3314999999993233,
+   "us_each": 1.3314999999993233
+  },
+  {
+   "name": "triton_poi_fused_sub_106",
+   "count": 1.0,
+   "us_total": 1.296099999998205,
+   "us_each": 1.296099999998205
+  },
+  {
+   "name": "triton_poi_fused_cat_11",
+   "count": 1.0,
+   "us_total": 1.2927000000013777,
+   "us_each": 1.2927000000013777
+  },
+  {
+   "name": "triton_poi_fused_sub_85",
+   "count": 1.0,
+   "us_total": 1.283200000001034,
+   "us_each": 1.283200000001034
+  },
+  {
+   "name": "triton_poi_fused_sub_154",
+   "count": 1.0,
+   "us_total": 1.2736000000004424,
+   "us_each": 1.2736000000004424
+  },
+  {
+   "name": "triton_poi_fused_sub_138",
+   "count": 1.0,
+   "us_total": 1.267200000000048,
+   "us_each": 1.267200000000048
+  },
+  {
+   "name": "triton_poi_fused_cat_12",
+   "count": 1.0,
+   "us_total": 1.2671000000006871,
+   "us_each": 1.2671000000006871
+  },
+  {
+   "name": "triton_poi_fused_sub_115",
+   "count": 1.0,
+   "us_total": 1.2575000000008003,
+   "us_each": 1.2575000000008003
+  }
+ ],
+ "replay_us": 3406.8414306640625,
+ "floor_us": {
+  "0": 12.333760261535645,
+  "50": 60.97695827484131,
+  "100": 116.02879524230957,
+  "200": 224.5568084716797,
+  "400": 437.8579330444336
+ }
+}
