@@ -289,6 +289,17 @@ config (it was 0.48 ms before P0).
 End to end, `generate.py --num_aa 100 --fast`: **1.5 s per design**, from
 ~2.1 s. `--preset exact` is the default; `--preset fast` is N011's.
 
+Other lengths, shipping config (two independent jobs agree):
+
+| L | full ms | lean ms | N007 baseline (full) |
+|---|---|---|---|
+| 50 | 3.738 / 3.724 | 3.029 / 3.020 | 4.22 |
+| 100 | 4.390 / 4.384 / 4.365 / 4.385 | 3.574 / 3.569 / 3.556 / 3.564 | 4.95 |
+
+The gain is roughly flat in absolute terms, as the kernel-count diagnosis
+predicts: what was removed is launches, and a launch costs the same at L=50 as
+at L=100.
+
 ### 7.3 P1 was already subsumed, and is now moot
 
 The angle head's CPU sidechain tables made *inductor* refuse to cudagraph that
