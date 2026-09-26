@@ -24,3 +24,9 @@ Sat Sep 26 08:27:17 2026
 
 RESULT preset=exact  override=-               L=100  full  4.381 ms  lean  3.568 ms  tf32=highest {'shared_cond_draw': False} trust=False steps=401 design= 1.43 s
 RESULT preset=fast   override=-               L=100  full  3.614 ms  lean  2.894 ms  tf32=high {'shared_cond_draw': True} trust=True steps=201 design= 0.58 s
+RESULT preset=fast   override=no_shared_draw  L=100  full  3.607 ms  lean  2.882 ms  tf32=high {'shared_cond_draw': False} trust=True steps=201 design= 0.58 s
+RESULT preset=fast   override=notf32          L=100  full  4.385 ms  lean  3.563 ms  tf32=highest {'shared_cond_draw': True} trust=True steps=201 design= 0.72 s
+RESULT preset=exact  override=tf32            L=100  full  3.719 ms  lean  2.996 ms  tf32=high {'shared_cond_draw': False} trust=False steps=401 design= 1.20 s
+RESULT preset=exact  override=-               L=100  full  4.368 ms  lean  3.554 ms  tf32=highest {'shared_cond_draw': False} trust=False steps=401 design= 1.43 s
+RESULT preset=fast   override=-               L=50   full  3.229 ms  lean  2.609 ms  tf32=high {'shared_cond_draw': True} trust=True steps=201 design= 0.52 s
+RESULT preset=fast   override=-               L=200  full  4.968 ms  lean  4.086 ms  tf32=high {'shared_cond_draw': True} trust=True steps=201 design= 0.82 s

@@ -6,4 +6,4 @@
 #SBATCH --output=/home/hpc/v181bb/v181bb10/SALAD_torch/outputs/diag_%j.log
 set -e
 cd /home/hpc/v181bb/v181bb10/SALAD_torch
-/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_prec.py
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/verify_n009.py

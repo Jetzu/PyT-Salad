@@ -53,3 +53,97 @@ fast path (fast) compiled + captured in 211s (one-time)
 
 8 designs of 100 aa: median 1.2s, total 9.7s
 ########## ARM fast (250/200)
+preset 'fast': schedule scaled by 0.5 -> num_steps=250 out_steps=200
+device: NVIDIA H100
+config default_vp  L=100  steps=250 out_steps=(200,)
+fast path (fast) compiled + captured in 71s (one-time)
+  design 0:    0.7s  CA-CA 3.744 A (min 3.628 max 3.898)  Rg 13.1 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_0.pdb
+  design 1:    0.6s  CA-CA 3.758 A (min 3.657 max 3.841)  Rg 11.9 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_1.pdb
+  design 2:    0.6s  CA-CA 3.758 A (min 3.625 max 3.851)  Rg 13.2 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_2.pdb
+  design 3:    0.6s  CA-CA 3.733 A (min 3.633 max 3.869)  Rg 13.4 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_3.pdb
+  design 4:    0.6s  CA-CA 3.756 A (min 3.618 max 3.867)  Rg 12.8 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_4.pdb
+  design 5:    0.6s  CA-CA 3.793 A (min 3.692 max 3.904)  Rg 11.7 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_5.pdb
+  design 6:    0.6s  CA-CA 3.759 A (min 3.638 max 3.949)  Rg 12.6 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_6.pdb
+  design 7:    0.6s  CA-CA 3.757 A (min 3.462 max 3.884)  Rg 14.6 A  -> .agent-research/results/N011-fast-preset/gen_fast/design_7.pdb
+
+8 designs of 100 aa: median 0.6s, total 4.9s
+########## ARM fast_125 (125/100)
+device: NVIDIA H100
+config default_vp  L=100  steps=125 out_steps=(100,)
+fast path (fast) compiled + captured in 76s (one-time)
+  design 0:    0.4s  CA-CA 3.750 A (min 3.663 max 3.880)  Rg 16.4 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_0.pdb
+  design 1:    0.3s  CA-CA 3.779 A (min 3.657 max 3.953)  Rg 11.9 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_1.pdb
+  design 2:    0.3s  CA-CA 3.764 A (min 3.583 max 3.854)  Rg 12.6 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_2.pdb
+  design 3:    0.3s  CA-CA 3.766 A (min 3.632 max 3.926)  Rg 12.4 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_3.pdb
+  design 4:    0.3s  CA-CA 3.757 A (min 3.595 max 3.854)  Rg 12.3 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_4.pdb
+  design 5:    0.3s  CA-CA 3.746 A (min 3.582 max 3.848)  Rg 13.7 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_5.pdb
+  design 6:    0.3s  CA-CA 3.748 A (min 3.623 max 3.900)  Rg 13.7 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_6.pdb
+  design 7:    0.3s  CA-CA 3.748 A (min 3.604 max 3.860)  Rg 13.1 A  -> .agent-research/results/N011-fast-preset/gen_fast125/design_7.pdb
+
+8 designs of 100 aa: median 0.3s, total 2.6s
+########## QUALITY GATE
+== .agent-research/results/N011-fast-preset/gen_exact   n_designs=8  L=100
+   design_0.pdb             CA-CA 3.762 (min 3.61 max 3.83)  Rg  14.1  H 0.36 E 0.60 c 0.04  clash<4A   0  nan 0
+   design_1.pdb             CA-CA 3.763 (min 3.62 max 3.92)  Rg  11.9  H 0.47 E 0.43 c 0.10  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.750 (min 3.58 max 3.84)  Rg  12.7  H 0.54 E 0.44 c 0.02  clash<4A   1  nan 0
+   design_3.pdb             CA-CA 3.752 (min 3.64 max 3.89)  Rg  12.1  H 0.36 E 0.58 c 0.06  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.770 (min 3.66 max 3.92)  Rg  12.5  H 0.62 E 0.19 c 0.19  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.761 (min 3.62 max 3.90)  Rg  11.4  H 0.52 E 0.30 c 0.18  clash<4A   0  nan 0
+   design_6.pdb             CA-CA 3.765 (min 3.60 max 3.85)  Rg  12.0  H 0.99 E 0.01 c 0.00  clash<4A   0  nan 0
+   design_7.pdb             CA-CA 3.758 (min 3.60 max 3.84)  Rg  13.2  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   MEAN  CA-CA 3.7601 +- 0.0062  Rg 12.50 +- 0.78  H 0.605  E 0.319  c 0.076  clash 0.1  nan 0
+== .agent-research/results/N011-fast-preset/gen_fast_full   n_designs=8  L=100
+   design_0.pdb             CA-CA 3.761 (min 3.60 max 3.90)  Rg  12.7  H 0.42 E 0.49 c 0.09  clash<4A   0  nan 0
+   design_1.pdb             CA-CA 3.777 (min 3.50 max 3.91)  Rg  11.8  H 0.21 E 0.70 c 0.09  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.780 (min 3.72 max 3.87)  Rg  12.7  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_3.pdb             CA-CA 3.760 (min 3.65 max 3.89)  Rg  12.7  H 0.41 E 0.48 c 0.11  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.757 (min 2.94 max 3.97)  Rg  12.7  H 0.39 E 0.45 c 0.16  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.748 (min 3.64 max 3.85)  Rg  11.5  H 0.61 E 0.29 c 0.10  clash<4A   0  nan 0
+   design_6.pdb             CA-CA 3.770 (min 3.61 max 3.88)  Rg  12.0  H 0.84 E 0.12 c 0.04  clash<4A   0  nan 0
+   design_7.pdb             CA-CA 3.779 (min 3.65 max 3.86)  Rg  12.6  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   MEAN  CA-CA 3.7666 +- 0.0110  Rg 12.35 +- 0.46  H 0.607  E 0.316  c 0.076  clash 0.0  nan 0
+== .agent-research/results/N011-fast-preset/gen_fast   n_designs=8  L=100
+   design_0.pdb             CA-CA 3.744 (min 3.63 max 3.90)  Rg  13.1  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_1.pdb             CA-CA 3.758 (min 3.66 max 3.84)  Rg  11.9  H 0.95 E 0.04 c 0.01  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.758 (min 3.62 max 3.85)  Rg  13.2  H 0.43 E 0.39 c 0.18  clash<4A   0  nan 0
+   design_3.pdb             CA-CA 3.733 (min 3.63 max 3.87)  Rg  13.4  H 0.40 E 0.55 c 0.05  clash<4A   1  nan 0
+   design_4.pdb             CA-CA 3.756 (min 3.62 max 3.87)  Rg  12.8  H 0.41 E 0.44 c 0.15  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.793 (min 3.69 max 3.90)  Rg  11.7  H 0.99 E 0.00 c 0.01  clash<4A   1  nan 0
+   design_6.pdb             CA-CA 3.759 (min 3.64 max 3.95)  Rg  12.6  H 0.55 E 0.38 c 0.07  clash<4A   2  nan 0
+   design_7.pdb             CA-CA 3.757 (min 3.46 max 3.88)  Rg  14.6  H 0.06 E 0.82 c 0.12  clash<4A   0  nan 0
+   MEAN  CA-CA 3.7572 +- 0.0160  Rg 12.92 +- 0.86  H 0.591  E 0.328  c 0.081  clash 0.5  nan 0
+== .agent-research/results/N011-fast-preset/gen_fast125   n_designs=8  L=100
+   design_0.pdb             CA-CA 3.750 (min 3.66 max 3.88)  Rg  16.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_1.pdb             CA-CA 3.779 (min 3.66 max 3.95)  Rg  11.9  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.764 (min 3.58 max 3.85)  Rg  12.6  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_3.pdb             CA-CA 3.766 (min 3.63 max 3.93)  Rg  12.4  H 0.39 E 0.50 c 0.11  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.757 (min 3.59 max 3.85)  Rg  12.3  H 0.52 E 0.45 c 0.03  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.746 (min 3.58 max 3.85)  Rg  13.7  H 0.48 E 0.37 c 0.15  clash<4A   0  nan 0
+   design_6.pdb             CA-CA 3.748 (min 3.62 max 3.90)  Rg  13.7  H 0.24 E 0.66 c 0.10  clash<4A   0  nan 0
+   design_7.pdb             CA-CA 3.748 (min 3.60 max 3.86)  Rg  13.1  H 0.05 E 0.80 c 0.15  clash<4A   0  nan 0
+   MEAN  CA-CA 3.7572 +- 0.0107  Rg 13.26 +- 1.34  H 0.570  E 0.348  c 0.082  clash 0.0  nan 0
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 08:39:23 CEST 2026
+= Job-ID             : 903116 on helma
+= Job-Name           : n011_e2e
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset/run_e2e.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:55:00
+= Elapsed runtime    : 00:12:21
+= Total RAM usage    : 4.0 GiB of assigned 175 GiB (2.3%)
+= Node list          : h14-02
+= Subm/Elig/Start/End: 2026-09-26T08:27:01 / 2026-09-26T08:27:01 / 2026-09-26T08:27:02 / 2026-09-26T08:39:23
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.9G   104.9G   209.7G        N/A     454K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K   6d10m28s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 1942393, 10 %, 8 %, 1344 MiB, 336326 ms
+NVIDIA H100, 00000000:06:00.0, 2033502, 6 %, 3 %, 1098 MiB, 229964 ms
+NVIDIA H100, 00000000:06:00.0, 2115392, 6 %, 0 %, 1098 MiB, 77673 ms
+NVIDIA H100, 00000000:06:00.0, 2144682, 3 %, 0 %, 1098 MiB, 80823 ms

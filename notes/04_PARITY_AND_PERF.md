@@ -459,3 +459,48 @@ off the GEMM stage, i.e. ~240 of the 321 launches gone. The two candidates:
 
 The honest exact floor is **~3.4-3.5 ms** for a lean step, ~1.5 s for a
 100-residue design.
+
+## 8. CUDA runs are NOT reproducible — independently confirmed
+
+One forward, identical input, same process, twice:
+
+| backend | max|d| |
+|---|---|
+| CUDA | **2.21e-04 A** |
+| CPU | 0.000e+00 |
+
+That is ~10x the 2e-5 A parity floor. Cause: `index_mean` -> `scatter_add`
+atomicAdd ordering (~1.6e-7 per op), amplified DISCRETELY because each block's
+`pos` feeds the next block's neighbour argsort, so a tie can flip.
+
+Consequences, and they are not small:
+- **`--seed` does not pin a CUDA run.** Two identical commands produce
+  different proteins. Any claim of the form "same seed, same structure" is
+  false on GPU.
+- **A PDB-identity gate is unachievable on CUDA**, including for a no-op
+  change. Gate optimisations on CPU `torch.equal`, or on a single forward
+  measured against this noise floor - never on the written structure.
+- Bug B1 (the -1 sentinel) was the prime suspect and is REFUTED: the chained
+  `index_put_` and the selected indices reproduce exactly over 20 repeats.
+
+Fixing it means a deterministic segment reduction, which changes summation
+order and needs its own parity re-baseline. Not attempted.
+
+## 9. "Compiled" is not the same as "one graph" — check, do not read
+
+An earlier pass reported 0 graph breaks in `forward_core`. That was a stale
+measurement: the counters were read after a warm compile, so they were empty.
+The real count was **30 graphs / 29 breaks**, and the model ran CUDA-graphed in
+thirty pieces while its docstring claimed otherwise.
+
+Cause: `DotDict.__getattr__ = dict.get` is untraceable by Dynamo, so **every
+`config.<key>` read inside the compiled region broke the graph**. Hoisting
+those reads to `__init__` took it to 1 graph / 0 breaks and bought 0.48 ms on a
+lean step - the single biggest win of the exact path, and it was not in the
+plan.
+
+Rules that follow:
+- never read `self.config` in a forward on the compiled path; resolve config in
+  `__init__`
+- verify with `torch._dynamo.explain` on a FRESH `dynamo.reset()`, and trust the
+  graph count over any comment
