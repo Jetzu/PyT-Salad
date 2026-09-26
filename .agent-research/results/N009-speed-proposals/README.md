@@ -51,6 +51,9 @@ of 321 GEMM launches for 2-3 days, and it spends parity budget); P8 (the only
 route to 2.0 ms, and "materially different" numerics by construction - that is
 the `fast` preset's licence).
 
+Kernel census (the unit of account the brief asked for): **1349 -> 946
+kernels, 403 removed**, 4.872 -> 3.521 ms GPU-busy.
+
 **2.0 ms is not reachable on the exact path. The measured floor is ~3.4-3.5 ms
 per lean step**, and notes/04 section 7.8 names where it goes: 60 % of a lean
 step is 321 cuBLAS launches at 6.5 us each against a 0.21 ms arithmetic floor.

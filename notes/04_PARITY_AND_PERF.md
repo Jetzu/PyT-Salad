@@ -387,6 +387,17 @@ floor is 0.
 
 ### 7.8 The floor, named (kernel census, L=100, `x_kernels.py`)
 
+The unit of account is kernels removed. Measured, profiling the same compiled
+callable with `capture=False` (a captured graph profiles as one opaque op):
+
+| | kernels | GPU-busy |
+|---|---|---|
+| **every proposal OFF**, reporting step | **1349** | 4.872 ms |
+| shipping, reporting step | 1202 | 4.351 ms |
+| **shipping, lean step** | **946** | **3.521 ms** |
+
+**403 kernels removed**, 4.872 -> 3.521 ms. Where they still go:
+
 | | kernels | GPU-busy | |
 |---|---|---|---|
 | reporting step (`need_aa=True`) | 1202 | 4.351 ms | |
