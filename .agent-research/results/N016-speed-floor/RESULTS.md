@@ -611,12 +611,24 @@ measure.** §2.2b measures the irreducible *materialised* traffic at
 does not bind; at the measured HBM rate (2.94 TB/s) it is **0.331 ms and it
 does bind**, which would raise the bound from 0.258 to ~0.33 ms. The physical
 argument for L2 is strong (60 MiB of L2, largest single tensor 10.2 MiB,
-produced and consumed adjacently) but it is an argument, not a measurement. An
-Nsight Compute run (`dram__bytes_read.sum` + `dram__bytes_write.sum`,
-NVTX-scoped to one lean forward) is in `x_ncu.py` / `run_r2b.sbatch`; see the
-log for whether it landed. **This is the term I would attack first if I were
-the red team**, and the worst case for me moves the bound by 1.3×, not by an
-order of magnitude — the headline (13.8× above the floor) survives it.
+produced and consumed adjacently) but it is an argument, not a measurement.
+
+The measurement that settles it is `ncu --metrics dram__bytes_read.sum,
+dram__bytes_write.sum`, NVTX-scoped to one lean forward; the harness is
+`x_ncu.py` / `run_r2b.sbatch`. **It did not land here.** Two attempts failed for
+mechanical reasons, both recorded: job 904016, where Nsight killed inductor's
+compile worker pool (`BrokenProcessPool` — fix is
+`TORCHINDUCTOR_COMPILE_THREADS=1`), and job 904019, where the NVTX filter was
+written as a start/end range (`--nvtx-include "measure"`) while the script uses
+push/pop, so *"No kernels were profiled"*; the push/pop form needs the trailing
+slash, `--nvtx-include "measure/"`. Job 904032 runs the corrected combination
+and its log is `logs/r2c_904032.log` — **whoever picks this up should read that
+log first.**
+
+**This is the term I would attack first if I were the red team.** The worst case
+for me moves the bound from 0.258 to ~0.33 ms, i.e. by 1.3×, not by an order of
+magnitude — the headline (>10× above the floor on both presets) survives it
+either way.
 
 **R3 — `c_launch = 1.166 µs` is this driver on this node.** It is the marginal
 replay cost of a 1-element `add_` in a captured graph, stable over 128–2048
