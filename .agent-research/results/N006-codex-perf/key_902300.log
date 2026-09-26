@@ -1,0 +1,90 @@
+### Starting TaskPrologue of job 902300 on h12-06 at Fri Sep 25 23:16:12 CEST 2026
+Running on cores 32-63 with governor performance
+Fri Sep 25 23:16:12 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   36C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0925 23:18:38.760000 3303759 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] torch._dynamo hit config.cache_size_limit (8)
+W0925 23:18:38.760000 3303759 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    function: '_slice' (/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N006-codex-perf/codex_key/salad_torch/modules/diffusion.py:29)
+W0925 23:18:38.760000 3303759 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    last reason: 5/0: L['i'] == 0                                                 
+W0925 23:18:38.760000 3303759 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0925 23:18:38.760000 3303759 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
+wall_ms reps=50 value=4.7959
+wall_ms reps=100 value=4.7949
+kernel_count 7370 per_forward 1474.0
+kernel_categories {'other': 745, 'memcpy': 375, 'triton': 4185, 'gemm': 2065}
+kernel_ms_total_5_forwards {'other': 1.6242080000000276, 'memcpy': 0.4594880000000175, 'triton': 8.689450000000065, 'gemm': 13.30945699999999}
+-----------------------------------------------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                                                           Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-----------------------------------------------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                                                        triton_         0.00%       0.000us         0.00%       0.000us       0.000us       8.689ms        36.08%       8.689ms       2.076us          4185  
+sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us       5.896ms        24.48%       5.896ms       6.272us           940  
+sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us       1.983ms         8.24%       1.983ms      11.018us           180  
+sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us       1.630ms         6.77%       1.630ms       7.085us           230  
+sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us       1.169ms         4.85%       1.169ms      12.988us            90  
+void cutlass::Kernel<cutlass_80_simt_sgemm_64x64_8x5_nn_align1>(cutlass_80_simt_sgemm_64x64_...         0.00%       0.000us         0.00%       0.000us       0.000us       1.031ms         4.28%       1.031ms       4.386us           235  
+void splitKreduce_kernel<32, 16, int, float, float, float, float, true, false, false>(cublas...         0.00%       0.000us         0.00%       0.000us       0.000us     552.537us         2.29%     552.537us       1.812us           305  
+void gemv2N_kernel<int, int, float, float, float, float, 128, 4, 4, 4, 1, false, cublasGemvP...         0.00%       0.000us         0.00%       0.000us       0.000us     521.276us         2.16%     521.276us       3.159us           165  
+sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us     371.999us         1.54%     371.999us       3.382us           110  
+void cutlass::Kernel<cutlass_80_simt_sgemm_128x32_8x5_nn_align1>(cutlass_80_simt_sgemm_128x3...         0.00%       0.000us         0.00%       0.000us       0.000us     370.467us         1.54%     370.467us       5.699us            65  
+sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us     309.827us         1.29%     309.827us       4.131us            75  
+                                                                                  memcpy32_post         0.00%       0.000us         0.00%       0.000us       0.000us     271.424us         1.13%     271.424us       1.180us           230  
+std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float, ...         0.00%       0.000us         0.00%       0.000us       0.000us     245.951us         1.02%     245.951us       4.099us            60  
+                                                                                    aten::copy_         1.14%     319.108us         3.23%     906.732us       6.253us     188.064us         0.78%     188.064us       1.297us           145  
+                                                                 Memcpy DtoD (Device -> Device)         0.00%       0.000us         0.00%       0.000us       0.000us     188.064us         0.78%     188.064us       1.297us           145  
+sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us     174.178us         0.72%     174.178us       2.903us            60  
+sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x32x8_stage3_warpsize1x2x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us     164.287us         0.68%     164.287us      10.952us            15  
+sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us     119.618us         0.50%     119.618us       2.658us            45  
+void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, at::de...         0.00%       0.000us         0.00%       0.000us       0.000us     107.229us         0.45%     107.229us       1.191us            90  
+                                                                                    aten::clone         0.22%      61.219us         2.10%     589.085us      10.711us       0.000us         0.00%      66.814us       1.215us            55  
+void at::native::vectorized_elementwise_kernel<4, at::native::BUnaryFunctor<float, float, fl...         0.00%       0.000us         0.00%       0.000us       0.000us      66.145us         0.27%      66.145us       1.102us            60  
+void cutlass::Kernel<cutlass_80_simt_sgemm_128x64_8x5_nn_align1>(cutlass_80_simt_sgemm_128x6...         0.00%       0.000us         0.00%       0.000us       0.000us      53.215us         0.22%      53.215us      10.643us             5  
+sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x32x8_stage3_warpsize1x2x1_ffma_aligna4_alig...         0.00%       0.000us         0.00%       0.000us       0.000us      37.890us         0.16%      37.890us       2.526us            15  
+std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float, ...         0.00%       0.000us         0.00%       0.000us       0.000us      26.849us         0.11%      26.849us       1.790us            15  
+void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::ArgMaxOps<flo...         0.00%       0.000us         0.00%       0.000us       0.000us      19.168us         0.08%      19.168us       3.834us             5  
+-----------------------------------------------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 28.036ms
+Self CUDA time total: 24.083ms
+
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 23:19:59 CEST 2026
+= Job-ID             : 902300 on helma
+= Job-Name           : salad_n006_key
+= Job-Command        : .agent-research/results/N006-codex-perf/key.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:35:00
+= Elapsed runtime    : 00:04:28
+= Total RAM usage    : 3.8 GiB of assigned 175 GiB (2.2%)
+= Node list          : h12-06
+= Subm/Elig/Start/End: 2026-09-25T23:15:30 / 2026-09-25T23:15:30 / 2026-09-25T23:15:31 / 2026-09-25T23:19:59
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  6d9h29m52s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 3303759, 8 %, 8 %, 1346 MiB, 219608 ms

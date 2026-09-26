@@ -50,14 +50,26 @@ class FastDenoiser(nn.Module):
         fast = FastDenoiser(model, length=100, device="cuda").warmup()
         result, prev = fast(data, prev)
 
-    `mode` is passed to `torch.compile`. "reduce-overhead" enables CUDA graphs
-    and is the setting that matters here; "default" fuses but still launches
-    per-kernel.
+    `mode` is passed to `torch.compile`, and `manual_graph` decides who owns
+    the CUDA graph:
+
+    * `manual_graph=True` (default, and the fast one): compile with
+      ``mode="default"`` and capture the WHOLE forward in one explicit
+      `torch.cuda.CUDAGraph`, then replay it. 4.79 ms at L=100.
+    * `manual_graph=False`: let inductor manage cudagraphs via
+      ``mode="reduce-overhead"``. 6.5-7.0 ms.
+
+    The two cannot be combined - wrapping an explicit capture around a
+    reduce-overhead callable raises "Offset increment outside graph capture",
+    because inductor is already capturing. `mode="default"` does not, which is
+    what makes the manual capture legal. Capturing the whole forward once is
+    what removes the remaining ~1400 per-launch costs; it is only possible
+    because every RNG draw is hoisted out of the region (see `uniform`).
     """
 
     def __init__(self, model, length: int, device="cuda",
                  mode: str = "reduce-overhead", dtype=torch.float32,
-                 capture: bool = True):
+                 capture: bool = True, manual_graph: bool = True):
         super().__init__()
         self.model = model
         self.config = model.config
@@ -65,6 +77,13 @@ class FastDenoiser(nn.Module):
         self.device = torch.device(device)
         self.dtype = dtype
         self.capture = capture and self.device.type == "cuda"
+        self.manual_graph = manual_graph
+        if manual_graph and mode == "reduce-overhead":
+            # Mutually exclusive: inductor is already capturing in
+            # reduce-overhead, so an explicit capture on top raises
+            # "Cannot prepare for replay during capturing stage". The manual
+            # graph needs a plain compile underneath it.
+            mode = "default"
         self.n_draws = uniform_draw_count(model.config)
         # NB skipping the inference-dead aux heads (dssp, distogram neighbours)
         # was tried and MEASURED SLOWER (6.48 -> 6.9 ms at L=100, variance
@@ -116,7 +135,13 @@ class FastDenoiser(nn.Module):
         with torch.no_grad():
             for _ in range(iters):
                 out = self._compiled(*args)
-            if self.capture:
+            if self.capture and self.manual_graph:
+                # Compile in default mode and capture the entire forward once.
+                # Inductor-managed reduce-overhead graphs cannot be nested.
+                self._graph = torch.cuda.CUDAGraph()
+                with torch.cuda.graph(self._graph):
+                    self._static_out = self._compiled(*args)
+            elif self.capture:
                 # NOTE: do NOT wrap an explicit torch.cuda.CUDAGraph around a
                 # mode="reduce-overhead" callable. Inductor already manages
                 # cudagraphs internally, and capturing on top of it raises
@@ -129,7 +154,7 @@ class FastDenoiser(nn.Module):
 
     # ------------------------------------------------------------------
     def _run(self, inputs: dict[str, Tensor]) -> tuple[Tensor, ...]:
-        if self.capture:
+        if self.capture and not self.manual_graph:
             # tells inductor a new iteration has begun, so it may reuse the
             # cudagraph's buffers; without it, holding on to a previous output
             # raises "accessing tensor output of CUDAGraphs that has been
@@ -151,7 +176,11 @@ class FastDenoiser(nn.Module):
             args = [self._static_in.get(k) for k in _CORE_ARGS]
         else:
             args = [inputs.get(k) for k in _CORE_ARGS]
-        out = self._compiled(*args)
+        if self.manual_graph and self._graph is not None:
+            self._graph.replay()
+            out = self._static_out
+        else:
+            out = self._compiled(*args)
         # clone for the same reason: these buffers are reused next call
         return tuple(o.clone() if torch.is_tensor(o) else o for o in out)
 

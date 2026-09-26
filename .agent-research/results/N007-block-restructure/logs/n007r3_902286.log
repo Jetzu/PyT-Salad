@@ -23,3 +23,36 @@ Fri Sep 25 23:04:53 2026
 ### Finished TaskPrologue
 
 ######## BATCH6 L=100
+condition-branch pair features x6 blocks, L=100, K=64
+  v0 sequential (current)                    1.017 ms
+  v1 batched bmm prologue                    0.792 ms   max|d| 7.629e-06   bitexact False
+     -> +22.2% vs v0   (+0.225 ms/fwd)
+######## BATCH6 L=400
+condition-branch pair features x6 blocks, L=400, K=64
+  v0 sequential (current)                    2.445 ms
+  v1 batched bmm prologue                    2.874 ms   max|d| 7.629e-06   bitexact False
+     -> -17.6% vs v0   (-0.429 ms/fwd)
+######## DONE3
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 23:06:23 CEST 2026
+= Job-ID             : 902286 on helma
+= Job-Name           : n007_r3
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/run3.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:01:31
+= Total RAM usage    : 2.9 GiB of assigned 175 GiB (1.7%)
+= Node list          : h12-06
+= Subm/Elig/Start/End: 2026-09-25T23:04:52 / 2026-09-25T23:04:52 / 2026-09-25T23:04:52 / 2026-09-25T23:06:23
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.9G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  6d9h43m27s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 3292846, 12 %, 12 %, 1676 MiB, 53531 ms
+NVIDIA H100, 00000000:26:00.0, 3294638, 23 %, 22 %, 2628 MiB, 31738 ms

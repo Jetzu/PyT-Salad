@@ -1,0 +1,59 @@
+### Starting TaskPrologue of job 902292 on h12-06 at Fri Sep 25 23:09:12 CEST 2026
+Running on cores 32-63 with governor performance
+Fri Sep 25 23:09:12 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   36C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0925 23:11:34.271000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] torch._dynamo hit config.cache_size_limit (8)
+W0925 23:11:34.271000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    function: '_slice' (/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N006-codex-perf/codex/salad_torch/modules/diffusion.py:29)
+W0925 23:11:34.271000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    last reason: 5/0: L['i'] == 0                                                 
+W0925 23:11:34.271000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0925 23:11:34.271000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
+W0925 23:13:03.631000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] torch._dynamo hit config.cache_size_limit (8)
+W0925 23:13:03.631000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [9/8]    function: 'neighbour_fn' (/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N006-codex-perf/codex/salad_torch/modules/diffusion.py:212)
+W0925 23:13:03.631000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [9/8]    last reason: 9/0: tensor 'L['cur_pos']' stride mismatch at index 1. expected 3, actual 1
+W0925 23:13:03.631000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0925 23:13:03.631000 3298682 site-packages/torch/_dynamo/convert_frame.py:844] [9/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
+default_vp manual_vs_eager_pos_A 0.0011031616013497114 old_vs_eager_pos_A 0.0007381403120234609 manual_vs_old_pos_A 0.0003662586968857795 manual_vs_eager_local 0.01715850830078125 old_vs_eager_local 0.013153076171875 manual_vs_old_local 0.006732940673828125 aatype_diff 0
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 23:14:02 CEST 2026
+= Job-ID             : 902292 on helma
+= Job-Name           : salad_n006_cmp
+= Job-Command        : .agent-research/results/N006-codex-perf/compare_modes.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:35:00
+= Elapsed runtime    : 00:05:05
+= Total RAM usage    : 4.2 GiB of assigned 175 GiB (2.4%)
+= Node list          : h12-06
+= Subm/Elig/Start/End: 2026-09-25T23:08:56 / 2026-09-25T23:08:56 / 2026-09-25T23:08:57 / 2026-09-25T23:14:02
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.7G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  6d9h35m49s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 3298682, 6 %, 6 %, 1122 MiB, 285656 ms

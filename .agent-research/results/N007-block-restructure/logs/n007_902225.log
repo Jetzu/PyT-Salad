@@ -66,3 +66,72 @@ sparse IPA x12, L=100, K=64
      -> -2.1% vs v0   (-0.028 ms/fwd)
 ---- neigh L=400
 neighbour selection, 6 blocks, L=400
+  v0 current                           0.846 ms
+  v1 hoisted + shared distance         0.610 ms
+     -> +27.9% vs v0   (+0.236 ms/fwd)
+     bit-identical indices: True
+######## E2E
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N007-block-restructure/x_e2e.py", line 142, in <module>
+    ref = m(d, p, compute_distogram=False)["pos"].clone()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+TypeError: tuple indices must be integers or slices, not str
+######## DONE
+=== JOB_STATISTICS ===
+=== current date     : Fri Sep 25 23:05:53 CEST 2026
+= Job-ID             : 902225 on helma
+= Job-Name           : n007_restruct
+= Job-Command        : .agent-research/results/N007-block-restructure/run.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:55:00
+= Elapsed runtime    : 00:07:50
+= Total RAM usage    : 3.0 GiB of assigned 175 GiB (1.7%)
+= Node list          : h14-02
+= Subm/Elig/Start/End: 2026-09-25T22:58:02 / 2026-09-25T22:58:02 / 2026-09-25T22:58:03 / 2026-09-25T23:05:53
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.9G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  6d9h43m58s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 3139854, 0 %, 0 %, 670 MiB, 1987 ms
+NVIDIA H100, 00000000:06:00.0, 3141650, 1 %, 0 %, 690 MiB, 1287 ms
+NVIDIA H100, 00000000:06:00.0, 3142804, 6 %, 6 %, 1708 MiB, 117456 ms
+NVIDIA H100, 00000000:06:00.0, 3183092, 1 %, 1 %, 992 MiB, 94879 ms
+NVIDIA H100, 00000000:06:00.0, 3218771, 10 %, 10 %, 1618 MiB, 39978 ms
+NVIDIA H100, 00000000:06:00.0, 3231621, 0 %, 0 %, 1278 MiB, 185711 ms
+NVIDIA H100, 00000000:06:00.0, 3296023, 1 %, 0 %, 794 MiB, 1679 ms
+NVIDIA H100, 00000000:06:00.0, 3298762, 0 %, 0 %, 794 MiB, 1204 ms
+NVIDIA H100, 00000000:06:00.0, 3300858, 0 %, 0 %, 794 MiB, 1169 ms
+NVIDIA H100, 00000000:06:00.0, 3301341, 0 %, 0 %, 794 MiB, 1471 ms
+NVIDIA H100, 00000000:06:00.0, 3302007, 0 %, 0 %, 794 MiB, 1616 ms
+NVIDIA H100, 00000000:06:00.0, 3302925, 0 %, 0 %, 794 MiB, 1304 ms

@@ -139,14 +139,14 @@ PATCHES = dict(tables=patch_tables, onehot=patch_onehot,
 m, cfg = build()
 d, p = make_data(cfg, a.length)
 with torch.no_grad():
-    ref = m(d, p, compute_distogram=False)["pos"].clone()
+    ref = m(d, p, compute_distogram=False)[0]["pos"].clone()
 
 for name in ("tables", "onehot", "nopc", "noaa", "k48"):
     if name in V:
         PATCHES[name]()
 
 with torch.no_grad():
-    got = m(d, p, compute_distogram=False)["pos"]
+    got = m(d, p, compute_distogram=False)[0]["pos"]
     dev_eager = (got - ref).abs().max().item()
     fast = FastDenoiser(m, a.length, device=dev, mode="reduce-overhead").warmup()
     t = bench(lambda: fast(d, p), iters=50, warm=10)
