@@ -82,7 +82,11 @@ peak, nothing left inside it" - measured inside a graph it is 16.19 us =
 gap lists and a section naming what a red team can still break), plus
 `x_micro.py`, `x_micro2.py`, `x_census.py`, `x_baseline.py`, `x_triton_gemm.py`,
 `x_concurrency.py`, `x_ncu.py`, `run_*.sbatch`, `logs/`.
-Worktree REMOVED (/hnvme is inode-capped and in grace). To reproduce, the
+Worktree: removed once, then RECREATED for job 904053 (the outstanding ncu
+run - see Next #5). Remove it again with
+`git worktree remove --force /hnvme/workspace/v181bb10-salad/n016-floor` once
+`logs/ncu_raw.txt` has been read; /hnvme is inode-capped and in grace. To
+reproduce from scratch, the
 scripts hardcode `ROOT = /hnvme/workspace/v181bb10-salad/n016-floor`; recreate
 it with
 
@@ -100,4 +104,13 @@ does not exist on the compute nodes.
 2. Multi-stream capture of ONE forward's independent work (latency form of the same).
 3. Per-shape Triton/cuBLAS selection for the narrow projections (~0.12 ms, bit-exact at fp32).
 4. Capture N sampler steps per graph to remove the 0.178 ms wrapper.
-5. R2 (traffic) is the one term a red team should attack first - see RESULTS.md section 10.
+5. R2 (traffic) is the one term a red team should attack first - see RESULTS.md
+   section 10. The ncu measurement that settles it is STILL OUTSTANDING after
+   three mechanical failures (904016 BrokenProcessPool, 904019 wrong NVTX filter
+   form, 904032 metrics collected but eaten by the log filter). Job 904053 has
+   the corrected recipe - `module load cuda/12.6.2`,
+   `TORCHINDUCTOR_COMPILE_THREADS=1`, `--nvtx-include "measure/"` WITH the
+   trailing slash, and NO grep on the output - and writes
+   `logs/ncu_raw.txt`. Read that file; if `dram__bytes_read.sum +
+   dram__bytes_write.sum` per lean forward is well under ~760 MB the bound of
+   0.258 ms stands, and if it is near 927 MiB the bound rises to ~0.33 ms.
