@@ -32,6 +32,12 @@ from .diffusion import uniform_draw_count
 
 __all__ = ["FastDenoiser", "PRESETS"]
 
+#: `SALAD_OPT_DETSEG=1` forces the deterministic segment reduction on for every
+#: preset; captured here because `FastDenoiser` writes `opt.DET_SEGMENT`.
+_ENV_DET_SEGMENT = opt.DET_SEGMENT
+#: ...and `SALAD_OPT_BATCHCOND=0` forces P7 off for every preset.
+_ENV_BATCH_COND = opt.BATCH_COND
+
 #: Inference presets. **"exact" is the default and must stay so.**
 #:
 #: "exact" holds the port's measured parity floor against JAX salad
@@ -59,6 +65,13 @@ PRESETS: dict[str, dict] = {
         # fp32 matmuls stay fp32, and the sampler keeps its 500/400 schedule.
         tf32=False,
         steps_scale=1.0,
+        # inductor scheduler knob, N013: -1.4 % at L=100 / -2.4 % at L=50, and
+        # BIT-IDENTICAL on CPU *and* on the H100 under the deterministic
+        # segment reduction. Not a numerics trade at all.
+        aggressive_fusion=True,
+        # P7, the batched condition-branch prologue: -9.2 % of a lean step.
+        # Reassociation only (bmm vs six mm); see `batch_cond_pair` below.
+        batch_cond_pair=True,
     ),
     # ------------------------------------------------------------------
     # "fast" (N011) - maximum speed, ALLOWED to move the numbers. It is NOT a
@@ -150,6 +163,64 @@ PRESETS: dict[str, dict] = {
         # designability check (ProteinMPNN + a folding model), which no arm in
         # this port has run. Structural gates cannot answer designability.
         steps_scale=0.5,
+        aggressive_fusion=True,
+        batch_cond_pair=True,
+    ),
+    # ------------------------------------------------------------------
+    # "deterministic" (N013) - `exact`, plus a segment reduction that does not
+    # use atomics, so **`--seed` actually pins a CUDA run**. Measured at L=100
+    # on an H100 (`x_floor.py`, job 903261): 40 identical forwards produce
+    # **1 distinct bit pattern instead of 40**, and the step costs 3.634 ms
+    # lean / 4.457 ms full against `exact`'s 3.558 / 4.384 in the same job,
+    # i.e. **+2.1 %**.
+    #
+    # It is NOT the default because it changes the summation order of every
+    # `index_sum`, so it is its own baseline - and that baseline is NOT free.
+    # It is a TRADE: a reproducible CUDA run, paid for in divergence from JAX.
+    # Measured with `tests/test_sampling_parity.py` (N014), reproduced on the
+    # live tree AND independently on an isolated snapshot (job 903683); the two
+    # agree to every digit, and the CPU run reproduces the GPU one - so this is
+    # the reassociation itself, not the atomics:
+    #
+    #                       DETSEG=0        DETSEG=1
+    #   final aatype     1/64 residues   **7/64 residues**   <- the real cost
+    #   final_aa rel        2.046e-02       6.019e-02
+    #   final structure     0.06166 A       0.19861 A        (~3.2x the drift)
+    #
+    # **Lead with the aatype count.** Seven of sixty-four residues take a
+    # DIFFERENT AMINO ACID - a discretely different design, which no rounding
+    # argument reaches. `tests/test_sampling_parity.py` FAILS under this preset.
+    # (It also reports a 30.6x final/noise-floor ratio; do NOT lean on that
+    # number. Its denominator is a self-divergence floor measured on the ATOMICS
+    # path, and driving self-divergence to zero is this preset's whole purpose,
+    # so the denominator no longer describes the configuration under test. The
+    # raw deviations and the aatype count are the defensible statements.)
+    #
+    # What DOES still hold at the usual floors: the four checkpoint parity
+    # configs (0.00002 A / 0.00020 A multimotif), geometry 38/38, stack and
+    # encoder. Only sampling moves.
+    #
+    # So: a legitimate preset to offer - reproducibility is worth real money for
+    # debugging and for anything that has to rerun and match - but it has **no
+    # recorded sampling baseline of its own yet**. Record one before reporting
+    # any result from it; never read it against `exact`'s baseline.
+    # Nothing in `exact` or `fast` is affected: `DET_SEGMENT` defaults False and
+    # neither preset sets it.
+    #
+    # `torch.use_deterministic_algorithms(True)` is the obvious alternative
+    # and is NOT usable here: it makes `scatter_add` deterministic (measured:
+    # 17 -> 170 us for one (100, 512) call) but RAISES under CUDA graph
+    # capture - "operation not permitted when stream is capturing" - so the
+    # whole fast path is unavailable under it.
+    "deterministic": dict(
+        lean_steps=True,
+        skip_pair_cond=True,
+        need_aux=True,
+        tf32=False,
+        steps_scale=1.0,
+        aggressive_fusion=True,
+        batch_cond_pair=True,
+        det_segment=True,
     ),
 }
 
@@ -216,6 +287,31 @@ class FastDenoiser(nn.Module):
         # building an "exact" denoiser after a "fast" one must put the process
         # back on the parity path rather than silently inherit TF32.
         torch.set_float32_matmul_precision("high" if p.get("tf32") else "highest")
+        # Same contract as the line above, and for the same reason: a
+        # PROCESS-GLOBAL switch, set in BOTH directions so an "exact" denoiser
+        # built after a "deterministic" one goes back to the default reduction
+        # rather than silently inheriting it. It has to be set BEFORE the
+        # compile, because `index_sum` reads it inside the traced region and
+        # Dynamo constant-folds it into a guard.
+        opt.DET_SEGMENT = bool(p.get("det_segment")) or _ENV_DET_SEGMENT
+        # Inductor's scheduler knob, likewise process-global and likewise set
+        # before the compile because that is when the scheduler reads it.
+        # Unlike TF32 this one is BIT-EXACT - measured on CPU and, under the
+        # deterministic reduction, on the H100 itself - so `exact` takes it.
+        import torch._inductor.config as _ind
+        _ind.aggressive_fusion = bool(p.get("aggressive_fusion")) and opt.AGGRESSIVE_FUSION
+        # P7, same contract: the preset chooses, `SALAD_OPT_BATCHCOND=0` can
+        # only veto. Also process-global, and also set before the compile.
+        opt.BATCH_COND = bool(p.get("batch_cond_pair")) and _ENV_BATCH_COND
+        # P7's stacked condition-branch weights are a CACHE of the per-block
+        # parameters, normally refreshed by a `load_state_dict` post-hook.
+        # Refresh once more here so a model whose weights arrived some other
+        # way (a hand-assigned `.w.data`, a converter that bypasses
+        # `load_state_dict`) cannot be served stale ones. It costs one stack of
+        # ~1.9 MB, once per denoiser.
+        _stack = getattr(model.diffusion, "diffusion_stack", None)
+        if getattr(_stack, "cond_pair_stack", None) is not None:
+            _stack.cond_pair_stack.sync(_stack.blocks)
         self.n_draws = uniform_draw_count(model.config)
         # NB skipping the inference-dead aux heads (dssp, distogram neighbours)
         # was tried and MEASURED SLOWER (6.48 -> 6.9 ms at L=100, variance

@@ -1,0 +1,104 @@
+### Starting TaskPrologue of job 903910 on h32-44 at Sat Sep 26 12:39:46 CEST 2026
+Running on cores 0-47 with governor performance
+No GPU known
+### Finished TaskPrologue
+
++ export PATH=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin:/home/hpc/v181bb/v181bb10/.vscode-server/cli/servers/Stable-a44adf7f53e00964ab890f9f8758a334f1fc15bc/server/bin/remote-cli:/home/hpc/v181bb/v181bb10/.local/bin:/apps/modules/5.6.0/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/apps/hpc-workspace/current/bin:/apps/hpc-workspace/current/bin:/apps/hpc-workspace/current/bin:/home/hpc/v181bb/v181bb10/.claude/plugins/cache/openai-codex/codex/1.0.6/bin:/apps/hpc-workspace/current/bin
++ PATH=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin:/home/hpc/v181bb/v181bb10/.vscode-server/cli/servers/Stable-a44adf7f53e00964ab890f9f8758a334f1fc15bc/server/bin/remote-cli:/home/hpc/v181bb/v181bb10/.local/bin:/apps/modules/5.6.0/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/apps/hpc-workspace/current/bin:/apps/hpc-workspace/current/bin:/apps/hpc-workspace/current/bin:/home/hpc/v181bb/v181bb10/.claude/plugins/cache/openai-codex/codex/1.0.6/bin:/apps/hpc-workspace/current/bin
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ export OMP_NUM_THREADS=48
++ OMP_NUM_THREADS=48
++ R=.agent-research/results/N014-batched-gemm
++ md5sum salad_torch/modules/cond_prologue.py salad_torch/modules/blocks.py salad_torch/modules/diffusion.py salad_torch/modules/fast.py salad_torch/opt.py
+3d70092f832b8ffd49e9d5df29bfdaed  salad_torch/modules/cond_prologue.py
+6d36435085525e4ba5a7eb776e9a926d  salad_torch/modules/blocks.py
+bed9c9183fb7e60edaa96a4c252edf21  salad_torch/modules/diffusion.py
+cba4048ee4412e6edda8aeb13eb73008  salad_torch/modules/fast.py
+d1c2ef0edc1389fc8a920f23fc95cfc3  salad_torch/opt.py
++ echo '################ GATE 1: parity suite, P7 OFF (SALAD_OPT_BATCHCOND=0) ################'
+################ GATE 1: parity suite, P7 OFF (SALAD_OPT_BATCHCOND=0) ################
++ SALAD_OPT_BATCHCOND=0
++ bash .agent-research/results/N014-batched-gemm/run_parity.sh
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00014 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0002 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] [PASS] final/noise-floor ratio = 12.9x
+[test_sampling_parity] generated CA-CA: mean 3.763 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=0
++ echo '################ GATE 1b: parity suite, P7 ON (SALAD_OPT_BATCHCOND=1) ################'
+################ GATE 1b: parity suite, P7 ON (SALAD_OPT_BATCHCOND=1) ################
++ SALAD_OPT_BATCHCOND=1
++ bash .agent-research/results/N014-batched-gemm/run_parity.sh
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00014 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0002 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] [PASS] final/noise-floor ratio = 7.5x
+[test_sampling_parity] generated CA-CA: mean 3.762 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=0
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 12:40:39 CEST 2026
+= Job-ID             : 903910 on helma
+= Job-Name           : n014_gates3
+= Job-Command        : .agent-research/results/N014-batched-gemm/run_cpu_gates3.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 00:30:00
+= Elapsed runtime    : 00:01:08
+= Total RAM usage    : 1.0 GiB of assigned 91 GiB (1.1%)
+= Node list          : h32-44
+= Subm/Elig/Start/End: 2026-09-26T12:13:40 / 2026-09-26T12:13:40 / 2026-09-26T12:39:31 / 2026-09-26T12:40:39
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.8G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+    /home/vault           774.0G  1048.6G  2097.2G        N/A     122K     200K     400K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      73K      61K      81K  5d20h9m12s !!!
+======================

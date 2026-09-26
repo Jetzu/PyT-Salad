@@ -26,6 +26,7 @@ from ..geometry.frames import aa_frames_t, apply_t
 from ..geometry.neighbours import (get_index_neighbours, get_neighbours,
                                    get_random_neighbours)
 from ..geometry.segment import index_mean
+from .cond_prologue import StackedCondPair
 from .. import opt
 from .attention import SparseStructureAttention
 from .basic import MLP, HkLayerNorm, HkLinear, gelu
@@ -340,7 +341,9 @@ class DiffusionBlock(nn.Module):
                 resi: Tensor, chain: Tensor, batch: Tensor, mask: Tensor,
                 current_neighbours: Tensor, cond_neighbours: Tensor,
                 cyclic_mask: Tensor | None = None,
-                init_pos: Tensor | None = None) -> tuple[Tensor, Tensor]:
+                init_pos: Tensor | None = None,
+                cond_pair: tuple[Tensor, Tensor] | None = None
+                ) -> tuple[Tensor, Tensor]:
         sigma = self.sigma_data
 
         pair, pair_mask = self.pair_1(pos, pair_condition, current_neighbours,
@@ -349,9 +352,15 @@ class DiffusionBlock(nn.Module):
         features = features + self.attn_1(
             self.layer_norm_1(features), pos / sigma, pair, pair_mask, current_neighbours)
 
-        pair, pair_mask = self.pair_2(prev_pos, pair_condition, cond_neighbours,
-                                      resi, chain, batch, mask,
-                                      cyclic_mask=cyclic_mask, init_pos=init_pos)
+        # P7: this block's slice of the batched condition-branch prologue
+        # (`StackedCondPair`), when the stack computed one. It is the same
+        # `pair_2` call, run for all blocks at once.
+        if cond_pair is not None:
+            pair, pair_mask = cond_pair
+        else:
+            pair, pair_mask = self.pair_2(prev_pos, pair_condition, cond_neighbours,
+                                          resi, chain, batch, mask,
+                                          cyclic_mask=cyclic_mask, init_pos=init_pos)
         features = features + self.attn_2(
             self.layer_norm_3(features), prev_pos / sigma, pair, pair_mask, cond_neighbours)
 
@@ -366,6 +375,12 @@ class DiffusionBlock(nn.Module):
                      if self.precond_edm else sigma)
         pos = self.update_positions(pos, local_norm, out_scale)
         return features, pos.to(local_norm.dtype)
+
+
+def _sync_cond_pair_stack(module, incompatible_keys):
+    """`load_state_dict` post-hook: refresh P7's stacked weight cache."""
+    if getattr(module, "cond_pair_stack", None) is not None:
+        module.cond_pair_stack.sync(module.blocks)
 
 
 class DiffusionStack(nn.Module):
@@ -385,17 +400,45 @@ class DiffusionStack(nn.Module):
             block_cls(config, local_size, atom_count, use_init_pos)
             for _ in range(config.diffusion_depth)
         ])
+        # P7. `MotifAdapterDiffusionBlock.pair_2` reads `pos`, which changes
+        # every block, so the motif path is not a prologue and gets none.
+        self.cond_pair_stack = (
+            None if config.multi_motif else
+            StackedCondPair(self.blocks, config.pair_size, use_init_pos,
+                            cyclic=bool(config.cyclic)))
+        if self.cond_pair_stack is not None:
+            # the stacked weights are a CACHE of the per-block parameters;
+            # re-read them whenever a checkpoint is loaded into this module or
+            # any ancestor of it (`load_model` -> `load_state_dict`).
+            self.register_load_state_dict_post_hook(_sync_cond_pair_stack)
+
+    def batched_cond_pair_available(self) -> bool:
+        """Whether P7's prologue may be used for THIS module, right now.
+
+        Three refusals, all of them about the stacked weights being a CACHE of
+        the per-block parameters rather than the parameters themselves:
+        `multi_motif` has no prologue at all, `train()` mode would read a cache
+        the optimiser has already invalidated, and a grad-enabled call would
+        silently get NO gradient into `pair_2` (the cache is detached). Every
+        inference path in this repo runs under `no_grad`/`set_grad_enabled
+        (False)`, including all four parity tests.
+        """
+        return (opt.BATCH_COND and self.cond_pair_stack is not None
+                and not self.training and not torch.is_grad_enabled())
 
     def forward(self, local, pos, prev_pos, condition, pair_condition, time,
                 resi, chain, batch, mask, neighbour_fn,
-                cyclic_mask=None, init_pos=None):
+                cyclic_mask=None, init_pos=None, cond_pair=None):
         trajectory = []
         for block_idx, block in enumerate(self.blocks):
             current_neighbours, cond_neighbours = neighbour_fn(pos, prev_pos, block_idx)
+            cp = None if cond_pair is None else (cond_pair[0][block_idx],
+                                                 cond_pair[1][block_idx])
             local, pos = block(local, pos, prev_pos, condition, pair_condition,
                                time, resi, chain, batch, mask,
                                current_neighbours, cond_neighbours,
-                               cyclic_mask=cyclic_mask, init_pos=init_pos)
+                               cyclic_mask=cyclic_mask, init_pos=init_pos,
+                               cond_pair=cp)
             trajectory.append(pos)
         return local, pos, torch.stack(trajectory, dim=0)
 
@@ -461,7 +504,12 @@ class MotifAdapterDiffusionBlock(nn.Module):
                 resi: Tensor, chain: Tensor, batch: Tensor, mask: Tensor,
                 current_neighbours: Tensor, cond_neighbours: Tensor,
                 cyclic_mask: Tensor | None = None,
-                init_pos: Tensor | None = None) -> tuple[Tensor, Tensor]:
+                init_pos: Tensor | None = None,
+                cond_pair: tuple[Tensor, Tensor] | None = None
+                ) -> tuple[Tensor, Tensor]:
+        # `cond_pair` (P7) is never supplied here: this block's `pair_2` reads
+        # `pos`, which changes every block, so it is not a prologue.
+        assert cond_pair is None, "MotifAdapterDiffusionBlock has no batched pair_2"
         # `cond_neighbours` carries the motif neighbours for this block; the
         # caller supplies them so the stack keeps one neighbour_fn contract.
         sigma = self.sigma_data

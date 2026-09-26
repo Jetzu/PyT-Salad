@@ -160,6 +160,7 @@ class Diffusion(nn.Module):
         self.vp_time_embedding = c.diffusion_kind in self._VP_KINDS
         self.n_draws = uniform_draw_count(c)
         self.cyclic = bool(c.cyclic)
+        self.depth = int(c.diffusion_depth)
 
     # ------------------------------------------------------------------
     def time_embedding(self, t: Tensor) -> Tensor:
@@ -318,28 +319,48 @@ class Diffusion(nn.Module):
                     prev_pos, pc_used, resi, chain, batch, mask,
                     index_neighbours=index_neighbours)
 
+        def cond_neighbours_of(block_idx: int, cond_pos):
+            base = 1 + block_idx * per_block
+            if self.multi_motif:
+                return extract_motif_neighbours(32)(pair_condition)
+            if hoist:
+                return condition_neighbour_tail(16, num_block)(
+                    cond_dist, cond_seed, pc_used, batch, mask,
+                    uniform=draws[base + 1], uniform2=draws[base + 2])
+            return extract_condition_neighbours(
+                16, 16, 16, num_block)(cond_pos, pc_used, resi, chain, batch,
+                                       mask, uniform=draws[base + 1],
+                                       uniform2=draws[base + 2])
+
+        # P7: the condition branch depends only on `prev_pos` (a loop
+        # invariant) and each block's condition neighbours, so all six blocks'
+        # `pair_2` is one batched prologue. Its `cond_neighbours` have to be
+        # drawn up front, which is why the selector is split out above - the
+        # bits each block gets are unchanged, only the order they are computed
+        # in moves.
+        batch_cond = self.diffusion_stack.batched_cond_pair_available()
+        cond_nbr_stack = None
+        cond_pair = None
+        if batch_cond:
+            cond_nbr_stack = torch.stack(
+                [cond_neighbours_of(i, prev_pos) for i in range(self.depth)])
+            cond_pair = self.diffusion_stack.cond_pair_stack(
+                prev_pos, pc_used, cond_nbr_stack, resi, chain, batch, mask,
+                cyclic_mask=cyclic_mask, init_pos=init_pos)
+
         def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
             base = 1 + block_idx * per_block
             current = extract_neighbours(16, 16, 32)(
                 cur_pos, resi, chain, batch, mask, uniform=draws[base],
                 index_neighbours=index_neighbours)
-            if self.multi_motif:
-                cond = extract_motif_neighbours(32)(pair_condition)
-            elif hoist:
-                cond = condition_neighbour_tail(16, num_block)(
-                    cond_dist, cond_seed, pc_used, batch, mask,
-                    uniform=draws[base + 1], uniform2=draws[base + 2])
-            else:
-                cond = extract_condition_neighbours(
-                    16, 16, 16, num_block)(cond_pos, pc_used, resi, chain, batch,
-                                           mask, uniform=draws[base + 1],
-                                           uniform2=draws[base + 2])
+            cond = (cond_nbr_stack[block_idx] if cond_nbr_stack is not None
+                    else cond_neighbours_of(block_idx, cond_pos))
             return current, cond
 
         local, pos, trajectory = self.diffusion_stack(
             local, pos, prev_pos, condition, pc_used, t_pos,
             resi, chain, batch, mask, neighbour_fn,
-            cyclic_mask=cyclic_mask, init_pos=init_pos)
+            cyclic_mask=cyclic_mask, init_pos=init_pos, cond_pair=cond_pair)
 
         if not need_aa:
             # P2. The three heads below are pure sinks on a non-output step.
@@ -397,30 +418,52 @@ class Diffusion(nn.Module):
                     prev_pos, pair_condition, resi, chain, batch, mask,
                     index_neighbours=index_neighbours)
 
+        def cond_neighbours_of(cond_pos):
+            if c.multi_motif:
+                # the motif block's second neighbour set comes from the motif
+                # distance map, not from self-conditioning geometry
+                return extract_motif_neighbours(32)(pair_condition)
+            if opt.HOIST_NEIGHBOURS:
+                return condition_neighbour_tail(16, 16)(
+                    cond_dist, cond_seed, pair_condition, batch, mask,
+                    uniform=uniform)
+            return extract_condition_neighbours(16, 16, 16, 16)(
+                cond_pos, pair_condition, resi, chain, batch, mask,
+                uniform=uniform)
+
+        # P7, wired here as well as in `forward_core` so the four checkpoint
+        # parity tests - which drive THIS path - actually cover it. The eager
+        # path shares one `uniform` across the blocks, so the six condition
+        # neighbour sets are identical; that changes nothing about the
+        # prologue, which is indexed per block either way.
+        cond_pair = None
+        cond_nbr_stack = None
+        if self.diffusion_stack.batched_cond_pair_available():
+            cond_nbr_stack = torch.stack(
+                [cond_neighbours_of(prev_pos) for _ in range(self.depth)])
+            cond_pair = self.diffusion_stack.cond_pair_stack(
+                prev_pos, pair_condition, cond_nbr_stack, resi, chain, batch,
+                mask, cyclic_mask=cyclic_mask, init_pos=init_pos)
+
         def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
             # the eager path takes a single (N, N) field (or None); the fast
             # path's per-draw stack is handled in forward_core
             current = extract_neighbours(16, 16, 32)(
                 cur_pos, resi, chain, batch, mask, uniform=uniform,
                 index_neighbours=index_neighbours)
-            if c.multi_motif:
-                # the motif block's second neighbour set comes from the motif
-                # distance map, not from self-conditioning geometry
-                cond = extract_motif_neighbours(32)(pair_condition)
-            elif opt.HOIST_NEIGHBOURS:
-                cond = condition_neighbour_tail(16, 16)(
-                    cond_dist, cond_seed, pair_condition, batch, mask,
-                    uniform=uniform)
-            else:
-                cond = extract_condition_neighbours(16, 16, 16, 16)(
-                    cond_pos, pair_condition, resi, chain, batch, mask,
-                    uniform=uniform)
+            # MUST be the same index set the prologue built this block's pair
+            # features from - `attn_2` gathers with it. Re-drawing here would
+            # silently pair block b's features with block b's *other* random
+            # neighbour set (with `uniform=None` the selector draws fresh
+            # Gumbel noise on every call).
+            cond = (cond_nbr_stack[block_idx] if cond_nbr_stack is not None
+                    else cond_neighbours_of(cond_pos))
             return current, cond
 
         local, pos, trajectory = self.diffusion_stack(
             local, pos, prev_pos, condition, pair_condition, t_pos,
             resi, chain, batch, mask, neighbour_fn,
-            cyclic_mask=cyclic_mask, init_pos=init_pos)
+            cyclic_mask=cyclic_mask, init_pos=init_pos, cond_pair=cond_pair)
 
         result = {"trajectory": trajectory, "local": local, "pos": pos}
 

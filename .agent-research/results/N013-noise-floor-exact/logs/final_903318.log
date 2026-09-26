@@ -1,0 +1,139 @@
+### Starting TaskPrologue of job 903318 on h12-12 at Sat Sep 26 10:20:18 AM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 10:20:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   36C    P0             71W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ P=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python
++ R=.agent-research/results/N013-noise-floor-exact
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_graph.py 100
+preset=exact BATCH_COND=True DET_SEGMENT=False aggressive_fusion=True
+  EXPLAIN exact          need_aa=False pair_cond=False graphs 1 breaks 0 []
+  EXPLAIN exact          need_aa=False pair_cond=True  graphs 1 breaks 0 []
+  EXPLAIN exact          need_aa=True  pair_cond=False graphs 1 breaks 0 []
+  EXPLAIN exact          need_aa=True  pair_cond=True  graphs 1 breaks 0 []
+preset=deterministic BATCH_COND=True DET_SEGMENT=True aggressive_fusion=True
+  EXPLAIN deterministic  need_aa=False pair_cond=False graphs 1 breaks 0 []
+  EXPLAIN deterministic  need_aa=False pair_cond=True  graphs 1 breaks 0 []
+  EXPLAIN deterministic  need_aa=True  pair_cond=False graphs 1 breaks 0 []
+  EXPLAIN deterministic  need_aa=True  pair_cond=True  graphs 1 breaks 0 []
++ for L in 50 100 200 400
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 50 --tag n009 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n009         L=50    GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.727 ms  lean  3.025 ms   500-step   1.51 s   compile   271 s
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 50 --tag n013 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n013         L=50    GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.296 ms  lean  2.598 ms   500-step   1.30 s   compile   267 s
++ for L in 50 100 200 400
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 100 --tag n009 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n009         L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  4.376 ms  lean  3.571 ms   500-step   1.79 s   compile   296 s
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 100 --tag n013 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n013         L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.988 ms  lean  3.176 ms   500-step   1.59 s   compile   322 s
++ for L in 50 100 200 400
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 200 --tag n009 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n009         L=200   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  5.778 ms  lean  4.767 ms   500-step   2.38 s   compile   297 s
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 200 --tag n013 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n013         L=200   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  5.449 ms  lean  4.459 ms   500-step   2.23 s   compile   323 s
++ for L in 50 100 200 400
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --tag n009 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n009         L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.759 ms  lean  7.398 ms   500-step   3.70 s   compile   351 s
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --tag n013 --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT n013         L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.585 ms  lean  7.193 ms   500-step   3.60 s   compile   420 s
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 100 --preset deterministic --tag det --no-eager
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT det          L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  4.061 ms  lean  3.258 ms   500-step   1.63 s   compile   184 s
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/generate.py --num_aa 100 --num_designs 3 --fast --preset exact --out_path outputs/n013_exact --seed 42
++ tail -6
+fast path (exact) compiled + captured in 63s (one-time)
+  design 0:    1.5s  CA-CA 3.951 A (min 3.594 max 4.801)  Rg 23.5 A  -> outputs/n013_exact/design_0.pdb
+  design 1:    1.4s  CA-CA 627.382 A (min 38.628 max 1428.927)  Rg 505.2 A  -> outputs/n013_exact/design_1.pdb
+  design 2:    1.4s  CA-CA 3.913 A (min 3.412 max 4.470)  Rg 20.3 A  -> outputs/n013_exact/design_2.pdb
+
+3 designs of 100 aa: median 1.4s, total 4.3s
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/generate.py --num_aa 100 --num_designs 3 --fast --preset deterministic --out_path outputs/n013_det1 --seed 42
++ tail -6
+[2026-09-26T11:10:36.003] error: *** JOB 903318 ON h12-12 CANCELLED AT 2026-09-26T11:10:36 DUE TO TIME LIMIT ***
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 11:10:38 CEST 2026
+= Job-ID             : 903318 on helma
+= Job-Name           : n013_fin
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N013-noise-floor-exact/run_final.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N013-noise-floor-exact
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:50:19
+= Total RAM usage    : 4.8 GiB of assigned 175 GiB (2.7%)
+= Node list          : h12-12
+= Subm/Elig/Start/End: 2026-09-26T10:20:17 / 2026-09-26T10:20:17 / 2026-09-26T10:20:17 / 2026-09-26T11:10:36
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.0G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  5d21h39m13s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 483472, 0 %, 0 %, 1034 MiB, 56576 ms
+NVIDIA H100, 00000000:A6:00.0, 483918, 9 %, 10 %, 1346 MiB, 280036 ms
+NVIDIA H100, 00000000:A6:00.0, 496664, 8 %, 8 %, 1474 MiB, 274199 ms
+NVIDIA H100, 00000000:A6:00.0, 499979, 8 %, 8 %, 1350 MiB, 304987 ms
+NVIDIA H100, 00000000:A6:00.0, 505558, 7 %, 7 %, 1562 MiB, 329910 ms
+NVIDIA H100, 00000000:A6:00.0, 508093, 8 %, 8 %, 1370 MiB, 305787 ms
+NVIDIA H100, 00000000:A6:00.0, 512028, 7 %, 7 %, 1900 MiB, 330965 ms
+NVIDIA H100, 00000000:A6:00.0, 514398, 7 %, 7 %, 1740 MiB, 359773 ms
+NVIDIA H100, 00000000:A6:00.0, 518358, 5 %, 5 %, 2612 MiB, 428003 ms
+NVIDIA H100, 00000000:A6:00.0, 520987, 0 %, 0 %, 1250 MiB, 191336 ms
+NVIDIA H100, 00000000:A6:00.0, 521624, 5 %, 0 %, 1242 MiB, 68484 ms
+NVIDIA H100, 00000000:A6:00.0, 521853, 0 %, 0 %, 1064 MiB, 62694 ms

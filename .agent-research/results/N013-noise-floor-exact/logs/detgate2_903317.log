@@ -1,0 +1,145 @@
+### Starting TaskPrologue of job 903317 on h12-02 at Sat Sep 26 10:20:02 AM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 10:20:02 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   39C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ P=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python
++ R=.agent-research/results/N013-noise-floor-exact
++ export SALAD_OPT_DETSEG=1
++ SALAD_OPT_DETSEG=1
++ export SALAD_OPT_AGGRFUSE=0
++ SALAD_OPT_AGGRFUSE=0
++ G='--length 100 --reps 4 --time'
++ SALAD_OPT_BATCHCOND=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 4 --time --input synth --tag dg2_base --save .agent-research/results/N013-noise-floor-exact/dg2_synth_base.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+FLOOR dg2_base   L=100  synth pos         distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_base   L=100  synth local       distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_base   L=100  synth trajectory  distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+TIME  dg2_base   L=100  IND=[] DET=[] full  4.455 ms  lean  3.630 ms
+saved .agent-research/results/N013-noise-floor-exact/dg2_synth_base.pt
+JSON {"length": 100, "reps": 4, "input": "synth", "preset": "exact", "ind": "", "det": "", "tag": "dg2_base", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 0, "DETSEG": 1}, "pos": {"key": "pos", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "local": {"key": "local", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "trajectory": {"key": "trajectory", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "full_ms": 4.454857002322872, "lean_ms": 3.6304729990661144}
++ SALAD_OPT_BATCHCOND=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 4 --time --input synth --tag dg2_p7 --save .agent-research/results/N013-noise-floor-exact/dg2_synth_p7.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+FLOOR dg2_p7     L=100  synth pos         distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_p7     L=100  synth local       distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_p7     L=100  synth trajectory  distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+TIME  dg2_p7     L=100  IND=[] DET=[] full  4.116 ms  lean  3.292 ms
+saved .agent-research/results/N013-noise-floor-exact/dg2_synth_p7.pt
+JSON {"length": 100, "reps": 4, "input": "synth", "preset": "exact", "ind": "", "det": "", "tag": "dg2_p7", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 1, "DETSEG": 1}, "pos": {"key": "pos", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "local": {"key": "local", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "trajectory": {"key": "trajectory", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "full_ms": 4.11585570157816, "lean_ms": 3.292064997367561}
++ SALAD_OPT_BATCHCOND=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 4 --time --input real --upto 50 --tag dg2_rbase --state-save .agent-research/results/N013-noise-floor-exact/state_t90.pt --save .agent-research/results/N013-noise-floor-exact/dg2_real_base.pt
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+real state at step 50: raw_t=0.900  CA-CA 2.488 A  Rg 11.16 A
+saved frozen state to .agent-research/results/N013-noise-floor-exact/state_t90.pt
+FLOOR dg2_rbase  L=100  real  pos         distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_rbase  L=100  real  local       distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_rbase  L=100  real  trajectory  distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+TIME  dg2_rbase  L=100  IND=[] DET=[] full  4.451 ms  lean  3.625 ms
+saved .agent-research/results/N013-noise-floor-exact/dg2_real_base.pt
+JSON {"length": 100, "reps": 4, "input": "real", "preset": "exact", "ind": "", "det": "", "tag": "dg2_rbase", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 0, "DETSEG": 1}, "pos": {"key": "pos", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "local": {"key": "local", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "trajectory": {"key": "trajectory", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "full_ms": 4.451220304084321, "lean_ms": 3.62495263107121}
++ SALAD_OPT_BATCHCOND=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 4 --time --state-load .agent-research/results/N013-noise-floor-exact/state_t90.pt --tag dg2_rp7 --save .agent-research/results/N013-noise-floor-exact/dg2_real_p7.pt
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+loaded frozen state from .agent-research/results/N013-noise-floor-exact/state_t90.pt
+FLOOR dg2_rp7    L=100  loaded@50 pos         distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_rp7    L=100  loaded@50 local       distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_rp7    L=100  loaded@50 trajectory  distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+TIME  dg2_rp7    L=100  IND=[] DET=[] full  4.117 ms  lean  3.291 ms
+saved .agent-research/results/N013-noise-floor-exact/dg2_real_p7.pt
+JSON {"length": 100, "reps": 4, "input": "loaded@50", "preset": "exact", "ind": "", "det": "", "tag": "dg2_rp7", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 1, "DETSEG": 1}, "pos": {"key": "pos", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "local": {"key": "local", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "trajectory": {"key": "trajectory", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "full_ms": 4.1174909022326265, "lean_ms": 3.2914741973703108}
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 4 --time --state-load .agent-research/results/N013-noise-floor-exact/state_t90.pt --tag dg2_raggr --save .agent-research/results/N013-noise-floor-exact/dg2_real_aggr.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+loaded frozen state from .agent-research/results/N013-noise-floor-exact/state_t90.pt
+FLOOR dg2_raggr  L=100  loaded@50 pos         distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_raggr  L=100  loaded@50 local       distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+FLOOR dg2_raggr  L=100  loaded@50 trajectory  distinct=1  /4 zero_pairs=6/6  mean 0.000e+00  median 0.000e+00  p95 0.000e+00  max 0.000e+00   nonzero: min 0.000e+00 med 0.000e+00
+      clusters [4]
+TIME  dg2_raggr  L=100  IND=[] DET=[] full  4.379 ms  lean  3.576 ms
+saved .agent-research/results/N013-noise-floor-exact/dg2_real_aggr.pt
+JSON {"length": 100, "reps": 4, "input": "loaded@50", "preset": "exact", "ind": "", "det": "", "tag": "dg2_raggr", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 0, "DETSEG": 1}, "pos": {"key": "pos", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "local": {"key": "local", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "trajectory": {"key": "trajectory", "n_reps": 4, "n_pairs": 6, "distinct": 1, "cluster_sizes": [4], "zero_pairs": 6, "mean": 0.0, "median": 0.0, "p95": 0.0, "max": 0.0, "nonzero_min": 0.0, "nonzero_median": 0.0}, "full_ms": 4.37856149704506, "lean_ms": 3.5761285728464527}
++ SALAD_OPT_DETSEG=0
++ SALAD_OPT_BATCHCOND=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 30 --state-load .agent-research/results/N013-noise-floor-exact/state_t90.pt --tag nd_t90 --save .agent-research/results/N013-noise-floor-exact/nd_real_t90.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+loaded frozen state from .agent-research/results/N013-noise-floor-exact/state_t90.pt
+FLOOR nd_t90     L=100  loaded@50 pos         distinct=30 /30 zero_pairs=0/435  mean 1.658e-05  median 1.574e-05  p95 2.575e-05  max 3.481e-05   nonzero: min 8.583e-06 med 1.574e-05
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR nd_t90     L=100  loaded@50 local       distinct=30 /30 zero_pairs=0/435  mean 6.041e-04  median 6.104e-04  p95 8.240e-04  max 1.099e-03   nonzero: min 3.891e-04 med 6.104e-04
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR nd_t90     L=100  loaded@50 trajectory  distinct=30 /30 zero_pairs=0/435  mean 1.790e-05  median 1.717e-05  p95 2.623e-05  max 3.481e-05   nonzero: min 9.775e-06 med 1.717e-05
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+saved .agent-research/results/N013-noise-floor-exact/nd_real_t90.pt
+JSON {"length": 100, "reps": 30, "input": "loaded@50", "preset": "exact", "ind": "", "det": "", "tag": "nd_t90", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 0, "DETSEG": 0}, "pos": {"key": "pos", "n_reps": 30, "n_pairs": 435, "distinct": 30, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 1.657776374486275e-05, "median": 1.5735626220703125e-05, "p95": 2.574920654296875e-05, "max": 3.4809112548828125e-05, "nonzero_min": 8.58306884765625e-06, "nonzero_median": 1.5735626220703125e-05}, "local": {"key": "local", "n_reps": 30, "n_pairs": 435, "distinct": 30, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.0006040857988409698, "median": 0.0006103515625, "p95": 0.000823974609375, "max": 0.0010986328125, "nonzero_min": 0.00038909912109375, "nonzero_median": 0.0006103515625}, "trajectory": {"key": "trajectory", "n_reps": 30, "n_pairs": 435, "distinct": 30, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 1.7901706087286584e-05, "median": 1.71661376953125e-05, "p95": 2.6226043701171875e-05, "max": 3.4809112548828125e-05, "nonzero_min": 9.775161743164062e-06, "nonzero_median": 1.71661376953125e-05}}
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 10:41:03 CEST 2026
+= Job-ID             : 903317 on helma
+= Job-Name           : n013_dg2
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N013-noise-floor-exact/run_detgate2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N013-noise-floor-exact
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:21:15
+= Total RAM usage    : 4.6 GiB of assigned 175 GiB (2.6%)
+= Node list          : h12-02
+= Subm/Elig/Start/End: 2026-09-26T10:19:41 / 2026-09-26T10:19:41 / 2026-09-26T10:19:48 / 2026-09-26T10:41:03
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.9G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      72K      61K      81K  5d22h8m48s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 842636, 8 %, 8 %, 1494 MiB, 325282 ms
+NVIDIA H100, 00000000:A6:00.0, 966515, 7 %, 7 %, 1400 MiB, 333093 ms
+NVIDIA H100, 00000000:A6:00.0, 1094445, 0 %, 0 %, 1104 MiB, 73395 ms
+NVIDIA H100, 00000000:A6:00.0, 1120929, 0 %, 0 %, 1254 MiB, 66385 ms
+NVIDIA H100, 00000000:A6:00.0, 1136873, 8 %, 8 %, 1348 MiB, 238313 ms
+NVIDIA H100, 00000000:A6:00.0, 1190959, 2 %, 2 %, 1182 MiB, 211422 ms

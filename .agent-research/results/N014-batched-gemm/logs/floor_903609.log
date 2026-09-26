@@ -1,0 +1,220 @@
+### Starting TaskPrologue of job 903609 on h11-24 at Sat Sep 26 10:48:51 AM CEST 2026
+Running on cores 32-63 with governor performance
+Sat Sep 26 10:48:51 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ P=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python
++ R=.agent-research/results/N014-batched-gemm
++ md5sum salad_torch/modules/cond_prologue.py salad_torch/modules/diffusion.py
+3d70092f832b8ffd49e9d5df29bfdaed  salad_torch/modules/cond_prologue.py
+bed9c9183fb7e60edaa96a4c252edf21  salad_torch/modules/diffusion.py
++ echo '######## is the bmm itself a NEW noise source? ########'
+######## is the bmm itself a NEW noise source? ########
++ for K in 48 64
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_p7_detprobe.py --length 100 --reps 40 --k 48
+L=100 K=48 depth=6 reps=40 pair_cond=False
+  six sequential mm    distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  one batched bmm      distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  batched vs sequential (same process): equal=False  max|d|=7.629395e-06
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_p7_detprobe.py --length 100 --reps 40 --k 48 --pair-cond
+L=100 K=48 depth=6 reps=40 pair_cond=True
+  six sequential mm    distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  one batched bmm      distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  batched vs sequential (same process): equal=False  max|d|=7.629395e-06
++ for K in 48 64
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_p7_detprobe.py --length 100 --reps 40 --k 64
+L=100 K=64 depth=6 reps=40 pair_cond=False
+  six sequential mm    distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  one batched bmm      distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  batched vs sequential (same process): equal=False  max|d|=7.629395e-06
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_p7_detprobe.py --length 100 --reps 40 --k 64 --pair-cond
+L=100 K=64 depth=6 reps=40 pair_cond=True
+  six sequential mm    distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  one batched bmm      distinct bit-patterns 1/40  clusters [40]  max|d| vs rep0 0.000e+00
+  batched vs sequential (same process): equal=False  max|d|=7.629395e-06
++ echo '######## paired floor: base vs P7 on ONE frozen input, 40 reps each ########'
+######## paired floor: base vs P7 on ONE frozen input, 40 reps each ########
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_floor.py --length 100 --reps 40 --input real --upto 250 --state-save .agent-research/results/N014-batched-gemm/state_real_L100.pt --tag base --save .agent-research/results/N014-batched-gemm/fl_base_L100.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+real state at step 250: raw_t=0.500  CA-CA 3.224 A  Rg 21.77 A
+saved frozen state to .agent-research/results/N014-batched-gemm/state_real_L100.pt
+FLOOR base       L=100  real  pos         distinct=40 /40 zero_pairs=0/780  mean 6.235e-06  median 5.722e-06  p95 8.583e-06  max 1.144e-05   nonzero: min 3.815e-06 med 5.722e-06
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR base       L=100  real  local       distinct=40 /40 zero_pairs=0/780  mean 4.969e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04   nonzero: min 3.662e-04 med 4.883e-04
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR base       L=100  real  trajectory  distinct=40 /40 zero_pairs=0/780  mean 7.747e-06  median 7.629e-06  p95 9.537e-06  max 1.240e-05   nonzero: min 5.722e-06 med 7.629e-06
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+saved .agent-research/results/N014-batched-gemm/fl_base_L100.pt
+JSON {"length": 100, "reps": 40, "input": "real", "preset": "exact", "ind": "", "det": "", "tag": "base", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 1, "DETSEG": 0}, "pos": {"key": "pos", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 6.235027740331134e-06, "median": 5.7220458984375e-06, "p95": 8.58306884765625e-06, "max": 1.1444091796875e-05, "nonzero_min": 3.814697265625e-06, "nonzero_median": 5.7220458984375e-06}, "local": {"key": "local", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.0004969291039742529, "median": 0.00048828125, "p95": 0.0006103515625, "max": 0.0008544921875, "nonzero_min": 0.0003662109375, "nonzero_median": 0.00048828125}, "trajectory": {"key": "trajectory", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 7.7472286648117e-06, "median": 7.62939453125e-06, "p95": 9.5367431640625e-06, "max": 1.239776611328125e-05, "nonzero_min": 5.7220458984375e-06, "nonzero_median": 7.62939453125e-06}}
++ SALAD_OPT_BATCHCOND=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_floor.py --length 100 --reps 40 --input real --state-load .agent-research/results/N014-batched-gemm/state_real_L100.pt --tag p7 --save .agent-research/results/N014-batched-gemm/fl_p7_L100.pt
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+loaded frozen state from .agent-research/results/N014-batched-gemm/state_real_L100.pt
+FLOOR p7         L=100  loaded@250 pos         distinct=40 /40 zero_pairs=0/780  mean 6.374e-06  median 5.722e-06  p95 8.583e-06  max 1.335e-05   nonzero: min 3.815e-06 med 5.722e-06
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR p7         L=100  loaded@250 local       distinct=40 /40 zero_pairs=0/780  mean 5.149e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04   nonzero: min 3.662e-04 med 4.883e-04
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR p7         L=100  loaded@250 trajectory  distinct=40 /40 zero_pairs=0/780  mean 7.942e-06  median 7.629e-06  p95 9.537e-06  max 1.526e-05   nonzero: min 5.722e-06 med 7.629e-06
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+saved .agent-research/results/N014-batched-gemm/fl_p7_L100.pt
+JSON {"length": 100, "reps": 40, "input": "loaded@250", "preset": "exact", "ind": "", "det": "", "tag": "p7", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 1, "DETSEG": 0}, "pos": {"key": "pos", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 6.3741817939444445e-06, "median": 5.7220458984375e-06, "p95": 8.58306884765625e-06, "max": 1.33514404296875e-05, "nonzero_min": 3.814697265625e-06, "nonzero_median": 5.7220458984375e-06}, "local": {"key": "local", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.0005148667842149734, "median": 0.00048828125, "p95": 0.0006103515625, "max": 0.0008544921875, "nonzero_min": 0.0003662109375, "nonzero_median": 0.00048828125}, "trajectory": {"key": "trajectory", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 7.942089723655954e-06, "median": 7.62939453125e-06, "p95": 9.5367431640625e-06, "max": 1.52587890625e-05, "nonzero_min": 5.7220458984375e-06, "nonzero_median": 7.62939453125e-06}}
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_floor.py --length 100 --reps 40 --input real --state-load .agent-research/results/N014-batched-gemm/state_real_L100.pt --tag base2 --save .agent-research/results/N014-batched-gemm/fl_base2_L100.pt
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+loaded frozen state from .agent-research/results/N014-batched-gemm/state_real_L100.pt
+FLOOR base2      L=100  loaded@250 pos         distinct=40 /40 zero_pairs=0/780  mean 6.332e-06  median 5.722e-06  p95 8.583e-06  max 1.144e-05   nonzero: min 3.815e-06 med 5.722e-06
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR base2      L=100  loaded@250 local       distinct=40 /40 zero_pairs=0/780  mean 5.153e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04   nonzero: min 3.662e-04 med 4.883e-04
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR base2      L=100  loaded@250 trajectory  distinct=40 /40 zero_pairs=0/780  mean 7.816e-06  median 7.629e-06  p95 9.537e-06  max 1.287e-05   nonzero: min 5.722e-06 med 7.629e-06
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+saved .agent-research/results/N014-batched-gemm/fl_base2_L100.pt
+JSON {"length": 100, "reps": 40, "input": "loaded@250", "preset": "exact", "ind": "", "det": "", "tag": "base2", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 1, "DETSEG": 0}, "pos": {"key": "pos", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 6.331694294203771e-06, "median": 5.7220458984375e-06, "p95": 8.58306884765625e-06, "max": 1.1444091796875e-05, "nonzero_min": 3.814697265625e-06, "nonzero_median": 5.7220458984375e-06}, "local": {"key": "local", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.0005153485108166933, "median": 0.00048828125, "p95": 0.0006103515625, "max": 0.0008544921875, "nonzero_min": 0.0003662109375, "nonzero_median": 0.00048828125}, "trajectory": {"key": "trajectory", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 7.816232027835213e-06, "median": 7.62939453125e-06, "p95": 9.5367431640625e-06, "max": 1.2874603271484375e-05, "nonzero_min": 5.7220458984375e-06, "nonzero_median": 7.62939453125e-06}}
++ for K in pos local trajectory
++ echo '==== within/cross, key=pos : base vs p7 ===='
+==== within/cross, key=pos : base vs p7 ====
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/cmp_floor.py .agent-research/results/N014-batched-gemm/fl_base_L100.pt .agent-research/results/N014-batched-gemm/fl_p7_L100.pt pos
+A: base L=100 IND='' DET='' input=real
+B: p7 L=100 IND='' DET='' input=loaded@250
+
+[pos] pairwise max|d|
+  within-A       n=780   zero=0     mean 6.235e-06  median 5.722e-06  p95 8.583e-06  max 1.144e-05
+  within-B       n=780   zero=0     mean 6.374e-06  median 5.722e-06  p95 8.583e-06  max 1.335e-05
+  cross A-B      n=1600  zero=0     mean 6.304e-06  median 5.722e-06  p95 8.583e-06  max 1.240e-05
+
+  distinct bit-patterns: A 40  B 40  shared 0
+  A cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B reps landing on an A pattern: 0/40    A reps landing on a B pattern: 0/40
+
+  cross max 1.240e-05  vs within max 1.335e-05  -> INSIDE the floor (cross <= within-A max)
++ echo '==== within/cross, key=pos : base vs base2 (the CONTROL) ===='
+==== within/cross, key=pos : base vs base2 (the CONTROL) ====
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/cmp_floor.py .agent-research/results/N014-batched-gemm/fl_base_L100.pt .agent-research/results/N014-batched-gemm/fl_base2_L100.pt pos
+A: base L=100 IND='' DET='' input=real
+B: base2 L=100 IND='' DET='' input=loaded@250
+
+[pos] pairwise max|d|
+  within-A       n=780   zero=0     mean 6.235e-06  median 5.722e-06  p95 8.583e-06  max 1.144e-05
+  within-B       n=780   zero=0     mean 6.332e-06  median 5.722e-06  p95 8.583e-06  max 1.144e-05
+  cross A-B      n=1600  zero=0     mean 6.289e-06  median 5.722e-06  p95 8.583e-06  max 1.335e-05
+
+  distinct bit-patterns: A 40  B 40  shared 0
+  A cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B reps landing on an A pattern: 0/40    A reps landing on a B pattern: 0/40
+
+  cross max 1.335e-05  vs within max 1.144e-05  -> ABOVE the floor
++ for K in pos local trajectory
++ echo '==== within/cross, key=local : base vs p7 ===='
+==== within/cross, key=local : base vs p7 ====
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/cmp_floor.py .agent-research/results/N014-batched-gemm/fl_base_L100.pt .agent-research/results/N014-batched-gemm/fl_p7_L100.pt local
+A: base L=100 IND='' DET='' input=real
+B: p7 L=100 IND='' DET='' input=loaded@250
+
+[local] pairwise max|d|
+  within-A       n=780   zero=0     mean 4.969e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04
+  within-B       n=780   zero=0     mean 5.149e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04
+  cross A-B      n=1600  zero=0     mean 5.061e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04
+
+  distinct bit-patterns: A 40  B 40  shared 0
+  A cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B reps landing on an A pattern: 0/40    A reps landing on a B pattern: 0/40
+
+  cross max 8.545e-04  vs within max 8.545e-04  -> INSIDE the floor (cross <= within-A max)
++ echo '==== within/cross, key=local : base vs base2 (the CONTROL) ===='
+==== within/cross, key=local : base vs base2 (the CONTROL) ====
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/cmp_floor.py .agent-research/results/N014-batched-gemm/fl_base_L100.pt .agent-research/results/N014-batched-gemm/fl_base2_L100.pt local
+A: base L=100 IND='' DET='' input=real
+B: base2 L=100 IND='' DET='' input=loaded@250
+
+[local] pairwise max|d|
+  within-A       n=780   zero=0     mean 4.969e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04
+  within-B       n=780   zero=0     mean 5.153e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04
+  cross A-B      n=1600  zero=0     mean 5.049e-04  median 4.883e-04  p95 6.104e-04  max 8.545e-04
+
+  distinct bit-patterns: A 40  B 40  shared 0
+  A cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B cluster sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  B reps landing on an A pattern: 0/40    A reps landing on a B pattern: 0/40
+
+  cross max 8.545e-04  vs within max 8.545e-04  -> INSIDE the floor (cross <= within-A max)
++ for K in pos local trajectory
++ echo '==== within/cross, key=trajectory : base vs p7 ===='
+==== within/cross, key=trajectory : base vs p7 ====
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/cmp_floor.py .agent-research/results/N014-batched-gemm/fl_base_L100.pt .agent-research/results/N014-batched-gemm/fl_p7_L100.pt trajectory
+A: base L=100 IND='' DET='' input=real
+B: p7 L=100 IND='' DET='' input=loaded@250
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/cmp_floor.py", line 21, in <module>
+    xa = torch.stack([o[key] for o in A["outs"]]).double()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/cmp_floor.py", line 21, in <listcomp>
+    xa = torch.stack([o[key] for o in A["outs"]]).double()
+                      ~^^^^^
+KeyError: 'trajectory'
++ true
++ echo '==== within/cross, key=trajectory : base vs base2 (the CONTROL) ===='
+==== within/cross, key=trajectory : base vs base2 (the CONTROL) ====
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/cmp_floor.py .agent-research/results/N014-batched-gemm/fl_base_L100.pt .agent-research/results/N014-batched-gemm/fl_base2_L100.pt trajectory
+A: base L=100 IND='' DET='' input=real
+B: base2 L=100 IND='' DET='' input=loaded@250
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/cmp_floor.py", line 21, in <module>
+    xa = torch.stack([o[key] for o in A["outs"]]).double()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/cmp_floor.py", line 21, in <listcomp>
+    xa = torch.stack([o[key] for o in A["outs"]]).double()
+                      ~^^^^^
+KeyError: 'trajectory'
++ true
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 10:57:47 CEST 2026
+= Job-ID             : 903609 on helma
+= Job-Name           : n014_floor
+= Job-Command        : .agent-research/results/N014-batched-gemm/run_floor_p7.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:08:57
+= Total RAM usage    : 3.9 GiB of assigned 175 GiB (2.2%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T10:48:49 / 2026-09-26T10:48:49 / 2026-09-26T10:48:50 / 2026-09-26T10:57:47
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.9G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      72K      61K      81K  5d21h52m4s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1814063, 4 %, 0 %, 976 MiB, 1993 ms
+NVIDIA H100, 00000000:26:00.0, 1814194, 12 %, 1 %, 1006 MiB, 1907 ms
+NVIDIA H100, 00000000:26:00.0, 1814328, 9 %, 0 %, 1054 MiB, 1744 ms
+NVIDIA H100, 00000000:26:00.0, 1814460, 13 %, 1 %, 1032 MiB, 2017 ms
+NVIDIA H100, 00000000:26:00.0, 1814588, 8 %, 8 %, 1560 MiB, 358968 ms
+NVIDIA H100, 00000000:26:00.0, 1820560, 0 %, 0 %, 1248 MiB, 74698 ms
+NVIDIA H100, 00000000:26:00.0, 1821081, 0 %, 0 %, 1248 MiB, 70589 ms

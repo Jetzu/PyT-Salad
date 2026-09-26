@@ -23,7 +23,7 @@ from __future__ import annotations
 import os
 
 __all__ = ["GATHER_ONEHOT", "HOIST_NEIGHBOURS", "SKIP_PAIR_COND", "LEAN_STEPS",
-           "NEED_AUX"]
+           "NEED_AUX", "BATCH_COND", "DET_SEGMENT", "AGGRESSIVE_FUSION"]
 
 
 def _flag(name: str, default: bool = True) -> bool:
@@ -62,3 +62,32 @@ LEAN_STEPS = _flag("SALAD_OPT_LEAN")
 #: back when the forward was 30 broken Dynamo graphs. `SALAD_OPT_AUX=0`
 #: re-tests it against the single-graph forward.
 NEED_AUX = _flag("SALAD_OPT_AUX")
+
+#: P7 (N013) - compute the condition branch's `pair_2` for all six blocks in
+#: one batched prologue (`modules/cond_prologue.StackedCondPair`). Worth
+#: -9.2 % of a lean step at L=100. The feature tensors are bit-identical (the
+#: builders are elementwise on a tiled residue axis); the seven projections and
+#: the two MLP layers become `bmm(batch=6)` instead of six `mm`s, which is a
+#: reassociation - the same class as P5, and a weaker one.
+#: Never taken for `multi_motif` (its `pair_2` reads `pos`, not `prev_pos`)
+#: nor in `train()` mode (the stacked weights are a cache of the parameters).
+#: `SALAD_OPT_BATCHCOND=0` turns it off; a preset can only turn it off too.
+BATCH_COND = _flag("SALAD_OPT_BATCHCOND")
+
+#: N013 item 4 - a DETERMINISTIC segment reduction, so `--seed` pins a CUDA
+#: run. `index_sum`'s `scatter_add` is an atomicAdd whose ordering varies at
+#: ~1.6e-7, and the neighbour argsort amplifies that into a discrete tie flip
+#: (notes/04 section 8). Replacing it with a one-hot matmul is deterministic by
+#: construction and needs no process-global mode. It CHANGES THE SUMMATION
+#: ORDER, so it is its own parity baseline - never the default.
+DET_SEGMENT = _flag("SALAD_OPT_DETSEG", default=False)
+
+#: N013 - inductor's `aggressive_fusion` scheduler knob. It merges more nodes
+#: into one kernel and is worth -1.4 to -2.4 % of the step. Measured
+#: BIT-IDENTICAL twice over: on CPU (deterministic by construction, L=64 and
+#: L=100, all eleven outputs, `x_cpu_bits.py`) and ON THE H100 under the
+#: deterministic segment reduction, which removes the only source of CUDA
+#: run-to-run noise (`cmp_floor.py dg_synth_base dg_synth_aggr`: one shared bit
+#: pattern). So it needs no noise-floor argument - it changes no element's
+#: arithmetic. `SALAD_OPT_AGGRFUSE=0` turns it off.
+AGGRESSIVE_FUSION = _flag("SALAD_OPT_AGGRFUSE")

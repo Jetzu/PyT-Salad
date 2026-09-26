@@ -1,0 +1,128 @@
+### Starting TaskPrologue of job 903736 on h11-24 at Sat Sep 26 11:45:21 AM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 11:45:22 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   39C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ P=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python
++ R=.agent-research/results/N014-batched-gemm
++ export SALAD_OPT_AGGRFUSE=0
++ SALAD_OPT_AGGRFUSE=0
++ echo '#### CONTROL: CPU, deterministic - the rerun floor MUST read 0.000e+00 ####'
+#### CONTROL: CPU, deterministic - the rerun floor MUST read 0.000e+00 ####
++ OMP_NUM_THREADS=16
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_p7_realstate.py --state .agent-research/results/N014-batched-gemm/st2_L100.pt --reps 3 --device cpu
+loaded .agent-research/results/N014-batched-gemm/st2_L100.pt (upto=250)  keys=['aa_gt', 'batch_index', 'chain_index', 'corrupt_aa', 'mask', 'pos', 'pos_noised', 'residue_index', 'seq', 'seq_noised', 't_pos', 't_seq']
+pinned uniform (19, 100, 100)
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/x_p7_realstate.py", line 57, in <module>
+    ref = run(False)
+          ^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/x_p7_realstate.py", line 51, in run
+    out, _ = m(data, prev, predict_aa=True, uniform=data.get("uniform"),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/model.py", line 78, in forward
+    result = self.diffusion(data, prev, predict_aa=predict_aa,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py", line 398, in forward
+    distogram_neighbours = get_random_neighbours(c.fape_neighbours)(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/neighbours.py", line 152, in inner
+    return get_neighbours(count)(distance, pair_mask, neighbours)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/neighbours.py", line 69, in inner
+    picked = distance[index[:, None], knn]
+             ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+IndexError: shape mismatch: indexing tensors could not be broadcast together with shapes [19, 1], [19, 100, 64]
++ true
++ echo '#### the real mid-trajectory state the 2.72 A came from, on CUDA ####'
+#### the real mid-trajectory state the 2.72 A came from, on CUDA ####
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N014-batched-gemm/x_p7_realstate.py --state .agent-research/results/N014-batched-gemm/st2_L100.pt --reps 12
+loaded .agent-research/results/N014-batched-gemm/st2_L100.pt (upto=250)  keys=['aa_gt', 'batch_index', 'chain_index', 'corrupt_aa', 'mask', 'pos', 'pos_noised', 'residue_index', 'seq', 'seq_noised', 't_pos', 't_seq']
+pinned uniform (19, 100, 100)
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/x_p7_realstate.py", line 57, in <module>
+    ref = run(False)
+          ^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N014-batched-gemm/x_p7_realstate.py", line 51, in run
+    out, _ = m(data, prev, predict_aa=True, uniform=data.get("uniform"),
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/model.py", line 78, in forward
+    result = self.diffusion(data, prev, predict_aa=predict_aa,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py", line 398, in forward
+    distogram_neighbours = get_random_neighbours(c.fape_neighbours)(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/neighbours.py", line 152, in inner
+    return get_neighbours(count)(distance, pair_mask, neighbours)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/geometry/neighbours.py", line 69, in inner
+    picked = distance[index[:, None], knn]
+             ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+IndexError: shape mismatch: indexing tensors could not be broadcast together with shapes [19, 1], [19, 100, 64]
++ true
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 11:45:34 CEST 2026
+= Job-ID             : 903736 on helma
+= Job-Name           : n014_real2
+= Job-Command        : .agent-research/results/N014-batched-gemm/run_realstate2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:00:29
+= Total RAM usage    : 1.1 GiB of assigned 175 GiB (0.6%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T11:45:05 / 2026-09-26T11:45:05 / 2026-09-26T11:45:05 / 2026-09-26T11:45:34
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.9G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  5d21h4m16s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 1860356, 0 %, 0 %, 778 MiB, 2396 ms

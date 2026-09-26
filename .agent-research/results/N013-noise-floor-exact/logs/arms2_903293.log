@@ -1,0 +1,93 @@
+### Starting TaskPrologue of job 903293 on h11-24 at Sat Sep 26 10:05:56 AM CEST 2026
+Running on cores 0-31 with governor performance
+Sat Sep 26 10:05:56 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   37C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ P=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python
++ R=.agent-research/results/N013-noise-floor-exact
++ F='--length 100 --reps 40 --input synth --time'
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 40 --input synth --time --tag base --save .agent-research/results/N013-noise-floor-exact/a2_base.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+FLOOR base       L=100  synth pos         distinct=40 /40 zero_pairs=0/780  mean 9.025e-05  median 8.535e-05  p95 1.650e-04  max 2.339e-04   nonzero: min 2.718e-05 med 8.535e-05
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR base       L=100  synth local       distinct=40 /40 zero_pairs=0/780  mean 2.505e-03  median 2.213e-03  p95 4.684e-03  max 6.111e-03   nonzero: min 8.545e-04 med 2.213e-03
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR base       L=100  synth trajectory  distinct=40 /40 zero_pairs=0/780  mean 1.004e-04  median 9.382e-05  p95 1.743e-04  max 2.471e-04   nonzero: min 3.433e-05 med 9.382e-05
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+TIME  base       L=100  IND=[] DET=[] full  4.376 ms  lean  3.562 ms
+saved .agent-research/results/N013-noise-floor-exact/a2_base.pt
+JSON {"length": 100, "reps": 40, "input": "synth", "preset": "exact", "ind": "", "det": "", "tag": "base", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 0, "DETSEG": 0}, "pos": {"key": "pos", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 9.024857718031853e-05, "median": 8.535385131835938e-05, "p95": 0.00016498565673828125, "max": 0.0002338886260986328, "nonzero_min": 2.7179718017578125e-05, "nonzero_median": 8.535385131835938e-05}, "local": {"key": "local", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.0025051140692085028, "median": 0.0022125244140625, "p95": 0.0046844482421875, "max": 0.00611114501953125, "nonzero_min": 0.0008544921875, "nonzero_median": 0.0022125244140625}, "trajectory": {"key": "trajectory", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.00010036279854830354, "median": 9.381771087646484e-05, "p95": 0.0001742839813232422, "max": 0.00024706125259399414, "nonzero_min": 3.4332275390625e-05, "nonzero_median": 9.381771087646484e-05}, "full_ms": 4.376073833554983, "lean_ms": 3.5620687665262567}
++ SALAD_IND=aggressive_fusion=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 40 --input synth --time --tag aggr --save .agent-research/results/N013-noise-floor-exact/a2_aggr.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+FLOOR aggr       L=100  synth pos         distinct=40 /40 zero_pairs=0/780  mean 9.794e-05  median 8.965e-05  p95 1.823e-04  max 3.283e-04   nonzero: min 2.491e-05 med 8.965e-05
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR aggr       L=100  synth local       distinct=40 /40 zero_pairs=0/780  mean 2.826e-03  median 2.392e-03  p95 5.638e-03  max 8.026e-03   nonzero: min 7.935e-04 med 2.392e-03
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR aggr       L=100  synth trajectory  distinct=40 /40 zero_pairs=0/780  mean 1.082e-04  median 9.990e-05  p95 2.042e-04  max 3.604e-04   nonzero: min 3.280e-05 med 9.990e-05
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+TIME  aggr       L=100  IND=[aggressive_fusion=1] DET=[] full  4.295 ms  lean  3.491 ms
+saved .agent-research/results/N013-noise-floor-exact/a2_aggr.pt
+JSON {"length": 100, "reps": 40, "input": "synth", "preset": "exact", "ind": "aggressive_fusion=1", "det": "", "tag": "aggr", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 0, "DETSEG": 0}, "pos": {"key": "pos", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 9.794145444175228e-05, "median": 8.96453857421875e-05, "p95": 0.00018227100372314453, "max": 0.00032830238342285156, "nonzero_min": 2.491474151611328e-05, "nonzero_median": 8.96453857421875e-05}, "local": {"key": "local", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.0028262408450245857, "median": 0.002391815185546875, "p95": 0.00563812255859375, "max": 0.008026123046875, "nonzero_min": 0.00079345703125, "nonzero_median": 0.002391815185546875}, "trajectory": {"key": "trajectory", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.00010818649752764031, "median": 9.989738464355469e-05, "p95": 0.00020420551300048828, "max": 0.0003604292869567871, "nonzero_min": 3.279745578765869e-05, "nonzero_median": 9.989738464355469e-05}, "full_ms": 4.294562766638895, "lean_ms": 3.491018632970129}
++ SALAD_OPT_BATCHCOND=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u .agent-research/results/N013-noise-floor-exact/x_floor.py --length 100 --reps 40 --input synth --time --tag p7 --save .agent-research/results/N013-noise-floor-exact/a2_p7.pt
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+gate: pair_cond_active=None graphs=[(False, False), (True, False)]
+FLOOR p7         L=100  synth pos         distinct=40 /40 zero_pairs=0/780  mean 4.015e-04  median 3.796e-04  p95 7.429e-04  max 1.049e-03   nonzero: min 6.866e-05 med 3.796e-04
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR p7         L=100  synth local       distinct=40 /40 zero_pairs=0/780  mean 1.384e-02  median 1.301e-02  p95 2.679e-02  max 3.589e-02   nonzero: min 2.083e-03 med 1.301e-02
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+FLOOR p7         L=100  synth trajectory  distinct=40 /40 zero_pairs=0/780  mean 6.291e-04  median 6.025e-04  p95 1.205e-03  max 1.831e-03   nonzero: min 7.963e-05 med 6.025e-04
+      clusters [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+TIME  p7         L=100  IND=[] DET=[] full  4.048 ms  lean  3.222 ms
+saved .agent-research/results/N013-noise-floor-exact/a2_p7.pt
+JSON {"length": 100, "reps": 40, "input": "synth", "preset": "exact", "ind": "", "det": "", "tag": "p7", "flags": {"GATHER": 1, "HOIST": 1, "NOPC": 1, "AUX": 1, "BATCHCOND": 1, "DETSEG": 0}, "pos": {"key": "pos", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.000401479919673875, "median": 0.0003795623779296875, "p95": 0.0007429122924804688, "max": 0.0010485649108886719, "nonzero_min": 6.866455078125e-05, "nonzero_median": 0.0003795623779296875}, "local": {"key": "local", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.013839416205883026, "median": 0.013011932373046875, "p95": 0.02679443359375, "max": 0.035888671875, "nonzero_min": 0.00208282470703125, "nonzero_median": 0.013011932373046875}, "trajectory": {"key": "trajectory", "n_reps": 40, "n_pairs": 780, "distinct": 40, "cluster_sizes": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], "zero_pairs": 0, "mean": 0.0006290993769653141, "median": 0.0006024837493896484, "p95": 0.0012050867080688477, "max": 0.0018305778503417969, "nonzero_min": 7.963180541992188e-05, "nonzero_median": 0.0006024837493896484}, "full_ms": 4.048403300112113, "lean_ms": 3.221552499841588}
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 10:20:54 CEST 2026
+= Job-ID             : 903293 on helma
+= Job-Name           : n013_a2
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N013-noise-floor-exact/run_arms2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N013-noise-floor-exact
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:15:03
+= Total RAM usage    : 4.0 GiB of assigned 175 GiB (2.3%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T10:05:51 / 2026-09-26T10:05:51 / 2026-09-26T10:05:51 / 2026-09-26T10:20:54
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.2G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      72K      61K      81K  5d22h28m57s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 1787384, 7 %, 7 %, 1350 MiB, 327469 ms
+NVIDIA H100, 00000000:06:00.0, 1797424, 7 %, 7 %, 1348 MiB, 230771 ms
+NVIDIA H100, 00000000:06:00.0, 1799887, 7 %, 7 %, 1566 MiB, 332128 ms

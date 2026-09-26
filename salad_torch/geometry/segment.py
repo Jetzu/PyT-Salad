@@ -15,8 +15,31 @@ from __future__ import annotations
 import torch
 from torch import Tensor
 
+from .. import opt
+
 __all__ = ["index_sum", "index_mean", "index_max", "index_var", "index_std",
-           "index_count", "unique_chain"]
+           "index_count", "unique_chain", "det_segment_sum"]
+
+
+def det_segment_sum(masked: Tensor, index: Tensor) -> Tensor:
+    """`scatter_add` written as a one-hot matmul - DETERMINISTIC on CUDA.
+
+    `scatter_add` lowers to `atomicAdd`, whose accumulation order varies from
+    run to run; measured on an H100 that is ~1.6e-7 per call, and the
+    neighbour argsort downstream turns it into a DISCRETE tie flip, so two
+    identical commands produce different proteins (notes/04 section 8).
+
+    A matmul against the segment indicator matrix computes exactly the same
+    sums with a fixed reduction tree, so it is reproducible without any
+    process-global `use_deterministic_algorithms` mode - but the tree is a
+    DIFFERENT one, so this is not bit-compatible with the default path and
+    needs its own parity baseline. See `opt.DET_SEGMENT`.
+    """
+    n = masked.shape[0]
+    flat = masked.reshape(n, -1)
+    ar = torch.arange(n, device=index.device)
+    onehot = (index.view(1, n) == ar.view(n, 1)).to(flat.dtype)
+    return (onehot @ flat).view_as(masked)
 
 
 def _segments(index: Tensor) -> int:
@@ -57,9 +80,12 @@ def index_sum(data: Tensor, index: Tensor, mask: Tensor, apply_mask: bool = True
     if valid is not None:
         masked = torch.where(valid.view(-1, *([1] * (data.dim() - 1))),
                              masked, torch.zeros_like(masked))
-    out = torch.zeros_like(data)
-    idx = index.view(-1, *([1] * (data.dim() - 1))).expand_as(data)
-    out = out.scatter_add(0, idx, masked)
+    if opt.DET_SEGMENT and masked.is_floating_point():
+        out = det_segment_sum(masked, index)
+    else:
+        out = torch.zeros_like(data)
+        idx = index.view(-1, *([1] * (data.dim() - 1))).expand_as(data)
+        out = out.scatter_add(0, idx, masked)
     result = out[index]
     if apply_mask:
         result = torch.where(mask.bool(), result, torch.zeros_like(result))

@@ -1,0 +1,117 @@
+### Starting TaskPrologue of job 903624 on h11-24 at Sat Sep 26 11:00:13 AM CEST 2026
+Running on cores 32-63 with governor performance
+Sat Sep 26 11:00:13 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
++ cd /home/hpc/v181bb/v181bb10/SALAD_torch
++ P=/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python
++ L=400
++ md5sum salad_torch/modules/cond_prologue.py salad_torch/modules/blocks.py salad_torch/modules/diffusion.py salad_torch/modules/fast.py salad_torch/opt.py
+3d70092f832b8ffd49e9d5df29bfdaed  salad_torch/modules/cond_prologue.py
+6d36435085525e4ba5a7eb776e9a926d  salad_torch/modules/blocks.py
+bed9c9183fb7e60edaa96a4c252edf21  salad_torch/modules/diffusion.py
+8e460f003e5c5e73dd993a7dc0543d80  salad_torch/modules/fast.py
+d1c2ef0edc1389fc8a920f23fc95cfc3  salad_torch/opt.py
++ for r in 1 2 3
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag off_r1
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT off_r1       L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.735 ms  lean  7.343 ms   500-step   3.67 s   compile   370 s
++ SALAD_OPT_BATCHCOND=1
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag p7_r1
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT p7_r1        L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.605 ms  lean  7.233 ms   500-step   3.62 s   compile   414 s
++ SALAD_OPT_BATCHCOND=1
++ SALAD_OPT_AGGRFUSE=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag ship_r1
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT ship_r1      L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.543 ms  lean  7.161 ms   500-step   3.58 s   compile   199 s
++ for r in 1 2 3
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag off_r2
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT off_r2       L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.772 ms  lean  7.348 ms   500-step   3.68 s   compile    71 s
++ SALAD_OPT_BATCHCOND=1
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag p7_r2
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT p7_r2        L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.609 ms  lean  7.232 ms   500-step   3.62 s   compile    65 s
++ SALAD_OPT_BATCHCOND=1
++ SALAD_OPT_AGGRFUSE=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag ship_r2
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT ship_r2      L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.544 ms  lean  7.189 ms   500-step   3.60 s   compile    80 s
++ for r in 1 2 3
++ SALAD_OPT_BATCHCOND=0
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag off_r3
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT off_r3       L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.754 ms  lean  7.373 ms   500-step   3.69 s   compile    83 s
++ SALAD_OPT_BATCHCOND=1
++ SALAD_OPT_AGGRFUSE=0
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag p7_r3
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT p7_r3        L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.648 ms  lean  7.249 ms   500-step   3.63 s   compile    65 s
++ SALAD_OPT_BATCHCOND=1
++ SALAD_OPT_AGGRFUSE=1
++ /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python -u scripts/bench_one.py --length 400 --no-eager --tag ship_r3
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT ship_r3      L=400   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  8.580 ms  lean  7.197 ms   500-step   3.60 s   compile    65 s
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 11:24:49 CEST 2026
+= Job-ID             : 903624 on helma
+= Job-Name           : n14b400
+= Job-Command        : .agent-research/results/N014-batched-gemm/run_bench2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:24:37
+= Total RAM usage    : 4.0 GiB of assigned 175 GiB (2.3%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T11:00:10 / 2026-09-26T11:00:10 / 2026-09-26T11:00:12 / 2026-09-26T11:24:49
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.9G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  5d21h25m2s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1822458, 6 %, 6 %, 1740 MiB, 381476 ms
+NVIDIA H100, 00000000:26:00.0, 1838240, 6 %, 6 %, 2460 MiB, 422935 ms
+NVIDIA H100, 00000000:26:00.0, 1846388, 9 %, 9 %, 2616 MiB, 207295 ms
+NVIDIA H100, 00000000:26:00.0, 1848939, 0 %, 0 %, 1736 MiB, 73804 ms
+NVIDIA H100, 00000000:26:00.0, 1849860, 0 %, 0 %, 2310 MiB, 67177 ms
+NVIDIA H100, 00000000:26:00.0, 1850641, 0 %, 0 %, 2402 MiB, 82096 ms
+NVIDIA H100, 00000000:26:00.0, 1852064, 0 %, 0 %, 1736 MiB, 85147 ms
+NVIDIA H100, 00000000:26:00.0, 1853019, 0 %, 0 %, 2310 MiB, 67487 ms
+NVIDIA H100, 00000000:26:00.0, 1853330, 0 %, 0 %, 2402 MiB, 67306 ms
