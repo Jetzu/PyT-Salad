@@ -32,7 +32,7 @@ from torch import Tensor, nn
 from .. import opt
 from .diffusion import uniform_draw_count
 
-__all__ = ["FastDenoiser", "GroupFastDenoiser", "PRESETS", "autosize_group"]
+__all__ = ["FastDenoiser", "GroupFastDenoiser", "PRESETS", "memory_bound_group"]
 
 #: `SALAD_OPT_DETSEG=1` forces the deterministic segment reduction on for every
 #: preset; captured here because `FastDenoiser` writes `opt.DET_SEGMENT`.
@@ -729,8 +729,9 @@ class GroupFastDenoiser(nn.Module):
     Portability, because this is squarely the kind of optimisation that gets
     over-fitted to one card:
 
-    * `group_size` is a runtime parameter (`autosize_group` derives a default
-      from ``multi_processor_count`` and free VRAM), never a constant;
+    * `group_size` is a runtime parameter, never a constant, and
+      ``group_size="auto"`` MEASURES it on the device in hand (`_autotune`)
+      rather than evaluating a formula fitted to one card;
     * ``group_size=1`` captures a single-stream body byte-for-byte identical
       to `FastDenoiser`'s, so degrading to "no grouping" is the same code
       path, not a fallback branch;
