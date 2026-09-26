@@ -1,0 +1,38 @@
+gates on: /hnvme/workspace/v181bb10-salad/n015-worktree   HEAD c5ab7a0
+[default_vp] [PASS] aatype      0/48 differ
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] [PASS] aatype      0/48 differ
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] [PASS] aatype      0/48 differ
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] [PASS] aatype      0/80 differ
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00020 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] index_count                         max|d|=0.00e+00
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] trajectory  rel=2.206e-06  max|d|=2.213e-04
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0003 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] final structure deviation: mean 0.05374 A, max 0.35083 A   (self-divergence floor: mean 0.00650 A)
+[test_sampling_parity] [PASS] final/noise-floor ratio = 8.3x
+[test_sampling_parity] generated CA-CA: mean 3.762 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=0

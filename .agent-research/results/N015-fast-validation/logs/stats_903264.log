@@ -1,0 +1,53 @@
+
+================ ALL DESIGNS ================
+arm          n        CA-CA (A)           Rg (A)            helix           strand             coil     clash/design  diverged
+a_exact     40   3.7605+-0.0128      12.77+-0.93     0.560+-0.349     0.359+-0.318     0.081+-0.047       0.30+-1.04         0
+b_tf32      40   3.7645+-0.0113      12.69+-1.08     0.549+-0.329     0.373+-0.299     0.078+-0.050       0.30+-0.61         0
+c_sched     40   3.7630+-0.0131      12.87+-1.36     0.581+-0.303     0.337+-0.275     0.082+-0.053       0.10+-0.30         0
+d_fast      40   3.7595+-0.0122      13.05+-2.17     0.584+-0.324     0.330+-0.297     0.086+-0.047       0.25+-0.49         0
+
+-- Welch t-test vs a_exact (p < 0.05 flagged *, p < 0.01 **)
+arm                         CA-CA (A)                     Rg (A)                      helix                     strand                       coil               clash/design
+b_tf32     d=+0.0040 t=+1.48 p=0.144    d=-0.08 t=-0.35 p=0.724   d=-0.011 t=-0.14 p=0.885   d=+0.014 t=+0.20 p=0.843   d=-0.003 t=-0.25 p=0.802    d=+0.00 t=+0.00 p=1.000 
+c_sched    d=+0.0025 t=+0.87 p=0.386    d=+0.11 t=+0.41 p=0.680   d=+0.021 t=+0.29 p=0.775   d=-0.023 t=-0.34 p=0.736   d=+0.002 t=+0.13 p=0.894    d=-0.20 t=-1.16 p=0.250 
+d_fast     d=-0.0010 t=-0.36 p=0.721    d=+0.29 t=+0.77 p=0.447   d=+0.024 t=+0.32 p=0.751   d=-0.029 t=-0.43 p=0.669   d=+0.005 t=+0.52 p=0.602    d=-0.05 t=-0.27 p=0.785 
+
+================ CONVERGED ONLY (diverged designs dropped) ================
+arm          n        CA-CA (A)           Rg (A)            helix           strand             coil     clash/design  diverged
+a_exact     40   3.7605+-0.0128      12.77+-0.93     0.560+-0.349     0.359+-0.318     0.081+-0.047       0.30+-1.04         0
+b_tf32      40   3.7645+-0.0113      12.69+-1.08     0.549+-0.329     0.373+-0.299     0.078+-0.050       0.30+-0.61         0
+c_sched     40   3.7630+-0.0131      12.87+-1.36     0.581+-0.303     0.337+-0.275     0.082+-0.053       0.10+-0.30         0
+d_fast      40   3.7595+-0.0122      13.05+-2.17     0.584+-0.324     0.330+-0.297     0.086+-0.047       0.25+-0.49         0
+
+-- Welch t-test vs a_exact (p < 0.05 flagged *, p < 0.01 **)
+arm                         CA-CA (A)                     Rg (A)                      helix                     strand                       coil               clash/design
+b_tf32     d=+0.0040 t=+1.48 p=0.144    d=-0.08 t=-0.35 p=0.724   d=-0.011 t=-0.14 p=0.885   d=+0.014 t=+0.20 p=0.843   d=-0.003 t=-0.25 p=0.802    d=+0.00 t=+0.00 p=1.000 
+c_sched    d=+0.0025 t=+0.87 p=0.386    d=+0.11 t=+0.41 p=0.680   d=+0.021 t=+0.29 p=0.775   d=-0.023 t=-0.34 p=0.736   d=+0.002 t=+0.13 p=0.894    d=-0.20 t=-1.16 p=0.250 
+d_fast     d=-0.0010 t=-0.36 p=0.721    d=+0.29 t=+0.77 p=0.447   d=+0.024 t=+0.32 p=0.751   d=-0.029 t=-0.43 p=0.669   d=+0.005 t=+0.52 p=0.602    d=-0.05 t=-0.27 p=0.785 
+
+per-design metrics -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N015-fast-validation/per_design.json
+
+-- what n=40 could have detected (two-sided alpha=0.05, power 0.80)
+metric          sd(exact)   SE(diff)        MDE   largest |observed d|
+CA-CA (A)          0.0128     0.0027     0.0076                 0.0040
+Rg (A)               0.93       0.23       0.63                   0.29
+helix               0.349      0.076      0.213                  0.024
+strand              0.318      0.069      0.193                  0.029
+coil                0.047      0.011      0.031                  0.005
+clash/design         1.04       0.19       0.53                   0.20
+
+-- spread vs a_exact: Brown-Forsythe (median-centred Levene)
+arm                             CA-CA (A)                         Rg (A)                          helix                         strand                           coil                   clash/design
+b_tf32     sd 0.0113/0.0128 W= 0.36 p=0.5518  sd 1.08/0.93 W= 0.00 p=0.9782  sd 0.329/0.349 W= 0.19 p=0.6604  sd 0.299/0.318 W= 0.33 p=0.5658  sd 0.050/0.047 W= 0.22 p=0.6394  sd 0.61/1.04 W= 0.00 p=1.0000 
+c_sched    sd 0.0131/0.0128 W= 0.26 p=0.6120  sd 1.36/0.93 W= 0.04 p=0.8349  sd 0.303/0.349 W= 1.44 p=0.2344  sd 0.275/0.318 W= 1.78 p=0.1866  sd 0.053/0.047 W= 1.34 p=0.2508  sd 0.30/1.04 W= 1.36 p=0.2477 
+d_fast     sd 0.0122/0.0128 W= 0.01 p=0.9428  sd 2.17/0.93 W= 0.68 p=0.4108  sd 0.324/0.349 W= 0.43 p=0.5142  sd 0.297/0.318 W= 0.37 p=0.5461  sd 0.047/0.047 W= 0.17 p=0.6817  sd 0.49/1.04 W= 0.08 p=0.7847 
+
+-- tail counts (threshold = exact mean +- 3 sd of the EXACT arm)
+CA-CA (A)      outside [3.7221, 3.7988]: a_exact 0 b_tf32 0 c_sched 0 d_fast 0
+Rg (A)         outside [9.97, 15.56]: a_exact 1 b_tf32 1 c_sched 2 d_fast 3
+
+-- tails (worst single design per arm)
+a_exact    CA-CA min 3.423 max 3.967   per-design CA-CA mean range 3.7304..3.7876   Rg range 11.6..15.6  max clash 6
+b_tf32     CA-CA min 3.531 max 3.958   per-design CA-CA mean range 3.7341..3.7895   Rg range 11.5..16.9  max clash 2
+c_sched    CA-CA min 3.428 max 3.958   per-design CA-CA mean range 3.7388..3.7899   Rg range 11.6..19.6  max clash 1
+d_fast     CA-CA min 3.282 max 3.957   per-design CA-CA mean range 3.7316..3.7868   Rg range 11.7..25.1  max clash 2

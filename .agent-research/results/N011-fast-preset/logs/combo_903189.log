@@ -25,3 +25,36 @@ Sat Sep 26 09:05:12 2026
 ---------- base
 RESULT combo variant=base        preset=fast  L=100  full  3.739 ms  lean  3.007 ms  compile   301s
 ---------- topk
+RESULT combo variant=topk        preset=fast  L=100  full  3.902 ms  lean  3.176 ms  compile   194s
+---------- combo
+Traceback (most recent call last):
+AssertionError: ops.sort is only supported in persistent reductions
+Traceback (most recent call last):
+AssertionError: ops.sort is only supported in persistent reductions
+---------- combo_topk
+RESULT combo variant=combo_topk  preset=fast  L=100  full  3.662 ms  lean  2.978 ms  compile   449s
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 09:22:31 CEST 2026
+= Job-ID             : 903189 on helma
+= Job-Name           : n011_cmb
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset/run_combo.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:55:00
+= Elapsed runtime    : 00:17:19
+= Total RAM usage    : 3.9 GiB of assigned 175 GiB (2.2%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T09:05:08 / 2026-09-26T09:05:08 / 2026-09-26T09:05:12 / 2026-09-26T09:22:31
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.2G   104.9G   209.7G        N/A     455K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  5d23h27m20s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1736831, 8 %, 8 %, 1348 MiB, 310688 ms
+NVIDIA H100, 00000000:26:00.0, 1746688, 3 %, 3 %, 1458 MiB, 203517 ms
+NVIDIA H100, 00000000:26:00.0, 1750766, 0 %, 0 %, 672 MiB, 54060 ms
+NVIDIA H100, 00000000:26:00.0, 1751673, 19 %, 21 %, 1498 MiB, 458290 ms

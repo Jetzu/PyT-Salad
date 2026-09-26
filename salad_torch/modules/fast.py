@@ -78,10 +78,37 @@ PRESETS: dict[str, dict] = {
     # other 2x. JAX salad is 1.56 s per design, so this is ~2.7x JAX and
     # ~2.5x the exact path.
     #
-    # Quality gate, 8 de-novo designs at L=100 (`ss.py`, seed 42), exact in
-    # brackets: CA-CA 3.7572 +- 0.0160 A [3.7601 +- 0.0062], Rg 12.9 +- 0.9 A
-    # [12.5 +- 0.8], helix 0.591 [0.605], strand 0.328 [0.319], coil 0.081
-    # [0.076], 0 NaN. Ordered fraction 0.919 against 0.924: not collapsed.
+    # QUALITY: validated at n=160 designs per arm, not at the n=8 this preset
+    # shipped on (N015, jobs 903264 + 903296; L=100, seeds 42 and 1234 pooled).
+    # Halving the schedule is the only knob here that changes the TRAJECTORY
+    # rather than the arithmetic, so it was factorised out and tested on its
+    # own. Converged designs, `exact` in brackets:
+    #
+    #                      CA-CA (A)        Rg (A)      helix  strand  diverged
+    #   exact         3.7628 +- 0.0137  12.89 +- 1.76   0.566   0.353    2/160
+    #   TF32 only     3.7615 +- 0.0123  12.89 +- 1.46   0.572   0.351    0/160
+    #   schedule only 3.7627 +- 0.0141  12.89 +- 1.56   0.575   0.345    0/160
+    #   fast          3.7613 +- 0.0131  12.90 +- 1.89   0.580   0.335    0/160
+    #
+    # Welch vs exact: every metric p >= 0.24. Two-sample KS (the shape test a
+    # t-test cannot do): every metric p >= 0.13. Brown-Forsythe on the spread:
+    # nothing survives Bonferroni. The specific worry - half the steps means
+    # less time to converge, so LESS secondary structure or MORE extended
+    # designs - is refuted with power: at n=160 this would have detected a
+    # 0.106 shift in helix fraction, 0.095 in strand, 0.51 A in Rg and 0.0041 A
+    # in CA-CA; the largest observed shift is 0.013 / 0.019 / 0.00 / 0.0015.
+    # Helix moves UP, not down.
+    #
+    # The n=8 table this preset shipped on (N011 section 4) read helix 0.605 ->
+    # 0.591 and Rg 12.50 -> 12.92, i.e. exactly the feared direction. Both were
+    # noise, and so was an n=40 rerun that put the fast arm's Rg sd at 2.3x
+    # exact's - it came from 3 designs and vanished at n=160. Per-design SSE
+    # variance here is sd ~0.35, so anything below n~100 says nothing.
+    #
+    # DIVERGED designs (CA-CA mean > 4.5 A) are a failure mode of the MODEL,
+    # not of this preset: 2/160 on `exact` (worst CA-CA 28.3 A, Rg 408 A),
+    # 0/160 on all three deviating arms, Fisher p=0.50. Upstream JAX produced
+    # 1/40 (N001 section 10). Filter on CA-CA downstream, on either preset.
     #
     # REFUTED and deliberately absent - each measured, none of them free:
     #   * K 64 -> 32 on both attention branches: -10 % of the step, but coil
@@ -113,6 +140,15 @@ PRESETS: dict[str, dict] = {
         # the trajectory's endpoints (raw_t 1.0 -> 0.2) and only coarsens it.
         # `scripts/generate.py` applies this, and only when the command line
         # did not set --num_steps/--out_steps itself.
+        #
+        # 0.5 STAYS, on N015's n=160-per-arm test (see QUALITY above): the
+        # schedule-only arm is indistinguishable from `exact` on mean, spread
+        # and distribution shape, so there is nothing to buy by backing off to
+        # 0.75, and nothing to isolate by splitting this into a second preset.
+        # A "faster" preset at 125/100 is NOT offered: N011 section 4 found it
+        # passes the same structural gate, but a 4x cut deserves a
+        # designability check (ProteinMPNN + a folding model), which no arm in
+        # this port has run. Structural gates cannot answer designability.
         steps_scale=0.5,
     ),
 }
