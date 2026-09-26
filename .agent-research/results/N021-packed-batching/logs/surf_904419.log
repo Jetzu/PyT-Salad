@@ -1,0 +1,52 @@
+### Starting TaskPrologue of job 904419 on h13-15 at Sat Sep 26 05:41:32 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 17:41:32 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   35C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h13-15 Sat Sep 26 05:41:32 PM CEST 2026 preset=fast L=1000 B=2 G in {1 2}
+GPU NVIDIA H100 132 SM 93.1 GiB
+CELL preset=fast L=1000 B=2 Greq=1 B_eff=2 G=1 designs_per_replay=2 replay_lean_ms=30.3994 replay_full_ms=34.8982 replay_lean_per_design_ms=15.1997 host_step_ms=31.7090 host_step_per_design_ms=15.8545 designs_per_s=63.0736 sec_per_design=3.1731 peak_reserved_MiB=12300.0 peak_reserved_MiB_per_design=6150.0 per_member_MiB=3075.7 warmup_s=191.6 sm=132 mem_bound_members=16
+CELL preset=fast L=1000 B=2 Greq=2 B_eff=2 G=2 designs_per_replay=4 replay_lean_ms=58.6422 replay_full_ms=67.0838 replay_lean_per_design_ms=14.6605 host_step_ms=61.1716 host_step_per_design_ms=15.2929 designs_per_s=65.3898 sec_per_design=3.0607 peak_reserved_MiB=18112.0 peak_reserved_MiB_per_design=4528.0 per_member_MiB=3084.0 warmup_s=65.5 sm=132 mem_bound_members=15
+### done Sat Sep 26 05:46:20 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 17:46:20 CEST 2026
+= Job-ID             : 904419 on helma
+= Job-Name           : n021s_2x1000
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/run_surface.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:20:00
+= Elapsed runtime    : 00:06:29
+= Total RAM usage    : 3.5 GiB of assigned 175 GiB (2.0%)
+= Node list          : h13-15
+= Subm/Elig/Start/End: 2026-09-26T17:39:50 / 2026-09-26T17:39:50 / 2026-09-26T17:39:51 / 2026-09-26T17:46:20
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.0G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K  5d15h3m31s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 855780, 17 %, 15 %, 13050 MiB, 202972 ms
+NVIDIA H100, 00000000:A6:00.0, 871425, 13 %, 9 %, 18870 MiB, 77942 ms

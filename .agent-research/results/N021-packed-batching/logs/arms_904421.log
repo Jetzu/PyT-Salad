@@ -1,0 +1,791 @@
+### Starting TaskPrologue of job 904421 on h13-15 at Sat Sep 26 05:41:31 PM CEST 2026
+Running on cores 96-127 with governor performance
+Sat Sep 26 17:41:32 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   35C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+worktree HEAD: fd9ba325199b115cd79683f165b8e838b9d4aaea (detached)
+893e7a8aefa9aa72187bec1315553b0e  salad_torch/modules/fast.py
+5a7c3745532813287c2abf8cae293884  salad_torch/diffusion/sampling.py
+fe222adb495ef3829c54e862dfaeb2dc  scripts/generate.py
+NVIDIA H100
+########## ARM a_b1  batch_size=1 group_size=8
+grouped fast path (fast, batch_size=1, group_size=8 -> 8 designs/replay) compiled + captured in 298s (one-time); peak reserved 3.74 GiB, ~0.147 GiB/packed member
+160 designs of 100 aa, up to 8 per replay (batch_size=1): median 0.329s/design, 52.6s of GPU time for all 160 (compile/capture excluded)
+########## ARM b_b2  batch_size=2 group_size=4
+grouped fast path (fast, batch_size=2, group_size=4 -> 8 designs/replay) compiled + captured in 289s (one-time); peak reserved 3.53 GiB, ~0.292 GiB/packed member
+  NB batch_size 2 is NOT bit-identical to batch_size 1: a design's answer depends on its offset in the flat residue axis (upstream bug B1). Same distribution, different designs.
+160 designs of 100 aa, up to 8 per replay (batch_size=2): median 0.295s/design, 47.2s of GPU time for all 160 (compile/capture excluded)
+########## ARM c_b4  batch_size=4 group_size=2
+grouped fast path (fast, batch_size=4, group_size=2 -> 8 designs/replay) compiled + captured in 380s (one-time); peak reserved 3.38 GiB, ~0.586 GiB/packed member
+  NB batch_size 4 is NOT bit-identical to batch_size 1: a design's answer depends on its offset in the flat residue axis (upstream bug B1). Same distribution, different designs.
+160 designs of 100 aa, up to 8 per replay (batch_size=4): median 0.296s/design, 47.4s of GPU time for all 160 (compile/capture excluded)
+########## ARM d_b8  batch_size=8 group_size=1
+grouped fast path (fast, batch_size=8, group_size=1 -> 8 designs/replay) compiled + captured in 183s (one-time); peak reserved 4.65 GiB, ~1.182 GiB/packed member
+  NB batch_size 8 is NOT bit-identical to batch_size 1: a design's answer depends on its offset in the flat residue axis (upstream bug B1). Same distribution, different designs.
+160 designs of 100 aa, up to 8 per replay (batch_size=8): median 0.302s/design, 48.3s of GPU time for all 160 (compile/capture excluded)
+########## counts
+a_b1: 160
+b_b2: 160
+c_b4: 160
+d_b8: 160
+########## RAW ss.py SUMMARY
+== /tmp/904421.helma/n021_designs-904421/a_b1   n_designs=160  L=100
+   design_0.pdb             CA-CA 3.925 (min 3.58 max 4.49)  Rg  27.1  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_1.pdb             CA-CA 3.877 (min 3.38 max 4.45)  Rg  24.6  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_10.pdb            CA-CA 3.811 (min 3.10 max 4.25)  Rg  17.3  H 0.05 E 0.77 c 0.18  clash<4A   9  nan 0
+   design_100.pdb           CA-CA 3.940 (min 3.49 max 4.58)  Rg  19.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_101.pdb           CA-CA 3.864 (min 3.56 max 4.34)  Rg  21.8  H 0.94 E 0.02 c 0.04  clash<4A   0  nan 0
+   design_102.pdb           CA-CA 9.790 (min 1.00 max 225.82)  Rg 237.1  H 0.09 E 0.36 c 0.55  clash<4A   4  nan 0
+   design_103.pdb           CA-CA 3.821 (min 3.14 max 4.32)  Rg  20.4  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_104.pdb           CA-CA 3.873 (min 3.14 max 4.40)  Rg  21.5  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_105.pdb           CA-CA 3.864 (min 3.50 max 4.44)  Rg  21.4  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_106.pdb           CA-CA 3.861 (min 3.50 max 4.39)  Rg  19.3  H 0.88 E 0.00 c 0.12  clash<4A   1  nan 0
+   design_107.pdb           CA-CA 3.866 (min 3.45 max 4.41)  Rg  18.5  H 0.91 E 0.00 c 0.09  clash<4A   1  nan 0
+   design_108.pdb           CA-CA 3.851 (min 3.49 max 4.35)  Rg  20.6  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_109.pdb           CA-CA 3.848 (min 3.44 max 4.38)  Rg  15.9  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_11.pdb            CA-CA 3.875 (min 3.49 max 4.64)  Rg  24.5  H 0.82 E 0.00 c 0.18  clash<4A   0  nan 0
+   design_110.pdb           CA-CA 421.603 (min 1.15 max 1155.45)  Rg 397.4  H 0.00 E 0.00 c 1.00  clash<4A   5  nan 0
+   design_111.pdb           CA-CA 3.861 (min 3.45 max 4.67)  Rg  21.8  H 0.86 E 0.04 c 0.10  clash<4A   0  nan 0
+   design_112.pdb           CA-CA 454.446 (min 2.21 max 1054.30)  Rg 427.2  H 0.00 E 0.00 c 1.00  clash<4A   5  nan 0
+   design_113.pdb           CA-CA 128.029 (min 0.74 max 892.15)  Rg 465.6  H 0.00 E 0.00 c 1.00  clash<4A  20  nan 0
+   design_114.pdb           CA-CA 437.265 (min 2.31 max 1007.04)  Rg 441.6  H 0.00 E 0.00 c 1.00  clash<4A   2  nan 0
+   design_115.pdb           CA-CA 3.725 (min 3.13 max 4.18)  Rg  15.2  H 0.36 E 0.30 c 0.34  clash<4A   0  nan 0
+   design_116.pdb           CA-CA 379.526 (min 2.35 max 865.46)  Rg 391.6  H 0.00 E 0.00 c 1.00  clash<4A   5  nan 0
+   design_117.pdb           CA-CA 3.831 (min 3.29 max 4.69)  Rg  18.3  H 0.84 E 0.06 c 0.10  clash<4A   0  nan 0
+   design_118.pdb           CA-CA 147.677 (min 1.94 max 749.21)  Rg 466.5  H 0.00 E 0.00 c 1.00  clash<4A   1  nan 0
+   design_119.pdb           CA-CA 3.908 (min 3.56 max 4.54)  Rg  18.5  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_12.pdb            CA-CA 3.901 (min 3.33 max 4.72)  Rg  22.5  H 0.85 E 0.00 c 0.15  clash<4A   2  nan 0
+   design_120.pdb           CA-CA 3.850 (min 3.39 max 4.38)  Rg  28.3  H 0.82 E 0.00 c 0.18  clash<4A   1  nan 0
+   design_121.pdb           CA-CA 3.920 (min 3.33 max 4.46)  Rg  21.5  H 0.88 E 0.04 c 0.08  clash<4A   0  nan 0
+   design_122.pdb           CA-CA 3.781 (min 3.05 max 4.61)  Rg  24.8  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_123.pdb           CA-CA 3.989 (min 3.67 max 4.51)  Rg  20.5  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_124.pdb           CA-CA 3.813 (min 3.36 max 4.27)  Rg  17.6  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_125.pdb           CA-CA 466.569 (min 1.93 max 1167.19)  Rg 419.7  H 0.00 E 0.00 c 1.00  clash<4A  12  nan 0
+   design_126.pdb           CA-CA 3.901 (min 3.14 max 4.25)  Rg  24.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_127.pdb           CA-CA 3.883 (min 3.50 max 4.37)  Rg  17.8  H 0.88 E 0.00 c 0.12  clash<4A   0  nan 0
+   design_128.pdb           CA-CA 3.926 (min 3.44 max 4.56)  Rg  17.5  H 0.87 E 0.00 c 0.13  clash<4A   0  nan 0
+   design_129.pdb           CA-CA 488.036 (min 2.24 max 1304.61)  Rg 462.0  H 0.00 E 0.00 c 1.00  clash<4A   3  nan 0
+   design_13.pdb            CA-CA 457.249 (min 1.51 max 1035.43)  Rg 423.2  H 0.05 E 0.00 c 0.95  clash<4A  12  nan 0
+   design_130.pdb           CA-CA 3.915 (min 3.49 max 4.44)  Rg  22.6  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_131.pdb           CA-CA 3.920 (min 3.46 max 4.51)  Rg  19.0  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_132.pdb           CA-CA 3.935 (min 3.63 max 4.63)  Rg  22.0  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_133.pdb           CA-CA 3.900 (min 3.51 max 4.43)  Rg  18.5  H 0.96 E 0.00 c 0.04  clash<4A   1  nan 0
+   design_134.pdb           CA-CA 3.933 (min 3.33 max 4.62)  Rg  20.9  H 0.86 E 0.00 c 0.14  clash<4A   1  nan 0
+   design_135.pdb           CA-CA 3.902 (min 3.55 max 4.28)  Rg  22.9  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_136.pdb           CA-CA 3.875 (min 3.55 max 4.54)  Rg  22.0  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_137.pdb           CA-CA 3.921 (min 3.23 max 4.44)  Rg  27.0  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_138.pdb           CA-CA 298.320 (min 2.12 max 992.43)  Rg 435.7  H 0.05 E 0.00 c 0.95  clash<4A   3  nan 0
+   design_139.pdb           CA-CA 3.867 (min 3.46 max 4.39)  Rg  17.3  H 0.92 E 0.03 c 0.05  clash<4A   0  nan 0
+   design_14.pdb            CA-CA 3.852 (min 3.29 max 4.46)  Rg  18.4  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_140.pdb           CA-CA 3.863 (min 3.51 max 4.58)  Rg  22.9  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_141.pdb           CA-CA 3.833 (min 3.20 max 4.59)  Rg  21.2  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_142.pdb           CA-CA 3.977 (min 3.63 max 4.69)  Rg  22.1  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_143.pdb           CA-CA 3.887 (min 3.40 max 4.48)  Rg  18.0  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_144.pdb           CA-CA 3.911 (min 3.50 max 4.52)  Rg  23.2  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_145.pdb           CA-CA 3.762 (min 2.98 max 4.68)  Rg  21.2  H 0.93 E 0.00 c 0.07  clash<4A   1  nan 0
+   design_146.pdb           CA-CA 3.793 (min 3.21 max 4.31)  Rg  16.4  H 0.87 E 0.00 c 0.13  clash<4A   0  nan 0
+   design_147.pdb           CA-CA 3.798 (min 3.36 max 4.48)  Rg  18.6  H 0.88 E 0.02 c 0.10  clash<4A   0  nan 0
+   design_148.pdb           CA-CA 3.907 (min 3.52 max 4.40)  Rg  18.2  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_149.pdb           CA-CA 3.755 (min 2.96 max 4.39)  Rg  20.7  H 0.00 E 0.84 c 0.16  clash<4A   1  nan 0
+   design_15.pdb            CA-CA 3.840 (min 3.45 max 4.37)  Rg  21.1  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_150.pdb           CA-CA 3.874 (min 3.34 max 4.54)  Rg  23.1  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_151.pdb           CA-CA 3.844 (min 3.49 max 4.49)  Rg  16.9  H 0.91 E 0.02 c 0.07  clash<4A   0  nan 0
+   design_152.pdb           CA-CA 555.058 (min 17.50 max 1231.68)  Rg 517.9  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_153.pdb           CA-CA 3.939 (min 3.54 max 4.60)  Rg  23.1  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_154.pdb           CA-CA 3.853 (min 3.16 max 4.54)  Rg  19.2  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_155.pdb           CA-CA 3.860 (min 3.33 max 4.58)  Rg  22.9  H 0.87 E 0.00 c 0.13  clash<4A   0  nan 0
+   design_156.pdb           CA-CA 3.829 (min 3.29 max 4.63)  Rg  17.5  H 0.88 E 0.00 c 0.12  clash<4A   0  nan 0
+   design_157.pdb           CA-CA 3.887 (min 3.48 max 4.37)  Rg  17.6  H 0.86 E 0.00 c 0.14  clash<4A   1  nan 0
+   design_158.pdb           CA-CA 3.849 (min 3.53 max 4.49)  Rg  19.8  H 0.86 E 0.02 c 0.12  clash<4A   0  nan 0
+   design_159.pdb           CA-CA 3.877 (min 3.51 max 4.55)  Rg  18.3  H 0.85 E 0.04 c 0.11  clash<4A   0  nan 0
+   design_16.pdb            CA-CA 3.923 (min 3.49 max 4.48)  Rg  19.8  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_17.pdb            CA-CA 3.918 (min 3.34 max 4.55)  Rg  21.6  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_18.pdb            CA-CA 3.908 (min 3.61 max 4.48)  Rg  29.6  H 0.99 E 0.00 c 0.01  clash<4A   1  nan 0
+   design_19.pdb            CA-CA 3.823 (min 3.52 max 4.36)  Rg  23.4  H 0.89 E 0.07 c 0.04  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.907 (min 3.40 max 4.44)  Rg  18.7  H 0.90 E 0.01 c 0.09  clash<4A   1  nan 0
+   design_20.pdb            CA-CA 3.776 (min 3.35 max 4.49)  Rg  24.2  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_21.pdb            CA-CA 3.817 (min 3.31 max 4.61)  Rg  17.8  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_22.pdb            CA-CA 3.873 (min 3.37 max 4.45)  Rg  26.1  H 0.91 E 0.05 c 0.04  clash<4A   0  nan 0
+   design_23.pdb            CA-CA 539.058 (min 34.26 max 1217.44)  Rg 500.5  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_24.pdb            CA-CA 3.881 (min 3.38 max 4.58)  Rg  21.6  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_25.pdb            CA-CA 3.869 (min 3.40 max 4.53)  Rg  18.7  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_26.pdb            CA-CA 3.886 (min 3.48 max 4.75)  Rg  18.1  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_27.pdb            CA-CA 3.863 (min 3.24 max 4.85)  Rg  20.7  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_28.pdb            CA-CA 3.904 (min 3.49 max 4.39)  Rg  17.6  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_29.pdb            CA-CA 3.849 (min 3.40 max 4.44)  Rg  30.8  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_3.pdb             CA-CA 321.626 (min 3.09 max 1140.36)  Rg 473.5  H 0.00 E 0.00 c 1.00  clash<4A   3  nan 0
+   design_30.pdb            CA-CA 3.936 (min 3.40 max 4.56)  Rg  22.5  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_31.pdb            CA-CA 3.922 (min 3.44 max 4.66)  Rg  18.8  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_32.pdb            CA-CA 3.782 (min 3.39 max 4.37)  Rg  17.3  H 0.79 E 0.09 c 0.12  clash<4A   0  nan 0
+   design_33.pdb            CA-CA 3.844 (min 3.36 max 4.59)  Rg  23.6  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_34.pdb            CA-CA 3.914 (min 3.35 max 4.33)  Rg  24.3  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_35.pdb            CA-CA 242.207 (min 11.06 max 736.95)  Rg 476.6  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_36.pdb            CA-CA 3.898 (min 3.52 max 4.69)  Rg  22.2  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_37.pdb            CA-CA 502.736 (min 8.26 max 1107.70)  Rg 455.3  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_38.pdb            CA-CA 3.819 (min 3.25 max 4.80)  Rg  22.7  H 0.77 E 0.00 c 0.23  clash<4A   1  nan 0
+   design_39.pdb            CA-CA 3.913 (min 3.51 max 4.38)  Rg  19.2  H 0.93 E 0.03 c 0.04  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.794 (min 3.15 max 4.40)  Rg  16.1  H 0.88 E 0.06 c 0.06  clash<4A   1  nan 0
+   design_40.pdb            CA-CA 3.912 (min 3.42 max 4.55)  Rg  21.5  H 0.92 E 0.00 c 0.08  clash<4A   2  nan 0
+   design_41.pdb            CA-CA 3.926 (min 3.53 max 4.30)  Rg  30.8  H 0.87 E 0.04 c 0.09  clash<4A   0  nan 0
+   design_42.pdb            CA-CA 3.808 (min 3.29 max 4.46)  Rg  17.8  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_43.pdb            CA-CA 3.804 (min 3.36 max 4.56)  Rg  21.8  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_44.pdb            CA-CA 3.887 (min 3.57 max 4.45)  Rg  21.5  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_45.pdb            CA-CA 3.875 (min 3.19 max 4.44)  Rg  18.9  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_46.pdb            CA-CA 3.878 (min 3.50 max 4.44)  Rg  18.2  H 0.89 E 0.03 c 0.08  clash<4A   0  nan 0
+   design_47.pdb            CA-CA 460.061 (min 7.00 max 1366.09)  Rg 455.1  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_48.pdb            CA-CA 3.822 (min 3.39 max 4.48)  Rg  20.5  H 0.89 E 0.00 c 0.11  clash<4A   1  nan 0
+   design_49.pdb            CA-CA 3.870 (min 3.54 max 4.40)  Rg  31.2  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.879 (min 3.53 max 4.68)  Rg  19.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_50.pdb            CA-CA 3.912 (min 3.47 max 4.41)  Rg  21.7  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_51.pdb            CA-CA 3.867 (min 3.23 max 4.39)  Rg  21.6  H 0.98 E 0.02 c 0.00  clash<4A   1  nan 0
+   design_52.pdb            CA-CA 3.739 (min 3.26 max 4.14)  Rg  16.4  H 0.30 E 0.51 c 0.19  clash<4A   2  nan 0
+   design_53.pdb            CA-CA 3.791 (min 3.28 max 4.50)  Rg  18.6  H 0.92 E 0.00 c 0.08  clash<4A   1  nan 0
+   design_54.pdb            CA-CA 3.931 (min 3.64 max 4.51)  Rg  22.7  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_55.pdb            CA-CA 3.913 (min 3.10 max 4.58)  Rg  23.8  H 0.95 E 0.04 c 0.01  clash<4A   0  nan 0
+   design_56.pdb            CA-CA 3.916 (min 3.51 max 4.39)  Rg  19.5  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_57.pdb            CA-CA 3.831 (min 3.55 max 4.54)  Rg  20.7  H 0.86 E 0.05 c 0.09  clash<4A   0  nan 0
+   design_58.pdb            CA-CA 3.860 (min 3.36 max 4.42)  Rg  23.0  H 0.84 E 0.05 c 0.11  clash<4A   0  nan 0
+   design_59.pdb            CA-CA 3.850 (min 3.31 max 4.37)  Rg  17.7  H 0.83 E 0.00 c 0.17  clash<4A   0  nan 0
+   design_6.pdb             CA-CA 3.851 (min 3.47 max 4.39)  Rg  15.6  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_60.pdb            CA-CA 3.889 (min 3.56 max 4.44)  Rg  21.2  H 0.84 E 0.00 c 0.16  clash<4A   0  nan 0
+   design_61.pdb            CA-CA 3.963 (min 3.33 max 4.67)  Rg  21.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_62.pdb            CA-CA 3.841 (min 3.33 max 4.52)  Rg  18.6  H 0.91 E 0.03 c 0.06  clash<4A   0  nan 0
+   design_63.pdb            CA-CA 3.876 (min 3.41 max 4.52)  Rg  19.2  H 0.93 E 0.03 c 0.04  clash<4A   0  nan 0
+   design_64.pdb            CA-CA 3.948 (min 3.58 max 4.75)  Rg  18.3  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_65.pdb            CA-CA 451.017 (min 1.00 max 1122.93)  Rg 428.3  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_66.pdb            CA-CA 3.903 (min 3.54 max 4.54)  Rg  22.1  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_67.pdb            CA-CA 3.816 (min 3.35 max 4.24)  Rg  17.6  H 0.85 E 0.09 c 0.06  clash<4A   0  nan 0
+   design_68.pdb            CA-CA 3.816 (min 3.37 max 4.52)  Rg  20.0  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_69.pdb            CA-CA 450.532 (min 1.40 max 1299.23)  Rg 427.2  H 0.00 E 0.00 c 1.00  clash<4A   7  nan 0
+   design_7.pdb             CA-CA 3.887 (min 3.44 max 4.46)  Rg  18.6  H 0.87 E 0.00 c 0.13  clash<4A   1  nan 0
+   design_70.pdb            CA-CA 3.844 (min 3.33 max 4.43)  Rg  19.7  H 0.80 E 0.05 c 0.15  clash<4A   0  nan 0
+   design_71.pdb            CA-CA 535.585 (min 4.36 max 1459.06)  Rg 499.9  H 0.05 E 0.05 c 0.90  clash<4A   0  nan 0
+   design_72.pdb            CA-CA 502.008 (min 16.72 max 1540.87)  Rg 544.8  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_73.pdb            CA-CA 361.926 (min 2.75 max 889.08)  Rg 463.7  H 0.00 E 0.00 c 1.00  clash<4A   1  nan 0
+   design_74.pdb            CA-CA 3.887 (min 3.45 max 4.41)  Rg  20.4  H 0.87 E 0.00 c 0.13  clash<4A   0  nan 0
+   design_75.pdb            CA-CA 3.790 (min 3.06 max 4.49)  Rg  16.3  H 0.80 E 0.06 c 0.14  clash<4A   0  nan 0
+   design_76.pdb            CA-CA 3.855 (min 3.43 max 4.42)  Rg  21.4  H 0.94 E 0.05 c 0.01  clash<4A   0  nan 0
+   design_77.pdb            CA-CA 3.925 (min 3.67 max 4.61)  Rg  22.5  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_78.pdb            CA-CA 3.890 (min 3.23 max 4.61)  Rg  22.2  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_79.pdb            CA-CA 3.819 (min 3.41 max 4.45)  Rg  20.0  H 0.88 E 0.00 c 0.12  clash<4A   1  nan 0
+   design_8.pdb             CA-CA 3.929 (min 3.58 max 4.51)  Rg  19.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_80.pdb            CA-CA 3.888 (min 3.34 max 4.68)  Rg  20.6  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_81.pdb            CA-CA 4.448 (min 3.20 max 54.17)  Rg  75.9  H 0.75 E 0.12 c 0.13  clash<4A   0  nan 0
+   design_82.pdb            CA-CA 3.942 (min 3.62 max 4.42)  Rg  18.9  H 0.89 E 0.00 c 0.11  clash<4A   1  nan 0
+   design_83.pdb            CA-CA 3.891 (min 3.44 max 4.47)  Rg  18.0  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_84.pdb            CA-CA 3.819 (min 3.38 max 4.44)  Rg  15.9  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_85.pdb            CA-CA 3.875 (min 3.50 max 4.40)  Rg  21.0  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_86.pdb            CA-CA 231.211 (min 0.24 max 907.63)  Rg 420.6  H 0.00 E 0.00 c 1.00  clash<4A  40  nan 0
+   design_87.pdb            CA-CA 3.867 (min 3.48 max 4.67)  Rg  23.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_88.pdb            CA-CA 3.858 (min 3.37 max 4.42)  Rg  18.9  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_89.pdb            CA-CA 3.858 (min 3.51 max 4.58)  Rg  24.0  H 0.94 E 0.03 c 0.03  clash<4A   0  nan 0
+   design_9.pdb             CA-CA 189.775 (min 0.87 max 867.45)  Rg 479.8  H 0.05 E 0.00 c 0.95  clash<4A  34  nan 0
+   design_90.pdb            CA-CA 3.895 (min 3.48 max 4.52)  Rg  18.3  H 0.86 E 0.05 c 0.09  clash<4A   0  nan 0
+   design_91.pdb            CA-CA 3.900 (min 3.53 max 4.39)  Rg  21.2  H 0.86 E 0.00 c 0.14  clash<4A   1  nan 0
+   design_92.pdb            CA-CA 3.880 (min 3.47 max 4.51)  Rg  20.8  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_93.pdb            CA-CA 412.138 (min 1.49 max 1118.44)  Rg 432.6  H 0.00 E 0.00 c 1.00  clash<4A  13  nan 0
+   design_94.pdb            CA-CA 3.851 (min 3.50 max 4.63)  Rg  21.3  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_95.pdb            CA-CA 3.859 (min 3.00 max 4.45)  Rg  20.4  H 0.90 E 0.05 c 0.05  clash<4A   0  nan 0
+   design_96.pdb            CA-CA 3.936 (min 3.58 max 4.67)  Rg  22.8  H 0.92 E 0.05 c 0.03  clash<4A   0  nan 0
+   design_97.pdb            CA-CA 3.862 (min 3.40 max 4.49)  Rg  18.0  H 0.99 E 0.01 c 0.00  clash<4A   0  nan 0
+   design_98.pdb            CA-CA 364.515 (min 0.91 max 934.86)  Rg 357.5  H 0.00 E 0.00 c 1.00  clash<4A  14  nan 0
+   design_99.pdb            CA-CA 3.883 (min 3.50 max 4.65)  Rg  22.4  H 0.94 E 0.05 c 0.01  clash<4A   0  nan 0
+   MEAN  CA-CA 64.5451 +- 148.7618  Rg 89.59 +- 157.17  H 0.747  E 0.027  c 0.226  clash 1.4  nan 0
+== /tmp/904421.helma/n021_designs-904421/b_b2   n_designs=160  L=100
+   design_0.pdb             CA-CA 3.818 (min 3.38 max 4.33)  Rg  16.9  H 0.80 E 0.00 c 0.20  clash<4A   0  nan 0
+   design_1.pdb             CA-CA 3.869 (min 3.29 max 4.16)  Rg  16.3  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_10.pdb            CA-CA 3.788 (min 3.14 max 4.29)  Rg  20.4  H 0.05 E 0.86 c 0.09  clash<4A   8  nan 0
+   design_100.pdb           CA-CA 3.875 (min 3.46 max 4.48)  Rg  21.2  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_101.pdb           CA-CA 3.902 (min 3.53 max 4.20)  Rg  20.3  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_102.pdb           CA-CA 334.153 (min 19.29 max 1110.62)  Rg 508.7  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_103.pdb           CA-CA 3.918 (min 3.39 max 4.20)  Rg  22.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_104.pdb           CA-CA 3.853 (min 3.40 max 4.22)  Rg  27.7  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_105.pdb           CA-CA 4.002 (min 3.65 max 4.28)  Rg  24.6  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_106.pdb           CA-CA 3.873 (min 3.55 max 4.35)  Rg  21.7  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_107.pdb           CA-CA 3.916 (min 3.24 max 4.20)  Rg  21.3  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_108.pdb           CA-CA 3.842 (min 3.36 max 4.36)  Rg  19.0  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_109.pdb           CA-CA 3.848 (min 3.07 max 4.06)  Rg  24.1  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_11.pdb            CA-CA 3.960 (min 3.61 max 4.27)  Rg  25.2  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_110.pdb           CA-CA 3.899 (min 3.58 max 4.39)  Rg  19.7  H 0.85 E 0.03 c 0.12  clash<4A   1  nan 0
+   design_111.pdb           CA-CA 3.933 (min 3.41 max 4.18)  Rg  21.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_112.pdb           CA-CA 3.895 (min 3.44 max 4.44)  Rg  21.4  H 0.93 E 0.02 c 0.05  clash<4A   0  nan 0
+   design_113.pdb           CA-CA 3.881 (min 3.39 max 4.16)  Rg  21.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_114.pdb           CA-CA 535.621 (min 9.25 max 1068.60)  Rg 474.6  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_115.pdb           CA-CA 3.888 (min 3.34 max 4.23)  Rg  20.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_116.pdb           CA-CA 554.099 (min 22.25 max 1411.88)  Rg 513.3  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_117.pdb           CA-CA 3.933 (min 3.48 max 4.23)  Rg  23.1  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_118.pdb           CA-CA 3.844 (min 3.26 max 4.45)  Rg  17.5  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_119.pdb           CA-CA 3.953 (min 3.51 max 4.32)  Rg  23.6  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_12.pdb            CA-CA 3.927 (min 3.41 max 4.63)  Rg  22.7  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_120.pdb           CA-CA 3.864 (min 3.24 max 4.38)  Rg  29.1  H 0.85 E 0.00 c 0.15  clash<4A   0  nan 0
+   design_121.pdb           CA-CA 3.971 (min 3.56 max 4.21)  Rg  25.0  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_122.pdb           CA-CA 3.845 (min 2.97 max 4.42)  Rg  24.7  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_123.pdb           CA-CA 3.936 (min 3.57 max 4.21)  Rg  24.2  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_124.pdb           CA-CA 3.916 (min 3.50 max 4.38)  Rg  22.4  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_125.pdb           CA-CA 3.854 (min 3.21 max 4.21)  Rg  20.2  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_126.pdb           CA-CA 3.886 (min 3.28 max 4.51)  Rg  22.9  H 0.88 E 0.05 c 0.07  clash<4A   0  nan 0
+   design_127.pdb           CA-CA 3.918 (min 3.28 max 4.17)  Rg  25.2  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_128.pdb           CA-CA 3.880 (min 3.45 max 4.71)  Rg  17.1  H 0.92 E 0.03 c 0.05  clash<4A   0  nan 0
+   design_129.pdb           CA-CA 3.980 (min 3.53 max 4.30)  Rg  26.2  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_13.pdb            CA-CA 3.941 (min 3.51 max 4.33)  Rg  26.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_130.pdb           CA-CA 3.867 (min 3.44 max 4.56)  Rg  20.3  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_131.pdb           CA-CA 3.903 (min 3.34 max 4.24)  Rg  19.0  H 0.91 E 0.00 c 0.09  clash<4A   1  nan 0
+   design_132.pdb           CA-CA 3.902 (min 3.32 max 4.47)  Rg  22.8  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_133.pdb           CA-CA 3.923 (min 3.46 max 4.18)  Rg  19.7  H 0.92 E 0.04 c 0.04  clash<4A   0  nan 0
+   design_134.pdb           CA-CA 3.904 (min 3.55 max 4.50)  Rg  20.1  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_135.pdb           CA-CA 3.936 (min 3.40 max 4.35)  Rg  25.2  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_136.pdb           CA-CA 3.940 (min 3.56 max 4.61)  Rg  22.3  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_137.pdb           CA-CA 3.912 (min 3.19 max 4.21)  Rg  20.8  H 0.91 E 0.00 c 0.09  clash<4A   1  nan 0
+   design_138.pdb           CA-CA 464.651 (min 31.01 max 1035.45)  Rg 516.9  H 0.05 E 0.00 c 0.95  clash<4A   0  nan 0
+   design_139.pdb           CA-CA 3.855 (min 3.36 max 4.11)  Rg  21.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_14.pdb            CA-CA 3.888 (min 3.30 max 4.57)  Rg  21.6  H 0.89 E 0.03 c 0.08  clash<4A   1  nan 0
+   design_140.pdb           CA-CA 3.873 (min 3.51 max 4.40)  Rg  30.3  H 0.93 E 0.00 c 0.07  clash<4A   1  nan 0
+   design_141.pdb           CA-CA 3.916 (min 3.45 max 4.21)  Rg  23.6  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_142.pdb           CA-CA 3.941 (min 3.65 max 4.63)  Rg  25.4  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_143.pdb           CA-CA 3.941 (min 3.55 max 4.26)  Rg  23.4  H 0.98 E 0.00 c 0.02  clash<4A   1  nan 0
+   design_144.pdb           CA-CA 3.890 (min 3.12 max 4.82)  Rg  20.1  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_145.pdb           CA-CA 3.937 (min 3.52 max 4.35)  Rg  19.9  H 0.78 E 0.00 c 0.22  clash<4A   0  nan 0
+   design_146.pdb           CA-CA 3.813 (min 3.32 max 4.53)  Rg  19.8  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_147.pdb           CA-CA 3.847 (min 2.60 max 4.18)  Rg  22.1  H 0.91 E 0.05 c 0.04  clash<4A   0  nan 0
+   design_148.pdb           CA-CA 457.398 (min 2.99 max 1136.59)  Rg 432.8  H 0.00 E 0.00 c 1.00  clash<4A   1  nan 0
+   design_149.pdb           CA-CA 3.820 (min 3.38 max 4.24)  Rg  18.4  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_15.pdb            CA-CA 3.837 (min 3.62 max 4.19)  Rg  24.5  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_150.pdb           CA-CA 3.871 (min 3.57 max 4.49)  Rg  22.2  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_151.pdb           CA-CA 3.888 (min 3.27 max 4.23)  Rg  22.4  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_152.pdb           CA-CA 582.929 (min 31.26 max 1337.74)  Rg 505.2  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_153.pdb           CA-CA 3.972 (min 3.61 max 4.25)  Rg  25.6  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_154.pdb           CA-CA 3.838 (min 3.51 max 4.68)  Rg  23.7  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_155.pdb           CA-CA 534.346 (min 9.42 max 1210.87)  Rg 492.6  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_156.pdb           CA-CA 3.852 (min 3.44 max 4.31)  Rg  18.3  H 0.23 E 0.72 c 0.05  clash<4A  12  nan 0
+   design_157.pdb           CA-CA 3.808 (min 3.22 max 4.24)  Rg  22.7  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_158.pdb           CA-CA 3.860 (min 3.54 max 4.49)  Rg  27.6  H 0.85 E 0.04 c 0.11  clash<4A   0  nan 0
+   design_159.pdb           CA-CA 3.882 (min 3.40 max 4.19)  Rg  23.5  H 0.83 E 0.00 c 0.17  clash<4A   0  nan 0
+   design_16.pdb            CA-CA 3.898 (min 3.58 max 4.57)  Rg  22.1  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_17.pdb            CA-CA 3.922 (min 3.32 max 4.23)  Rg  26.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_18.pdb            CA-CA 456.465 (min 27.29 max 1288.08)  Rg 504.0  H 0.05 E 0.00 c 0.95  clash<4A   0  nan 0
+   design_19.pdb            CA-CA 3.860 (min 3.41 max 4.15)  Rg  21.6  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.878 (min 3.32 max 4.38)  Rg  18.3  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_20.pdb            CA-CA 3.825 (min 3.36 max 4.39)  Rg  19.9  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_21.pdb            CA-CA 3.825 (min 3.06 max 4.24)  Rg  19.3  H 0.93 E 0.02 c 0.05  clash<4A   0  nan 0
+   design_22.pdb            CA-CA 547.059 (min 7.91 max 1288.36)  Rg 516.2  H 0.05 E 0.05 c 0.90  clash<4A   0  nan 0
+   design_23.pdb            CA-CA 3.810 (min 3.11 max 4.12)  Rg  21.6  H 0.98 E 0.00 c 0.02  clash<4A   1  nan 0
+   design_24.pdb            CA-CA 3.887 (min 3.52 max 4.55)  Rg  21.6  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_25.pdb            CA-CA 3.839 (min 3.52 max 4.11)  Rg  24.0  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_26.pdb            CA-CA 505.107 (min 27.56 max 1192.98)  Rg 495.6  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_27.pdb            CA-CA 3.869 (min 3.30 max 4.11)  Rg  21.3  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_28.pdb            CA-CA 3.819 (min 3.34 max 4.38)  Rg  21.4  H 0.82 E 0.00 c 0.18  clash<4A   0  nan 0
+   design_29.pdb            CA-CA 3.813 (min 3.38 max 4.08)  Rg  16.8  H 0.82 E 0.10 c 0.08  clash<4A   0  nan 0
+   design_3.pdb             CA-CA 3.920 (min 3.50 max 4.25)  Rg  24.1  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_30.pdb            CA-CA 3.943 (min 3.24 max 4.32)  Rg  23.1  H 0.83 E 0.00 c 0.17  clash<4A   2  nan 0
+   design_31.pdb            CA-CA 3.919 (min 3.50 max 4.26)  Rg  24.4  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_32.pdb            CA-CA 459.024 (min 1.54 max 1294.44)  Rg 505.8  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_33.pdb            CA-CA 4.013 (min 3.69 max 4.36)  Rg  34.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_34.pdb            CA-CA 51.279 (min 1.08 max 651.46)  Rg 382.1  H 0.00 E 0.00 c 1.00  clash<4A  42  nan 0
+   design_35.pdb            CA-CA 3.979 (min 3.49 max 4.45)  Rg  24.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_36.pdb            CA-CA 3.928 (min 3.57 max 4.55)  Rg  22.0  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_37.pdb            CA-CA 3.910 (min 3.44 max 4.31)  Rg  22.8  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_38.pdb            CA-CA 3.831 (min 3.30 max 4.46)  Rg  17.8  H 0.81 E 0.00 c 0.19  clash<4A   0  nan 0
+   design_39.pdb            CA-CA 3.870 (min 3.04 max 4.20)  Rg  21.7  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.801 (min 3.06 max 4.34)  Rg  20.4  H 0.85 E 0.00 c 0.15  clash<4A   0  nan 0
+   design_40.pdb            CA-CA 3.811 (min 3.44 max 4.42)  Rg  16.0  H 0.92 E 0.03 c 0.05  clash<4A   0  nan 0
+   design_41.pdb            CA-CA 3.921 (min 3.51 max 4.21)  Rg  23.8  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_42.pdb            CA-CA 3.809 (min 3.37 max 4.36)  Rg  18.1  H 0.95 E 0.01 c 0.04  clash<4A   0  nan 0
+   design_43.pdb            CA-CA 3.931 (min 3.19 max 4.23)  Rg  22.0  H 0.83 E 0.00 c 0.17  clash<4A   1  nan 0
+   design_44.pdb            CA-CA 3.857 (min 3.53 max 4.19)  Rg  21.4  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_45.pdb            CA-CA 3.938 (min 3.56 max 4.24)  Rg  29.5  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_46.pdb            CA-CA 3.867 (min 3.15 max 4.52)  Rg  18.1  H 0.82 E 0.00 c 0.18  clash<4A   0  nan 0
+   design_47.pdb            CA-CA 3.950 (min 3.33 max 4.26)  Rg  22.5  H 0.98 E 0.01 c 0.01  clash<4A   0  nan 0
+   design_48.pdb            CA-CA 3.860 (min 3.29 max 4.44)  Rg  18.8  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_49.pdb            CA-CA 3.923 (min 3.29 max 4.29)  Rg  28.1  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.862 (min 3.42 max 4.29)  Rg  23.0  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_50.pdb            CA-CA 3.834 (min 3.33 max 4.33)  Rg  16.5  H 0.91 E 0.00 c 0.09  clash<4A   2  nan 0
+   design_51.pdb            CA-CA 3.901 (min 3.52 max 4.18)  Rg  23.3  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_52.pdb            CA-CA 534.986 (min 30.29 max 1096.30)  Rg 492.8  H 0.05 E 0.00 c 0.95  clash<4A   0  nan 0
+   design_53.pdb            CA-CA 3.892 (min 3.44 max 4.22)  Rg  23.5  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_54.pdb            CA-CA 3.900 (min 3.27 max 4.42)  Rg  24.7  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_55.pdb            CA-CA 3.905 (min 3.57 max 4.17)  Rg  23.5  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_56.pdb            CA-CA 3.946 (min 3.50 max 4.70)  Rg  20.7  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_57.pdb            CA-CA 3.894 (min 3.32 max 4.33)  Rg  19.3  H 0.95 E 0.00 c 0.05  clash<4A   1  nan 0
+   design_58.pdb            CA-CA 3.923 (min 3.42 max 4.41)  Rg  22.6  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_59.pdb            CA-CA 3.883 (min 3.51 max 4.17)  Rg  19.9  H 0.92 E 0.00 c 0.08  clash<4A   1  nan 0
+   design_6.pdb             CA-CA 505.496 (min 5.55 max 1324.42)  Rg 477.9  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_60.pdb            CA-CA 3.929 (min 3.58 max 4.52)  Rg  24.9  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_61.pdb            CA-CA 3.859 (min 3.08 max 4.21)  Rg  21.1  H 0.88 E 0.00 c 0.12  clash<4A   0  nan 0
+   design_62.pdb            CA-CA 3.853 (min 3.49 max 4.54)  Rg  17.3  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_63.pdb            CA-CA 3.897 (min 2.95 max 4.18)  Rg  24.9  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_64.pdb            CA-CA 3.952 (min 3.52 max 4.56)  Rg  18.2  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_65.pdb            CA-CA 3.919 (min 3.43 max 4.20)  Rg  21.5  H 0.98 E 0.00 c 0.02  clash<4A   1  nan 0
+   design_66.pdb            CA-CA 3.849 (min 3.30 max 4.41)  Rg  20.5  H 0.80 E 0.08 c 0.12  clash<4A   0  nan 0
+   design_67.pdb            CA-CA 3.951 (min 3.42 max 4.24)  Rg  20.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_68.pdb            CA-CA 3.883 (min 3.57 max 4.49)  Rg  24.3  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_69.pdb            CA-CA 3.945 (min 3.66 max 4.23)  Rg  23.4  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_7.pdb             CA-CA 3.913 (min 3.35 max 4.17)  Rg  22.6  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_70.pdb            CA-CA 287.807 (min 1.80 max 1154.81)  Rg 429.2  H 0.00 E 0.00 c 1.00  clash<4A   2  nan 0
+   design_71.pdb            CA-CA 3.958 (min 3.61 max 4.27)  Rg  26.3  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_72.pdb            CA-CA 473.325 (min 21.47 max 1295.40)  Rg 495.6  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_73.pdb            CA-CA 3.843 (min 3.55 max 4.08)  Rg  24.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_74.pdb            CA-CA 3.815 (min 3.29 max 4.40)  Rg  20.6  H 0.85 E 0.03 c 0.12  clash<4A   0  nan 0
+   design_75.pdb            CA-CA 3.824 (min 3.32 max 4.24)  Rg  20.5  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_76.pdb            CA-CA 3.905 (min 3.36 max 4.60)  Rg  20.9  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_77.pdb            CA-CA 3.872 (min 3.40 max 4.39)  Rg  23.9  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_78.pdb            CA-CA 3.864 (min 3.09 max 4.58)  Rg  22.8  H 0.81 E 0.00 c 0.19  clash<4A   0  nan 0
+   design_79.pdb            CA-CA 3.954 (min 3.64 max 4.19)  Rg  24.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_8.pdb             CA-CA 3.894 (min 3.53 max 4.67)  Rg  27.3  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_80.pdb            CA-CA 3.796 (min 3.12 max 4.48)  Rg  23.1  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_81.pdb            CA-CA 3.889 (min 3.29 max 4.20)  Rg  22.2  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_82.pdb            CA-CA 3.890 (min 3.54 max 4.44)  Rg  21.8  H 0.88 E 0.00 c 0.12  clash<4A   1  nan 0
+   design_83.pdb            CA-CA 3.921 (min 3.55 max 4.24)  Rg  24.0  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_84.pdb            CA-CA 3.828 (min 3.34 max 4.42)  Rg  16.8  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_85.pdb            CA-CA 3.900 (min 3.41 max 4.19)  Rg  21.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_86.pdb            CA-CA 472.195 (min 16.10 max 1032.06)  Rg 494.9  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_87.pdb            CA-CA 3.951 (min 3.66 max 4.29)  Rg  23.6  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_88.pdb            CA-CA 3.843 (min 3.49 max 4.49)  Rg  20.5  H 0.92 E 0.03 c 0.05  clash<4A   0  nan 0
+   design_89.pdb            CA-CA 3.894 (min 3.54 max 4.17)  Rg  24.8  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_9.pdb             CA-CA 3.873 (min 3.38 max 4.18)  Rg  22.0  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_90.pdb            CA-CA 3.886 (min 3.55 max 4.45)  Rg  18.2  H 0.87 E 0.02 c 0.11  clash<4A   0  nan 0
+   design_91.pdb            CA-CA 3.823 (min 3.17 max 4.13)  Rg  20.7  H 0.98 E 0.00 c 0.02  clash<4A   2  nan 0
+   design_92.pdb            CA-CA 3.810 (min 3.37 max 4.38)  Rg  17.2  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_93.pdb            CA-CA 4.023 (min 3.73 max 4.27)  Rg  24.5  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_94.pdb            CA-CA 3.925 (min 3.47 max 4.50)  Rg  21.3  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_95.pdb            CA-CA 3.919 (min 3.52 max 4.24)  Rg  23.3  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_96.pdb            CA-CA 3.888 (min 3.51 max 4.42)  Rg  22.5  H 0.83 E 0.09 c 0.08  clash<4A   0  nan 0
+   design_97.pdb            CA-CA 3.963 (min 3.51 max 4.38)  Rg  24.9  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_98.pdb            CA-CA 358.439 (min 1.66 max 1010.37)  Rg 478.1  H 0.00 E 0.00 c 1.00  clash<4A  16  nan 0
+   design_99.pdb            CA-CA 3.842 (min 3.51 max 4.17)  Rg  23.8  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   MEAN  CA-CA 54.1670 +- 147.1579  Rg 74.19 +- 146.48  H 0.816  E 0.016  c 0.168  clash 0.7  nan 0
+== /tmp/904421.helma/n021_designs-904421/c_b4   n_designs=160  L=100
+   design_0.pdb             CA-CA 3.817 (min 3.16 max 4.43)  Rg  20.4  H 0.94 E 0.05 c 0.01  clash<4A   0  nan 0
+   design_1.pdb             CA-CA 3.864 (min 3.32 max 4.18)  Rg  21.8  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_10.pdb            CA-CA 3.850 (min 3.52 max 4.08)  Rg  24.0  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_100.pdb           CA-CA 3.840 (min 3.09 max 4.45)  Rg  28.0  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_101.pdb           CA-CA 4.095 (min 3.46 max 4.37)  Rg  30.2  H 0.84 E 0.00 c 0.16  clash<4A   1  nan 0
+   design_102.pdb           CA-CA 3.936 (min 3.60 max 4.29)  Rg  23.4  H 0.83 E 0.00 c 0.17  clash<4A   0  nan 0
+   design_103.pdb           CA-CA 4.038 (min 3.64 max 4.38)  Rg  32.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_104.pdb           CA-CA 419.183 (min 1.81 max 1017.73)  Rg 405.2  H 0.00 E 0.05 c 0.95  clash<4A   6  nan 0
+   design_105.pdb           CA-CA 3.911 (min 3.36 max 4.24)  Rg  23.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_106.pdb           CA-CA 3.963 (min 3.43 max 4.33)  Rg  28.2  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_107.pdb           CA-CA 3.927 (min 3.46 max 4.15)  Rg  18.0  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_108.pdb           CA-CA 3.857 (min 3.47 max 4.47)  Rg  18.9  H 0.97 E 0.01 c 0.02  clash<4A   0  nan 0
+   design_109.pdb           CA-CA 3.892 (min 3.60 max 4.29)  Rg  24.5  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_11.pdb            CA-CA 3.938 (min 3.29 max 4.22)  Rg  31.7  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_110.pdb           CA-CA 3.887 (min 3.36 max 4.20)  Rg  18.7  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_111.pdb           CA-CA 3.921 (min 3.44 max 4.17)  Rg  25.9  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_112.pdb           CA-CA 3.891 (min 3.46 max 4.69)  Rg  33.8  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_113.pdb           CA-CA 4.016 (min 3.70 max 4.25)  Rg  26.1  H 0.80 E 0.00 c 0.20  clash<4A   0  nan 0
+   design_114.pdb           CA-CA 3.923 (min 3.56 max 4.22)  Rg  24.6  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_115.pdb           CA-CA 3.885 (min 3.43 max 4.18)  Rg  18.2  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_116.pdb           CA-CA 3.884 (min 3.53 max 4.38)  Rg  21.8  H 0.90 E 0.00 c 0.10  clash<4A   1  nan 0
+   design_117.pdb           CA-CA 3.883 (min 3.40 max 4.23)  Rg  23.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_118.pdb           CA-CA 3.982 (min 3.54 max 4.30)  Rg  23.3  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_119.pdb           CA-CA 3.902 (min 3.41 max 4.21)  Rg  19.3  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_12.pdb            CA-CA 3.914 (min 3.48 max 4.48)  Rg  19.6  H 0.87 E 0.05 c 0.08  clash<4A   0  nan 0
+   design_120.pdb           CA-CA 3.884 (min 3.53 max 4.68)  Rg  22.7  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_121.pdb           CA-CA 4.010 (min 3.33 max 4.27)  Rg  33.8  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_122.pdb           CA-CA 3.838 (min 3.53 max 4.11)  Rg  23.6  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_123.pdb           CA-CA 3.939 (min 3.48 max 4.24)  Rg  25.1  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_124.pdb           CA-CA 3.873 (min 3.57 max 4.43)  Rg  21.8  H 0.93 E 0.00 c 0.07  clash<4A   1  nan 0
+   design_125.pdb           CA-CA 3.942 (min 3.05 max 4.29)  Rg  23.6  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_126.pdb           CA-CA 443.778 (min 1.17 max 1391.59)  Rg 464.1  H 0.00 E 0.00 c 1.00  clash<4A   6  nan 0
+   design_127.pdb           CA-CA 4.005 (min 3.55 max 4.34)  Rg  28.3  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_128.pdb           CA-CA 3.871 (min 3.53 max 4.52)  Rg  21.2  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_129.pdb           CA-CA 3.980 (min 3.50 max 4.32)  Rg  22.2  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_13.pdb            CA-CA 3.951 (min 3.34 max 4.28)  Rg  24.5  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_130.pdb           CA-CA 3.902 (min 3.57 max 4.20)  Rg  24.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_131.pdb           CA-CA 3.898 (min 3.39 max 4.17)  Rg  23.3  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_132.pdb           CA-CA 3.893 (min 3.57 max 4.51)  Rg  23.1  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_133.pdb           CA-CA 3.881 (min 3.39 max 4.17)  Rg  21.6  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_134.pdb           CA-CA 3.883 (min 3.43 max 4.16)  Rg  21.0  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_135.pdb           CA-CA 3.810 (min 3.29 max 4.09)  Rg  24.1  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_136.pdb           CA-CA 532.734 (min 27.80 max 1307.63)  Rg 490.0  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_137.pdb           CA-CA 4.019 (min 3.60 max 4.65)  Rg  24.0  H 0.95 E 0.00 c 0.05  clash<4A   1  nan 0
+   design_138.pdb           CA-CA 3.923 (min 3.63 max 4.18)  Rg  24.0  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_139.pdb           CA-CA 3.819 (min 3.45 max 4.04)  Rg  23.6  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_14.pdb            CA-CA 3.918 (min 3.52 max 4.26)  Rg  25.0  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_140.pdb           CA-CA 3.933 (min 3.61 max 4.43)  Rg  33.3  H 0.87 E 0.08 c 0.05  clash<4A   0  nan 0
+   design_141.pdb           CA-CA 3.937 (min 3.49 max 4.28)  Rg  25.9  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_142.pdb           CA-CA 3.910 (min 3.62 max 4.29)  Rg  24.4  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_143.pdb           CA-CA 3.967 (min 3.53 max 4.23)  Rg  26.1  H 0.88 E 0.00 c 0.12  clash<4A   1  nan 0
+   design_144.pdb           CA-CA 3.907 (min 3.43 max 4.63)  Rg  19.5  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_145.pdb           CA-CA 3.917 (min 3.21 max 4.46)  Rg  29.4  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_146.pdb           CA-CA 555.904 (min 1.50 max 1163.43)  Rg 484.7  H 0.00 E 0.00 c 1.00  clash<4A   7  nan 0
+   design_147.pdb           CA-CA 3.941 (min 3.63 max 4.39)  Rg  24.7  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_148.pdb           CA-CA 3.894 (min 3.46 max 4.54)  Rg  19.9  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_149.pdb           CA-CA 3.942 (min 3.59 max 4.21)  Rg  24.9  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_15.pdb            CA-CA 3.827 (min 3.23 max 4.12)  Rg  21.0  H 0.87 E 0.00 c 0.13  clash<4A   0  nan 0
+   design_150.pdb           CA-CA 3.919 (min 3.33 max 4.25)  Rg  24.4  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_151.pdb           CA-CA 3.985 (min 3.54 max 4.33)  Rg  24.3  H 0.97 E 0.00 c 0.03  clash<4A   1  nan 0
+   design_152.pdb           CA-CA 326.039 (min 4.13 max 1042.60)  Rg 513.5  H 0.00 E 0.00 c 1.00  clash<4A   2  nan 0
+   design_153.pdb           CA-CA 4.007 (min 3.60 max 4.30)  Rg  26.6  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_154.pdb           CA-CA 3.851 (min 3.04 max 4.13)  Rg  24.1  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_155.pdb           CA-CA 3.899 (min 3.51 max 4.21)  Rg  23.5  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_156.pdb           CA-CA 3.836 (min 3.39 max 4.49)  Rg  23.4  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_157.pdb           CA-CA 3.958 (min 3.31 max 4.28)  Rg  29.2  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_158.pdb           CA-CA 3.887 (min 3.58 max 4.21)  Rg  23.8  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_159.pdb           CA-CA 3.964 (min 3.64 max 4.25)  Rg  23.7  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_16.pdb            CA-CA 3.885 (min 3.29 max 4.32)  Rg  22.7  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_17.pdb            CA-CA 3.950 (min 3.66 max 4.29)  Rg  24.0  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_18.pdb            CA-CA 3.923 (min 3.50 max 4.19)  Rg  24.2  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_19.pdb            CA-CA 4.038 (min 3.53 max 4.33)  Rg  24.5  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.912 (min 3.62 max 4.17)  Rg  24.7  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_20.pdb            CA-CA 3.879 (min 3.23 max 4.50)  Rg  22.6  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_21.pdb            CA-CA 3.888 (min 3.34 max 4.21)  Rg  23.6  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_22.pdb            CA-CA 3.834 (min 3.27 max 4.15)  Rg  20.1  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_23.pdb            CA-CA 3.990 (min 3.53 max 4.29)  Rg  26.8  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_24.pdb            CA-CA 3.918 (min 3.40 max 4.76)  Rg  22.4  H 0.89 E 0.00 c 0.11  clash<4A   1  nan 0
+   design_25.pdb            CA-CA 3.984 (min 3.60 max 4.35)  Rg  32.4  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_26.pdb            CA-CA 3.943 (min 3.46 max 4.26)  Rg  19.2  H 0.88 E 0.02 c 0.10  clash<4A   1  nan 0
+   design_27.pdb            CA-CA 3.908 (min 2.96 max 4.34)  Rg  24.7  H 0.94 E 0.01 c 0.05  clash<4A   0  nan 0
+   design_28.pdb            CA-CA 3.815 (min 3.47 max 4.55)  Rg  21.6  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_29.pdb            CA-CA 3.934 (min 3.62 max 4.18)  Rg  24.6  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_3.pdb             CA-CA 3.980 (min 3.49 max 4.31)  Rg  25.3  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_30.pdb            CA-CA 3.929 (min 3.61 max 4.21)  Rg  25.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_31.pdb            CA-CA 3.929 (min 3.50 max 4.22)  Rg  24.8  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_32.pdb            CA-CA 3.909 (min 3.52 max 4.57)  Rg  18.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_33.pdb            CA-CA 3.887 (min 3.54 max 4.15)  Rg  24.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_34.pdb            CA-CA 3.960 (min 3.51 max 4.35)  Rg  24.4  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_35.pdb            CA-CA 3.889 (min 3.28 max 4.26)  Rg  20.4  H 0.95 E 0.00 c 0.05  clash<4A   2  nan 0
+   design_36.pdb            CA-CA 372.926 (min 2.18 max 974.94)  Rg 433.9  H 0.00 E 0.00 c 1.00  clash<4A   1  nan 0
+   design_37.pdb            CA-CA 4.047 (min 3.48 max 4.29)  Rg  33.4  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_38.pdb            CA-CA 3.912 (min 3.57 max 4.33)  Rg  17.6  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_39.pdb            CA-CA 3.900 (min 3.44 max 4.23)  Rg  25.3  H 0.98 E 0.00 c 0.02  clash<4A   1  nan 0
+   design_4.pdb             CA-CA 3.907 (min 3.50 max 4.49)  Rg  20.3  H 0.87 E 0.00 c 0.13  clash<4A   1  nan 0
+   design_40.pdb            CA-CA 3.855 (min 3.46 max 4.35)  Rg  18.3  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_41.pdb            CA-CA 3.860 (min 3.07 max 4.14)  Rg  26.1  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_42.pdb            CA-CA 3.882 (min 3.22 max 4.14)  Rg  23.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_43.pdb            CA-CA 565.464 (min 3.37 max 1333.84)  Rg 479.7  H 0.00 E 0.00 c 1.00  clash<4A   4  nan 0
+   design_44.pdb            CA-CA 3.902 (min 3.40 max 4.43)  Rg  22.6  H 0.87 E 0.00 c 0.13  clash<4A   0  nan 0
+   design_45.pdb            CA-CA 3.953 (min 3.47 max 4.30)  Rg  27.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_46.pdb            CA-CA 3.843 (min 3.57 max 4.07)  Rg  23.7  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_47.pdb            CA-CA 3.966 (min 3.46 max 4.40)  Rg  23.9  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_48.pdb            CA-CA 3.918 (min 3.59 max 4.35)  Rg  22.3  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_49.pdb            CA-CA 3.902 (min 3.41 max 4.23)  Rg  24.6  H 0.98 E 0.00 c 0.02  clash<4A   1  nan 0
+   design_5.pdb             CA-CA 4.000 (min 3.46 max 4.43)  Rg  24.5  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_50.pdb            CA-CA 3.935 (min 3.25 max 4.23)  Rg  21.6  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_51.pdb            CA-CA 3.919 (min 3.24 max 4.27)  Rg  23.7  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_52.pdb            CA-CA 10.340 (min 0.55 max 256.85)  Rg 261.9  H 0.05 E 0.34 c 0.61  clash<4A  11  nan 0
+   design_53.pdb            CA-CA 3.923 (min 3.44 max 4.22)  Rg  22.3  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_54.pdb            CA-CA 3.864 (min 3.58 max 4.19)  Rg  23.3  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_55.pdb            CA-CA 3.965 (min 3.66 max 4.27)  Rg  24.5  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_56.pdb            CA-CA 3.912 (min 3.17 max 4.67)  Rg  20.1  H 0.96 E 0.03 c 0.01  clash<4A   1  nan 0
+   design_57.pdb            CA-CA 3.930 (min 3.58 max 4.27)  Rg  22.8  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_58.pdb            CA-CA 3.903 (min 3.45 max 4.18)  Rg  24.9  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_59.pdb            CA-CA 3.868 (min 3.16 max 4.33)  Rg  20.6  H 0.89 E 0.00 c 0.11  clash<4A   1  nan 0
+   design_6.pdb             CA-CA 3.948 (min 3.28 max 4.21)  Rg  20.6  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_60.pdb            CA-CA 3.936 (min 3.53 max 4.50)  Rg  31.3  H 0.97 E 0.00 c 0.03  clash<4A   1  nan 0
+   design_61.pdb            CA-CA 3.959 (min 3.47 max 4.29)  Rg  23.8  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_62.pdb            CA-CA 3.865 (min 3.25 max 4.19)  Rg  17.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_63.pdb            CA-CA 3.954 (min 3.57 max 4.26)  Rg  22.0  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_64.pdb            CA-CA 3.884 (min 3.56 max 4.32)  Rg  18.5  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_65.pdb            CA-CA 3.979 (min 3.54 max 4.23)  Rg  30.9  H 0.93 E 0.05 c 0.02  clash<4A   0  nan 0
+   design_66.pdb            CA-CA 3.880 (min 3.35 max 4.12)  Rg  23.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_67.pdb            CA-CA 3.939 (min 3.55 max 4.25)  Rg  22.8  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_68.pdb            CA-CA 536.182 (min 32.00 max 1224.51)  Rg 503.9  H 0.00 E 0.00 c 1.00  clash<4A   0  nan 0
+   design_69.pdb            CA-CA 3.903 (min 3.29 max 4.24)  Rg  22.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_7.pdb             CA-CA 3.928 (min 3.65 max 4.22)  Rg  21.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_70.pdb            CA-CA 3.938 (min 3.66 max 4.23)  Rg  24.5  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_71.pdb            CA-CA 3.862 (min 3.22 max 4.40)  Rg  21.7  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_72.pdb            CA-CA 447.940 (min 2.90 max 1025.28)  Rg 418.9  H 0.00 E 0.00 c 1.00  clash<4A   6  nan 0
+   design_73.pdb            CA-CA 3.842 (min 3.27 max 4.11)  Rg  21.1  H 0.92 E 0.01 c 0.07  clash<4A   0  nan 0
+   design_74.pdb            CA-CA 3.934 (min 3.55 max 4.21)  Rg  23.4  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_75.pdb            CA-CA 3.872 (min 3.27 max 4.13)  Rg  17.5  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_76.pdb            CA-CA 3.836 (min 3.53 max 4.35)  Rg  19.1  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_77.pdb            CA-CA 3.989 (min 3.58 max 4.28)  Rg  23.9  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_78.pdb            CA-CA 3.961 (min 3.55 max 4.19)  Rg  19.8  H 1.00 E 0.00 c 0.00  clash<4A   1  nan 0
+   design_79.pdb            CA-CA 3.840 (min 3.31 max 4.13)  Rg  24.1  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_8.pdb             CA-CA 3.827 (min 3.34 max 4.36)  Rg  18.3  H 0.87 E 0.00 c 0.13  clash<4A   1  nan 0
+   design_80.pdb            CA-CA 3.830 (min 3.35 max 4.38)  Rg  17.1  H 0.88 E 0.00 c 0.12  clash<4A   0  nan 0
+   design_81.pdb            CA-CA 3.902 (min 3.33 max 4.17)  Rg  24.8  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_82.pdb            CA-CA 3.878 (min 3.02 max 4.28)  Rg  20.6  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_83.pdb            CA-CA 3.865 (min 3.60 max 4.10)  Rg  24.7  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_84.pdb            CA-CA 3.872 (min 3.54 max 4.43)  Rg  18.2  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_85.pdb            CA-CA 3.981 (min 3.65 max 4.35)  Rg  24.3  H 0.93 E 0.00 c 0.07  clash<4A   1  nan 0
+   design_86.pdb            CA-CA 3.823 (min 3.15 max 4.30)  Rg  20.0  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_87.pdb            CA-CA 3.895 (min 3.27 max 4.31)  Rg  23.8  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_88.pdb            CA-CA 3.868 (min 3.53 max 4.44)  Rg  17.3  H 0.89 E 0.08 c 0.03  clash<4A   0  nan 0
+   design_89.pdb            CA-CA 3.889 (min 3.35 max 4.16)  Rg  23.7  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_9.pdb             CA-CA 3.985 (min 3.68 max 4.28)  Rg  33.3  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_90.pdb            CA-CA 3.917 (min 3.47 max 4.30)  Rg  21.0  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_91.pdb            CA-CA 3.825 (min 3.56 max 4.09)  Rg  23.9  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_92.pdb            CA-CA 3.931 (min 3.31 max 4.48)  Rg  17.8  H 0.90 E 0.00 c 0.10  clash<4A   2  nan 0
+   design_93.pdb            CA-CA 3.887 (min 3.43 max 4.30)  Rg  19.2  H 0.97 E 0.00 c 0.03  clash<4A   1  nan 0
+   design_94.pdb            CA-CA 3.895 (min 3.59 max 4.22)  Rg  24.0  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_95.pdb            CA-CA 3.872 (min 3.52 max 4.15)  Rg  20.6  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_96.pdb            CA-CA 3.836 (min 3.39 max 4.27)  Rg  23.5  H 0.87 E 0.11 c 0.02  clash<4A   0  nan 0
+   design_97.pdb            CA-CA 3.905 (min 3.53 max 4.29)  Rg  23.0  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_98.pdb            CA-CA 3.865 (min 3.28 max 4.09)  Rg  20.4  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_99.pdb            CA-CA 3.888 (min 3.38 max 4.30)  Rg  22.1  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   MEAN  CA-CA 29.9829 +- 108.3202  Rg 49.86 +- 103.73  H 0.888  E 0.006  c 0.106  clash 0.4  nan 0
+== /tmp/904421.helma/n021_designs-904421/d_b8   n_designs=160  L=100
+   design_0.pdb             CA-CA 96.768 (min 1.16 max 614.10)  Rg 469.8  H 0.00 E 0.00 c 1.00  clash<4A 107  nan 0
+   design_1.pdb             CA-CA 3.877 (min 3.50 max 4.16)  Rg  26.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_10.pdb            CA-CA 3.893 (min 3.43 max 4.28)  Rg  24.5  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_100.pdb           CA-CA 3.892 (min 3.37 max 4.17)  Rg  25.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_101.pdb           CA-CA 3.892 (min 3.41 max 4.16)  Rg  24.8  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_102.pdb           CA-CA 3.952 (min 3.59 max 4.21)  Rg  25.3  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_103.pdb           CA-CA 3.964 (min 3.62 max 4.27)  Rg  31.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_104.pdb           CA-CA 3.908 (min 3.50 max 4.44)  Rg  18.9  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_105.pdb           CA-CA 3.933 (min 3.37 max 4.18)  Rg  23.5  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_106.pdb           CA-CA 3.925 (min 3.44 max 4.27)  Rg  19.8  H 0.92 E 0.00 c 0.08  clash<4A   1  nan 0
+   design_107.pdb           CA-CA 3.977 (min 3.60 max 4.29)  Rg  24.4  H 0.96 E 0.00 c 0.04  clash<4A   1  nan 0
+   design_108.pdb           CA-CA 3.937 (min 3.40 max 4.27)  Rg  20.4  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_109.pdb           CA-CA 3.991 (min 3.41 max 4.25)  Rg  37.7  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_11.pdb            CA-CA 3.962 (min 3.46 max 4.32)  Rg  28.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_110.pdb           CA-CA 3.990 (min 3.52 max 4.27)  Rg  27.3  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_111.pdb           CA-CA 3.998 (min 3.14 max 4.36)  Rg  24.4  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_112.pdb           CA-CA 3.884 (min 3.47 max 4.47)  Rg  22.3  H 0.97 E 0.00 c 0.03  clash<4A   1  nan 0
+   design_113.pdb           CA-CA 3.961 (min 3.39 max 4.32)  Rg  23.5  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_114.pdb           CA-CA 3.972 (min 3.60 max 4.33)  Rg  24.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_115.pdb           CA-CA 3.938 (min 3.52 max 4.33)  Rg  18.9  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_116.pdb           CA-CA 3.887 (min 3.40 max 4.30)  Rg  19.3  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_117.pdb           CA-CA 3.846 (min 3.50 max 4.15)  Rg  23.6  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_118.pdb           CA-CA 4.020 (min 3.36 max 4.41)  Rg  23.0  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_119.pdb           CA-CA 3.905 (min 3.55 max 4.28)  Rg  24.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_12.pdb            CA-CA 3.944 (min 3.29 max 4.32)  Rg  29.0  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_120.pdb           CA-CA 3.838 (min 3.46 max 4.40)  Rg  18.2  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_121.pdb           CA-CA 3.910 (min 3.47 max 4.19)  Rg  18.3  H 0.94 E 0.04 c 0.02  clash<4A   0  nan 0
+   design_122.pdb           CA-CA 3.871 (min 3.31 max 4.17)  Rg  23.2  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_123.pdb           CA-CA 3.870 (min 3.33 max 4.25)  Rg  21.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_124.pdb           CA-CA 3.882 (min 3.48 max 4.19)  Rg  23.7  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_125.pdb           CA-CA 3.942 (min 3.48 max 4.36)  Rg  22.0  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_126.pdb           CA-CA 3.998 (min 3.63 max 4.39)  Rg  24.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_127.pdb           CA-CA 4.017 (min 3.47 max 4.24)  Rg  36.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_128.pdb           CA-CA 3.859 (min 3.57 max 4.38)  Rg  23.1  H 0.86 E 0.05 c 0.09  clash<4A   0  nan 0
+   design_129.pdb           CA-CA 3.948 (min 3.28 max 4.32)  Rg  31.1  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_13.pdb            CA-CA 3.923 (min 3.41 max 4.23)  Rg  23.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_130.pdb           CA-CA 3.851 (min 3.49 max 4.17)  Rg  20.7  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_131.pdb           CA-CA 3.957 (min 3.56 max 4.27)  Rg  28.0  H 0.84 E 0.00 c 0.16  clash<4A   0  nan 0
+   design_132.pdb           CA-CA 3.911 (min 3.56 max 4.38)  Rg  23.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_133.pdb           CA-CA 3.899 (min 3.59 max 4.17)  Rg  23.8  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_134.pdb           CA-CA 3.974 (min 2.94 max 4.28)  Rg  25.7  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_135.pdb           CA-CA 3.924 (min 3.61 max 4.29)  Rg  24.1  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_136.pdb           CA-CA 3.855 (min 3.50 max 4.42)  Rg  17.8  H 0.86 E 0.00 c 0.14  clash<4A   0  nan 0
+   design_137.pdb           CA-CA 3.927 (min 3.71 max 4.13)  Rg  24.9  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_138.pdb           CA-CA 3.898 (min 3.30 max 4.17)  Rg  19.3  H 0.91 E 0.02 c 0.07  clash<4A   0  nan 0
+   design_139.pdb           CA-CA 3.832 (min 3.36 max 4.23)  Rg  16.6  H 0.68 E 0.13 c 0.19  clash<4A   0  nan 0
+   design_14.pdb            CA-CA 3.935 (min 2.82 max 4.28)  Rg  25.3  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_140.pdb           CA-CA 3.993 (min 3.61 max 4.31)  Rg  22.8  H 0.93 E 0.00 c 0.07  clash<4A   1  nan 0
+   design_141.pdb           CA-CA 3.933 (min 3.64 max 4.28)  Rg  24.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_142.pdb           CA-CA 480.845 (min 1.62 max 1025.87)  Rg 418.6  H 0.00 E 0.00 c 1.00  clash<4A   8  nan 0
+   design_143.pdb           CA-CA 3.866 (min 3.52 max 4.09)  Rg  21.8  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_144.pdb           CA-CA 463.264 (min 1.83 max 1114.77)  Rg 435.5  H 0.00 E 0.00 c 1.00  clash<4A   7  nan 0
+   design_145.pdb           CA-CA 3.901 (min 3.48 max 4.26)  Rg  24.7  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_146.pdb           CA-CA 3.876 (min 3.53 max 4.19)  Rg  24.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_147.pdb           CA-CA 3.865 (min 3.28 max 4.31)  Rg  19.1  H 0.88 E 0.03 c 0.09  clash<4A   0  nan 0
+   design_148.pdb           CA-CA 3.859 (min 3.36 max 4.15)  Rg  21.2  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_149.pdb           CA-CA 3.916 (min 3.66 max 4.19)  Rg  23.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_15.pdb            CA-CA 3.924 (min 3.64 max 4.22)  Rg  24.2  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_150.pdb           CA-CA 3.950 (min 3.18 max 4.26)  Rg  23.4  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_151.pdb           CA-CA 4.003 (min 3.52 max 4.34)  Rg  24.5  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_152.pdb           CA-CA 3.769 (min 3.30 max 4.30)  Rg  19.6  H 0.82 E 0.00 c 0.18  clash<4A   0  nan 0
+   design_153.pdb           CA-CA 3.906 (min 3.50 max 4.19)  Rg  21.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_154.pdb           CA-CA 3.958 (min 3.45 max 4.28)  Rg  24.2  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_155.pdb           CA-CA 3.925 (min 3.60 max 4.31)  Rg  23.2  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_156.pdb           CA-CA 3.895 (min 3.45 max 4.33)  Rg  24.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_157.pdb           CA-CA 3.920 (min 3.51 max 4.17)  Rg  29.5  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_158.pdb           CA-CA 3.873 (min 2.87 max 4.25)  Rg  22.3  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_159.pdb           CA-CA 3.937 (min 3.58 max 4.22)  Rg  24.3  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_16.pdb            CA-CA 3.846 (min 3.27 max 4.24)  Rg  18.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_17.pdb            CA-CA 3.991 (min 3.55 max 4.33)  Rg  25.0  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_18.pdb            CA-CA 3.947 (min 3.51 max 4.27)  Rg  25.2  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_19.pdb            CA-CA 3.909 (min 3.40 max 4.23)  Rg  21.9  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_2.pdb             CA-CA 3.896 (min 3.47 max 4.19)  Rg  25.1  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_20.pdb            CA-CA 3.845 (min 3.40 max 4.18)  Rg  20.7  H 0.96 E 0.02 c 0.02  clash<4A   0  nan 0
+   design_21.pdb            CA-CA 3.879 (min 3.21 max 4.24)  Rg  23.3  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_22.pdb            CA-CA 3.821 (min 3.35 max 4.24)  Rg  19.6  H 0.88 E 0.02 c 0.10  clash<4A   0  nan 0
+   design_23.pdb            CA-CA 3.938 (min 3.50 max 4.19)  Rg  24.8  H 0.98 E 0.00 c 0.02  clash<4A   1  nan 0
+   design_24.pdb            CA-CA 3.936 (min 3.41 max 4.57)  Rg  24.5  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_25.pdb            CA-CA 3.835 (min 3.32 max 4.17)  Rg  20.9  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_26.pdb            CA-CA 3.898 (min 3.54 max 4.14)  Rg  23.6  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_27.pdb            CA-CA 3.929 (min 3.44 max 4.18)  Rg  25.4  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_28.pdb            CA-CA 3.952 (min 3.43 max 4.20)  Rg  23.7  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_29.pdb            CA-CA 3.987 (min 3.66 max 4.37)  Rg  25.4  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_3.pdb             CA-CA 3.861 (min 3.33 max 4.14)  Rg  19.1  H 0.94 E 0.03 c 0.03  clash<4A   0  nan 0
+   design_30.pdb            CA-CA 3.929 (min 3.61 max 4.22)  Rg  23.7  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_31.pdb            CA-CA 3.994 (min 3.44 max 4.31)  Rg  28.4  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_32.pdb            CA-CA 3.835 (min 3.32 max 4.25)  Rg  22.6  H 0.88 E 0.00 c 0.12  clash<4A   0  nan 0
+   design_33.pdb            CA-CA 3.917 (min 3.54 max 4.20)  Rg  24.2  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_34.pdb            CA-CA 3.853 (min 3.23 max 4.21)  Rg  26.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_35.pdb            CA-CA 3.921 (min 3.69 max 4.27)  Rg  25.4  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_36.pdb            CA-CA 3.819 (min 3.41 max 4.11)  Rg  19.5  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_37.pdb            CA-CA 3.865 (min 3.29 max 4.19)  Rg  17.7  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_38.pdb            CA-CA 3.849 (min 2.61 max 4.17)  Rg  19.5  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_39.pdb            CA-CA 3.862 (min 3.49 max 4.25)  Rg  23.9  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.927 (min 3.30 max 4.24)  Rg  21.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_40.pdb            CA-CA 3.911 (min 3.55 max 4.44)  Rg  21.4  H 0.84 E 0.00 c 0.16  clash<4A   0  nan 0
+   design_41.pdb            CA-CA 3.891 (min 3.25 max 4.21)  Rg  24.6  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_42.pdb            CA-CA 514.604 (min 2.40 max 1427.14)  Rg 506.1  H 0.00 E 0.00 c 1.00  clash<4A   1  nan 0
+   design_43.pdb            CA-CA 483.116 (min 1.70 max 1309.11)  Rg 483.0  H 0.00 E 0.00 c 1.00  clash<4A   1  nan 0
+   design_44.pdb            CA-CA 3.857 (min 3.41 max 4.14)  Rg  21.8  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_45.pdb            CA-CA 3.906 (min 3.51 max 4.18)  Rg  24.8  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_46.pdb            CA-CA 3.881 (min 3.42 max 4.17)  Rg  23.7  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_47.pdb            CA-CA 3.964 (min 3.39 max 4.29)  Rg  24.4  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_48.pdb            CA-CA 446.302 (min 1.55 max 1235.92)  Rg 434.9  H 0.00 E 0.05 c 0.95  clash<4A  10  nan 0
+   design_49.pdb            CA-CA 3.881 (min 3.40 max 4.15)  Rg  26.3  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.892 (min 3.30 max 4.23)  Rg  19.1  H 0.87 E 0.00 c 0.13  clash<4A   0  nan 0
+   design_50.pdb            CA-CA 3.889 (min 3.34 max 4.23)  Rg  16.3  H 0.90 E 0.02 c 0.08  clash<4A   0  nan 0
+   design_51.pdb            CA-CA 3.927 (min 3.25 max 4.24)  Rg  24.5  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_52.pdb            CA-CA 3.962 (min 3.72 max 4.22)  Rg  25.4  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_53.pdb            CA-CA 3.936 (min 3.58 max 4.23)  Rg  25.0  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_54.pdb            CA-CA 3.916 (min 3.55 max 4.21)  Rg  24.6  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_55.pdb            CA-CA 3.898 (min 3.42 max 4.14)  Rg  23.5  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_56.pdb            CA-CA 512.590 (min 28.75 max 1163.11)  Rg 498.8  H 0.00 E 0.05 c 0.95  clash<4A   0  nan 0
+   design_57.pdb            CA-CA 3.947 (min 3.15 max 4.27)  Rg  25.0  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_58.pdb            CA-CA 3.921 (min 3.61 max 4.19)  Rg  24.2  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_59.pdb            CA-CA 3.963 (min 3.59 max 4.19)  Rg  24.3  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_6.pdb             CA-CA 3.928 (min 3.56 max 4.24)  Rg  24.3  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_60.pdb            CA-CA 3.943 (min 3.48 max 4.25)  Rg  25.9  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_61.pdb            CA-CA 3.866 (min 3.25 max 4.15)  Rg  23.7  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_62.pdb            CA-CA 3.987 (min 3.49 max 4.31)  Rg  24.0  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_63.pdb            CA-CA 3.957 (min 3.52 max 4.28)  Rg  24.5  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_64.pdb            CA-CA 3.889 (min 3.54 max 4.49)  Rg  23.3  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_65.pdb            CA-CA 3.869 (min 3.53 max 4.11)  Rg  24.2  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_66.pdb            CA-CA 4.007 (min 3.54 max 4.34)  Rg  23.7  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_67.pdb            CA-CA 3.964 (min 3.52 max 4.28)  Rg  24.6  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_68.pdb            CA-CA 3.883 (min 3.47 max 4.16)  Rg  27.2  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_69.pdb            CA-CA 3.921 (min 3.52 max 4.17)  Rg  21.1  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_7.pdb             CA-CA 3.891 (min 3.23 max 4.23)  Rg  17.5  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_70.pdb            CA-CA 3.914 (min 3.60 max 4.31)  Rg  20.6  H 0.91 E 0.03 c 0.06  clash<4A   0  nan 0
+   design_71.pdb            CA-CA 3.934 (min 3.53 max 4.25)  Rg  20.0  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_72.pdb            CA-CA 3.912 (min 3.59 max 4.37)  Rg  23.8  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_73.pdb            CA-CA 3.919 (min 3.40 max 4.25)  Rg  23.3  H 0.99 E 0.00 c 0.01  clash<4A   1  nan 0
+   design_74.pdb            CA-CA 3.930 (min 3.46 max 4.19)  Rg  30.3  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_75.pdb            CA-CA 3.899 (min 3.37 max 4.18)  Rg  21.0  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_76.pdb            CA-CA 3.917 (min 3.38 max 4.23)  Rg  24.9  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_77.pdb            CA-CA 3.923 (min 3.40 max 4.28)  Rg  25.6  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_78.pdb            CA-CA 3.908 (min 3.42 max 4.20)  Rg  24.3  H 0.95 E 0.00 c 0.05  clash<4A   0  nan 0
+   design_79.pdb            CA-CA 3.938 (min 3.41 max 4.13)  Rg  31.0  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_8.pdb             CA-CA 3.842 (min 3.22 max 4.29)  Rg  17.9  H 0.11 E 0.79 c 0.10  clash<4A   8  nan 0
+   design_80.pdb            CA-CA 7.486 (min 0.48 max 415.66)  Rg 269.8  H 0.05 E 0.25 c 0.70  clash<4A  22  nan 0
+   design_81.pdb            CA-CA 3.909 (min 3.43 max 4.13)  Rg  18.9  H 0.96 E 0.00 c 0.04  clash<4A   1  nan 0
+   design_82.pdb            CA-CA 3.937 (min 3.59 max 4.29)  Rg  25.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_83.pdb            CA-CA 3.968 (min 3.62 max 4.28)  Rg  27.8  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_84.pdb            CA-CA 3.902 (min 3.27 max 4.26)  Rg  23.6  H 0.97 E 0.02 c 0.01  clash<4A   0  nan 0
+   design_85.pdb            CA-CA 3.988 (min 3.51 max 4.24)  Rg  35.2  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_86.pdb            CA-CA 4.030 (min 3.38 max 4.57)  Rg  28.0  H 0.87 E 0.00 c 0.13  clash<4A   1  nan 0
+   design_87.pdb            CA-CA 3.776 (min 3.08 max 4.20)  Rg  18.0  H 0.92 E 0.04 c 0.04  clash<4A   0  nan 0
+   design_88.pdb            CA-CA 3.893 (min 3.43 max 4.38)  Rg  22.7  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_89.pdb            CA-CA 3.929 (min 3.07 max 4.21)  Rg  22.3  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_9.pdb             CA-CA 3.936 (min 3.54 max 4.18)  Rg  24.5  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_90.pdb            CA-CA 3.918 (min 3.54 max 4.30)  Rg  24.5  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_91.pdb            CA-CA 3.959 (min 3.25 max 4.28)  Rg  31.1  H 0.91 E 0.00 c 0.09  clash<4A   0  nan 0
+   design_92.pdb            CA-CA 3.915 (min 3.36 max 4.23)  Rg  21.3  H 0.94 E 0.00 c 0.06  clash<4A   1  nan 0
+   design_93.pdb            CA-CA 3.966 (min 3.47 max 4.27)  Rg  23.1  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_94.pdb            CA-CA 3.907 (min 3.39 max 4.28)  Rg  22.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_95.pdb            CA-CA 3.900 (min 3.12 max 4.24)  Rg  18.4  H 0.89 E 0.00 c 0.11  clash<4A   0  nan 0
+   design_96.pdb            CA-CA 3.865 (min 3.51 max 4.49)  Rg  20.6  H 0.88 E 0.05 c 0.07  clash<4A   2  nan 0
+   design_97.pdb            CA-CA 3.892 (min 3.47 max 4.14)  Rg  21.8  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_98.pdb            CA-CA 3.960 (min 3.50 max 4.27)  Rg  23.4  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_99.pdb            CA-CA 3.921 (min 3.47 max 4.21)  Rg  24.0  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   MEAN  CA-CA 22.5006 +- 91.4031  Rg 44.43 +- 92.08  H 0.900  E 0.010  c 0.090  clash 1.1  nan 0
+########## STATS (N015 methodology, n=160 per arm)
+
+================ ALL DESIGNS ================
+arm          n        CA-CA (A)           Rg (A)            helix           strand             coil     clash/design  diverged
+a_b1       160 64.5451+-149.2289    89.59+-157.66     0.747+-0.348     0.027+-0.105     0.226+-0.334       1.40+-4.88        26
+b_b2       160 54.1670+-147.6199    74.19+-146.94     0.816+-0.305     0.016+-0.089     0.168+-0.291       0.66+-3.71        18
+c_b4       160 29.9829+-108.6603    49.86+-104.05     0.888+-0.232     0.006+-0.031     0.106+-0.224       0.41+-1.37        10
+d_b8       160 22.5006+-91.6901     44.43+-92.37     0.900+-0.220     0.010+-0.067     0.090+-0.203       1.10+-8.70         8
+
+-- Welch t-test vs a_b1 (p < 0.05 flagged *, p < 0.01 **)
+arm                         CA-CA (A)                     Rg (A)                      helix                     strand                       coil               clash/design
+b_b2       d=-10.3781 t=-0.63 p=0.532   d=-15.40 t=-0.90 p=0.367   d=+0.069 t=+1.88 p=0.061   d=-0.011 t=-1.03 p=0.305   d=-0.058 t=-1.65 p=0.101    d=-0.74 t=-1.53 p=0.126 
+c_b4       d=-34.5621 t=-2.37 p=0.019* d=-39.72 t=-2.66 p=0.008** d=+0.141 t=+4.27 p=0.000**  d=-0.021 t=-2.49 p=0.014* d=-0.120 t=-3.76 p=0.000**   d=-0.99 t=-2.46 p=0.015*
+d_b8       d=-42.0444 t=-3.04 p=0.003** d=-45.15 t=-3.13 p=0.002** d=+0.153 t=+4.70 p=0.000**  d=-0.017 t=-1.74 p=0.082  d=-0.136 t=-4.40 p=0.000**   d=-0.30 t=-0.38 p=0.704 
+
+================ CONVERGED ONLY (diverged designs dropped) ================
+arm          n        CA-CA (A)           Rg (A)            helix           strand             coil     clash/design  diverged
+a_b1       134   3.8750+-0.0694      21.14+-5.67     0.890+-0.137     0.029+-0.110     0.081+-0.051       0.30+-0.89        26
+b_b2       142   3.8897+-0.0485      22.21+-2.98     0.918+-0.107     0.016+-0.095     0.066+-0.048       0.31+-1.26        18
+c_b4       150   3.9118+-0.0531      23.48+-3.58     0.947+-0.041     0.003+-0.015     0.050+-0.040       0.15+-0.40        10
+d_b8       152   3.9153+-0.0477      23.64+-3.48     0.947+-0.081     0.008+-0.065     0.044+-0.038       0.13+-0.71         8
+
+-- Welch t-test vs a_b1 (p < 0.05 flagged *, p < 0.01 **)
+arm                         CA-CA (A)                     Rg (A)                      helix                     strand                       coil               clash/design
+b_b2       d=+0.0147 t=+2.03 p=0.044*   d=+1.07 t=+1.95 p=0.053   d=+0.028 t=+1.89 p=0.059   d=-0.013 t=-1.06 p=0.291   d=-0.015 t=-2.53 p=0.012*   d=+0.01 t=+0.09 p=0.931 
+c_b4       d=+0.0369 t=+4.98 p=0.000**  d=+2.34 t=+4.11 p=0.000** d=+0.057 t=+4.67 p=0.000** d=-0.026 t=-2.70 p=0.008** d=-0.032 t=-5.81 p=0.000**   d=-0.15 t=-1.73 p=0.084 
+d_b8       d=+0.0403 t=+5.65 p=0.000**  d=+2.50 t=+4.42 p=0.000** d=+0.057 t=+4.25 p=0.000**  d=-0.021 t=-1.91 p=0.058  d=-0.037 t=-6.89 p=0.000**   d=-0.17 t=-1.74 p=0.084 
+
+per-design metrics -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/per_design.json
+
+-- what n=134 (converged) could have detected (two-sided alpha=0.05, power 0.80)
+metric          sd(exact)   SE(diff)        MDE   largest |observed d|
+CA-CA (A)          0.0694     0.0073     0.0205                 0.0403
+Rg (A)               5.67       0.55       1.55                   2.50
+helix               0.137      0.015      0.042                  0.057
+strand              0.110      0.013      0.035                  0.026
+coil                0.051      0.006      0.017                  0.037
+clash/design         0.89       0.13       0.37                   0.17
+
+-- spread vs a_exact, CONVERGED only: Brown-Forsythe (median-centred Levene)
+arm                             CA-CA (A)                         Rg (A)                          helix                         strand                           coil                   clash/design
+b_b2       sd 0.0485/0.0694 W= 0.20 p=0.6578  sd 2.98/5.67 W= 1.16 p=0.2822  sd 0.107/0.137 W= 0.42 p=0.5180  sd 0.095/0.110 W= 1.13 p=0.2886  sd 0.048/0.051 W= 0.27 p=0.6059  sd 1.26/0.89 W= 0.01 p=0.9317 
+c_b4       sd 0.0531/0.0694 W= 0.00 p=0.9478  sd 3.58/5.67 W= 0.19 p=0.6598  sd 0.041/0.137 W= 6.52 p=0.0112* sd 0.015/0.110 W= 8.12 p=0.0047** sd 0.040/0.051 W= 4.75 p=0.0301* sd 0.40/0.89 W= 3.25 p=0.0726 
+d_b8       sd 0.0477/0.0694 W= 0.76 p=0.3832  sd 3.48/5.67 W= 0.58 p=0.4452  sd 0.081/0.137 W= 3.78 p=0.0529  sd 0.065/0.110 W= 3.86 p=0.0505  sd 0.038/0.051 W= 7.73 p=0.0058** sd 0.71/0.89 W= 3.11 p=0.0791 
+
+-- tail counts, CONVERGED only (threshold = exact mean +- 3 sd of the EXACT arm)
+CA-CA (A)      outside [3.6667, 4.0833]: a_b1 1 b_b2 0 c_b4 1 d_b8 0
+Rg (A)         outside [4.13, 38.15]: a_b1 1 b_b2 0 c_b4 0 d_b8 0
+
+-- distribution shape vs a_exact, CONVERGED only: two-sample KS
+arm                     CA-CA (A)                 Rg (A)                  helix                 strand                   coil
+b_b2            D=0.170 p=0.0324*     D=0.252 p=0.0002**     D=0.213 p=0.0030**      D=0.143 p=0.1059      D=0.195 p=0.0086**
+c_b4           D=0.314 p=0.0000**     D=0.421 p=0.0000**     D=0.341 p=0.0000**     D=0.215 p=0.0023**     D=0.293 p=0.0000**
+d_b8           D=0.388 p=0.0000**     D=0.486 p=0.0000**     D=0.406 p=0.0000**     D=0.191 p=0.0090**     D=0.352 p=0.0000**
+
+-- diverged designs: Fisher exact vs a_exact
+b_b2       18/160 vs 26/160   p=0.2557 
+c_b4       10/160 vs 26/160   p=0.0073**
+d_b8       8/160 vs 26/160   p=0.0017**
+
+-- NOTE: 18 mean tests + 18 spread tests + 15 KS tests were run. Bonferroni over the 18 tests of one family is alpha=0.0028; a single p in the 0.01-0.05 range does not survive it.
+
+-- tails (worst single design per arm)
+a_b1       CA-CA min 0.236 max 1540.874   per-design CA-CA mean range 3.7247..555.0576   Rg range 15.2..544.8  max clash 40
+b_b2       CA-CA min 1.077 max 1411.881   per-design CA-CA mean range 3.7884..582.9293   Rg range 16.0..516.9  max clash 42
+c_b4       CA-CA min 0.553 max 1391.592   per-design CA-CA mean range 3.8096..565.4642   Rg range 17.1..513.5  max clash 11
+d_b8       CA-CA min 0.480 max 1427.142   per-design CA-CA mean range 3.7690..514.6043   Rg range 16.3..506.1  max clash 107
+### done Sat Sep 26 06:04:41 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 18:04:42 CEST 2026
+= Job-ID             : 904421 on helma
+= Job-Name           : n021_arms
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/run_arms.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 02:30:00
+= Elapsed runtime    : 00:24:25
+= Total RAM usage    : 4.8 GiB of assigned 175 GiB (2.7%)
+= Node list          : h13-15
+= Subm/Elig/Start/End: 2026-09-26T17:40:17 / 2026-09-26T17:40:17 / 2026-09-26T17:40:17 / 2026-09-26T18:04:42
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.0G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K  5d14h45m9s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 855530, 21 %, 13 %, 4602 MiB, 358203 ms
+NVIDIA H100, 00000000:C6:00.0, 872889, 21 %, 14 %, 4378 MiB, 343445 ms
+NVIDIA H100, 00000000:C6:00.0, 877245, 17 %, 11 %, 4278 MiB, 435109 ms
+NVIDIA H100, 00000000:C6:00.0, 881776, 31 %, 21 %, 5512 MiB, 238801 ms

@@ -35,7 +35,8 @@ from torch import Tensor
 
 from .schedules import parse_timescale
 
-__all__ = ["SamplerConfig", "sample", "sample_group", "make_initial_data"]
+__all__ = ["SamplerConfig", "sample", "sample_group", "make_initial_data",
+           "pack_designs", "split_packed_snapshot"]
 
 #: ``step_fn(data, prev, generator) -> (update, prev)``.
 StepFn = Callable[[dict, dict, torch.Generator | None], tuple[dict, dict]]
@@ -111,6 +112,201 @@ def make_initial_data(num_aa: int, residue_index: Tensor, chain_index: Tensor,
                  "local": torch.zeros((num_aa, local_size), **f32)}
     return data, init_prev
 
+
+
+# ---------------------------------------------------------------------------
+# N021 - PACKED batching: B designs concatenated along the flat residue axis
+# ---------------------------------------------------------------------------
+#: Conditioning fields that are dense ``(N, N)`` pair maps. Packing these is
+#: NOT a concatenation - they have to become BLOCK DIAGONAL, so design `i`'s
+#: map covers only design `i`'s residues and every cross-design entry is the
+#: unconditional sentinel (0 / False). Concatenating them along axis 0 would
+#: produce a ``(B*L, L)`` tensor, i.e. the wrong shape, and broadcasting one
+#: design's map across the pack would apply its motif to every member.
+_PAIR_FIELDS = ("dmap", "dmap_mask", "omap", "chain_contacts")
+#: Fields the packer knows how to handle by a rule other than "concatenate".
+_SPECIAL_FIELDS = ("batch_index", "dssp_mean", "dssp_mean_mask", "cloud_std")
+
+
+def _block_diagonal(values: Sequence[Tensor], lengths: Sequence[int]) -> Tensor:
+    """Place each ``(L_i, L_i, ...)`` map on the diagonal of one ``(N, N, ...)``."""
+    total = int(sum(lengths))
+    v0 = values[0]
+    out = torch.zeros((total, total) + tuple(v0.shape[2:]),
+                      dtype=v0.dtype, device=v0.device)
+    off = 0
+    for v, n in zip(values, lengths):
+        out[off:off + n, off:off + n] = v
+        off += n
+    return out
+
+
+def pack_designs(datas: Sequence[dict], prevs: Sequence[dict]
+                 ) -> tuple[dict, dict, list[int]]:
+    """Concatenate B per-design ``(data, prev)`` pairs into ONE packed pair.
+
+    salad has **no leading batch dimension**. A batch is several proteins
+    concatenated along the flat residue axis with a companion
+    ``batch_index``/``chain_index``/``mask``; every segment op (`index_mean`,
+    `index_sum`, `extract_neighbours`) expects exactly that, so
+    `torch.stack` is the wrong collate and `salad_torch.data.collate`'s
+    `concat_collate` (which reproduces upstream's `np_collate`) is the right
+    one. This is the inference-side counterpart of it.
+
+    **Nothing is padded.** `notes/04_PARITY_AND_PERF.md` B1: a `-1`
+    "no neighbour" sentinel writes the *original* finite distance back into
+    column N-1, so a protein sitting next to masked padding, or at any offset
+    other than the end of the flat axis, gets a measurably different answer.
+    That bug is upstream's and is reproduced bit-for-bit by this port, so the
+    only defence is to concatenate exact-length designs and never pad. A
+    packed design is therefore **not** bit-identical to the same design
+    generated alone - see `.agent-research/results/N021-packed-batching/`
+    for how far apart they actually come out.
+
+    Returns ``(packed_data, packed_prev, lengths)``; `lengths` is what
+    `split_packed_snapshot` needs to take the pack apart again.
+
+    Every field is packed by an explicit rule and an unrecognised key RAISES.
+    A silent fallback is exactly how a conditioning channel would end up
+    broadcast across the whole pack.
+    """
+    n = len(datas)
+    if len(prevs) != n:
+        raise ValueError(f"{n} data dicts but {len(prevs)} prev dicts")
+    lengths = [int(d["mask"].shape[0]) for d in datas]
+    if n == 1:
+        # B=1 must be the ORDINARY computation, byte for byte: same dict, same
+        # tensors, no renumbering (batch_index is already all-zero).
+        return dict(datas[0]), dict(prevs[0]), lengths
+
+    keys = set(datas[0])
+    for i, d in enumerate(datas[1:], 1):
+        if set(d) != keys:
+            raise ValueError(
+                f"design {i} carries a different set of keys than design 0 "
+                f"({sorted(set(d) ^ keys)}); a packed batch must be "
+                f"homogeneous - run heterogeneous conditioning unpacked")
+
+    out: dict[str, Any] = {}
+    for k in keys:
+        values = [d[k] for d in datas]
+        v0 = values[0]
+        if k == "batch_index":
+            out[k] = torch.cat([torch.full_like(v, i)
+                                for i, v in enumerate(values)])
+        elif k == "chain_index":
+            # RENUMBERED, not concatenated - and this is not cosmetic.
+            # `batch_index` separates the members in every op that takes
+            # `same_item`, but two of salad's reductions key on `chain_index`
+            # ALONE and would fuse members that both call their first chain 0:
+            #   * `modules/blocks.py` `Update`'s per-chain global gate,
+            #     `index_mean(chain_gate * local_update, chain, mask)`, in
+            #     EVERY block of the trunk;
+            #   * `geometry/features.py`'s relative-position feature, whose
+            #     chain length is `index_count(chain, ones)`, so a shared id
+            #     reports a B*L-residue chain.
+            # Measured on CPU (deterministic) at L=100, B=2, one forward with
+            # identical injected randomness: leaving the ids colliding moves
+            # `local` by 34-38 and `pos` by ~4 A, i.e. it is a different
+            # protein, and it moves the LAST member too - so it is not the B1
+            # sentinel. Only chain-relative comparisons are ever made
+            # (`chain[:, None] == chain[None, :]`), so a per-member offset is
+            # invisible within a member.
+            #
+            # NB upstream's own training collate (`dataset.py` step 8,
+            # `_numerical_chain_index` per part) does NOT do this, so packed
+            # TRAINING batches in salad share chain ids across items and take
+            # both of these leaks. Out of scope here, but recorded.
+            offset, renumbered = 0, []
+            for v in values:
+                renumbered.append(v + offset)
+                offset += int(v.max().item()) + 1
+            out[k] = torch.cat(renumbered)
+        elif k in _PAIR_FIELDS:
+            out[k] = _block_diagonal(values, lengths)
+        elif k == "dssp_mean":
+            # a 1-D (3,) request means "this composition, for every residue",
+            # and `prepare_condition` expands it over the WHOLE flat axis - so
+            # packing it as-is would apply design 0's composition to all B.
+            # Expand each design's request to its own (L_i, 3) rows first.
+            rows, masks = [], []
+            for v, L_i in zip(values, lengths):
+                if v.dim() == 1:
+                    rows.append(v[None].expand(L_i, v.shape[0]).contiguous())
+                    masks.append(torch.ones((L_i,), dtype=torch.bool,
+                                            device=v.device))
+                else:
+                    rows.append(v)
+                    masks.append(None)
+            out[k] = torch.cat(rows, dim=0)
+            if any(m is not None for m in masks):
+                built = [m if m is not None else
+                         datas[i]["dssp_mean_mask"]
+                         for i, m in enumerate(masks)]
+                out["dssp_mean_mask"] = torch.cat(built, dim=0)
+        elif k == "dssp_mean_mask":
+            continue          # written by the "dssp_mean" branch above
+        elif k == "cloud_std":
+            if torch.is_tensor(v0) and v0.dim() >= 1 and v0.shape[0] == lengths[0]:
+                out[k] = torch.cat(values, dim=0)
+            else:
+                # a python/0-d scalar: one cloud std for the whole pack. Only
+                # safe if every design asked for the same one.
+                scalars = [float(v) for v in values]
+                if len(set(scalars)) != 1:
+                    raise ValueError(
+                        "packed designs ask for different scalar cloud_std "
+                        f"{sorted(set(scalars))}; pass it per residue or run "
+                        "them unpacked")
+                out[k] = v0
+        elif torch.is_tensor(v0):
+            if v0.shape[0] != lengths[0]:
+                raise ValueError(
+                    f"do not know how to pack {k!r}: leading dimension "
+                    f"{v0.shape[0]} is not this design's residue count "
+                    f"{lengths[0]}")
+            out[k] = torch.cat(values, dim=0)
+        else:
+            raise ValueError(f"do not know how to pack non-tensor field {k!r}")
+
+    packed_prev = {k: torch.cat([p[k] for p in prevs], dim=0) for k in prevs[0]}
+    return out, packed_prev, lengths
+
+
+def split_packed_snapshot(snapshot: dict, lengths: Sequence[int]) -> list[dict]:
+    """Inverse of `pack_designs` on one snapshot: B per-design snapshots.
+
+    Every tensor whose leading dimension is the pack's total residue count is
+    sliced; ``batch_index`` is reset to all-zero so a split snapshot is
+    indistinguishable from an unpacked one downstream. Pair maps are diced on
+    both axes. Scalars (``step``, ``raw_t``) are copied.
+    """
+    total = int(sum(lengths))
+    offsets, off = [], 0
+    for n in lengths:
+        offsets.append((off, off + n))
+        off += n
+
+    def cut(key, value, lo, hi):
+        if isinstance(value, dict):
+            return {k: cut(k, v, lo, hi) for k, v in value.items()}
+        if not torch.is_tensor(value) or tuple(value.shape[:1]) != (total,):
+            return value
+        out = value[lo:hi]
+        # the second axis is diced ONLY for the known pair maps. Sniffing
+        # `shape[1] == total` instead would mis-slice `pos` whenever the flat
+        # axis happens to equal the atom count.
+        if key in _PAIR_FIELDS and value.dim() >= 2:
+            out = out[:, lo:hi]
+        return out
+
+    parts = []
+    for lo, hi in offsets:
+        part = {k: cut(k, v, lo, hi) for k, v in snapshot.items()}
+        if torch.is_tensor(part.get("batch_index")):
+            part["batch_index"] = torch.zeros_like(part["batch_index"])
+        parts.append(part)
+    return parts
 
 def sample(step_fn: StepFn, data: dict, prev: dict, cfg: SamplerConfig, *,
            generator: torch.Generator | None = None,

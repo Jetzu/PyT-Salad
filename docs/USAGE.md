@@ -92,6 +92,51 @@ size worth using — speed picks N first.
 legacy per-design loop to within 3% and exists as the reference a grouped run
 must match.
 
+### `--batch_size N` — measured, and NOT recommended (N021)
+
+**Real batching**: `N` designs concatenated along salad's flat residue axis, so
+each kernel does `N` designs' work in one launch. Composes with `--group_size`,
+so one replay advances `batch_size × group_size` designs. `--batch_size 1` is
+today's path, byte for byte.
+
+It is **faster**, on top of `--group_size`'s own ceiling:
+
+| L | best group-only | best packed | packing's gain |
+|---|---|---|---|
+| 50 | `G=16` 975 designs/s | `B=8 G=4` 1385/s | **+42 %** |
+| 100 | `G=16` 613/s | `B=8 G=2` 713/s | **+16 %** |
+| 200 | `G=8` 341/s | `B=4 G=2` 356/s | +4.5 % |
+| 400 | `G=4` 171/s | `B=2 G=2` 177/s | +3.6 % |
+| 1000 | `G=2` 70/s | packing **loses** (B=4 is 0.84×) | 0 % |
+
+The knee is a flat-axis length, not a batch size: every winning cell has
+`batch_size × L` between 400 and 800 residues. That is the recipe if you want
+one — `B ≈ 600 / L`, rounded to a power of two, then let `--group_size auto`
+pick the rest. There is no `--batch_size auto`, because each `B` is a new
+compiled shape (minutes), not a re-capture (seconds).
+
+**But it changes the designs**, and that is why it is not recommended. Unlike
+`--group_size`, packing is not semantically free. At n=160 per arm, replicated
+on two seeds, with the seed-set confound controlled, `--batch_size 8` against
+`--batch_size 1` at L=100:
+
+* alanine 7.2 % → **39.8 %** of residues, leucine 46.8 % → 14.1 %
+  (χ² = 13 984, 19 dof, p = 0) — the sequences drift toward poly-alanine;
+* helix +0.06, strand −0.025, coil −0.037, Rg +2.4 Å, CA-CA +0.045 Å, all
+  surviving Bonferroni, every two-sample KS p < 1e-4;
+* diverged designs drop (26/160 → 8/160), which is the one change in the
+  user's favour.
+
+It also does **not** raise arithmetic utilisation: grouping already takes the
+step from 5.6 % to 10.9 % of fp32 peak, and packing adds 0.3 points before
+going backwards past `B=2`. The win is launch slots, the same currency
+`--group_size` spends, because the matmul FLOPs scale exactly linearly with `B`
+while the neighbour sort, the Gumbel field and the pair maps scale as `B²`.
+
+Use it only if you have measured that the distribution shift does not matter
+for what you are doing. Full numbers:
+`.agent-research/results/N021-packed-batching/RESULTS.md`.
+
 ---
 
 ## 3. What to generate

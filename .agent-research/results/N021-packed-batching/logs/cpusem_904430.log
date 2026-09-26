@@ -1,0 +1,163 @@
+### Starting TaskPrologue of job 904430 on h32-44 at Sat Sep 26 17:40:51 CEST 2026
+Running on cores 48-95 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+### node h32-44 Sat Sep 26 17:40:51 CEST 2026
+########## 1. Does a packed design depend on WHO ELSE is in the pack?
+   (if it does, packing leaks; if it does not, the only effect is the offset)
+L=32: is design 0 sensitive to WHO ELSE is in the pack?
+  [0,1] m0 vs [0,2] m0               pos 0.000000e+00  local 0.000e+00  aatype 0/32
+  [0,1] m0 vs [0,1,2] m0             pos 4.148483e-05  local 1.202e-03  aatype 0/32
+  [0] alone vs [0,1] m0              pos 1.583099e-04  local 3.662e-03  aatype 0/32
+  [0] alone vs [1,0] m1 (0 is LAST)  pos 4.673004e-05  local 1.953e-03  aatype 0/32
+L=50: is design 0 sensitive to WHO ELSE is in the pack?
+  [0,1] m0 vs [0,2] m0               pos 0.000000e+00  local 0.000e+00  aatype 0/50
+  [0,1] m0 vs [0,1,2] m0             pos 6.903410e-04  local 1.123e-02  aatype 0/50
+  [0] alone vs [0,1] m0              pos 2.740622e-04  local 6.020e-03  aatype 0/50
+  [0] alone vs [1,0] m1 (0 is LAST)  pos 2.192259e-04  local 2.930e-03  aatype 0/50
+L=64: is design 0 sensitive to WHO ELSE is in the pack?
+  [0,1] m0 vs [0,2] m0               pos 0.000000e+00  local 0.000e+00  aatype 0/64
+  [0,1] m0 vs [0,1,2] m0             pos 3.767014e-05  local 7.629e-04  aatype 0/64
+  [0] alone vs [0,1] m0              pos 6.633997e-05  local 1.656e-03  aatype 0/64
+  [0] alone vs [1,0] m1 (0 is LAST)  pos 4.863739e-05  local 1.099e-03  aatype 0/64
+L=100: is design 0 sensitive to WHO ELSE is in the pack?
+  [0,1] m0 vs [0,2] m0               pos 0.000000e+00  local 0.000e+00  aatype 0/100
+  [0,1] m0 vs [0,1,2] m0             pos 1.788735e-04  local 3.208e-03  aatype 0/100
+  [0] alone vs [0,1] m0              pos 1.916885e-04  local 3.698e-03  aatype 0/100
+  [0] alone vs [1,0] m1 (0 is LAST)  pos 1.751184e-04  local 3.349e-03  aatype 0/100
+L=200: is design 0 sensitive to WHO ELSE is in the pack?
+  [0,1] m0 vs [0,2] m0               pos 0.000000e+00  local 0.000e+00  aatype 0/200
+  [0,1] m0 vs [0,1,2] m0             pos 3.433228e-04  local 1.074e-02  aatype 0/200
+  [0] alone vs [0,1] m0              pos 1.644135e-03  local 5.396e-02  aatype 0/200
+  [0] alone vs [1,0] m1 (0 is LAST)  pos 1.217604e-03  local 4.077e-02  aatype 0/200
+L=400: is design 0 sensitive to WHO ELSE is in the pack?
+  [0,1] m0 vs [0,2] m0               pos 0.000000e+00  local 0.000e+00  aatype 0/400
+  [0,1] m0 vs [0,1,2] m0             pos 9.679794e-05  local 3.784e-03  aatype 0/400
+  [0] alone vs [0,1] m0              pos 5.170846e-02  local 2.326e+00  aatype 0/400
+  [0] alone vs [1,0] m1 (0 is LAST)  pos 2.077818e-04  local 4.028e-03  aatype 0/400
+########## 2. Do the NEIGHBOUR SETS change? (the B1 sentinel's reach)
+L=50: 27 get_neighbours calls alone, 27 packed
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/x_neighbourdiff_cpu.py", line 56, in <module>
+    diff=(n0!=sub).sum().item()
+          ^^^^^^^
+RuntimeError: The size of tensor a (50) must match the size of tensor b (64) at non-singleton dimension 1
+L=100: 27 get_neighbours calls alone, 27 packed
+  call  23 count= 32 K= 64 MISMATCH 2 entries; -1 alone=0 packed=0
+  total mismatching neighbour calls: 1/27
+  -1 counts per call (alone): [0, 0, 0, 1600, 0, 1600, 0, 1600, 0, 1600, 0, 1600]
+L=200: 27 get_neighbours calls alone, 27 packed
+  call  26 count= 32 K= 32 MISMATCH 8 entries; -1 alone=0 packed=0
+  total mismatching neighbour calls: 1/27
+  -1 counts per call (alone): [0, 0, 0, 3200, 0, 3200, 0, 3200, 0, 3200, 0, 3200]
+L=400: 27 get_neighbours calls alone, 27 packed
+  call  20 count= 16 K= 32 MISMATCH 2 entries; -1 alone=0 packed=0
+  call  21 count= 32 K= 64 MISMATCH 5 entries; -1 alone=0 packed=0
+  call  22 count= 16 K= 32 MISMATCH 23 entries; -1 alone=0 packed=0
+  call  23 count= 32 K= 64 MISMATCH 65 entries; -1 alone=0 packed=0
+  call  24 count= 16 K= 32 MISMATCH 39 entries; -1 alone=0 packed=0
+  call  25 count= 32 K= 64 MISMATCH 97 entries; -1 alone=0 packed=0
+  total mismatching neighbour calls: 7/27
+  -1 counts per call (alone): [0, 0, 0, 6400, 0, 6400, 0, 6400, 0, 6400, 0, 6400]
+########## 3. WHERE does the first difference appear? (module-level bisect)
+L=50: 301 records
+  rec  11 diffusion.diffusion_stack.cond_pair_stack[0] SKIP shapes (6, 50, 64, 64) (6, 100, 64, 64)
+  rec  12 diffusion.diffusion_stack.cond_pair_stack[1] SKIP shapes (6, 50, 64) (6, 100, 64)
+  rec  30 diffusion.diffusion_stack.blocks.0.layer_norm_3[0] (50, 128) alone-vs-pack=5.722e-06 packmate_delta=0.000e+00
+  rec  31 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm[0] (50, 128) alone-vs-pack=6.557e-07 packmate_delta=0.000e+00
+  rec  32 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.qkv[0] (50, 768) alone-vs-pack=2.861e-06 packmate_delta=0.000e+00
+  rec  33 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm_1[0] (50, 8, 32) alone-vs-pack=3.457e-06 packmate_delta=0.000e+00
+  rec  34 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm_2[0] (50, 8, 32) alone-vs-pack=2.623e-06 packmate_delta=0.000e+00
+  rec  35 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.qkv_global.linear[0] (50, 576) alone-vs-pack=2.503e-06 packmate_delta=0.000e+00
+  rec  36 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.bias[0] (50, 64, 8) alone-vs-pack=4.674e+00 packmate_delta=0.000e+00
+  rec  37 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.project_out[0] (50, 128) alone-vs-pack=1.144e-05 packmate_delta=0.000e+00
+  rec  38 diffusion.diffusion_stack.blocks.0.layer_norm_4[0] (50, 128) alone-vs-pack=1.192e-06 packmate_delta=0.000e+00
+  rec  39 diffusion.diffusion_stack.blocks.0.update.linear_condition[0] (50, 128) alone-vs-pack=1.281e-09 packmate_delta=0.000e+00
+  rec  40 diffusion.diffusion_stack.blocks.0.update.mlp.layers.0[0] (50, 256) alone-vs-pack=3.815e-06 packmate_delta=0.000e+00
+  rec  41 diffusion.diffusion_stack.blocks.0.update.mlp.layers.1[0] (50, 128) alone-vs-pack=2.384e-07 packmate_delta=0.000e+00
+  rec  42 diffusion.diffusion_stack.blocks.0.update.linear_update[0] (50, 512) alone-vs-pack=3.815e-06 packmate_delta=0.000e+00
+  rec  43 diffusion.diffusion_stack.blocks.0.update.linear_gate[0] (50, 512) alone-vs-pack=1.526e-05 packmate_delta=0.000e+00
+  rec  44 diffusion.diffusion_stack.blocks.0.update.linear_chain_gate[0] (50, 512) alone-vs-pack=3.052e-05 packmate_delta=0.000e+00
+  rec  45 diffusion.diffusion_stack.blocks.0.update.linear_batch_gate[0] (50, 512) alone-vs-pack=1.526e-05 packmate_delta=0.000e+00
+  rec  46 diffusion.diffusion_stack.blocks.0.update.linear_out[0] (50, 128) alone-vs-pack=3.052e-04 packmate_delta=0.000e+00
+  rec  47 diffusion.diffusion_stack.blocks.0.layer_norm_5[0] (50, 128) alone-vs-pack=2.384e-07 packmate_delta=0.000e+00
+  rec  48 diffusion.diffusion_stack.blocks.0.update_positions.linear[0] (50, 60) alone-vs-pack=5.774e-07 packmate_delta=0.000e+00
+  rec  49 diffusion.diffusion_stack.blocks.1.pair_1.linear_dmap[0] (50, 64, 64) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  50 diffusion.diffusion_stack.blocks.1.pair_1.linear_flags[0] (50, 64, 64) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  51 diffusion.diffusion_stack.blocks.1.pair_1.linear_dist[0] (50, 64, 64) alone-vs-pack=3.830e+00 packmate_delta=2.675e+00
+  rec  52 diffusion.diffusion_stack.blocks.1.pair_1.linear_dir[0] (50, 64, 64) alone-vs-pack=5.661e+00 packmate_delta=4.454e+00
+L=100: 301 records
+  rec  11 diffusion.diffusion_stack.cond_pair_stack[0] SKIP shapes (6, 100, 64, 64) (6, 200, 64, 64)
+  rec  12 diffusion.diffusion_stack.cond_pair_stack[1] SKIP shapes (6, 100, 64) (6, 200, 64)
+  rec  30 diffusion.diffusion_stack.blocks.0.layer_norm_3[0] (100, 128) alone-vs-pack=7.153e-07 packmate_delta=0.000e+00
+  rec  31 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm[0] (100, 128) alone-vs-pack=2.980e-07 packmate_delta=0.000e+00
+  rec  32 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.qkv[0] (100, 768) alone-vs-pack=9.537e-07 packmate_delta=0.000e+00
+  rec  33 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm_1[0] (100, 8, 32) alone-vs-pack=1.132e-06 packmate_delta=0.000e+00
+  rec  34 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm_2[0] (100, 8, 32) alone-vs-pack=7.153e-07 packmate_delta=0.000e+00
+  rec  35 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.qkv_global.linear[0] (100, 576) alone-vs-pack=9.537e-07 packmate_delta=0.000e+00
+  rec  36 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.bias[0] (100, 64, 8) alone-vs-pack=4.674e+00 packmate_delta=0.000e+00
+  rec  37 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.project_out[0] (100, 128) alone-vs-pack=3.815e-06 packmate_delta=0.000e+00
+  rec  38 diffusion.diffusion_stack.blocks.0.layer_norm_4[0] (100, 128) alone-vs-pack=4.768e-07 packmate_delta=0.000e+00
+  rec  39 diffusion.diffusion_stack.blocks.0.update.linear_condition[0] (100, 128) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  40 diffusion.diffusion_stack.blocks.0.update.mlp.layers.0[0] (100, 256) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  41 diffusion.diffusion_stack.blocks.0.update.mlp.layers.1[0] (100, 128) alone-vs-pack=9.537e-07 packmate_delta=0.000e+00
+  rec  42 diffusion.diffusion_stack.blocks.0.update.linear_update[0] (100, 512) alone-vs-pack=1.526e-05 packmate_delta=0.000e+00
+  rec  43 diffusion.diffusion_stack.blocks.0.update.linear_gate[0] (100, 512) alone-vs-pack=3.052e-05 packmate_delta=0.000e+00
+  rec  44 diffusion.diffusion_stack.blocks.0.update.linear_chain_gate[0] (100, 512) alone-vs-pack=6.104e-05 packmate_delta=0.000e+00
+  rec  45 diffusion.diffusion_stack.blocks.0.update.linear_batch_gate[0] (100, 512) alone-vs-pack=3.052e-05 packmate_delta=0.000e+00
+  rec  46 diffusion.diffusion_stack.blocks.0.update.linear_out[0] (100, 128) alone-vs-pack=6.104e-05 packmate_delta=0.000e+00
+  rec  47 diffusion.diffusion_stack.blocks.0.layer_norm_5[0] (100, 128) alone-vs-pack=2.384e-07 packmate_delta=0.000e+00
+  rec  48 diffusion.diffusion_stack.blocks.0.update_positions.linear[0] (100, 60) alone-vs-pack=2.328e-07 packmate_delta=0.000e+00
+  rec  49 diffusion.diffusion_stack.blocks.1.pair_1.linear_dmap[0] (100, 64, 64) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  50 diffusion.diffusion_stack.blocks.1.pair_1.linear_flags[0] (100, 64, 64) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  51 diffusion.diffusion_stack.blocks.1.pair_1.linear_dist[0] (100, 64, 64) alone-vs-pack=7.629e-06 packmate_delta=0.000e+00
+  rec  52 diffusion.diffusion_stack.blocks.1.pair_1.linear_dir[0] (100, 64, 64) alone-vs-pack=1.783e-05 packmate_delta=0.000e+00
+L=200: 301 records
+  rec  11 diffusion.diffusion_stack.cond_pair_stack[0] SKIP shapes (6, 200, 64, 64) (6, 400, 64, 64)
+  rec  12 diffusion.diffusion_stack.cond_pair_stack[1] SKIP shapes (6, 200, 64) (6, 400, 64)
+  rec  30 diffusion.diffusion_stack.blocks.0.layer_norm_3[0] (200, 128) alone-vs-pack=3.815e-06 packmate_delta=0.000e+00
+  rec  31 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm[0] (200, 128) alone-vs-pack=1.788e-07 packmate_delta=0.000e+00
+  rec  32 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.qkv[0] (200, 768) alone-vs-pack=8.345e-07 packmate_delta=0.000e+00
+  rec  33 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm_1[0] (200, 8, 32) alone-vs-pack=1.192e-06 packmate_delta=0.000e+00
+  rec  34 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.layer_norm_2[0] (200, 8, 32) alone-vs-pack=7.153e-07 packmate_delta=0.000e+00
+  rec  35 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.qkv_global.linear[0] (200, 576) alone-vs-pack=4.768e-07 packmate_delta=0.000e+00
+  rec  36 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.bias[0] (200, 64, 8) alone-vs-pack=4.674e+00 packmate_delta=0.000e+00
+  rec  37 diffusion.diffusion_stack.blocks.0.attn_2.ada_point_attention.project_out[0] (200, 128) alone-vs-pack=2.861e-06 packmate_delta=0.000e+00
+  rec  38 diffusion.diffusion_stack.blocks.0.layer_norm_4[0] (200, 128) alone-vs-pack=2.384e-07 packmate_delta=0.000e+00
+  rec  39 diffusion.diffusion_stack.blocks.0.update.linear_condition[0] (200, 128) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  40 diffusion.diffusion_stack.blocks.0.update.mlp.layers.0[0] (200, 256) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  41 diffusion.diffusion_stack.blocks.0.update.mlp.layers.1[0] (200, 128) alone-vs-pack=2.384e-07 packmate_delta=0.000e+00
+  rec  42 diffusion.diffusion_stack.blocks.0.update.linear_update[0] (200, 512) alone-vs-pack=7.629e-06 packmate_delta=0.000e+00
+  rec  43 diffusion.diffusion_stack.blocks.0.update.linear_gate[0] (200, 512) alone-vs-pack=1.526e-05 packmate_delta=0.000e+00
+  rec  44 diffusion.diffusion_stack.blocks.0.update.linear_chain_gate[0] (200, 512) alone-vs-pack=1.526e-05 packmate_delta=0.000e+00
+  rec  45 diffusion.diffusion_stack.blocks.0.update.linear_batch_gate[0] (200, 512) alone-vs-pack=1.526e-05 packmate_delta=0.000e+00
+  rec  46 diffusion.diffusion_stack.blocks.0.update.linear_out[0] (200, 128) alone-vs-pack=3.052e-05 packmate_delta=0.000e+00
+  rec  47 diffusion.diffusion_stack.blocks.0.layer_norm_5[0] (200, 128) alone-vs-pack=2.384e-07 packmate_delta=0.000e+00
+  rec  48 diffusion.diffusion_stack.blocks.0.update_positions.linear[0] (200, 60) alone-vs-pack=2.533e-07 packmate_delta=0.000e+00
+  rec  49 diffusion.diffusion_stack.blocks.1.pair_1.linear_dmap[0] (200, 64, 64) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  50 diffusion.diffusion_stack.blocks.1.pair_1.linear_flags[0] (200, 64, 64) alone-vs-pack=0.000e+00 packmate_delta=0.000e+00
+  rec  51 diffusion.diffusion_stack.blocks.1.pair_1.linear_dist[0] (200, 64, 64) alone-vs-pack=7.629e-06 packmate_delta=0.000e+00
+  rec  52 diffusion.diffusion_stack.blocks.1.pair_1.linear_dir[0] (200, 64, 64) alone-vs-pack=3.219e-05 packmate_delta=0.000e+00
+### done Sat Sep 26 17:41:36 CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 17:41:36 CEST 2026
+= Job-ID             : 904430 on helma
+= Job-Name           : n021_cpusem
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/run_cpu_semantics.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 02:00:00
+= Elapsed runtime    : 00:00:45
+= Total RAM usage    : 2.9 GiB of assigned 91 GiB (3.2%)
+= Node list          : h32-44
+= Subm/Elig/Start/End: 2026-09-26T17:40:50 / 2026-09-26T17:40:50 / 2026-09-26T17:40:51 / 2026-09-26T17:41:36
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.0G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+    /home/vault           774.0G  1048.6G  2097.2G        N/A     122K     200K     400K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K  5d15h8m15s !!!
+======================

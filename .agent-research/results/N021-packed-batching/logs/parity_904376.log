@@ -1,0 +1,69 @@
+### Starting TaskPrologue of job 904376 on h13-03 at Sat Sep 26 05:27:18 PM CEST 2026
+Running on cores 0-31 with governor ondemand
+Sat Sep 26 17:27:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   36C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h13-03 Sat Sep 26 05:27:18 PM CEST 2026
+a61d184ea49ca9a97f8c6dfa273425eb  salad_torch/modules/fast.py
+5a7c3745532813287c2abf8cae293884  salad_torch/diffusion/sampling.py
+fe222adb495ef3829c54e862dfaeb2dc  scripts/generate.py
+[default_vp] SKIP: missing /hnvme/workspace/v181bb10-salad/n021tree/fixtures/model_default_vp.npz
+[default_vp] exit=0
+[default_vp_scaled] SKIP: missing /hnvme/workspace/v181bb10-salad/n021tree/fixtures/model_default_vp_scaled.npz
+[default_vp_scaled] exit=0
+[default_ve_scaled] SKIP: missing /hnvme/workspace/v181bb10-salad/n021tree/fixtures/model_default_ve_scaled.npz
+[default_ve_scaled] exit=0
+[multimotif_vp] SKIP: missing /hnvme/workspace/v181bb10-salad/n021tree/fixtures/model_multimotif_vp.npz
+[multimotif_vp] exit=0
+[test_geometry_parity]     fid = stack.enter_context(open(os_fspath(file), "rb"))
+[test_geometry_parity]                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[test_geometry_parity] FileNotFoundError: [Errno 2] No such file or directory: '/hnvme/workspace/v181bb10-salad/n021tree/fixtures/geometry.npz'
+[test_geometry_parity] exit=1
+[test_stack_parity] SKIP: missing /hnvme/workspace/v181bb10-salad/n021tree/fixtures/block_ref.npz
+[test_stack_parity] exit=0
+[test_encoder_parity] SKIP: missing /hnvme/workspace/v181bb10-salad/n021tree/fixtures/encoder_default_vp.npz
+[test_encoder_parity] exit=0
+[test_sampling_parity] SKIP: missing /hnvme/workspace/v181bb10-salad/n021tree/fixtures/sampling_default_vp.npz
+[test_sampling_parity] exit=0
+SUITE_EXIT=1
+### done Sat Sep 26 05:27:33 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 17:27:33 CEST 2026
+= Job-ID             : 904376 on helma
+= Job-Name           : n021_parity
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/run_parity.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:30:00
+= Elapsed runtime    : 00:00:16
+= Total RAM usage    : 0.5 GiB of assigned 175 GiB (0.3%)
+= Node list          : h13-03
+= Subm/Elig/Start/End: 2026-09-26T17:27:17 / 2026-09-26T17:27:17 / 2026-09-26T17:27:17 / 2026-09-26T17:27:33
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.0G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K  5d15h22m18s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]

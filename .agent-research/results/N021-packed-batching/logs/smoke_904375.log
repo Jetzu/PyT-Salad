@@ -1,0 +1,121 @@
+### Starting TaskPrologue of job 904375 on h11-24 at Sat Sep 26 05:25:41 PM CEST 2026
+Running on cores 0-31 with governor performance
+Sat Sep 26 17:25:41 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-24 Sat Sep 26 05:25:41 PM CEST 2026
+===== A. --batch_size 1 --group_size 2 (must equal today's grouped path)
+W0926 17:26:14.378000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/0] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+W0926 17:28:54.623000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/1] Can't pickle
+W0926 17:28:54.623000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/1] Traceback (most recent call last):
+W0926 17:28:54.623000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 600, in dumps
+W0926 17:28:54.623000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/1]     pickler.dump(obj)
+W0926 17:28:54.623000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/1] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+W0926 17:29:43.506000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/2] Can't pickle
+W0926 17:29:43.506000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/2] Traceback (most recent call last):
+W0926 17:29:43.506000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/2]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 600, in dumps
+W0926 17:29:43.506000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/2]     pickler.dump(obj)
+W0926 17:29:43.506000 2081083 site-packages/torch/_inductor/codecache.py:604] [0/2] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+grouped fast path (fast, batch_size=1, group_size=2 -> 2 designs/replay) compiled + captured in 295s (one-time); peak reserved 1.22 GiB, ~0.147 GiB/packed member
+  design 0:    0.4s/design  CA-CA 3.924 A (min 3.586 max 4.501)  Rg 27.1 A  -> /tmp/904375.helma/n021s-904375/b1/design_0.pdb
+  design 1:    0.4s/design  CA-CA 3.823 A (min 3.258 max 4.624)  Rg 19.2 A  -> /tmp/904375.helma/n021s-904375/b1/design_1.pdb
+  replay of 2 design(s) (2 x 1): 0.9s wall (0.434s/design)
+  design 2:    0.4s/design  CA-CA 3.891 A (min 3.413 max 4.623)  Rg 19.2 A  -> /tmp/904375.helma/n021s-904375/b1/design_2.pdb
+  design 3:    0.4s/design  CA-CA 3.899 A (min 3.431 max 4.620)  Rg 17.8 A  -> /tmp/904375.helma/n021s-904375/b1/design_3.pdb
+  replay of 2 design(s) (2 x 1): 0.9s wall (0.427s/design)
+
+4 designs of 100 aa, up to 2 per replay (batch_size=1): median 0.431s/design, 1.7s of GPU time for all 4 (compile/capture excluded)
+===== B. --batch_size 4 --group_size 1
+W0926 17:31:18.667000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/0] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+W0926 17:35:51.106000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/1] Can't pickle
+W0926 17:35:51.106000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/1] Traceback (most recent call last):
+W0926 17:35:51.106000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/1]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 600, in dumps
+W0926 17:35:51.106000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/1]     pickler.dump(obj)
+W0926 17:35:51.106000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/1] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+W0926 17:36:39.952000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/2] Can't pickle
+W0926 17:36:39.952000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/2] Traceback (most recent call last):
+W0926 17:36:39.952000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/2]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 600, in dumps
+W0926 17:36:39.952000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/2]     pickler.dump(obj)
+W0926 17:36:39.952000 2098746 site-packages/torch/_inductor/codecache.py:604] [0/2] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+grouped fast path (fast, batch_size=4, group_size=1 -> 4 designs/replay) compiled + captured in 444s (one-time); peak reserved 2.46 GiB, ~0.586 GiB/packed member
+  NB batch_size 4 is NOT bit-identical to batch_size 1: a design's answer depends on its offset in the flat residue axis (upstream bug B1). Same distribution, different designs.
+  design 0:    0.3s/design  CA-CA 3.856 A (min 3.355 max 4.585)  Rg 19.8 A  -> /tmp/904375.helma/n021s-904375/b4/design_0.pdb
+  design 1:    0.3s/design  CA-CA 3.846 A (min 2.909 max 4.202)  Rg 21.7 A  -> /tmp/904375.helma/n021s-904375/b4/design_1.pdb
+  design 2:    0.3s/design  CA-CA 4.044 A (min 3.652 max 4.340)  Rg 27.6 A  -> /tmp/904375.helma/n021s-904375/b4/design_2.pdb
+  design 3:    0.3s/design  CA-CA 3.935 A (min 3.587 max 4.130)  Rg 24.7 A  -> /tmp/904375.helma/n021s-904375/b4/design_3.pdb
+  replay of 4 design(s) (1 x 4): 1.4s wall (0.341s/design)
+
+4 designs of 100 aa, up to 4 per replay (batch_size=4): median 0.341s/design, 1.4s of GPU time for all 4 (compile/capture excluded)
+===== C. --batch_size 2 --group_size 2, num_designs 5 (tail path)
+grouped fast path (fast, batch_size=2, group_size=2 -> 4 designs/replay) compiled + captured in 290s (one-time); peak reserved 1.92 GiB, ~0.292 GiB/packed member
+  NB batch_size 2 is NOT bit-identical to batch_size 1: a design's answer depends on its offset in the flat residue axis (upstream bug B1). Same distribution, different designs.
+  design 0:    0.3s/design  CA-CA 3.896 A (min 3.513 max 4.499)  Rg 26.3 A  -> /tmp/904375.helma/n021s-904375/b2/design_0.pdb
+  design 1:    0.3s/design  CA-CA 3.889 A (min 3.488 max 4.220)  Rg 16.6 A  -> /tmp/904375.helma/n021s-904375/b2/design_1.pdb
+  design 2:    0.3s/design  CA-CA 3.857 A (min 3.135 max 4.353)  Rg 18.9 A  -> /tmp/904375.helma/n021s-904375/b2/design_2.pdb
+  design 3:    0.3s/design  CA-CA 3.891 A (min 3.520 max 4.215)  Rg 21.8 A  -> /tmp/904375.helma/n021s-904375/b2/design_3.pdb
+  replay of 4 design(s) (2 x 2): 1.3s wall (0.330s/design)
+  --num_designs 5 is not a multiple of --batch_size 2; the trailing 1 design(s) need their own compile at batch_size=1 (padding the pack is what notes/04_PARITY_AND_PERF.md B1 forbids). Pick a multiple of 2 to avoid this.
+W0926 17:43:35.590000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/3] Can't pickle
+W0926 17:43:35.590000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/3] Traceback (most recent call last):
+W0926 17:43:35.590000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/3]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 600, in dumps
+W0926 17:43:35.590000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/3]     pickler.dump(obj)
+W0926 17:43:35.590000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/3] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+W0926 17:44:26.484000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/4] Can't pickle
+W0926 17:44:26.484000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/4] Traceback (most recent call last):
+W0926 17:44:26.484000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/4]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 600, in dumps
+W0926 17:44:26.484000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/4]     pickler.dump(obj)
+W0926 17:44:26.484000 2118066 site-packages/torch/_inductor/codecache.py:604] [0/4] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+grouped fast path (fast, batch_size=1, group_size=1 -> 1 designs/replay) compiled + captured in 96s (one-time); peak reserved 1.03 GiB, ~0.146 GiB/packed member
+  batch_size 1 + group_size 1: this is the ordinary single-design computation, run through the grouped machinery - the reference the other configurations must be read against.
+  design 4:    0.6s/design  CA-CA 3.836 A (min 3.411 max 4.370)  Rg 16.9 A  -> /tmp/904375.helma/n021s-904375/b2/design_4.pdb
+  replay of 1 design(s) (1 x 1): 0.6s wall (0.584s/design)
+
+5 designs of 100 aa, up to 4 per replay (batch_size=2): median 0.330s/design, 1.9s of GPU time for all 5 (compile/capture excluded)
+===== files
+b1: 4 pdbs
+b4: 4 pdbs
+b2: 5 pdbs
+### done Sat Sep 26 05:45:02 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 17:45:02 CEST 2026
+= Job-ID             : 904375 on helma
+= Job-Name           : n021_smoke
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/run_smoke.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:50:00
+= Elapsed runtime    : 00:19:21
+= Total RAM usage    : 4.3 GiB of assigned 175 GiB (2.5%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T17:25:40 / 2026-09-26T17:25:40 / 2026-09-26T17:25:41 / 2026-09-26T17:45:02
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.0G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K  5d15h4m49s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 2081083, 9 %, 9 %, 2006 MiB, 303171 ms
+NVIDIA H100, 00000000:06:00.0, 2098746, 6 %, 6 %, 3278 MiB, 452751 ms
+NVIDIA H100, 00000000:06:00.0, 2118066, 7 %, 7 %, 2730 MiB, 397929 ms

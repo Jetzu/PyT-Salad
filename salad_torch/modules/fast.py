@@ -307,7 +307,7 @@ class FastDenoiser(nn.Module):
     def __init__(self, model, length: int, device="cuda",
                  mode: str = "reduce-overhead", dtype=torch.float32,
                  capture: bool = True, manual_graph: bool = True,
-                 preset: str = "exact"):
+                 preset: str = "exact", batch_size: int = 1):
         super().__init__()
         if preset not in PRESETS:
             raise ValueError(f"unknown preset {preset!r}; have {sorted(PRESETS)}")
@@ -316,6 +316,16 @@ class FastDenoiser(nn.Module):
         self.model = model
         self.config = model.config
         self.length = length
+        # N021 - PACKED batching. `length` stays the per-design residue count;
+        # every buffer in this instance is sized for the FLAT axis, which is
+        # `batch_size` designs concatenated. salad has no leading batch
+        # dimension, so a batch IS a longer flat axis plus a `batch_index`
+        # (see `salad_torch.diffusion.sampling.pack_designs`). batch_size=1
+        # is the ordinary single-design instance, unchanged in every respect.
+        self.batch_size = int(batch_size)
+        if self.batch_size < 1:
+            raise ValueError(f"batch_size must be >= 1, got {batch_size}")
+        self.flat_length = int(length) * self.batch_size
         self.device = torch.device(device)
         self.dtype = dtype
         self.capture = capture and self.device.type == "cuda"
@@ -442,7 +452,9 @@ class FastDenoiser(nn.Module):
 
     # ------------------------------------------------------------------
     def _blank_inputs(self) -> dict[str, Tensor]:
-        L = self.length
+        # the FLAT axis: `batch_size` designs of `self.length` residues each
+        L = self.flat_length
+        per = self.length
         A = self.model.diffusion.atom_count
         ls = self.config.local_size
         d, f = self.device, self.dtype
@@ -460,9 +472,16 @@ class FastDenoiser(nn.Module):
             seq_noised=torch.full((L,), 20, device=d, dtype=torch.long),
             aa_gt=torch.full((L,), 20, device=d, dtype=torch.long),
             pos_gt=torch.zeros(L, A, 3, device=d, dtype=f),
-            resi=torch.arange(L, device=d),
+            # the packed layout, not a single 0..L-1 run: `resi` restarts per
+            # design and `batch` labels them, so the blank inputs the capture
+            # and the autotune timing run on have the same neighbour topology
+            # the real ones will. (Every one of these is overwritten by
+            # `_copy_in` before the first real replay; getting the blanks right
+            # only matters for what warmup MEASURES.)
+            resi=torch.arange(per, device=d).repeat(self.batch_size),
             chain=torch.zeros(L, device=d, dtype=torch.long),
-            batch=torch.zeros(L, device=d, dtype=torch.long),
+            batch=torch.arange(self.batch_size, device=d,
+                               dtype=torch.long).repeat_interleave(per),
             mask=torch.ones(L, device=d, dtype=torch.bool),
             # A cyclic config MUST get a real buffer here, not None. The graph
             # is captured against these addresses, so a `cyclic_mask` that
@@ -564,9 +583,11 @@ class FastDenoiser(nn.Module):
                         # N010/S2: a length-48 instance fed length-49 returned
                         # 48 coordinates). Refuse rather than silently lie.
                         raise ValueError(
-                            f"FastDenoiser was captured for length {self.length} "
-                            f"but got {k!r} with shape {tuple(src.shape)}; build "
-                            f"a new FastDenoiser per length")
+                            f"FastDenoiser was captured for a flat axis of "
+                            f"{self.flat_length} residues "
+                            f"({self.batch_size} x {self.length}) but got "
+                            f"{k!r} with shape {tuple(src.shape)}; build a new "
+                            f"FastDenoiser per (length, batch_size)")
                     # CLONE: adopting the caller's tensor as the persistent
                     # buffer means the next call's copy_ silently mutates the
                     # caller's data (observed: cyclic_mask flipped 0/64 -> 64/64).
@@ -666,7 +687,11 @@ class FastDenoiser(nn.Module):
                         ) -> tuple[dict, bool]:
         if uniform is None:
             # drawn OUTSIDE the graph, then copied into the static buffer
-            uniform = torch.rand(self.n_draws, self.length, self.length,
+            # (draws, N, N) over the FLAT axis: with batch_size=B this is
+            # B^2 times the field a single design draws, which is one of the
+            # two terms that make packed batching superlinear (the other is
+            # the (N, N) stable argsort in `extract_neighbours`).
+            uniform = torch.rand(self.n_draws, self.flat_length, self.flat_length,
                                  device=self.device, dtype=self.dtype,
                                  generator=generator).clamp_(1e-6, 1 - 1e-6)
         if getattr(self, "_cond_pinned", False):
@@ -850,9 +875,14 @@ class GroupFastDenoiser(nn.Module):
     def __init__(self, model, length: int, group_size: int | str = "auto",
                  device="cuda", mode: str = "default",
                  dtype=torch.float32, preset: str = "exact",
-                 autosize_cap: int = _AUTOSIZE_CAP):
+                 autosize_cap: int = _AUTOSIZE_CAP, batch_size: int = 1):
         super().__init__()
         self.length = int(length)
+        # N021: each MEMBER may itself be a packed batch of `batch_size`
+        # designs. The two axes compose and are orthogonal - `batch_size`
+        # makes each kernel bigger, `group_size` runs more kernels at once -
+        # so one replay advances ``group_size * batch_size`` designs.
+        self.batch_size = int(batch_size)
         self.device = torch.device(device)
         if self.device.type != "cuda":
             raise ValueError("GroupFastDenoiser needs a CUDA device")
@@ -872,7 +902,8 @@ class GroupFastDenoiser(nn.Module):
         # members differ only in which buffers they point at.
         self._head = FastDenoiser(model, self.length, device=self.device,
                                   mode=mode, dtype=dtype, capture=False,
-                                  manual_graph=False, preset=preset)
+                                  manual_graph=False, preset=preset,
+                                  batch_size=self.batch_size)
         self.model = model
         self.config = model.config
         self.members: list[FastDenoiser] = [self._head]
@@ -883,13 +914,19 @@ class GroupFastDenoiser(nn.Module):
         #: filled in by `warmup`, reported by `scripts/generate.py`
         self.peak_bytes: int | None = None
 
+    @property
+    def designs_per_replay(self) -> int:
+        """How many designs one `replay()` advances: group_size x batch_size."""
+        return self.group_size * self.batch_size
+
     # ------------------------------------------------------------------
     def _add_members(self, n: int) -> None:
         head = self._head
         while len(self.members) < n:
             m = FastDenoiser(head.model, self.length, device=self.device,
                              mode="default", dtype=head.dtype, capture=False,
-                             manual_graph=False, preset=self.preset)
+                             manual_graph=False, preset=self.preset,
+                             batch_size=self.batch_size)
             # ONE compiled callable for the whole group: a second
             # `torch.compile` wrapper would get its own code cache and
             # recompile the identical graph from scratch.
@@ -1086,7 +1123,9 @@ class GroupFastDenoiser(nn.Module):
                 graph.replay()
             e.record()
             torch.cuda.synchronize()
-            per = s.elapsed_time(e) / reps / n
+            # per DESIGN, not per member: with packed batching one member
+            # carries `batch_size` designs.
+            per = s.elapsed_time(e) / reps / (n * self.batch_size)
             del graph, _outs
             if best_per is None or per < best_per * (1.0 - _AUTOSIZE_MIN_GAIN):
                 best_n, best_per = n, per

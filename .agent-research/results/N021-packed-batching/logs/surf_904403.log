@@ -1,0 +1,58 @@
+### Starting TaskPrologue of job 904403 on h11-24 at Sat Sep 26 05:39:51 PM CEST 2026
+Running on cores 96-127 with governor performance
+Sat Sep 26 17:39:51 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   37C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-24 Sat Sep 26 05:39:52 PM CEST 2026 preset=fast L=50 B=1 G in {1 2 4 8 16}
+GPU NVIDIA H100 132 SM 93.1 GiB
+CELL preset=fast L=50 B=1 Greq=1 B_eff=1 G=1 designs_per_replay=1 replay_lean_ms=2.2487 replay_full_ms=2.8761 replay_lean_per_design_ms=2.2487 host_step_ms=2.4664 host_step_per_design_ms=2.4664 designs_per_s=405.4550 sec_per_design=0.4939 peak_reserved_MiB=632.0 peak_reserved_MiB_per_design=632.0 per_member_MiB=74.6 warmup_s=248.8 sm=132 mem_bound_members=16
+CELL preset=fast L=50 B=1 Greq=2 B_eff=1 G=2 designs_per_replay=2 replay_lean_ms=2.9660 replay_full_ms=3.7559 replay_lean_per_design_ms=1.4830 host_step_ms=3.3572 host_step_per_design_ms=1.6786 designs_per_s=595.7377 sec_per_design=0.3361 peak_reserved_MiB=598.0 peak_reserved_MiB_per_design=299.0 per_member_MiB=74.6 warmup_s=64.9 sm=132 mem_bound_members=16
+CELL preset=fast L=50 B=1 Greq=4 B_eff=1 G=4 designs_per_replay=4 replay_lean_ms=4.1333 replay_full_ms=5.1419 replay_lean_per_design_ms=1.0333 host_step_ms=5.1753 host_step_per_design_ms=1.2938 designs_per_s=772.8992 sec_per_design=0.2590 peak_reserved_MiB=1104.0 peak_reserved_MiB_per_design=276.0 per_member_MiB=74.6 warmup_s=64.9 sm=132 mem_bound_members=16
+CELL preset=fast L=50 B=1 Greq=8 B_eff=1 G=8 designs_per_replay=8 replay_lean_ms=6.6430 replay_full_ms=8.0375 replay_lean_per_design_ms=0.8304 host_step_ms=8.7692 host_step_per_design_ms=1.0962 designs_per_s=912.2833 sec_per_design=0.2194 peak_reserved_MiB=2116.0 peak_reserved_MiB_per_design=264.5 per_member_MiB=74.6 warmup_s=70.8 sm=132 mem_bound_members=16
+CELL preset=fast L=50 B=1 Greq=16 B_eff=1 G=16 designs_per_replay=16 replay_lean_ms=12.4402 replay_full_ms=14.8255 replay_lean_per_design_ms=0.7775 host_step_ms=16.4107 host_step_per_design_ms=1.0257 designs_per_s=974.9740 sec_per_design=0.2053 peak_reserved_MiB=4078.0 peak_reserved_MiB_per_design=254.9 per_member_MiB=74.6 warmup_s=71.1 sm=132 mem_bound_members=16
+### done Sat Sep 26 05:49:06 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 17:49:06 CEST 2026
+= Job-ID             : 904403 on helma
+= Job-Name           : n021s_1x50
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/run_surface.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:20:00
+= Elapsed runtime    : 00:09:15
+= Total RAM usage    : 3.5 GiB of assigned 175 GiB (2.0%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T17:39:50 / 2026-09-26T17:39:50 / 2026-09-26T17:39:51 / 2026-09-26T17:49:06
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.0G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K   5d15h45s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 2126087, 11 %, 11 %, 1386 MiB, 255755 ms
+NVIDIA H100, 00000000:C6:00.0, 2137966, 0 %, 0 %, 1360 MiB, 67346 ms
+NVIDIA H100, 00000000:C6:00.0, 2139931, 1 %, 0 %, 1872 MiB, 67659 ms
+NVIDIA H100, 00000000:C6:00.0, 2141480, 2 %, 0 %, 2900 MiB, 74285 ms
+NVIDIA H100, 00000000:C6:00.0, 2145546, 3 %, 1 %, 4892 MiB, 75598 ms

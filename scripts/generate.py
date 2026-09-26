@@ -32,7 +32,8 @@ from salad_torch import opt as salad_opt  # noqa: E402
 from salad_torch.config import get_config  # noqa: E402
 from salad_torch.convert.haiku_to_torch import load_model, load_param_npz  # noqa: E402
 from salad_torch.diffusion.sampling import (  # noqa: E402
-    SamplerConfig, StepFn, make_initial_data, sample, sample_group)
+    SamplerConfig, StepFn, make_initial_data, pack_designs, sample,
+    sample_group, split_packed_snapshot)
 from salad_torch.diffusion.schedules import parse_num_aa, parse_timescale  # noqa: E402
 from salad_torch.inference.options import decode_sequence, parse_dssp, parse_dssp_mean  # noqa: E402
 from salad_torch.inference.postprocess import reorder_amino_acids  # noqa: E402
@@ -99,6 +100,22 @@ def build_arg_parser() -> argparse.ArgumentParser:
                          "card or a long one.")
 
     # -- §1: symmetry -------------------------------------------------
+    ap.add_argument("--batch_size", default="",
+                    help="N021. PACKED batching: B designs concatenated along "
+                         "the flat residue axis of ONE forward, so each kernel "
+                         "does B designs' work in one launch. Composes with "
+                         "--group_size (G packed batches per captured graph), "
+                         "so one replay advances B*G designs. Needs --fast and "
+                         "CUDA. NOT semantically free, unlike --group_size: "
+                         "salad's neighbour selection is a global top-k over "
+                         "the flat residue axis and its '-1' no-neighbour "
+                         "sentinel behaves differently depending on a design's "
+                         "offset in that axis (notes/04_PARITY_AND_PERF.md B1, "
+                         "an upstream bug this port reproduces), so a packed "
+                         "design is NOT the design the same seed produces "
+                         "alone. --batch_size 1 (the default) is today's path, "
+                         "unchanged. See "
+                         ".agent-research/results/N021-packed-batching/.")
     sym = ap.add_argument_group("symmetry (notes/specs/06_generation_flags.md §1)")
     sym.add_argument("--sym", default="",
                      help="Screw/cyclic symmetry group. '' disables it. "
@@ -424,32 +441,48 @@ def run_grouped(args, config, model, cfg: SamplerConfig, pc: dict, num_aa: int,
                 resi: Tensor, chain: Tensor, base_chain: Tensor,
                 is_cyclic: bool, cyclic_mask: Tensor,
                 device: torch.device) -> None:
-    """`--group_size`: N designs per captured graph (N019).
+    """`--group_size` (N019) and/or `--batch_size` (N021).
 
-    The design-facing behaviour is the ordinary one - ``design_{n}.pdb``, the
-    same stats line, the same `--timing_json` - and the only thing that
-    differs is that `--num_designs` is consumed in groups instead of one at a
-    time. A trailing partial group is run as its own, smaller group rather
-    than padded with throwaway designs, so `--num_designs 10 --group_size 4`
-    costs 4+4+2 and writes 10 designs, not 12.
+    Two orthogonal axes of parallelism over designs, and they compose:
+
+    * ``--group_size G`` records G INDEPENDENT copies of the forward into one
+      CUDA graph on G streams. Nothing is shared, so design `i` computes
+      exactly what it would alone - measured bit-identical under
+      ``SALAD_OPT_DETSEG=1``. It reclaims idle SMs; it cannot make a kernel
+      bigger.
+    * ``--batch_size B`` concatenates B designs along salad's flat residue
+      axis, so every kernel does B designs' work in ONE launch. It makes the
+      kernels bigger - and it is NOT semantically free: the neighbour
+      selection is a global top-k over that axis, so a design's answer
+      depends on its offset in it (`notes/04_PARITY_AND_PERF.md` B1).
+
+    One replay therefore advances ``B * G`` designs. The design-facing
+    behaviour is the ordinary one - ``design_{n}.pdb``, the same stats line,
+    the same ``--timing_json``.
+
+    A trailing group is run at a smaller G rather than padded with throwaway
+    designs. A trailing *pack* (``--num_designs`` not a multiple of B) is run
+    by a second, smaller-B denoiser, which costs one extra compile and is
+    announced; padding it would be the one thing B1 forbids.
     """
     from salad_torch.modules.fast import GroupFastDenoiser
 
     if not args.fast:
-        raise SystemExit("--group_size needs --fast (it groups the captured "
-                         "graph; there is nothing to group on the eager path)")
+        raise SystemExit("--group_size/--batch_size need --fast (they group or "
+                         "pack the captured graph; there is nothing to group "
+                         "on the eager path)")
     if device.type != "cuda":
-        raise SystemExit("--group_size needs a CUDA device")
+        raise SystemExit("--group_size/--batch_size need a CUDA device")
     for flag in ("sym", "renoise", "sequence_only", "sample_final"):
         if getattr(args, flag) not in ("", False, None):
             raise SystemExit(
-                f"--group_size is incompatible with --{flag}: it steps every "
-                f"design of the group through one captured replay, and "
+                f"--group_size/--batch_size are incompatible with --{flag}: "
+                f"they step every design through one captured replay, and "
                 f"--{flag} inserts per-design host work between the noising "
-                f"and the denoising that the capture cannot see. Drop "
-                f"--group_size to get the ordinary path back.")
+                f"and the denoising that the capture cannot see. Drop them "
+                f"to get the ordinary path back.")
 
-    want = args.group_size.strip().lower()
+    want = (args.group_size or "1").strip().lower()
     if want != "auto":
         try:
             want = int(want)
@@ -458,91 +491,146 @@ def run_grouped(args, config, model, cfg: SamplerConfig, pc: dict, num_aa: int,
                              f"got {args.group_size!r}")
         if want < 1:
             raise SystemExit("--group_size must be >= 1")
+    try:
+        batch = int((args.batch_size or "1").strip())
+    except ValueError:
+        raise SystemExit(f"--batch_size must be an integer, "
+                         f"got {args.batch_size!r}")
+    if batch < 1:
+        raise SystemExit("--batch_size must be >= 1")
 
-    t_warm = time.perf_counter()
     pc_hint = bool(config.multi_motif or pc["template"] is not None
                    or int(chain.max()) > 0)
-    group = GroupFastDenoiser(model.predict, num_aa, group_size=want,
-                              device=device, preset=args.preset).warmup(
-                                  pair_cond=pc_hint)
-    n = group.group_size
-    peak_gb = (group.peak_bytes or 0) / 2 ** 30
-    per_gb = (group.per_member_bytes or 0) / 2 ** 30
-    if want == "auto":
-        props = torch.cuda.get_device_properties(device)
-        print(f"group_size auto -> {n} on {props.name} "
-              f"({props.multi_processor_count} SMs, "
-              f"{props.total_memory / 2**30:.1f} GiB)")
-    print(f"grouped fast path ({args.preset}, group_size={n}) compiled + "
-          f"captured in {time.perf_counter() - t_warm:.0f}s (one-time); "
-          f"peak reserved {peak_gb:.2f} GiB, ~{per_gb:.3f} GiB/design")
-    if n == 1:
-        print("  group_size 1: this is the ordinary single-design "
-              "computation, run through the grouped machinery - the "
-              "reference a larger group must reproduce.")
-
     os.makedirs(args.out_path, exist_ok=True)
     stats, times, group_wall = [], [], []
     written = 0
-    for start in range(0, args.num_designs, n):
-        members = list(range(start, min(start + n, args.num_designs)))
-        if len(members) != n:
-            # trailing partial group: recapture at the smaller size rather
-            # than run throwaway designs. One extra capture, not one extra
-            # compile - the compiled forward is shared.
-            group.resize(len(members), pair_cond=pc_hint)
-        group.invalidate_condition_cache()
-        datas, prevs, gens = [], [], []
-        for d in members:
-            data, prev = make_design_data(args, pc, num_aa, resi, chain,
-                                          is_cyclic, cyclic_mask, device)
-            datas.append(data)
-            prevs.append(prev)
-            gens.append(design_generator(device, args.seed, d))
-        gate = group.pin_conditions(datas)
+    reported_n = None
 
-        def step_fn_group(ds, ps, gs, *, need_aa=True, _gate=gate):
-            with torch.no_grad():
-                noised = [apply_diffusion(config, d, generator=g)
-                          for d, g in zip(ds, gs)]
-                fed = [dict(d, **nz) for d, nz in zip(ds, noised)]
-                return group(fed, ps, need_aa=need_aa, pair_cond=_gate,
-                             generators=gs)
+    # PHASES. One per distinct batch_size: the bulk of the run at B, then -
+    # only if `--num_designs` is not a multiple of B - a tail at B_tail = the
+    # remainder. A second phase is a second compile, so it is announced.
+    tail = args.num_designs % batch
+    bulk = args.num_designs - tail
+    phases = ([(0, bulk, batch, want)] if bulk else [])
+    if tail:
+        phases.append((bulk, tail, tail, 1))
 
-        torch.cuda.synchronize()
-        t0 = time.perf_counter()
-        snaps_per_design = sample_group(step_fn_group, datas, prevs, cfg,
-                                        generators=gens)
-        torch.cuda.synchronize()
-        elapsed = time.perf_counter() - t0
-        # one entry PER DESIGN, not per group - the summary line below sums
-        # this to get the run's total GPU time, and a per-group entry made a
-        # group of 8 report a total of one design's worth.
-        times.extend([elapsed / len(members)] * len(members))
-        group_wall.append(elapsed)
+    for first, count, b, group_request in phases:
+        if first:
+            print(f"  --num_designs {args.num_designs} is not a multiple of "
+                  f"--batch_size {batch}; the trailing {tail} design(s) need "
+                  f"their own compile at batch_size={tail} (padding the pack "
+                  f"is what notes/04_PARITY_AND_PERF.md B1 forbids). Pick a "
+                  f"multiple of {batch} to avoid this.")
+        t_warm = time.perf_counter()
+        group = GroupFastDenoiser(model.predict, num_aa,
+                                  group_size=group_request, device=device,
+                                  preset=args.preset,
+                                  batch_size=b).warmup(pair_cond=pc_hint)
+        n = group.group_size
+        per_replay = group.designs_per_replay
+        if reported_n is None:
+            reported_n = per_replay
+        peak_gb = (group.peak_bytes or 0) / 2 ** 30
+        per_gb = (group.per_member_bytes or 0) / 2 ** 30
+        if group_request == "auto":
+            props = torch.cuda.get_device_properties(device)
+            print(f"group_size auto -> {n} on {props.name} "
+                  f"({props.multi_processor_count} SMs, "
+                  f"{props.total_memory / 2**30:.1f} GiB) at batch_size={b}")
+        print(f"grouped fast path ({args.preset}, batch_size={b}, "
+              f"group_size={n} -> {per_replay} designs/replay) compiled + "
+              f"captured in {time.perf_counter() - t_warm:.0f}s (one-time); "
+              f"peak reserved {peak_gb:.2f} GiB, "
+              f"~{per_gb:.3f} GiB/packed member")
+        if n == 1 and b == 1:
+            print("  batch_size 1 + group_size 1: this is the ordinary "
+                  "single-design computation, run through the grouped "
+                  "machinery - the reference the other configurations must "
+                  "be read against.")
+        if b > 1:
+            print(f"  NB batch_size {b} is NOT bit-identical to batch_size 1: "
+                  f"a design's answer depends on its offset in the flat "
+                  f"residue axis (upstream bug B1). Same distribution, "
+                  f"different designs.")
 
-        for d, snaps in zip(members, snaps_per_design):
-            snap = {k: (v.cpu() if torch.is_tensor(v) else v)
-                    for k, v in snaps[-1].items()}
-            path = os.path.join(args.out_path, f"design_{d}.pdb")
-            write_result_pdb(path, snap, chain_index=base_chain,
-                             order_agnostic=args.order_agnostic)
-            ca = snap["pos"][:, 1].numpy()
-            d_ca = np.linalg.norm(ca[1:] - ca[:-1], axis=-1)
-            rg = float(np.sqrt(((ca - ca.mean(0)) ** 2).sum(-1).mean()))
-            stats.append(dict(ca_ca_mean=float(d_ca.mean()),
-                              ca_ca_min=float(d_ca.min()),
-                              ca_ca_max=float(d_ca.max()), rg=rg,
-                              seconds=elapsed / len(members)))
-            written += 1
-            print(f"  design {d}: {elapsed / len(members):6.1f}s/design  "
-                  f"CA-CA {d_ca.mean():.3f} A (min {d_ca.min():.3f} "
-                  f"max {d_ca.max():.3f})  Rg {rg:.1f} A  -> {path}")
-        print(f"  group of {len(members)}: {elapsed:.1f}s wall "
-              f"({elapsed / len(members):.3f}s/design)")
+        for start in range(first, first + count, per_replay):
+            members = min(n, -(-(first + count - start) // b))
+            design_ids = list(range(start, min(start + members * b,
+                                               first + count)))
+            if members != n:
+                # trailing GROUP: recapture at fewer members. One extra
+                # capture, not one extra compile - the compiled forward and
+                # every member's buffers survive.
+                group.resize(members, pair_cond=pc_hint)
+                n = group.group_size
+                per_replay = group.designs_per_replay
+            group.invalidate_condition_cache()
+            datas, prevs, gens, lengths = [], [], [], []
+            for m in range(members):
+                ids = design_ids[m * b:(m + 1) * b]
+                per_design = [make_design_data(args, pc, num_aa, resi, chain,
+                                               is_cyclic, cyclic_mask, device)
+                              for _ in ids]
+                pdata, pprev, lens = pack_designs([d for d, _ in per_design],
+                                                  [p for _, p in per_design])
+                datas.append(pdata)
+                prevs.append(pprev)
+                lengths.append(lens)
+                # keyed on the FIRST design of the pack, so batch_size=1
+                # reproduces N019's per-design streams exactly.
+                gens.append(design_generator(device, args.seed, ids[0]))
+            gate = group.pin_conditions(datas)
+
+            def step_fn_group(ds, ps, gs, *, need_aa=True, _gate=gate):
+                with torch.no_grad():
+                    noised = [apply_diffusion(config, d, generator=g)
+                              for d, g in zip(ds, gs)]
+                    fed = [dict(d, **nz) for d, nz in zip(ds, noised)]
+                    return group(fed, ps, need_aa=need_aa, pair_cond=_gate,
+                                 generators=gs)
+
+            torch.cuda.synchronize()
+            t0 = time.perf_counter()
+            snaps_per_member = sample_group(step_fn_group, datas, prevs, cfg,
+                                            generators=gens)
+            torch.cuda.synchronize()
+            elapsed = time.perf_counter() - t0
+            n_designs = len(design_ids)
+            # one entry PER DESIGN, not per replay - the summary line below
+            # sums this to get the run's total GPU time.
+            times.extend([elapsed / n_designs] * n_designs)
+            group_wall.append(elapsed)
+
+            flat_ids = iter(design_ids)
+            for m, snaps in enumerate(snaps_per_member):
+                for part in split_packed_snapshot(snaps[-1], lengths[m]):
+                    d = next(flat_ids)
+                    snap = {k: (v.cpu() if torch.is_tensor(v) else v)
+                            for k, v in part.items() if k != "result"}
+                    path = os.path.join(args.out_path, f"design_{d}.pdb")
+                    write_result_pdb(path, snap, chain_index=base_chain,
+                                     order_agnostic=args.order_agnostic)
+                    ca = snap["pos"][:, 1].numpy()
+                    d_ca = np.linalg.norm(ca[1:] - ca[:-1], axis=-1)
+                    rg = float(np.sqrt(((ca - ca.mean(0)) ** 2).sum(-1).mean()))
+                    stats.append(dict(ca_ca_mean=float(d_ca.mean()),
+                                      ca_ca_min=float(d_ca.min()),
+                                      ca_ca_max=float(d_ca.max()), rg=rg,
+                                      seconds=elapsed / n_designs))
+                    written += 1
+                    print(f"  design {d}: {elapsed / n_designs:6.1f}s/design  "
+                          f"CA-CA {d_ca.mean():.3f} A (min {d_ca.min():.3f} "
+                          f"max {d_ca.max():.3f})  Rg {rg:.1f} A  -> {path}")
+            print(f"  replay of {n_designs} design(s) "
+                  f"({members} x {b}): {elapsed:.1f}s wall "
+                  f"({elapsed / n_designs:.3f}s/design)")
+        del group
+        torch.cuda.empty_cache()
 
     t = np.array(times)
-    print(f"\n{written} designs of {num_aa} aa in groups of up to {n}: "
+    print(f"\n{written} designs of {num_aa} aa, up to {reported_n} per "
+          f"replay (batch_size={batch}): "
           f"median {np.median(t):.3f}s/design, "
           f"{sum(group_wall):.1f}s of GPU time for all {written} "
           f"(compile/capture excluded)")
@@ -550,9 +638,8 @@ def run_grouped(args, config, model, cfg: SamplerConfig, pc: dict, num_aa: int,
         with open(args.timing_json, "w") as fh:
             json.dump(dict(backend="torch", config=args.config, num_aa=num_aa,
                            num_steps=args.num_steps, device=str(device),
-                           compile=args.compile, group_size=n,
-                           peak_reserved_bytes=group.peak_bytes,
-                           per_member_bytes=group.per_member_bytes,
+                           compile=args.compile,
+                           batch_size=batch, designs_per_replay=reported_n,
                            stats=stats), fh, indent=2)
 
 
@@ -635,7 +722,7 @@ def main() -> None:
           f"out_steps={cfg.out_steps}"
           + (f"  sym={sym.group}(count={sym.replicate_count})" if sym.active else ""))
 
-    if args.group_size:
+    if args.group_size or args.batch_size:
         run_grouped(args, config, model, cfg, pc, num_aa, resi, chain,
                     base_chain, is_cyclic, cyclic_mask, device)
         return

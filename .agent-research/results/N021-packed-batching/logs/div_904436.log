@@ -1,0 +1,67 @@
+### Starting TaskPrologue of job 904436 on h12-15 at Sat Sep 26 05:42:19 PM CEST 2026
+Running on cores 96-127 with governor ondemand
+Sat Sep 26 17:42:19 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   36C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h12-15 Sat Sep 26 05:42:20 PM CEST 2026
+# preset=fast L=100 B=4 steps=250 out=200 DETSEG=1
+DIV L=100 B=4 design=0 max_dpos=3.535783e+01 max_dca=2.668023e+01 aatype_differ=59/100 bit_identical=False
+DIV L=100 B=4 design=1 max_dpos=4.827036e+01 max_dca=3.845232e+01 aatype_differ=86/100 bit_identical=False
+DIV L=100 B=4 design=2 max_dpos=6.541649e+01 max_dca=5.585890e+01 aatype_differ=86/100 bit_identical=False
+DIV L=100 B=4 design=3 max_dpos=6.737760e+01 max_dca=5.597028e+01 aatype_differ=88/100 bit_identical=False
+FLOOR L=100 B=1 design=0 max_dpos=0.000000e+00 aatype_differ=0/100
+FLOOR L=100 B=1 design=1 max_dpos=0.000000e+00 aatype_differ=0/100
+FLOOR L=100 B=1 design=2 max_dpos=0.000000e+00 aatype_differ=0/100
+FLOOR L=100 B=1 design=3 max_dpos=0.000000e+00 aatype_differ=0/100
+# preset=fast L=200 B=4 steps=250 out=200 DETSEG=1
+DIV L=200 B=4 design=0 max_dpos=5.486205e+01 max_dca=4.671374e+01 aatype_differ=161/200 bit_identical=False
+DIV L=200 B=4 design=1 max_dpos=5.722585e+01 max_dca=4.703155e+01 aatype_differ=185/200 bit_identical=False
+DIV L=200 B=4 design=2 max_dpos=6.497517e+01 max_dca=5.439314e+01 aatype_differ=187/200 bit_identical=False
+DIV L=200 B=4 design=3 max_dpos=7.139713e+01 max_dca=5.803240e+01 aatype_differ=185/200 bit_identical=False
+FLOOR L=200 B=1 design=0 max_dpos=0.000000e+00 aatype_differ=0/200
+FLOOR L=200 B=1 design=1 max_dpos=0.000000e+00 aatype_differ=0/200
+FLOOR L=200 B=1 design=2 max_dpos=0.000000e+00 aatype_differ=0/200
+FLOOR L=200 B=1 design=3 max_dpos=0.000000e+00 aatype_differ=0/200
+### done Sat Sep 26 06:00:55 PM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 18:00:55 CEST 2026
+= Job-ID             : 904436 on helma
+= Job-Name           : n021_div
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N021-packed-batching/run_divergence.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:30:00
+= Elapsed runtime    : 00:18:36
+= Total RAM usage    : 5.0 GiB of assigned 175 GiB (2.9%)
+= Node list          : h12-15
+= Subm/Elig/Start/End: 2026-09-26T17:41:50 / 2026-09-26T17:41:50 / 2026-09-26T17:42:19 / 2026-09-26T18:00:55
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.0G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K  5d14h48m56s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 3527333, 8 %, 8 %, 3776 MiB, 657576 ms
+NVIDIA H100, 00000000:C6:00.0, 3582841, 13 %, 12 %, 6016 MiB, 452384 ms
