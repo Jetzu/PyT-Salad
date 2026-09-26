@@ -289,16 +289,26 @@ config (it was 0.48 ms before P0).
 End to end, `generate.py --num_aa 100 --fast`: **1.5 s per design**, from
 ~2.1 s. `--preset exact` is the default; `--preset fast` is N011's.
 
-Other lengths, shipping config (two independent jobs agree):
+Other lengths, shipping config (repeats are independent jobs):
 
-| L | full ms | lean ms | N007 baseline (full) |
-|---|---|---|---|
-| 50 | 3.738 / 3.724 | 3.029 / 3.020 | 4.22 |
-| 100 | 4.390 / 4.384 / 4.365 / 4.385 | 3.574 / 3.569 / 3.556 / 3.564 | 4.95 |
+| L | full ms | lean ms | N009 start (full) | JAX jit, section 3 |
+|---|---|---|---|---|
+| 50 | 3.738 / 3.724 | **3.029 / 3.020** | 4.22 | 3.65 |
+| 100 | 4.390 / 4.384 / 4.365 / 4.385 | **3.574 / 3.569 / 3.556 / 3.564** | 4.95 | 3.96 (4.73 at matched fp32) |
+| 200 | 5.806 / 5.794 | **4.794 / 4.787** | - | 5.21 |
+| 400 | 8.773 | **7.376** | - | 7.72 |
 
-The gain is roughly flat in absolute terms, as the kernel-count diagnosis
-predicts: what was removed is launches, and a launch costs the same at L=50 as
-at L=100.
+Between L=50 and L=100 the gain is roughly flat in absolute terms, which is
+what the kernel-count diagnosis predicts: what was removed is launches, and a
+launch costs the same at either length.
+
+**The port is now faster than JAX at every length measured, on a lean step -
+and that comparison is CONSERVATIVE**, because the section 3 JAX column is
+JAX at its TF32 default (10 mantissa bits) while these numbers are fp32
+`highest`. At L=100 the matched-precision JAX figure is 4.73 ms (N007) against
+3.56 ms here, i.e. **25 % faster at equal precision**. A reporting step is
+still slower than JAX at L<=200 and faster at L=400; there is one of those per
+design.
 
 ### 7.3 P1 was already subsumed, and is now moot
 

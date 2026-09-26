@@ -38,6 +38,11 @@ run); `lean` = the other 499 steps of a 500-step design.
 | + P4 + P5 skip dead pair conditioning, K 64->48 | **4.390** | **3.574** | 903105 |
 | (repeats) | 4.384 / 4.365 / 4.385 | 3.569 / 3.556 / 3.564 | 903105, 903126 |
 
+Length sweep, shipping config (lean step): L=50 **3.02 ms**, L=100 **3.56 ms**,
+L=200 **4.79 ms**, L=400 **7.38 ms** - under the JAX jit column of notes/04
+section 3 at every length, and that column is JAX at its TF32 default while
+these are fp32 `highest`.
+
 Per proposal, on a lean step: **P0 -0.48, P3 -0.11, P6 -0.08, P4+P5 -0.25 ms**.
 P2 is the full->lean column itself: **-0.82 ms**.
 End to end, `generate.py --num_aa 100 --fast`: **1.5 s/design**, was ~2.1 s.
