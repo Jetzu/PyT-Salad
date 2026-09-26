@@ -90,13 +90,26 @@ def get_index_neighbours(count: int):
 
 
 def get_spatial_neighbours(count: int):
-    """k-nearest in space. `points` is already the CA slice, ``(N, 3)``."""
+    """k-nearest in space. `points` is already the CA slice, ``(N, 3)``.
+
+    An already-built ``(N, N)`` matrix may be supplied as `distance`, in which
+    case `points` is ignored. That is what lets `extract_neighbours` build
+    ``pair_distance(ca)`` once and hand the same tensor to both the spatial and
+    the random stage instead of computing it twice (P6); the arithmetic is
+    identical, so the selected indices are bit-identical. NB this is an
+    explicit keyword, deliberately NOT `get_random_neighbours`' square-shape
+    sniffing - that overload misreads a 3-residue protein's ``(3, 3)`` CA
+    slice as a distance matrix, and this selector is called with raw points
+    from `AADecoder`.
+    """
 
     def inner(points: Tensor, batch: Tensor, mask: Tensor,
-              neighbours: Tensor | None = None) -> Tensor:
+              neighbours: Tensor | None = None,
+              distance: Tensor | None = None) -> Tensor:
         same_item = batch[:, None] == batch[None, :]
         pair_mask = mask[:, None] & mask[None, :] & same_item
-        distance = pair_distance(points)
+        if distance is None:
+            distance = pair_distance(points)
         distance = torch.where(same_item, distance, torch.full_like(distance, _INF))
         return get_neighbours(count)(distance, pair_mask, neighbours)
 
@@ -150,12 +163,21 @@ def extract_neighbours(num_index: int = 16, num_spatial: int = 16, num_random: i
 
     def inner(pos: Tensor, resi: Tensor, chain: Tensor, batch: Tensor, mask: Tensor,
               generator: torch.Generator | None = None,
-              uniform: Tensor | None = None) -> Tensor:
-        neighbours = get_index_neighbours(num_index)(resi, chain, batch, mask)
-        ca = pos[:, 1]
-        neighbours = get_spatial_neighbours(num_spatial)(ca, batch, mask, neighbours)
+              uniform: Tensor | None = None,
+              index_neighbours: Tensor | None = None) -> Tensor:
+        # P6: `index_neighbours` is a loop invariant - it depends only on
+        # resi/chain/batch/mask, none of which the trunk mutates - so the
+        # caller may build it once for the whole forward and pass it in.
+        # Bit-exact: the same call with the same arguments.
+        neighbours = (get_index_neighbours(num_index)(resi, chain, batch, mask)
+                      if index_neighbours is None else index_neighbours)
+        # ONE CA distance matrix for both stages (P6); computing it twice is
+        # what the un-hoisted code did.
+        distance = pair_distance(pos[:, 1])
+        neighbours = get_spatial_neighbours(num_spatial)(
+            pos[:, 1], batch, mask, neighbours, distance=distance)
         neighbours = get_random_neighbours(num_random)(
-            ca, batch, mask, neighbours, generator=generator, uniform=uniform)
+            distance, batch, mask, neighbours, generator=generator, uniform=uniform)
         return neighbours
 
     return inner

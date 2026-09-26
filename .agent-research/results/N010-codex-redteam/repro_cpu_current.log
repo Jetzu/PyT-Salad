@@ -1,0 +1,23 @@
+CACHE first [0.0, 1.0, 2.0, 3.0] second [0.0, 1.0, 2.0, 3.0] eager [3.0, 2.0, 1.0, 0.0] refreshed [3.0, 2.0, 1.0, 0.0]
+SYM 8 4 out_length 8 identity False remainder_equal True
+SYM 9 4 out_length 9 identity False remainder_equal True
+SYM 4 1 out_length 4 identity True remainder_equal True
+SYM 3 4 out_length 3 identity True remainder_equal True
+SYM c0 ZeroDivisionError float division by zero
+LOSS weight [0.0, 0.0, 0.25, 0.25] sum 0.5
+LOSS all_masked_aa 0.0 all_masked_dssp 0.0
+FIXTURE block_ref.npz {}
+FIXTURE encoder_default_vp.npz {}
+FIXTURE geometry.npz {}
+FIXTURE kabsch_ref.npz {}
+FIXTURE loss_ref.npz {}
+FIXTURE loss_ref2.npz {}
+FIXTURE model_default_ve_scaled.npz {'jax_platform': 'cpu', 'jax_matmul_precision': 'highest'}
+FIXTURE model_default_vp.npz {'jax_platform': 'cpu', 'jax_matmul_precision': 'highest'}
+FIXTURE model_default_vp_scaled.npz {'jax_platform': 'cpu', 'jax_matmul_precision': 'highest'}
+FIXTURE model_multimotif_vp.npz {'jax_platform': 'cpu', 'jax_matmul_precision': 'highest'}
+FIXTURE sampling_default_vp.npz {}
+FIXTURE stack_ref.npz {}
+FIXTURE viol_ref.npz {}
+FIXTURE viol_ref2.npz {}
+FAST compute_distogram=True key_present False

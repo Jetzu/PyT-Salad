@@ -1,0 +1,44 @@
+### Starting TaskPrologue of job 903136 on h11-24 at Sat Sep 26 08:36:21 AM CEST 2026
+Running on cores 96-127 with governor performance
+Sat Sep 26 08:36:21 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   36C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== is the CUDA denoiser reproducible at all?
+device=cuda  L=100  reps=20
+rows that index BOTH a real N-1 and a -1 sentinel: 26/100   (these are the duplicate-write rows)
+index_put_ chaining reproducible over 20 reps: True   max|d|=nan
+selected neighbour indices reproducible: True   worst differing slots: 0
+index_mean reproducible: False   max|d|=1.639e-07
+=== equivalence harness, GPU, with its own noise-floor control
+single chain: flags.any()=False  dmap_mask.any()=False
+cond_neighbours (100, 64): -1 in cols 0:48 = 0, in cols 48:64 = 1600 of 1600
+K=48 selector reproduces the first 48 columns exactly: True
+
+NOISE FLOOR: the identical call run twice differs by 1.755e-02 on cuda
+[PASS] P2  need_aa=False: pos/local/trajectory        torch.equal=False max|d|=1.514e-02  (bit-exact)  = 0.86x the noise floor
+[PASS] P4  pair block: dmap/flags terms dropped       torch.equal=True  max|d|=0.000e+00  (bit-exact)  = 0.00x the noise floor
+[PASS] P4+P5 pair_cond=False (K 64->48)               torch.equal=False max|d|=1.611e-02  (floor 2e-5)  = 0.92x the noise floor
+
+two chains: flags.any()=True
+block-contact stage selects 1600 real neighbours of 1600 -> the skip would be WRONG here, and the runtime gate refuses it
+[INFO] with flags set, taking the skip anyway moves pos by 2.113e+02 -- which is why FastDenoiser derives the gate from the tensors
+[PASS] P2  need_aa=False, two chains                  torch.equal=False max|d|=1.307e-02  (bit-exact)  = 0.74x the noise floor

@@ -115,8 +115,16 @@ def clash_repulsion_grad(ca: Tensor) -> Tensor:
     """
     with torch.enable_grad():
         leaf = ca.detach().clone().requires_grad_(True)
-        diff2 = (leaf[:, None, :] - leaf[None, :, :]) ** 2
-        d = torch.sqrt(torch.clamp(diff2, min=1e-3).sum(-1))
+        # Clamp the signed DIFFERENCE, then square. Upstream:
+        #   eval_noise_schedule_benchmark.py:205
+        #   dist = sqrt((maximum(x[:,None] - x[None,:], 1e-3) ** 2).sum(-1))
+        # i.e. max(dx, 1e-3)**2, which zeroes negative components. Clamping
+        # dx**2 instead keeps them and is a different function.
+        # NB an earlier pass reverted this after checking inference/contacts.py,
+        # which clamps max(sum(dx**2), 1e-6) - a THIRD formula, and not the one
+        # this hook mirrors (the 6/12 switch below matches the eval script).
+        diff = torch.clamp(leaf[:, None, :] - leaf[None, :, :], min=1e-3)
+        d = torch.sqrt((diff ** 2).sum(-1))
         ratio = (d - 2) / 8
         switch = (torch.clamp(1 - ratio ** 6, min=1e-6)
                  / torch.clamp(1 - ratio ** 12, min=1e-6))

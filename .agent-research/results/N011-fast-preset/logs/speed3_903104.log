@@ -1,0 +1,66 @@
+### Starting TaskPrologue of job 903104 on h11-24 at Sat Sep 26 08:21:36 AM CEST 2026
+Running on cores 0-31 with governor performance
+Sat Sep 26 08:21:36 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+RESULT variant=EXACT     L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  3.371  dev_max=3.223e-04 A  dev_rms=3.988e-05 A  nan=False  compile=102s
+Traceback (most recent call last):
+NameError: name 'fastopt' is not defined
+RESULT variant=tf32med   L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  2.856  dev_max=2.886e-01 A  dev_rms=5.675e-02 A  nan=False  compile=66s
+RESULT variant=condsame  L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  3.387  dev_max=3.057e-04 A  dev_rms=3.774e-05 A  nan=False  compile=24s
+RESULT variant=tf32_condsame L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  2.845  dev_max=2.874e-01 A  dev_rms=5.930e-02 A  nan=False  compile=25s
+RESULT variant=tf32_cur48 L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  2.729  dev_max=9.192e+00 A  dev_rms=1.103e+00 A  nan=False  compile=70s
+RESULT variant=tf32_both32 L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  2.572  dev_max=6.774e+00 A  dev_rms=1.966e+00 A  nan=False  compile=64s
+RESULT variant=tf32_condsame32 L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  2.556  dev_max=6.786e+00 A  dev_rms=1.965e+00 A  nan=False  compile=23s
+RESULT variant=tf32      L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  2.848  dev_max=3.350e-01 A  dev_rms=6.130e-02 A  nan=False  compile=23s
+RESULT variant=EXACT     L=100  dtype=float32  need_aux=1 need_aa=0 pair_cond=0 ms=  3.391  dev_max=3.446e-04 A  dev_rms=4.052e-05 A  nan=False  compile=28s
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 08:29:47 CEST 2026
+= Job-ID             : 903104 on helma
+= Job-Name           : n011_sp3
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset/run_speed3.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:45:00
+= Elapsed runtime    : 00:08:12
+= Total RAM usage    : 3.4 GiB of assigned 175 GiB (1.9%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T08:21:34 / 2026-09-26T08:21:34 / 2026-09-26T08:21:35 / 2026-09-26T08:29:47
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.8G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K    6d20m4s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 1690539, 15 %, 16 %, 1364 MiB, 108367 ms
+NVIDIA H100, 00000000:06:00.0, 1696441, 0 %, 0 %, 774 MiB, 1313 ms
+NVIDIA H100, 00000000:06:00.0, 1696604, 3 %, 3 %, 1116 MiB, 72035 ms
+NVIDIA H100, 00000000:06:00.0, 1697381, 0 %, 0 %, 988 MiB, 28007 ms
+NVIDIA H100, 00000000:06:00.0, 1698123, 0 %, 0 %, 988 MiB, 28803 ms
+NVIDIA H100, 00000000:06:00.0, 1698697, 14 %, 14 %, 1134 MiB, 76422 ms
+NVIDIA H100, 00000000:06:00.0, 1700825, 9 %, 9 %, 1120 MiB, 70229 ms
+NVIDIA H100, 00000000:06:00.0, 1702701, 0 %, 0 %, 932 MiB, 26700 ms
+NVIDIA H100, 00000000:06:00.0, 1703068, 0 %, 0 %, 988 MiB, 27010 ms
+NVIDIA H100, 00000000:06:00.0, 1703365, 0 %, 0 %, 988 MiB, 31211 ms

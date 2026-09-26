@@ -75,6 +75,27 @@ class HkLinear(nn.Module):
             out = out + self.b
         return out
 
+    def forward_indexed(self, idx: Tensor) -> Tensor:
+        """`forward(one_hot(idx, in_size))` written as the row gather it is.
+
+        **Bit-exact**, not approximately: row `r` of `one_hot @ w` is
+        `sum_k onehot[k] * w[k, :]`, in which `in_size - 1` terms are exactly
+        `0.0 * finite = 0.0` and one is `w[idx, :]`. IEEE-754 guarantees
+        `a + 0.0 == a` for finite `a` in any order, so no summation-order
+        argument is needed - the two results are the same bits (the only
+        difference a conforming implementation may produce is the sign of a
+        zero, which nothing downstream distinguishes).
+
+        The caller owns the range check: `idx` must be in `[0, in_size)`.
+        `jax.nn.one_hot` returns an all-zero row for an out-of-range index and
+        this does not - it faults (loudly) instead. Only use it where the bin
+        derivation makes the range structural.
+        """
+        out = self.w[idx]
+        if self.use_bias:
+            out = out + self.b
+        return out
+
     def extra_repr(self) -> str:  # pragma: no cover
         return f"{self.in_size}->{self.out_size}, bias={self.use_bias}"
 

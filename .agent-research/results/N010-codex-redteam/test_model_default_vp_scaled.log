@@ -1,0 +1,17 @@
+config: default_vp_scaled
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=2.263e-07  abs=1.53e-05
+[PASS] local       rel=5.394e-07  abs=8.35e-04
+[PASS] trajectory  rel=2.689e-07  abs=1.83e-05
+[PASS] aa          rel=1.539e-06  abs=1.34e-05
+[PASS] atom_pos    rel=1.715e-07  abs=1.16e-05
+[PASS] angles      rel=3.994e-06  abs=3.99e-06  (tol 1e-03)
+[PASS] raw_angles  rel=1.202e-06  abs=7.48e-04  (tol 1e-04)
+[PASS] dssp        rel=1.332e-06  abs=1.34e-05
+[PASS] distogram   rel=4.525e-06  abs=4.73e-04
+[PASS] prev_pos    rel=2.263e-07  abs=1.53e-05
+[PASS] prev_local  rel=5.394e-07  abs=8.35e-04
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00002 A
+OK

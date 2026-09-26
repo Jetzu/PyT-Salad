@@ -20,18 +20,82 @@ from __future__ import annotations
 import torch
 from torch import Tensor, nn
 
-from ..diffusion.precond import preconditioning_scale_factors
+from ..diffusion.precond import edm_scaling
 from ..geometry import features as GF
 from ..geometry.frames import aa_frames_t, apply_t
 from ..geometry.neighbours import (get_index_neighbours, get_neighbours,
                                    get_random_neighbours)
 from ..geometry.segment import index_mean
+from .. import opt
 from .attention import SparseStructureAttention
 from .basic import MLP, HkLayerNorm, HkLinear, gelu
 
 __all__ = ["DiffusionPairFeatures", "Update", "EncoderUpdate", "UpdatePositions",
            "DiffusionBlock", "DiffusionStack", "extract_condition_neighbours",
+           "condition_neighbour_prologue", "condition_neighbour_tail",
            "MotifAdapterDiffusionBlock", "extract_motif_neighbours"]
+
+
+def condition_neighbour_prologue(num_index: int, num_spatial: int):
+    """The part of `extract_condition_neighbours` that is loop-INVARIANT (P6).
+
+    The self-conditioning branch ranks against ``prev_pos``, which the trunk
+    never mutates, so its distance matrix, its sequence-index stage and its
+    spatial stage are the same tensors in all six blocks. Building them once
+    and reusing them is common-subexpression elimination: bit-exact, because
+    the removed work is literally the same arithmetic re-executed.
+
+    Returns ``(distance, seed_neighbours)`` for `condition_neighbour_tail`.
+    """
+
+    def inner(pos: Tensor, pair_condition: dict | None, resi: Tensor,
+              chain: Tensor, batch: Tensor, mask: Tensor,
+              index_neighbours: Tensor | None = None) -> tuple[Tensor, Tensor]:
+        neighbours = (get_index_neighbours(num_index)(resi, chain, batch, mask)
+                      if index_neighbours is None else index_neighbours)
+        ca = pos[:, 1]
+        dist = torch.sqrt(torch.clamp(
+            ((ca[:, None] - ca[None, :]) ** 2).sum(-1), min=1e-12))
+        if pair_condition is not None:
+            # P4: with no pair conditioning `dmap_mask` is all-false, so this
+            # `where` is the identity on `dist`. The caller passes None to say
+            # so; it never guesses.
+            dist = torch.where(pair_condition["dmap_mask"],
+                               pair_condition["dmap"], dist)
+        same_batch = batch[:, None] == batch[None, :]
+        pair_mask = mask[:, None] & mask[None, :] & same_batch
+        return dist, get_neighbours(num_spatial)(dist, pair_mask, neighbours)
+
+    return inner
+
+
+def condition_neighbour_tail(num_random: int, num_block: int):
+    """The per-block part: the Gumbel stage, and the block-contact stage.
+
+    ``num_block=0`` drops the fourth stage entirely (P5) rather than calling
+    ``get_random_neighbours(0)``, which would still build a whole ``(N, N)``
+    Gumbel field before concatenating nothing. That is only legal when
+    ``flags`` is all-false, in which case the stage's distance matrix is
+    ``+inf`` everywhere and every one of its 16 columns is the ``-1``
+    sentinel - see the caller's runtime gate.
+    """
+
+    def inner(dist: Tensor, seed: Tensor, pair_condition: dict | None,
+              batch: Tensor, mask: Tensor, uniform: Tensor | None = None,
+              uniform2: Tensor | None = None) -> Tensor:
+        neighbours = get_random_neighbours(num_random)(
+            dist, batch, mask, seed, uniform=uniform)
+        if num_block <= 0:
+            return neighbours
+        flags_any = pair_condition["flags"].any(dim=-1)
+        block_contact_dist = torch.where(
+            flags_any, flags_any.to(dist.dtype),
+            torch.full_like(dist, float("inf")))
+        return get_random_neighbours(num_block)(
+            block_contact_dist, batch, mask, neighbours,
+            uniform=uniform2 if uniform2 is not None else uniform)
+
+    return inner
 
 
 def extract_condition_neighbours(num_index: int, num_spatial: int,
@@ -40,29 +104,19 @@ def extract_condition_neighbours(num_index: int, num_spatial: int,
 
     Motif distances override the geometric CA distance where ``dmap_mask`` is
     set, and a final stage samples among residues flagged by pair conditioning.
+
+    This is exactly ``condition_neighbour_prologue`` followed by
+    ``condition_neighbour_tail``; the two halves exist separately so the
+    invariant half can be hoisted out of the 6-block loop (P6).
     """
+    prologue = condition_neighbour_prologue(num_index, num_spatial)
+    tail = condition_neighbour_tail(num_random, num_block)
 
     def inner(pos: Tensor, pair_condition: dict, resi: Tensor, chain: Tensor,
               batch: Tensor, mask: Tensor, uniform: Tensor | None = None,
               uniform2: Tensor | None = None) -> Tensor:
-        neighbours = get_index_neighbours(num_index)(resi, chain, batch, mask)
-        ca = pos[:, 1]
-        dist = torch.sqrt(torch.clamp(
-            ((ca[:, None] - ca[None, :]) ** 2).sum(-1), min=1e-12))
-        dist = torch.where(pair_condition["dmap_mask"], pair_condition["dmap"], dist)
-        same_batch = batch[:, None] == batch[None, :]
-        pair_mask = mask[:, None] & mask[None, :] & same_batch
-        neighbours = get_neighbours(num_spatial)(dist, pair_mask, neighbours)
-        neighbours = get_random_neighbours(num_random)(
-            dist, batch, mask, neighbours, uniform=uniform)
-        flags_any = pair_condition["flags"].any(dim=-1)
-        block_contact_dist = torch.where(
-            flags_any, flags_any.to(dist.dtype),
-            torch.full_like(dist, float("inf")))
-        neighbours = get_random_neighbours(num_block)(
-            block_contact_dist, batch, mask, neighbours,
-            uniform=uniform2 if uniform2 is not None else uniform)
-        return neighbours
+        dist, seed = prologue(pos, pair_condition, resi, chain, batch, mask)
+        return tail(dist, seed, pair_condition, batch, mask, uniform, uniform2)
 
     return inner
 
@@ -117,10 +171,20 @@ class DiffusionPairFeatures(nn.Module):
         else:
             pc = None
 
-        relpos = GF.sequence_relative_position(
-            32, one_hot=True, cyclic=cyclic_mask is not None)(
-                resi, chain, batch, neighbours, cyclic_mask=cyclic_mask)
-        pair = self.linear_relpos(relpos)
+        # P3: the relative-position term is a row gather written as a
+        # (N, K, 66) one-hot times a (66, 64) matrix. `forward_indexed` is the
+        # same bits (see HkLinear.forward_indexed); the bins are structurally
+        # in [0, 65] because `sequence_relative_position` clamps them.
+        if opt.GATHER_ONEHOT:
+            relpos = GF.sequence_relative_position(
+                32, one_hot=False, cyclic=cyclic_mask is not None)(
+                    resi, chain, batch, neighbours, cyclic_mask=cyclic_mask)
+            pair = self.linear_relpos.forward_indexed(relpos.long())
+        else:
+            relpos = GF.sequence_relative_position(
+                32, one_hot=True, cyclic=cyclic_mask is not None)(
+                    resi, chain, batch, neighbours, cyclic_mask=cyclic_mask)
+            pair = self.linear_relpos(relpos)
 
         if pc is not None:
             if self.multi_motif:
@@ -252,6 +316,16 @@ class DiffusionBlock(nn.Module):
         self.update = Update(c, local_size, atom_count, global_update=True)
         self.layer_norm_5 = HkLayerNorm(local_size)
         self.update_positions = UpdatePositions(local_size, atom_count)
+        # HOIST every config value `forward` needs into plain Python
+        # attributes. `DotDict.__getattr__` is `dict.get`, which Dynamo cannot
+        # trace: `_getattr_static` raises AttributeError and Dynamo BREAKS THE
+        # GRAPH at every `config.<key>` read inside the compiled region.
+        # Measured on `forward_core`: 27 graphs / 26 breaks before this, and
+        # a broken graph is a lost fusion, i.e. extra kernels - which is the
+        # one currency this model has. Reading them here, at construction
+        # time, is free and bit-exact.
+        self.sigma_data = float(c.sigma_data)
+        self.precond_edm = c.preconditioning in ("edm", "edm_scaled")
 
     def forward(self, features: Tensor, pos: Tensor, prev_pos: Tensor,
                 condition: Tensor, pair_condition: dict, time: Tensor,
@@ -259,8 +333,7 @@ class DiffusionBlock(nn.Module):
                 current_neighbours: Tensor, cond_neighbours: Tensor,
                 cyclic_mask: Tensor | None = None,
                 init_pos: Tensor | None = None) -> tuple[Tensor, Tensor]:
-        c = self.config
-        sigma = c.sigma_data
+        sigma = self.sigma_data
 
         pair, pair_mask = self.pair_1(pos, pair_condition, current_neighbours,
                                       resi, chain, batch, mask,
@@ -278,7 +351,11 @@ class DiffusionBlock(nn.Module):
             self.layer_norm_4(features), pos, chain, batch, mask, condition)
 
         local_norm = self.layer_norm_5(features)
-        out_scale = preconditioning_scale_factors(c, time[:, None], sigma)["out"]
+        # `preconditioning_scale_factors(config, ...)["out"]` inlined: it reads
+        # two config keys, and a config read is a graph break (see __init__).
+        # Every non-EDM branch of it returns `sigma_data` unchanged.
+        out_scale = (edm_scaling(sigma, 1.0, alpha=1.0, beta=time[:, None])["out"]
+                     if self.precond_edm else sigma)
         pos = self.update_positions(pos, local_norm, out_scale)
         return features, pos.to(local_norm.dtype)
 
@@ -360,6 +437,16 @@ class MotifAdapterDiffusionBlock(nn.Module):
         self.update = Update(c, local_size, atom_count, global_update=True)
         self.layer_norm_5 = HkLayerNorm(local_size)
         self.update_positions = UpdatePositions(local_size, atom_count)
+        # HOIST every config value `forward` needs into plain Python
+        # attributes. `DotDict.__getattr__` is `dict.get`, which Dynamo cannot
+        # trace: `_getattr_static` raises AttributeError and Dynamo BREAKS THE
+        # GRAPH at every `config.<key>` read inside the compiled region.
+        # Measured on `forward_core`: 27 graphs / 26 breaks before this, and
+        # a broken graph is a lost fusion, i.e. extra kernels - which is the
+        # one currency this model has. Reading them here, at construction
+        # time, is free and bit-exact.
+        self.sigma_data = float(c.sigma_data)
+        self.precond_edm = c.preconditioning in ("edm", "edm_scaled")
 
     def forward(self, features: Tensor, pos: Tensor, prev_pos: Tensor,
                 condition: Tensor, pair_condition: dict, time: Tensor,
@@ -369,8 +456,7 @@ class MotifAdapterDiffusionBlock(nn.Module):
                 init_pos: Tensor | None = None) -> tuple[Tensor, Tensor]:
         # `cond_neighbours` carries the motif neighbours for this block; the
         # caller supplies them so the stack keeps one neighbour_fn contract.
-        c = self.config
-        sigma = c.sigma_data
+        sigma = self.sigma_data
         motif_neighbours = cond_neighbours
 
         pair, pair_mask = self.pair_1(pos, pair_condition, motif_neighbours,
@@ -392,6 +478,10 @@ class MotifAdapterDiffusionBlock(nn.Module):
             self.layer_norm_4(features), pos, chain, batch, mask, condition)
 
         local_norm = self.layer_norm_5(features)
-        out_scale = preconditioning_scale_factors(c, time[:, None], sigma)["out"]
+        # `preconditioning_scale_factors(config, ...)["out"]` inlined: it reads
+        # two config keys, and a config read is a graph break (see __init__).
+        # Every non-EDM branch of it returns `sigma_data` unchanged.
+        out_scale = (edm_scaling(sigma, 1.0, alpha=1.0, beta=time[:, None])["out"]
+                     if self.precond_edm else sigma)
         pos = self.update_positions(pos, local_norm, out_scale)
         return features, pos.to(local_norm.dtype)

@@ -1,0 +1,25 @@
+steps: 81 (ref 81)
+   step    0  max|d| = 6.025e-05 A
+   step   10  max|d| = 1.195e-03 A
+   step   20  max|d| = 4.283e-01 A
+   step   30  max|d| = 1.119e+00 A
+   step   40  max|d| = 7.945e-01 A
+   step   50  max|d| = 1.694e-01 A
+   step   60  max|d| = 1.214e-01 A
+   step   70  max|d| = 1.745e-01 A
+   step   80  max|d| = 3.508e-01 A
+   step   80  max|d| = 3.508e-01 A
+worst per-step deviation over the whole trajectory: 4.370e+00 A
+[PASS] worst/noise-floor ratio = 7.5x (self-divergence 0.583 A)
+[PASS] final_pos       rel=1.061e-02
+[PASS] final_local     rel=2.515e-03
+[PASS] final_aa        rel=1.713e-02
+[PASS] atom_pos backbone rel=5.579e-03
+[PASS] atom_pos agreeing rel=8.029e-03
+       (1 residue(s) flipped identity -> different rotamer: [46])
+[PASS] final_aatype    1/64 residues differ
+
+final structure deviation: mean 0.05374 A, max 0.35083 A   (self-divergence floor: mean 0.00650 A)
+[PASS] final/noise-floor ratio = 8.3x
+generated CA-CA: mean 3.762 A (native ~3.8)
+OK

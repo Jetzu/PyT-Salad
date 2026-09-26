@@ -1,0 +1,20 @@
+tests/harness/check_block.py
+tests/harness/check_loss.py
+tests/harness/check_loss2.py
+tests/harness/check_pair.py
+tests/harness/check_se3b.py
+tests/harness/check_stack.py
+tests/harness/gen_block_ref.py
+tests/harness/gen_encoder_ref.py
+tests/harness/gen_loss_ref.py
+tests/harness/gen_loss_ref2.py
+tests/harness/gen_pair_ref.py
+tests/harness/gen_stack_ref.py
+tests/test_encoder_parity.py
+tests/test_geometry_parity.py
+tests/test_model_parity.py
+tests/test_sampling_parity.py
+tests/test_stack_parity.py
+--- pytest functions ---
+--- target references in test files ---
+tests/test_encoder_parity.py:7:`unsqueeze_batch` fix) until `training/loop.py::prepare_batch` started calling

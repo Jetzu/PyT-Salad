@@ -1,0 +1,112 @@
+### Starting TaskPrologue of job 903106 on h12-06 at Sat Sep 26 08:22:21 AM CEST 2026
+Running on cores 96-127 with governor performance
+Sat Sep 26 08:22:21 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   37C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== allon  (SALAD_OPT_GATHER=1 SALAD_OPT_HOIST=1 SALAD_OPT_NOPC=1 SALAD_OPT_LEAN=1)
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+fast path (exact) compiled + captured in 320s (one-time)
+  design 0:    1.9s  CA-CA 3.767 A (min 3.707 max 3.845)  Rg 13.2 A  -> .agent-research/results/N009-speed-proposals/e2e/allon/design_0.pdb
+  design 1:    1.5s  CA-CA 3.754 A (min 3.631 max 3.909)  Rg 14.9 A  -> .agent-research/results/N009-speed-proposals/e2e/allon/design_1.pdb
+  design 2:    1.5s  CA-CA 3.777 A (min 3.722 max 3.862)  Rg 13.1 A  -> .agent-research/results/N009-speed-proposals/e2e/allon/design_2.pdb
+
+3 designs of 100 aa: median 1.5s, total 4.8s
+=== nolean  (SALAD_OPT_GATHER=1 SALAD_OPT_HOIST=1 SALAD_OPT_NOPC=1 SALAD_OPT_LEAN=0)
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+fast path (exact) compiled + captured in 52s (one-time)
+  design 0:    1.9s  CA-CA 3.763 A (min 3.655 max 3.881)  Rg 15.2 A  -> .agent-research/results/N009-speed-proposals/e2e/nolean/design_0.pdb
+  design 1:    1.8s  CA-CA 3.759 A (min 3.551 max 3.862)  Rg 11.7 A  -> .agent-research/results/N009-speed-proposals/e2e/nolean/design_1.pdb
+  design 2:    1.8s  CA-CA 3.771 A (min 3.616 max 3.928)  Rg 12.8 A  -> .agent-research/results/N009-speed-proposals/e2e/nolean/design_2.pdb
+
+3 designs of 100 aa: median 1.8s, total 5.6s
+=== alloff  (SALAD_OPT_GATHER=0 SALAD_OPT_HOIST=0 SALAD_OPT_NOPC=0 SALAD_OPT_LEAN=0)
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+fast path (exact) compiled + captured in 254s (one-time)
+  design 0:   29.5s  CA-CA 3.764 A (min 3.560 max 4.025)  Rg 11.8 A  -> .agent-research/results/N009-speed-proposals/e2e/alloff/design_0.pdb
+  design 1:    2.0s  CA-CA 3.770 A (min 3.549 max 3.900)  Rg 12.3 A  -> .agent-research/results/N009-speed-proposals/e2e/alloff/design_1.pdb
+  design 2:    2.0s  CA-CA 3.738 A (min 3.547 max 3.926)  Rg 12.1 A  -> .agent-research/results/N009-speed-proposals/e2e/alloff/design_2.pdb
+
+3 designs of 100 aa: median 2.0s, total 33.5s
+=== allon2  (SALAD_OPT_GATHER=1 SALAD_OPT_HOIST=1 SALAD_OPT_NOPC=1 SALAD_OPT_LEAN=1)
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+fast path (exact) compiled + captured in 72s (one-time)
+  design 0:    1.6s  CA-CA 3.741 A (min 3.544 max 3.855)  Rg 15.2 A  -> .agent-research/results/N009-speed-proposals/e2e/allon2/design_0.pdb
+  design 1:    1.5s  CA-CA 3.735 A (min 3.574 max 3.840)  Rg 19.1 A  -> .agent-research/results/N009-speed-proposals/e2e/allon2/design_1.pdb
+  design 2:    1.5s  CA-CA 3.776 A (min 3.622 max 3.879)  Rg 12.7 A  -> .agent-research/results/N009-speed-proposals/e2e/allon2/design_2.pdb
+
+3 designs of 100 aa: median 1.5s, total 4.6s
+=== sha256 of every written PDB
+a72365eabfd1fdfa  .agent-research/results/N009-speed-proposals/e2e/allon/design_0.pdb
+300a2600969d9b6e  .agent-research/results/N009-speed-proposals/e2e/allon/design_1.pdb
+c0688bea24f435da  .agent-research/results/N009-speed-proposals/e2e/allon/design_2.pdb
+0158ca1ce3fc27dc  .agent-research/results/N009-speed-proposals/e2e/nolean/design_0.pdb
+4ff7f6e170ab28df  .agent-research/results/N009-speed-proposals/e2e/nolean/design_1.pdb
+b9d8dba704825892  .agent-research/results/N009-speed-proposals/e2e/nolean/design_2.pdb
+d3ec88f634d45fc2  .agent-research/results/N009-speed-proposals/e2e/alloff/design_0.pdb
+aca718cc432959f0  .agent-research/results/N009-speed-proposals/e2e/alloff/design_1.pdb
+dcd3c77a19d2139d  .agent-research/results/N009-speed-proposals/e2e/alloff/design_2.pdb
+b473b8a7a0f90b63  .agent-research/results/N009-speed-proposals/e2e/allon2/design_0.pdb
+59ad78ee58655b16  .agent-research/results/N009-speed-proposals/e2e/allon2/design_1.pdb
+ca0f9ce347cb6505  .agent-research/results/N009-speed-proposals/e2e/allon2/design_2.pdb
+=== byte comparison against allon
+  design_0  allon vs nolean : DIFFERS
+  design_1  allon vs nolean : DIFFERS
+  design_2  allon vs nolean : DIFFERS
+  design_0  allon vs alloff : DIFFERS
+  design_1  allon vs alloff : DIFFERS
+  design_2  allon vs alloff : DIFFERS
+  design_0  allon vs allon2 : DIFFERS
+  design_1  allon vs allon2 : DIFFERS
+  design_2  allon vs allon2 : DIFFERS
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 08:35:15 CEST 2026
+= Job-ID             : 903106 on helma
+= Job-Name           : salad_e2e
+= Job-Command        : .agent-research/results/N009-speed-proposals/e2e.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:40:00
+= Elapsed runtime    : 00:13:17
+= Total RAM usage    : 4.7 GiB of assigned 175 GiB (2.7%)
+= Node list          : h12-06
+= Subm/Elig/Start/End: 2026-09-26T08:21:53 / 2026-09-26T08:21:53 / 2026-09-26T08:21:58 / 2026-09-26T08:35:15
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.8G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K   6d14m36s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 3542431, 8 %, 7 %, 1348 MiB, 333460 ms
+NVIDIA H100, 00000000:C6:00.0, 3547646, 9 %, 0 %, 1000 MiB, 58882 ms
+NVIDIA H100, 00000000:C6:00.0, 3548555, 8 %, 6 %, 1350 MiB, 294490 ms
+NVIDIA H100, 00000000:C6:00.0, 3553112, 5 %, 0 %, 1104 MiB, 77850 ms

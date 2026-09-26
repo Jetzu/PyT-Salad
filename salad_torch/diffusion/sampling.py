@@ -60,6 +60,20 @@ class SamplerConfig:
     #: i.e. the off-by-one; ``num_steps - 1`` is the fixed variant the author
     #: left commented out at ``eval_...:596``. Not a default for a reason.
     raw_t_denominator: int | None = None
+    #: Ask `step_fn` for the sequence heads only on steps that report (P2).
+    #:
+    #: Off by default. When on, `step_fn` is called with an extra
+    #: ``need_aa=<bool>`` keyword and may return an update WITHOUT ``aa``,
+    #: ``aatype`` and ``atom_pos``; the loop then leaves `data`'s copies
+    #: alone. That is output-preserving **only** because the denoiser reads
+    #: none of them back: its inputs are
+    #: ``(pos_noised, prev_pos, prev_local, condition, aa_gt)``, `aa_gt` is a
+    #: base key fixed for the whole run, and `data["seq"]` reaches the model
+    #: solely through `apply_diffusion`'s `diffuse_sequence`, whose output
+    #: `seq_noised` is consumed only when ``config.diffuse_sequence`` is set
+    #: (no released checkpoint sets it). Turn this on only after checking
+    #: that, and only with a `step_fn` that accepts `need_aa`.
+    lean_steps: bool = False
 
 
 def make_initial_data(num_aa: int, residue_index: Tensor, chain_index: Tensor,
@@ -148,14 +162,21 @@ def sample(step_fn: StepFn, data: dict, prev: dict, cfg: SamplerConfig, *,
 
         is_out_step = step in out_steps
         fn = final_step_fn if (final_step_fn is not None and is_out_step) else step_fn
-        update, prev = fn(data, prev, generator)
+        if cfg.lean_steps:
+            update, prev = fn(data, prev, generator, need_aa=is_out_step)
+        else:
+            update, prev = fn(data, prev, generator)
 
         data["pos"] = update["pos"]           # x0 prediction, fed straight back
         if post_step_fn is not None:
             data["pos"] = post_step_fn(data["pos"], raw_t)
-        data["seq"] = update["aa"].argmax(dim=-1)
-        data["atom_pos"] = update["atom_pos"]
-        data["aatype"] = update["aatype"]
+        # absent (not stale) on a lean step - see SamplerConfig.lean_steps
+        if "aa" in update:
+            data["seq"] = update["aa"].argmax(dim=-1)
+        if "atom_pos" in update:
+            data["atom_pos"] = update["atom_pos"]
+        if "aatype" in update:
+            data["aatype"] = update["aatype"]
         if "latent" in data and "latent" in update:
             data["latent"] = update["latent"]
 

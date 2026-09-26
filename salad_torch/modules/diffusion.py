@@ -12,7 +12,7 @@ from __future__ import annotations
 import torch
 from torch import Tensor, nn
 
-from ..diffusion.precond import preconditioning_scale_factors
+from ..diffusion.precond import edm_scaling, preconditioning_scale_factors
 from ..geometry import features as GF
 from ..geometry.frames import aa_frames_t
 from ..geometry.neighbours import (extract_neighbours, get_index_neighbours,
@@ -20,11 +20,40 @@ from ..geometry.neighbours import (extract_neighbours, get_index_neighbours,
 from ..geometry.rigid import vec_norm
 from .basic import MLP, HkLayerNorm, HkLinear, gelu
 from ..config import uses_init_pos
-from .blocks import (DiffusionStack, extract_condition_neighbours,
+from .. import fastopt, opt
+from .blocks import (DiffusionStack, condition_neighbour_prologue,
+                     condition_neighbour_tail, extract_condition_neighbours,
                      extract_motif_neighbours)
 from .decoders import AADecoder, AngleHead, DistogramDecoder
 
 __all__ = ["Diffusion", "uniform_draw_count"]
+
+def _unbind_draws(stack, count: int) -> list:
+    """Split a pre-drawn ``(draws, N, N)`` stack into a plain Python list.
+
+    Replaces a former ``_slice(stack, i)`` helper, and the replacement is worth
+    a paragraph. Dynamo compiled `_slice` as its OWN frame and specialised it on
+    the integer `i`; with 19 draws that blows the default
+    ``cache_size_limit`` of 8, and every call past the eighth **breaks the
+    graph**. Measured on `forward_core` before the change:
+    ``torch._dynamo.explain`` reported 27 graphs / 26 breaks. Unbinding once,
+    up front, into a list indexed by an int known at trace time gives Dynamo
+    nothing to specialise on.
+
+    `torch.unbind` returns views, so this costs no kernels and no memory. A
+    2-D ``(N, N)`` field means "use this one field for every draw", which is
+    what the JAX parity fixtures record (their generator patches one field into
+    every call). Indexing that as a stack would silently hand a single ROW to
+    the Gumbel and quietly corrupt neighbour selection - it cost 300-1800x
+    parity on default_vp_scaled and multimotif_vp while default_vp happened to
+    survive it.
+    """
+    if stack is None:
+        return [None] * count
+    if stack.dim() == 2:
+        return [stack] * count
+    return list(torch.unbind(stack, dim=0))
+
 
 def _slice(stack, i: int):
     """Pick draw `i` from a pre-drawn ``(draws, N, N)`` stack.
@@ -55,6 +84,13 @@ def uniform_draw_count(config) -> int:
     1 for the distogram neighbours, then per block: 1 for extract_neighbours
     and, unless multi_motif routes to the motif map, 2 for
     extract_condition_neighbours (its random and block-contact stages).
+
+    This stays at 3 fields per block even when P5 drops the block-contact
+    stage. The stack LAYOUT is what maps a seed to a trajectory: renumbering
+    it would hand the surviving Gumbel stage a different field and generate a
+    different (equally valid, but different) protein, which is not a change
+    the exact path is allowed to make. The unconsumed slice costs one
+    `(N, N)` slab of an already-single `rand` call.
     """
     per_block = 1 if config.multi_motif else 3
     return 1 + config.diffusion_depth * per_block
@@ -108,9 +144,28 @@ class Diffusion(nn.Module):
         self.distogram_decoder = DistogramDecoder(c, ls, a)
         self.angle_head = AngleHead(ls, a)
 
+        # -- config, hoisted into plain attributes ---------------------------
+        # `DotDict.__getattr__` is `dict.get`; Dynamo's `_getattr_static`
+        # raises on it and BREAKS THE GRAPH at every `config.<key>` read inside
+        # `forward_core`. Measured before this hoist: 30 graphs / 29 breaks,
+        # every one of them a lost fusion. Reading the keys once, here, is
+        # free and bit-exact. Any new config read in a hot path belongs here,
+        # not in `forward`.
+        self.multi_motif = bool(c.multi_motif)
+        self.time_embedding_on = bool(c.time_embedding)
+        self.diffuse_sequence = bool(c.diffuse_sequence)
+        self.fape_neighbours = int(c.fape_neighbours)
+        self.preconditioning = str(c.preconditioning or "")
+        self.sigma_data = float(c.sigma_data)
+        self.vp_time_embedding = c.diffusion_kind in self._VP_KINDS
+        self.n_draws = uniform_draw_count(c)
+        self.cyclic = bool(c.cyclic)
+
     # ------------------------------------------------------------------
     def time_embedding(self, t: Tensor) -> Tensor:
-        if self.config.diffusion_kind in self._VP_KINDS:
+        # `self.vp_time_embedding`, not `self.config.diffusion_kind` - see
+        # __init__: a DotDict read inside the compiled region breaks the graph.
+        if self.vp_time_embedding:
             return vp_time_embedding(t)
         return edm_time_embedding(t)
 
@@ -126,9 +181,9 @@ class Diffusion(nn.Module):
             local_pos.reshape(n, -1),
             GF.distance_rbf(vec_norm(local_pos), 0.0, 22.0).reshape(n, -1),
         ]
-        if c.time_embedding:
+        if self.time_embedding_on:
             parts = [self.time_embedding(t_pos)] + parts
-        if c.diffuse_sequence:
+        if self.diffuse_sequence:
             parts += [self.time_embedding(t_seq),
                       (seq[..., None] == torch.arange(21, device=seq.device)).float()]
         parts.append(self.prepare_layer_norm_prev(prev["local"]))
@@ -161,28 +216,62 @@ class Diffusion(nn.Module):
                      cyclic_mask: Tensor | None = None,
                      uniform: Tensor | None = None,
                      need_aux: bool = True,
+                     need_aa: bool = True,
+                     pair_cond: bool = True,
                      ) -> tuple[Tensor, ...]:
         """Returns (pos, local, trajectory, aa_logits, aa_features, dssp,
-        distogram_neighbours, raw_angles, angles, angle_pos, aatype).
+        distogram_neighbours, raw_angles, angles, angle_pos, aatype), or just
+        ``(pos, local, trajectory)`` when `need_aa` is False.
 
         `need_aux=False` skips the two outputs the sampler never reads: the
         dssp head and the distogram neighbour draw. The latter is a full
         (N, N) Gumbel + stable argsort, i.e. one of the more expensive single
         ops in the forward, spent on a tensor that is then discarded.
+
+        `need_aa=False` (P2) additionally skips the whole AA decoder, the dssp
+        head and the angle head. Legal only on a sampling step whose outputs
+        are never read: the trunk's inputs are
+        ``(pos_noised, prev_pos, prev_local, condition, aa_gt)`` and `aa_gt` is
+        a base key that never changes over a run, so nothing the three heads
+        produce can re-enter the model. `pos`, `local` and `trajectory` - the
+        only things the sampler feeds back - are **bit-identical**, because
+        this is a skip and not a reassociation.
+
+        `pair_cond=False` (P4 + P5) asserts that this design has no pair
+        conditioning at all: ``dmap_mask`` all false AND ``flags`` all false.
+        The caller must establish that from the real tensors; getting it wrong
+        is silently wrong, so `FastDenoiser` derives it and never guesses.
+        Under that condition the `dmap`/`flags` pair terms are exactly-zero
+        matrices fed through exactly-zero GEMMs (bit-exact to drop), and the
+        fourth neighbour stage's every column is the `-1` sentinel, so the
+        self-conditioning branch runs at K=48 instead of K=64 (reassociation
+        of reductions over K whose dropped terms are exactly 0.0).
+
+        These three flags are Python bools, so Dynamo specialises on them and
+        each combination gets its own graph.
         """
-        c = self.config
+        # NB every config value used below is a plain attribute hoisted in
+        # __init__, never `self.config.<key>`: a DotDict read inside the
+        # compiled region breaks the Dynamo graph (see __init__).
+        # multi_motif ROUTES through the pair conditioning (its first attention
+        # runs over the motif map), so the P4/P5 skip is never available there.
+        skip_pc = bool(pair_cond is False and opt.SKIP_PAIR_COND
+                       and not self.multi_motif)
         pair_condition = {"dmap": dmap, "omap": omap,
                           "dmap_mask": dmap_mask, "flags": flags}
         n = pos_noised.shape[0]
-        # `uniform` is a (draws, N, N) stack, pre-drawn outside any CUDA graph
+        # `uniform` is a (draws, N, N) stack, pre-drawn outside any CUDA graph.
+        # Unbound ONCE - see `_unbind_draws`; slicing it per call cost 26
+        # Dynamo graph breaks.
+        draws = _unbind_draws(uniform, self.n_draws)
 
 
         _, _, local_pos = aa_frames_t(pos_noised)
         parts = [local_pos.reshape(n, -1),
                  GF.distance_rbf(vec_norm(local_pos), 0.0, 22.0).reshape(n, -1)]
-        if c.time_embedding:
+        if self.time_embedding_on:
             parts = [self.time_embedding(t_pos)] + parts
-        if c.diffuse_sequence:
+        if self.diffuse_sequence:
             parts += [self.time_embedding(t_seq),
                       (seq_noised[..., None]
                        == torch.arange(21, device=seq_noised.device)).float()]
@@ -190,42 +279,80 @@ class Diffusion(nn.Module):
         local = self.prepare_layer_norm_local(self.prepare_mlp(torch.cat(parts, dim=-1)))
         condition = self.prepare_layer_norm_cond(condition)
 
-        if need_aux:
-            distogram_neighbours = get_random_neighbours(c.fape_neighbours)(
-                pos_gt[:, 4], batch, mask, uniform=_slice(uniform, 0))
+        if need_aux and need_aa:
+            distogram_neighbours = get_random_neighbours(self.fape_neighbours)(
+                pos_gt[:, 4], batch, mask, uniform=draws[0])
         else:
             distogram_neighbours = torch.zeros((pos_noised.shape[0], 0),
                                                dtype=torch.long,
                                                device=pos_noised.device)
 
         pos = pos_noised
-        pos_factors = preconditioning_scale_factors(c, t_pos, c.sigma_data)
-        init_pos = prev_pos if c.multi_motif else None
-        if c.preconditioning == "edm":
-            pos = pos * pos_factors["skip"][:, None, None]
-        elif c.preconditioning == "edm_scaled":
-            init_pos = c.sigma_data * pos_factors["in"][:, None, None] * pos
+        init_pos = prev_pos if self.multi_motif else None
+        if self.preconditioning in ("edm", "edm_scaled"):
+            pos_factors = edm_scaling(self.sigma_data, 1.0, alpha=1.0, beta=t_pos)
+            if self.preconditioning == "edm_scaled":
+                init_pos = self.sigma_data * pos_factors["in"][:, None, None] * pos
             pos = pos * pos_factors["skip"][:, None, None]
 
-        per_block = 1 if c.multi_motif else 3
+        per_block = 1 if self.multi_motif else 3
+        # P4: what the pair blocks and the neighbour selector are allowed to
+        # see. None means "there is no pair conditioning", which is a stronger
+        # statement than "the tensors happen to be zero" - it is the caller's
+        # assertion, checked at the call site.
+        pc_used = None if skip_pc else pair_condition
+        # P5: 16 -> 0 block-contact neighbours (K 64 -> 48 on this branch)
+        num_block = 0 if skip_pc else 16
+
+        # P6: everything in the two selectors that does not change between the
+        # six blocks, computed once. `resi`/`chain`/`batch`/`mask` and
+        # `prev_pos` are all loop invariants, so this is pure CSE - the tensors
+        # it produces are the same bits the unhoisted code produced twelve and
+        # six times respectively.
+        hoist = opt.HOIST_NEIGHBOURS
+        index_neighbours = cond_dist = cond_seed = None
+        if hoist:
+            index_neighbours = get_index_neighbours(16)(resi, chain, batch, mask)
+            if not self.multi_motif:
+                cond_dist, cond_seed = condition_neighbour_prologue(16, 16)(
+                    prev_pos, pc_used, resi, chain, batch, mask,
+                    index_neighbours=index_neighbours)
 
         def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
             base = 1 + block_idx * per_block
+            # N011 fast preset: give every block the SAME self-conditioning
+            # draw. `cond_neighbours` is then one tensor for the whole trunk
+            # (its other three stages are already block-invariant after the P6
+            # hoist), so `pair_2`'s geometric features become the same
+            # expression on the same inputs in all six blocks and the compiler
+            # builds them once. NOT applied to `current`, whose neighbour list
+            # legitimately changes with `pos`, and not reachable on the
+            # multi_motif route, which draws no condition randomness at all.
+            cbase = 1 if fastopt.SHARED_COND_DRAW else base
             current = extract_neighbours(16, 16, 32)(
-                cur_pos, resi, chain, batch, mask, uniform=_slice(uniform, base))
-            if c.multi_motif:
+                cur_pos, resi, chain, batch, mask, uniform=draws[base],
+                index_neighbours=index_neighbours)
+            if self.multi_motif:
                 cond = extract_motif_neighbours(32)(pair_condition)
+            elif hoist:
+                cond = condition_neighbour_tail(16, num_block)(
+                    cond_dist, cond_seed, pc_used, batch, mask,
+                    uniform=draws[cbase + 1], uniform2=draws[cbase + 2])
             else:
                 cond = extract_condition_neighbours(
-                    16, 16, 16, 16)(cond_pos, pair_condition, resi, chain, batch,
-                                    mask, uniform=_slice(uniform, base + 1),
-                                    uniform2=_slice(uniform, base + 2))
+                    16, 16, 16, num_block)(cond_pos, pc_used, resi, chain, batch,
+                                           mask, uniform=draws[cbase + 1],
+                                           uniform2=draws[cbase + 2])
             return current, cond
 
         local, pos, trajectory = self.diffusion_stack(
-            local, pos, prev_pos, condition, pair_condition, t_pos,
+            local, pos, prev_pos, condition, pc_used, t_pos,
             resi, chain, batch, mask, neighbour_fn,
             cyclic_mask=cyclic_mask, init_pos=init_pos)
+
+        if not need_aa:
+            # P2. The three heads below are pure sinks on a non-output step.
+            return (pos, local, trajectory)
 
         # NOT train_forward: its ADM masking draws RNG, and CUDA graphs cannot
         # capture an RNG op. The draw is a no-op at inference anyway - aa_gt is
@@ -269,15 +396,30 @@ class Diffusion(nn.Module):
             init_pos = c.sigma_data * pos_factors["in"][:, None, None] * pos
             pos = pos * pos_factors["skip"][:, None, None]
 
+        # P6, same hoist as `forward_core` - kept here too so the parity tests,
+        # which exercise this path, actually cover it.
+        index_neighbours = cond_dist = cond_seed = None
+        if opt.HOIST_NEIGHBOURS:
+            index_neighbours = get_index_neighbours(16)(resi, chain, batch, mask)
+            if not self.multi_motif:
+                cond_dist, cond_seed = condition_neighbour_prologue(16, 16)(
+                    prev_pos, pair_condition, resi, chain, batch, mask,
+                    index_neighbours=index_neighbours)
+
         def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
             # the eager path takes a single (N, N) field (or None); the fast
             # path's per-draw stack is handled in forward_core
             current = extract_neighbours(16, 16, 32)(
-                cur_pos, resi, chain, batch, mask, uniform=uniform)
+                cur_pos, resi, chain, batch, mask, uniform=uniform,
+                index_neighbours=index_neighbours)
             if c.multi_motif:
                 # the motif block's second neighbour set comes from the motif
                 # distance map, not from self-conditioning geometry
                 cond = extract_motif_neighbours(32)(pair_condition)
+            elif opt.HOIST_NEIGHBOURS:
+                cond = condition_neighbour_tail(16, 16)(
+                    cond_dist, cond_seed, pair_condition, batch, mask,
+                    uniform=uniform)
             else:
                 cond = extract_condition_neighbours(16, 16, 16, 16)(
                     cond_pos, pair_condition, resi, chain, batch, mask,

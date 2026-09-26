@@ -1,0 +1,10 @@
+[PASS] L16c1 local  rel=4.030e-07  max|d|=1.431e-06
+[PASS] L16c1 pos    rel=1.759e-07  max|d|=4.768e-06
+[PASS] L16c1 coords mean=0.00000 A max=0.00001 A
+[PASS] L64c1 local  rel=1.850e-06  max|d|=8.166e-06
+[PASS] L64c1 pos    rel=7.663e-08  max|d|=7.629e-06
+[PASS] L64c1 coords mean=0.00000 A max=0.00001 A
+[PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+OK

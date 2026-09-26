@@ -111,3 +111,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# A checker that prints FAIL must FAIL: this exited 0 while reporting
+# failing terms, so CI could never have caught a loss regression.
+if __name__ == "__main__":
+    import sys
+    sys.exit(0 if globals().get("_ALL_OK", True) else 1)

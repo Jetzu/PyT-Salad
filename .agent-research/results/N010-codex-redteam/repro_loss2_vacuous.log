@@ -1,0 +1,28 @@
+== probes ==
+  cb_distance     max|d| = 3.815e-06  (inf pattern match: True)
+  fape_neighbours differ: 0 / 6144
+  local_neighbours differ: 0 / 1536
+  bounds/lower_bound  max|d| = 0.000e+00
+  bounds/upper_bound  max|d| = 0.000e+00
+  bounds/stddev       max|d| = 0.000e+00
+  radius(masked)  max|d| = 0.000e+00   radius(raw) max|d| = 1.550e+00
+  restype_atom14_mask max|d| = 0.000e+00
+
+== loss terms ==
+  term                                  JAX              torch          abs        rel
+  aa                           3.8728413582       3.8728413582    0.000e+00  0.000e+00 OK  
+  dssp                         4.3121342659       4.3121347427    4.768e-07  1.106e-07 OK  
+  pos                       1007.4770302773       7.4770317078    1.000e+03  9.926e-01 FAIL
+  pos_trajectory               7.0821866989       7.0821871758    4.768e-07  6.733e-08 OK  
+  x                           10.5988044739      10.5988044739    0.000e+00  0.000e+00 OK  
+  rotation                     5.0090022087       5.0090026855    4.768e-07  9.520e-08 OK  
+  rotation_trajectory          5.1224308014       5.1224308014    0.000e+00  0.000e+00 OK  
+  fape                        29.5005588531      29.5005569458    1.907e-06  6.465e-08 OK  
+  fape_trajectory             29.4015045166      29.4015026093    1.907e-06  6.487e-08 OK  
+  local                        2.5014572144       2.5014574528    2.384e-07  9.531e-08 OK  
+  distogram                    2.7877004147       2.7877006531    2.384e-07  8.553e-08 OK  
+  violation                   37.4163894653      37.4163932800    3.815e-06  1.020e-07 OK  
+  TOTAL                      174.6511230469     174.6511230469    0.000e+00  0.000e+00
+
+  worst terms: ['pos(9.93e-01)', 'dssp(1.11e-07)', 'violation(1.02e-07)', 'local(9.53e-08)']
+check_loss2 returned None

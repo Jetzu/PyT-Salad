@@ -1,0 +1,133 @@
+### Starting TaskPrologue of job 903127 on h14-02 at Sat Sep 26 08:30:25 AM CEST 2026
+Running on cores 32-63 with governor performance
+Sat Sep 26 08:30:25 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+########## ARM fast_k32 (fast preset + K 64->32, 250/200)
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0] Error while creating guard:
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0] Name: "G['__import___main__']._orig_cur"
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     Source: global
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     Create Function: CLOSURE_MATCH
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     Guard Types: None
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     Code List: None
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     Object Weakref: None
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     Guarded Class Weakref: None
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0] Traceback (most recent call last):
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_guards.py", line 281, in create
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     return self.create_fn(builder, self)
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/guards.py", line 1597, in CLOSURE_MATCH
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     val = self.get(guard.name)
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]           ^^^^^^^^^^^^^^^^^^^^
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]   File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/guards.py", line 1148, in get
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]     return eval(name, self.scope, CLOSURE_VARS)
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0]   File "<string>", line 1, in <module>
+E0926 08:32:50.079000 1980883 site-packages/torch/_guards.py:283] [0/0] AttributeError: module '__main__' has no attribute '_orig_cur'
+[x_gen_k32] neighbourhood halved: current (16,8,8), condition (16,8,8)
+preset 'fast': schedule scaled by 0.5 -> num_steps=250 out_steps=200
+device: NVIDIA H100
+config default_vp  L=100  steps=250 out_steps=(200,)
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset/x_gen_k32.py", line 39, in <module>
+    runpy.run_path(f"{ROOT}/scripts/generate.py", run_name="__main__")
+  File "<frozen runpy>", line 291, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 620, in <module>
+    main()
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 441, in main
+    preset=args.preset).warmup(pair_cond=pc_hint)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/fast.py", line 280, in warmup
+    self._build(True, want_pc, iters=iters)
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/fast.py", line 247, in _build
+    out = self._compiled(*args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 465, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1269, in __call__
+    return self._torchdynamo_orig_callable(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1064, in __call__
+    result = self._inner_convert(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 526, in __call__
+    return _compile(
+           ^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 952, in _compile
+    raise InternalTorchDynamoError(
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 924, in _compile
+    guarded_code = compile_inner(code, one_graph, hooks, transform)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 666, in compile_inner
+    return _compile_inner(code, one_graph, hooks, transform)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_utils_internal.py", line 87, in wrapper_function
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 796, in _compile_inner
+    check_fn = CheckFunctionManager(
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/guards.py", line 2261, in __init__
+    guard.create(builder)
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_guards.py", line 281, in create
+    return self.create_fn(builder, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/guards.py", line 1597, in CLOSURE_MATCH
+    val = self.get(guard.name)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_dynamo/guards.py", line 1148, in get
+    return eval(name, self.scope, CLOSURE_VARS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 1, in <module>
+torch._dynamo.exc.InternalTorchDynamoError: AttributeError: module '__main__' has no attribute '_orig_cur'
+
+
+You can suppress this exception and fall back to eager by setting:
+    import torch._dynamo
+    torch._dynamo.config.suppress_errors = True
+
+.agent-research/results/N011-fast-preset/gen_fast_k32: no pdbs
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 08:32:55 CEST 2026
+= Job-ID             : 903127 on helma
+= Job-Name           : n011_k32
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset/run_e2e_k32.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N011-fast-preset
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:40:00
+= Elapsed runtime    : 00:02:32
+= Total RAM usage    : 3.6 GiB of assigned 175 GiB (2.1%)
+= Node list          : h14-02
+= Subm/Elig/Start/End: 2026-09-26T08:30:21 / 2026-09-26T08:30:21 / 2026-09-26T08:30:22 / 2026-09-26T08:32:54
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              90.9G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K   6d16m56s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1980883, 2 %, 3 %, 1018 MiB, 146075 ms

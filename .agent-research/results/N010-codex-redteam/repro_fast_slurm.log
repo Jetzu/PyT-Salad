@@ -1,0 +1,60 @@
+### Starting TaskPrologue of job 903067 on h11-24 at Sat Sep 26 08:00:32 CEST 2026
+Running on cores 96-127 with governor performance
+Sat Sep 26 08:00:32 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   35C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+W0926 08:02:11.094000 1661479 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] torch._dynamo hit config.cache_size_limit (8)
+W0926 08:02:11.094000 1661479 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    function: '_slice' (/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:29)
+W0926 08:02:11.094000 1661479 site-packages/torch/_dynamo/convert_frame.py:844] [5/8]    last reason: 5/0: L['i'] == 0                                                 
+W0926 08:02:11.094000 1661479 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W0926 08:02:11.094000 1661479 site-packages/torch/_dynamo/convert_frame.py:844] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/torch.compiler_troubleshooting.html.
+warmup_s 150.40539360046387
+base_max 8.225440979003906e-06
+repeat_max 1.0843489170074463 held_change 0.0
+collision_sums 24 24 fast_cross 0.057859644293785095 fast_vs_eager 2.301114320755005
+refresh_vs_eager 0.9955772161483765
+interleave_f2_change 1.0478143692016602
+length_mismatch_returned 48
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 08:03:10 CEST 2026
+= Job-ID             : 903067 on helma
+= Job-Name           : n010-fast-redteam
+= Job-Command        : .agent-research/results/N010-codex-redteam/repro_fast.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:02:40
+= Total RAM usage    : 3.4 GiB of assigned 175 GiB (1.9%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T08:00:30 / 2026-09-26T08:00:30 / 2026-09-26T08:00:30 / 2026-09-26T08:03:10
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.1G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K   6d46m41s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 1661479, 11 %, 12 %, 1096 MiB, 154240 ms

@@ -1,0 +1,51 @@
+### Starting TaskPrologue of job 903084 on h11-24 at Sat Sep 26 08:13:22 CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 08:13:22 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   39C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+device: NVIDIA H100
+config default_vp  L=48  steps=2 out_steps=(1,)  sym=c4(count=4)
+  design 0:    0.5s  CA-CA 2.097 A (min 0.952 max 2.728)  Rg 11.1 A  -> .agent-research/results/N010-codex-redteam/generated_sym_template/design_0.pdb
+
+1 designs of 48 aa: median 0.5s, total 0.5s
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 08:13:27 CEST 2026
+= Job-ID             : 903084 on helma
+= Job-Name           : n010-sym-template
+= Job-Command        : .agent-research/results/N010-codex-redteam/repro_sym_template.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:10:00
+= Elapsed runtime    : 00:00:05
+= Total RAM usage    : 0.9 GiB of assigned 175 GiB (0.5%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T08:13:21 / 2026-09-26T08:13:21 / 2026-09-26T08:13:22 / 2026-09-26T08:13:27
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.2G   104.9G   209.7G        N/A     453K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K   6d36m24s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 1672881, 0 %, 0 %, 778 MiB, 2961 ms

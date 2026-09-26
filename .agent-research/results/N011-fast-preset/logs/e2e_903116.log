@@ -1,0 +1,55 @@
+### Starting TaskPrologue of job 903116 on h14-02 at Sat Sep 26 08:27:09 AM CEST 2026
+Running on cores 0-31 with governor performance
+Sat Sep 26 08:27:09 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   37C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+########## ARM exact (500/400)
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+fast path (exact) compiled + captured in 314s (one-time)
+  design 0:    1.6s  CA-CA 3.762 A (min 3.614 max 3.833)  Rg 14.1 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_0.pdb
+  design 1:    1.5s  CA-CA 3.763 A (min 3.626 max 3.923)  Rg 11.9 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_1.pdb
+  design 2:    1.5s  CA-CA 3.750 A (min 3.582 max 3.839)  Rg 12.7 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_2.pdb
+  design 3:    1.5s  CA-CA 3.752 A (min 3.642 max 3.893)  Rg 12.1 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_3.pdb
+  design 4:    1.5s  CA-CA 3.770 A (min 3.664 max 3.919)  Rg 12.5 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_4.pdb
+  design 5:    1.5s  CA-CA 3.761 A (min 3.622 max 3.901)  Rg 11.4 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_5.pdb
+  design 6:    1.5s  CA-CA 3.765 A (min 3.604 max 3.849)  Rg 12.0 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_6.pdb
+  design 7:    1.5s  CA-CA 3.758 A (min 3.603 max 3.843)  Rg 13.2 A  -> .agent-research/results/N011-fast-preset/gen_exact/design_7.pdb
+
+8 designs of 100 aa: median 1.5s, total 11.9s
+########## ARM fast_full (fast numerics, 500/400)
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+fast path (fast) compiled + captured in 211s (one-time)
+  design 0:    1.3s  CA-CA 3.761 A (min 3.599 max 3.900)  Rg 12.7 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_0.pdb
+  design 1:    1.2s  CA-CA 3.777 A (min 3.504 max 3.914)  Rg 11.8 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_1.pdb
+  design 2:    1.2s  CA-CA 3.780 A (min 3.719 max 3.873)  Rg 12.7 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_2.pdb
+  design 3:    1.2s  CA-CA 3.760 A (min 3.655 max 3.886)  Rg 12.7 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_3.pdb
+  design 4:    1.2s  CA-CA 3.757 A (min 2.939 max 3.971)  Rg 12.7 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_4.pdb
+  design 5:    1.2s  CA-CA 3.748 A (min 3.641 max 3.846)  Rg 11.5 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_5.pdb
+  design 6:    1.2s  CA-CA 3.770 A (min 3.611 max 3.884)  Rg 12.0 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_6.pdb
+  design 7:    1.2s  CA-CA 3.779 A (min 3.651 max 3.860)  Rg 12.6 A  -> .agent-research/results/N011-fast-preset/gen_fast_full/design_7.pdb
+
+8 designs of 100 aa: median 1.2s, total 9.7s
+########## ARM fast (250/200)

@@ -28,6 +28,7 @@ from torch import Tensor
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
+from salad_torch import opt as salad_opt  # noqa: E402
 from salad_torch.config import get_config  # noqa: E402
 from salad_torch.convert.haiku_to_torch import load_model, load_param_npz  # noqa: E402
 from salad_torch.diffusion.sampling import (  # noqa: E402
@@ -47,14 +48,25 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--params", default="")
     ap.add_argument("--num_aa", default="100")
     ap.add_argument("--num_designs", type=int, default=1)
-    ap.add_argument("--num_steps", type=int, default=500)
-    ap.add_argument("--out_steps", default="400")
+    # None means "not given": a preset may then supply its own schedule
+    # (see PRESETS[...]["steps_scale"]). An explicit value always wins.
+    ap.add_argument("--num_steps", type=int, default=None)
+    ap.add_argument("--out_steps", default=None)
     ap.add_argument("--prev_threshold", type=float, default=0.8)
     ap.add_argument("--timescale_pos", default="cosine(t)")
     ap.add_argument("--cloud_std", default="")
     ap.add_argument("--out_path", default="outputs/designs")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--compile", default="")
+    ap.add_argument("--fast", action="store_true",
+                    help="use the compiled + CUDA-graph inference path "
+                         "(~15x faster; GPU only, fixed length, no --sym)")
+    ap.add_argument("--preset", default="exact",
+                    help="which --fast inference preset to run. 'exact' (the "
+                         "default) holds the port's measured parity floor "
+                         "against JAX salad; any other preset is allowed to "
+                         "trade numerics for speed. See "
+                         "salad_torch.modules.fast.PRESETS.")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--jax_seed", type=int, default=None,
                     help="Alias for --seed, for command lines copied from the "
@@ -209,12 +221,17 @@ def run_renoise(step_fn: StepFn, snapshot: dict, base_data: dict, cfg: SamplerCo
             scaled_t_seq = 1.0 if timescale_seq is None else timescale_seq(raw_t)
             d["t_pos"] = scaled_t_pos * torch.ones_like(d["t_pos"])
             d["t_seq"] = scaled_t_seq * torch.ones_like(d["t_seq"])
-            update, _ = step_fn(d, init_prev, generator)
+            # P2: every sub-step but the last overwrites keys nothing reads
+            need_aa = (not cfg.lean_steps) or s == step_target - 1
+            update, _ = step_fn(d, init_prev, generator, need_aa=need_aa)
             d["pos"] = update["pos"]
-            d["seq"] = update["aa"].argmax(dim=-1)
-            d["atom_pos"] = update["atom_pos"]
-            d["aatype"] = update["aatype"]
-            d["aa_logits"] = update["aa"]
+            if "aa" in update:
+                d["seq"] = update["aa"].argmax(dim=-1)
+                d["aa_logits"] = update["aa"]
+            if "atom_pos" in update:
+                d["atom_pos"] = update["atom_pos"]
+            if "aatype" in update:
+                d["aatype"] = update["aatype"]
         passes.append(d)
     return passes
 
@@ -366,10 +383,39 @@ def main() -> None:
                     screw_translation=args.screw_translation,
                     sym_mean=args.sym_mean, sym_threshold=args.sym_threshold)
 
+    # A preset may shorten the trajectory (N011's "fast" halves it). Scaling
+    # num_steps and out_steps TOGETHER is what makes that a coarsening rather
+    # than a different run: the schedule is `raw_t = 1 - step/num_steps`, so
+    # both endpoints (raw_t 1.0 at the start, 0.2 at the reported step) are
+    # preserved and only the spacing changes. Skipped entirely the moment the
+    # command line names either value.
+    num_steps, out_steps_s = args.num_steps, args.out_steps
+    steps_scale = 1.0
+    if args.fast:
+        from salad_torch.modules.fast import PRESETS as _PRESETS
+        steps_scale = float(_PRESETS.get(args.preset, {}).get("steps_scale", 1.0))
+    if steps_scale != 1.0 and num_steps is None and out_steps_s is None:
+        num_steps = max(1, int(round(500 * steps_scale)))
+        out_steps_s = ",".join(str(max(0, int(round(int(x) * steps_scale))))
+                               for x in "400".split(","))
+        print(f"preset {args.preset!r}: schedule scaled by {steps_scale} -> "
+              f"num_steps={num_steps} out_steps={out_steps_s}")
+    if num_steps is None:
+        num_steps = 500
+    if out_steps_s is None:
+        out_steps_s = "400"
+    args.num_steps, args.out_steps = num_steps, out_steps_s
     cfg = SamplerConfig(num_steps=args.num_steps,
                         out_steps=tuple(int(x) for x in args.out_steps.split(",")),
                         prev_threshold=args.prev_threshold,
-                        timescale_pos=args.timescale_pos)
+                        timescale_pos=args.timescale_pos,
+                        # P2: ask for the sequence heads only on reporting
+                        # steps. Gated on `diffuse_sequence` because that is
+                        # the one config key that would let `data["seq"]`
+                        # re-enter the denoiser (no released checkpoint sets
+                        # it). See SamplerConfig.lean_steps.
+                        lean_steps=bool(args.fast and not config.diffuse_sequence
+                                        and salad_opt.LEAN_STEPS))
     os.makedirs(args.out_path, exist_ok=True)
     if device.type == "cuda":
         print(f"device: {torch.cuda.get_device_name(0)}")
@@ -377,11 +423,37 @@ def main() -> None:
           f"out_steps={cfg.out_steps}"
           + (f"  sym={sym.group}(count={sym.replicate_count})" if sym.active else ""))
 
+    fast_denoiser = None
+    if args.fast:
+        if device.type != "cuda":
+            raise SystemExit("--fast needs a CUDA device")
+        if sym.active:
+            # the symmetriser mutates pos_noised between noising and denoising,
+            # which the captured graph cannot see
+            raise SystemExit("--fast is incompatible with --sym")
+        from salad_torch.modules.fast import FastDenoiser
+        t_warm = time.perf_counter()
+        # HINT only (which graphs to pre-build): FastDenoiser re-derives the
+        # real gate from the conditioning tensors on the first step.
+        pc_hint = bool(config.multi_motif or pc["template"] is not None
+                       or int(chain.max()) > 0)
+        fast_denoiser = FastDenoiser(model.predict, num_aa, device=device,
+                                     preset=args.preset).warmup(pair_cond=pc_hint)
+        print(f"fast path ({args.preset}) compiled + captured in "
+              f"{time.perf_counter() - t_warm:.0f}s (one-time)")
+
     gen = torch.Generator(device=device).manual_seed(args.seed)
     stats, times = [], []
     seq_path = os.path.join(args.out_path, "sequences.fa")
 
     for design in range(args.num_designs):
+        # the conditioning is redrawn per design (--dssp random, --dssp_mean
+        # random, a per-design template), so the cached `prepare_condition`
+        # output from the previous design must go. Unconditional: the "exact"
+        # preset re-derives its key anyway and this only saves it the work,
+        # while the "fast" preset TRUSTS this call.
+        if fast_denoiser is not None:
+            fast_denoiser.invalidate_condition_cache()
         data, prev = make_initial_data(
             num_aa, resi, chain, cyclic_mask if is_cyclic else None, device=device)
         if args.cloud_std:
@@ -409,8 +481,18 @@ def main() -> None:
                 radius=sym.radius, translation=sym.translation,
                 chain_center=False, mean=sym.mean)
 
-        def step_fn(d, p, generator=None, _sym=sym):
+        def step_fn(d, p, generator=None, *, need_aa=True,
+                    _sym=sym, _fast=fast_denoiser):
             with torch.no_grad():
+                if _fast is not None:
+                    # the fast path denoises only, so noise explicitly first
+                    noised = apply_diffusion(config, d, generator=generator)
+                    # thread the seeded generator into the Gumbel neighbour
+                    # draw too: without it that draw came off the DEFAULT CUDA
+                    # RNG, so --seed did not actually pin a --fast run and two
+                    # identical command lines produced different proteins.
+                    return _fast(dict(d, **noised), p, need_aa=need_aa,
+                                 generator=generator)
                 if not _sym.active:
                     return model(d, p, generator=gen)
                 # Hook B (§1.5): compose apply_diffusion + model.predict
@@ -439,7 +521,7 @@ def main() -> None:
 
         final_step_fn = None
         if args.sample_final:
-            def final_step_fn(d, p, generator=None):
+            def final_step_fn(d, p, generator=None, *, need_aa=True):
                 # §5.3: no separate "second model" - config.sample_aa is
                 # never consumed by Diffusion.forward (it doesn't exist as a
                 # branch there, and diffusion.py is off-limits for this

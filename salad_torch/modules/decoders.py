@@ -23,6 +23,7 @@ from ..geometry.frames import extract_aa_frames
 from ..geometry.neighbours import get_index_neighbours, get_spatial_neighbours
 from ..geometry.rigid import vec_norm
 from ..geometry.sidechain import single_protein_sidechains
+from .. import opt
 from .attention import SparseStructureAttention
 from .basic import MLP, HkLayerNorm, HkLinear, gelu
 from .blocks import EncoderUpdate
@@ -82,9 +83,14 @@ class AADecoderPairFeatures(nn.Module):
         pair_mask = mask[:, None] & mask[neighbours] & (neighbours != -1)
 
         # no cyclic offsets in the AA decoder, even when c.cyclic is set
-        relpos = GF.sequence_relative_position(32, one_hot=True)(
-            resi, chain, batch, neighbours)
-        pair = self.linear_relpos(relpos)
+        if opt.GATHER_ONEHOT:   # P3, bit-exact
+            pair = self.linear_relpos.forward_indexed(
+                GF.sequence_relative_position(32, one_hot=False)(
+                    resi, chain, batch, neighbours).long())
+        else:
+            relpos = GF.sequence_relative_position(32, one_hot=True)(
+                resi, chain, batch, neighbours)
+            pair = self.linear_relpos(relpos)
         pair = pair + self.linear_dist(GF.distance_features(pos, neighbours, 0.0, 22.0))
         pair = pair + self.linear_dir(GF.direction_features(pos, neighbours))
         pair = pair + self.linear_rot(GF.position_rotation_features(pos, neighbours))
@@ -92,7 +98,11 @@ class AADecoderPairFeatures(nn.Module):
 
         # gather happens *after* the LayerNorm, so masked-out neighbours pick up
         # a normalised (not raw) embedding - matching upstream
-        aa_embedding = self.layer_norm_aa(self.linear_aa(one_hot(aa, 21)))
+        # `aa` is an amino-acid index in [0, 20] (20 = MASK), so the gather is
+        # in range by construction; P3 again.
+        aa_embedding = self.layer_norm_aa(
+            self.linear_aa.forward_indexed(aa) if opt.GATHER_ONEHOT
+            else self.linear_aa(one_hot(aa, 21)))
         pair = pair + aa_embedding[neighbours]
 
         pair = self.layer_norm(pair)
@@ -171,7 +181,9 @@ class AADecoder(nn.Module):
     def forward(self, aa: Tensor, local: Tensor, pos: Tensor, resi: Tensor,
                 chain: Tensor, batch: Tensor, mask: Tensor) -> tuple[Tensor, Tensor]:
         """Returns ``(raw 20-way logits, decoder features)``."""
-        local = local + self.linear_aa_embed(one_hot(aa, 21))  # never `+=`, see docstring
+        # never `+=`, see docstring; P3 gather, `aa` is in [0, 20]
+        local = local + (self.linear_aa_embed.forward_indexed(aa) if opt.GATHER_ONEHOT
+                         else self.linear_aa_embed(one_hot(aa, 21)))
 
         # extract_neighbours(num_index=0, num_spatial=32, num_random=0), with the
         # two zero-count stages elided: get_index_neighbours(0) returns an (L, 0)
@@ -281,10 +293,17 @@ class DistogramDecoder(nn.Module):
                 chain: Tensor, batch: Tensor, mask: Tensor,
                 cyclic_mask: Tensor | None = None) -> Tensor:
         """Returns ``(L, K, 64)`` log-probabilities - already log-softmaxed."""
-        relpos = GF.sequence_relative_position(
-            32, one_hot=True, cyclic=cyclic_mask is not None)(
-                resi, chain, batch, neighbours, cyclic_mask=cyclic_mask)
-        pair = self.linear_relpos(relpos)
+        if opt.GATHER_ONEHOT:   # P3, bit-exact
+            pair = self.linear_relpos.forward_indexed(
+                GF.sequence_relative_position(
+                    32, one_hot=False, cyclic=cyclic_mask is not None)(
+                        resi, chain, batch, neighbours,
+                        cyclic_mask=cyclic_mask).long())
+        else:
+            relpos = GF.sequence_relative_position(
+                32, one_hot=True, cyclic=cyclic_mask is not None)(
+                    resi, chain, batch, neighbours, cyclic_mask=cyclic_mask)
+            pair = self.linear_relpos(relpos)
         # guarded by `if not c.distogram_no_pos:` upstream, which is on for
         # every shipped config
         pair = pair + self.linear_dist(GF.distance_features(pos, neighbours, 0.0, 22.0))
