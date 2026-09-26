@@ -22,6 +22,21 @@
 - T16 (N015): `scripts/generate.py` prints CA-CA per design but never flags a diverged one. A one-line warning on CA-CA mean > 4.5 A or Rg beyond ~3 sd would have surfaced the 2/160 `exact` divergences at run time instead of in a post-hoc script. Out of N015's scope; cheap.
 - T17 (N015 -> N013, HANDOFF, reproduced first-hand): `SALAD_OPT_DETSEG=1` (the deterministic one-hot-matmul segment sum in `geometry/segment.py`, uncommitted at the time of writing) **fails `tests/test_sampling_parity.py`**: final/noise-floor ratio **30.6x against the gate, vs 9.5x with the flag off**, final structure deviation mean 0.19861 A vs 0.06166 A. The four checkpoint parity tests, geometry 38/38, stack and encoder all still pass at their floors - it is only the 81-step trajectory that amplifies the reassociation, which is exactly the mechanism notes/04 section 2 describes. Reproduced 2x2 (on/off, twice each); both DETSEG=1 runs are bit-identical to each other, which is the change working as intended. `PRESETS["deterministic"]`'s docstring currently claims sampling passes; it does not. Log: results/N015-fast-validation/logs/gates_detseg_sidecheck.log. Not fixed here - N013's code, N013's call.
 
+- T18 (N020): an n=160 structural validation (N015's method) of `fast` +
+  `gemm_templates=True` would let a future item land inductor's matmul
+  templates in the `fast` preset specifically - a real -14%@L100/-6.4%@L400
+  win, just not proven safe to ship without it. `SALAD_OPT_GEMMTPL=1` already
+  works today for whoever runs that experiment; see K018.
+- T19 (N020): `SALAD_OPT_DETSEG=1` does not guarantee bit-identical output
+  across independent cold-cache recompiles of the SAME config at L=400 (K019)
+  - worth a dedicated look before leaning on N013's/N019's "bit-identical
+  under DETSEG" claims at length; not chased further by N020 (out of scope).
+- T20 (N020, process gap): no Codex red-team pass was run before closing this
+  item, breaking from the four-role workflow - the shipped change is inert by
+  default (reverts to pre-N020 behaviour) which is why this was judged an
+  acceptable risk under time/resource constraints, but the eventual `fast`
+  landing in T18 should get the standard red-team pass this rejection did not.
+
 ## Unverified claims
 - N003 was run by a Claude subagent, not Codex (Codex produced no output). Priors are correlated with the implementer's; a genuine cross-family red team is still owed.
 - N003 did not test "batch of two == two separate runs" for `training/` — `loop.py` was being edited concurrently by N004.

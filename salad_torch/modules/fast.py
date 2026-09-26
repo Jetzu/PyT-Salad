@@ -96,6 +96,20 @@ PRESETS: dict[str, dict] = {
         # P7, the batched condition-branch prologue: -9.2 % of a lean step.
         # Reassociation only (bmm vs six mm); see `batch_cond_pair` below.
         batch_cond_pair=True,
+        # N020: inductor's matmul templates (`max_autotune_gemm`) - REJECTED
+        # from every preset. -14% at L=100 (eroding to -6.4% at L=400) but NOT
+        # bit-exact: whole-forward H100/DETSEG control measured pos
+        # max|d|=5.84e-05 at L=100 / 7.87e-04 at L=400, templates-on vs off
+        # (both above the 2e-05 A floor), and templates-on is not even
+        # reproducible against itself across independent cold-cache compiles
+        # (up to pos 8.87e-05 between two compiles of the SAME config - the
+        # autotune benchmark can pick a different kernel at a shape where
+        # candidates are within noise). See opt.py's GEMM_TEMPLATES docstring
+        # and .agent-research/results/N020-matmul-lowering/RESULTS.md.
+        # `SALAD_OPT_GEMMTPL=1` still works as an opt-in for experimentation;
+        # it is a `fast`-preset candidate pending an n=160 structural
+        # validation (N015's method) that has not been run.
+        gemm_templates=False,
     ),
     # ------------------------------------------------------------------
     # "fast" (N011) - maximum speed, ALLOWED to move the numbers. It is NOT a
@@ -189,6 +203,10 @@ PRESETS: dict[str, dict] = {
         steps_scale=0.5,
         aggressive_fusion=True,
         batch_cond_pair=True,
+        # N020: rejected everywhere (not bit-exact, no n=160 validation done
+        # for `fast` yet) - see the `exact` preset's comment above and
+        # .agent-research/results/N020-matmul-lowering/RESULTS.md.
+        gemm_templates=False,
     ),
     # ------------------------------------------------------------------
     # "deterministic" (N013) - `exact`, plus a segment reduction that does not
@@ -244,6 +262,8 @@ PRESETS: dict[str, dict] = {
         steps_scale=1.0,
         aggressive_fusion=True,
         batch_cond_pair=True,
+        # N020: rejected everywhere - see the `exact` preset's comment above.
+        gemm_templates=False,
         det_segment=True,
     ),
 }
@@ -324,6 +344,34 @@ class FastDenoiser(nn.Module):
         # deterministic reduction, on the H100 itself - so `exact` takes it.
         import torch._inductor.config as _ind
         _ind.aggressive_fusion = bool(p.get("aggressive_fusion")) and opt.AGGRESSIVE_FUSION
+        # N020. Turning `max_autotune_gemm` on makes inductor BENCHMARK a
+        # Triton template against cuBLAS at every distinct GEMM shape in the
+        # graph, at compile time, on the machine that is compiling, and keep
+        # the winner. So the selection is per-shape AND per-device - the
+        # narrow projections (K <= 128) go to Triton, the wide ones (`dist`
+        # K=400, `proj_out` K=1024) stay on cuBLAS, and on a different card the
+        # same measurement decides again. That adaptivity is the point: a
+        # consumer Ada/Blackwell card has a different cuBLAS heuristic and a
+        # different SM count, and nothing here is tuned to this node.
+        #
+        # This is reachable at `MM_MODE`'s DEFAULT (`einsum` -> batch-1 `bmm`)
+        # via inductor's `tuned_bmm` template path - NO change to how
+        # `HkLinear` contracts is needed. An earlier brief assumed batch-1
+        # `bmm` forecloses inductor's matmul templates; that premise is
+        # REFUTED (measured: `einsum` unchanged + templates on is -14 % at
+        # L=100, bigger than the `mm` rewrite's -0.3 %, and with none of its
+        # parity cost - see RESULTS.md). `opt.MM_MODE` and `GEMM_TEMPLATES` are
+        # independent knobs for that reason.
+        #
+        # ATEN stays in the candidate list, so a shape where the template loses
+        # keeps exactly the kernel it has today. Compile time goes up by the
+        # benchmarking pass (one per distinct shape). REJECTED from every
+        # preset (see PRESETS above) - not bit-exact end to end, so this line
+        # is always `False and ...` today; kept live (not deleted) so a future
+        # `fast`-only landing, once validated, is a one-line preset change.
+        _ind.max_autotune_gemm = bool(p.get("gemm_templates")) and opt.GEMM_TEMPLATES
+        if _ind.max_autotune_gemm:
+            _ind.max_autotune_gemm_backends = "ATEN,TRITON"
         # N017/O1. Inductor's inference pipeline has no CSE pass: `joint_graph_passes`
         # runs remove_noop_ops, the pattern matcher and constant folding, and that is
         # all. So the denoiser rebuilds the SAME Gram-Schmidt frame 61 times per

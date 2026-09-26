@@ -19,6 +19,8 @@ from typing import Callable, Sequence
 import torch
 from torch import Tensor, nn
 
+from .. import opt
+
 __all__ = ["HkLinear", "HkLayerNorm", "MLP", "init_weight_", "gelu", "relu"]
 
 # CRITICAL: jax.nn.gelu is `def gelu(x, approximate: bool = True)`, i.e. the TANH
@@ -70,9 +72,39 @@ class HkLinear(nn.Module):
         init_weight_(self.w, initializer)
 
     def forward(self, x: Tensor) -> Tensor:
-        out = torch.einsum("...k,ki->...i", x, self.w)
-        if self.use_bias:
-            out = out + self.b
+        # N020. This used to be `torch.einsum("...k,ki->...i", x, self.w)`, which
+        # ATen lowers to `bmm` with batch=1 - there was not a single `mm`/`addmm`
+        # in the whole generated module (N017 section 7). That mattered for three
+        # reasons, all measured: a batch-1 `bmm` is a cuBLAS launch at ~5.98 us
+        # for problems whose arithmetic is under 1 us; `bmm` forecloses
+        # inductor's own matmul TEMPLATES, which N016 measured 1.21-1.37x faster
+        # than cuBLAS on this model's narrow projections and BIT-IDENTICAL at
+        # fp32; and a template is autotuned PER DEVICE at compile time, which is
+        # the adaptive behaviour a consumer-GPU/Blackwell target wants and a
+        # fixed cuBLAS heuristic is not.
+        #
+        # Folding the leading axes into M and calling `mm` is exactly what
+        # `at::matmul` does for (>=3-D) @ (2-D) anyway; doing it here makes the
+        # lowering explicit instead of depending on ATen's `should_fold`
+        # heuristic (which declines for some strides and silently goes back to
+        # `bmm`). The weight keeps Haiku's `(in, out)` layout - no transpose, so
+        # checkpoint conversion stays a pure name mapping.
+        mode = opt.MM_MODE
+        if mode == "einsum":
+            out = torch.einsum("...k,ki->...i", x, self.w)
+            if self.use_bias:
+                out = out + self.b
+            return out
+        ndim = x.dim()
+        flat = x if ndim == 2 else x.reshape(-1, x.shape[-1])
+        if mode == "addmm" and self.use_bias:
+            out = torch.addmm(self.b, flat, self.w)
+        else:
+            out = torch.mm(flat, self.w)
+            if self.use_bias:
+                out = out + self.b
+        if ndim != 2:
+            out = out.view(*x.shape[:-1], self.out_size)
         return out
 
     def forward_indexed(self, idx: Tensor) -> Tensor:

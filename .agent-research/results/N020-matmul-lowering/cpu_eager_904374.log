@@ -1,0 +1,140 @@
+### Starting TaskPrologue of job 904374 on h32-44 at Sat Sep 26 17:24:36 CEST 2026
+Running on cores 48-95 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+wrote /tmp/n020e_64_eager_einsum.pt L=64 MM_MODE=einsum tensors=11
+wrote /tmp/n020e_64_cmp_einsum.pt L=64 MM_MODE=einsum tensors=11
+wrote /tmp/n020e_64_eager_mm.pt L=64 MM_MODE=mm tensors=11
+wrote /tmp/n020e_64_cmp_mm.pt L=64 MM_MODE=mm tensors=11
+wrote /tmp/n020e_64_eager_addmm.pt L=64 MM_MODE=addmm tensors=11
+wrote /tmp/n020e_64_cmp_addmm.pt L=64 MM_MODE=addmm tensors=11
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=64 EAGER mm vs einsum      bit_identical=True
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=64 EAGER addmm vs einsum   bit_identical=False
+   pos                    max|d|=6.479025e-05
+   local                  max|d|=3.322601e-03
+   trajectory             max|d|=7.903576e-05
+   aa                     max|d|=1.149940e-02
+   aa_features            max|d|=4.500270e-03
+   dssp                   max|d|=1.907349e-05
+   raw_angles             max|d|=1.242065e-02
+   angles                 max|d|=1.180209e-04
+   angle_pos              max|d|=6.175041e-05
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=64 einsum: compiled vs eager bit_identical=False
+   pos                    max|d|=1.542568e-04
+   local                  max|d|=4.343033e-03
+   trajectory             max|d|=2.496243e-04
+   aa                     max|d|=1.149940e-02
+   aa_features            max|d|=4.501581e-03
+   dssp                   max|d|=2.789497e-05
+   raw_angles             max|d|=1.589966e-02
+   angles                 max|d|=1.621246e-04
+   angle_pos              max|d|=5.197525e-05
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=64 mm: compiled vs eager   bit_identical=False
+   pos                    max|d|=1.342297e-04
+   local                  max|d|=3.808975e-03
+   trajectory             max|d|=2.191067e-04
+   aa                     max|d|=1.149082e-02
+   aa_features            max|d|=4.500717e-03
+   dssp                   max|d|=2.527237e-05
+   raw_angles             max|d|=1.882935e-02
+   angles                 max|d|=1.632571e-04
+   angle_pos              max|d|=4.196167e-05
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=64 addmm: compiled vs eager bit_identical=False
+   pos                    max|d|=8.606911e-05
+   local                  max|d|=3.913879e-03
+   trajectory             max|d|=2.045631e-04
+   aa                     max|d|=4.386902e-05
+   aa_features            max|d|=7.346272e-06
+   dssp                   max|d|=2.384186e-05
+   raw_angles             max|d|=6.408691e-03
+   angles                 max|d|=1.141727e-04
+   angle_pos              max|d|=7.772446e-05
+wrote /tmp/n020e_100_eager_einsum.pt L=100 MM_MODE=einsum tensors=11
+wrote /tmp/n020e_100_cmp_einsum.pt L=100 MM_MODE=einsum tensors=11
+wrote /tmp/n020e_100_eager_mm.pt L=100 MM_MODE=mm tensors=11
+wrote /tmp/n020e_100_cmp_mm.pt L=100 MM_MODE=mm tensors=11
+wrote /tmp/n020e_100_eager_addmm.pt L=100 MM_MODE=addmm tensors=11
+wrote /tmp/n020e_100_cmp_addmm.pt L=100 MM_MODE=addmm tensors=11
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=100 EAGER mm vs einsum     bit_identical=True
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=100 EAGER addmm vs einsum  bit_identical=False
+   pos                    max|d|=6.675720e-05
+   local                  max|d|=2.735138e-03
+   trajectory             max|d|=6.675720e-05
+   aa                     max|d|=1.049042e-05
+   aa_features            max|d|=3.635883e-06
+   dssp                   max|d|=1.037121e-05
+   raw_angles             max|d|=5.035400e-03
+   angles                 max|d|=3.829598e-05
+   angle_pos              max|d|=1.215935e-04
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=100 einsum: compiled vs eager bit_identical=False
+   pos                    max|d|=9.346008e-05
+   local                  max|d|=2.502441e-03
+   trajectory             max|d|=9.346008e-05
+   aa                     max|d|=1.001358e-05
+   aa_features            max|d|=3.062189e-06
+   dssp                   max|d|=1.192093e-05
+   raw_angles             max|d|=6.530762e-03
+   angles                 max|d|=8.286536e-05
+   angle_pos              max|d|=5.197525e-05
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=100 mm: compiled vs eager  bit_identical=False
+   pos                    max|d|=7.963181e-05
+   local                  max|d|=2.563477e-03
+   trajectory             max|d|=9.059906e-05
+   aa                     max|d|=1.096725e-05
+   aa_features            max|d|=3.166497e-06
+   dssp                   max|d|=1.287460e-05
+   raw_angles             max|d|=9.033203e-03
+   angles                 max|d|=6.103516e-05
+   angle_pos              max|d|=6.347895e-05
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/x_cmp.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a, b = torch.load(a_p), torch.load(b_p)
+BITS L=100 addmm: compiled vs eager bit_identical=False
+   pos                    max|d|=1.430511e-04
+   local                  max|d|=3.822327e-03
+   trajectory             max|d|=1.430511e-04
+   aa                     max|d|=1.287460e-05
+   aa_features            max|d|=4.589558e-06
+   dssp                   max|d|=1.120567e-05
+   raw_angles             max|d|=1.097107e-02
+   angles                 max|d|=5.561113e-05
+   angle_pos              max|d|=1.173019e-04
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 17:34:42 CEST 2026
+= Job-ID             : 904374 on helma
+= Job-Name           : n020_cpueager
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N020-matmul-lowering/cpu_eager.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 01:00:00
+= Elapsed runtime    : 00:10:07
+= Total RAM usage    : 9.4 GiB of assigned 91 GiB (10.3%)
+= Node list          : h32-44
+= Subm/Elig/Start/End: 2026-09-26T17:24:35 / 2026-09-26T17:24:35 / 2026-09-26T17:24:35 / 2026-09-26T17:34:42
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.1G   104.9G   209.7G        N/A     457K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+    /home/vault           774.0G  1048.6G  2097.2G        N/A     122K     200K     400K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      75K      61K      81K  5d15h15m9s !!!
+======================
