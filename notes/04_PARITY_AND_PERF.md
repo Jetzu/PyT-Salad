@@ -514,3 +514,25 @@ Rules that follow:
   `__init__`
 - verify with `torch._dynamo.explain` on a FRESH `dynamo.reset()`, and trust the
   graph count over any comment
+
+
+## 10. Distributional check: 40 designs per backend
+
+`scripts/distrib.sbatch`, job 903178. 40 x L=100 through `generate.py --fast`
+(`exact` preset) against 40 from upstream's eval script, same settings.
+
+| metric | torch | JAX | Welch t | p |
+|---|---|---|---|---|
+| CA-CA (A) | 3.762 +- 0.015 | 3.763 +- 0.018 | -0.11 | 0.91 |
+| Rg (A) | 12.60 +- 0.63 | 13.55 +- 5.31 | -1.11 | 0.27 |
+| helix frac | 0.490 +- 0.262 | 0.570 +- 0.280 | -1.31 | 0.19 |
+| strand frac | 0.353 +- 0.231 | 0.275 +- 0.245 | 1.45 | 0.15 |
+
+No metric significant. This retires the apparent helix skew seen at n=5, which
+was sampling noise - with per-design SSE variance this large, n=5 says nothing.
+
+**Incidental: JAX produced 1 diverged design in 40** (CA-CA mean 99.8 A, max
+668 A - a valid single-chain PDB with exploded coordinates), torch 0. At n=40
+that is not a quality claim in either direction, but it is a real failure mode
+of the MODEL, and it is the whole reason JAX's Rg spread is 8x torch's. Any
+downstream pipeline should filter on CA-CA before trusting a design.

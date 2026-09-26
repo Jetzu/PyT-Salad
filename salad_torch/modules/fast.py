@@ -27,7 +27,7 @@ from __future__ import annotations
 import torch
 from torch import Tensor, nn
 
-from .. import fastopt, opt
+from .. import opt
 from .diffusion import uniform_draw_count
 
 __all__ = ["FastDenoiser", "PRESETS"]
@@ -58,46 +58,61 @@ PRESETS: dict[str, dict] = {
         need_aux=True,
         # fp32 matmuls stay fp32, and the sampler keeps its 500/400 schedule.
         tf32=False,
-        shared_cond_draw=False,
-        trust_cond_cache=False,
         steps_scale=1.0,
     ),
     # ------------------------------------------------------------------
     # "fast" (N011) - maximum speed, ALLOWED to move the numbers. It is NOT a
     # different model: same checkpoint, same architecture, same neighbourhood
-    # sizes; what it gives up is mantissa bits, independent random draws, and
-    # trajectory resolution. Measured at L=100 on an H100 (whole-forward CUDA
-    # graph, .agent-research/results/N011-fast-preset/):
+    # sizes, same sampler. What it gives up is mantissa bits in the matmuls and
+    # half the trajectory's resolution - and nothing else, because nothing else
+    # that was tried paid for itself. Measured at L=100 on an H100, production
+    # path, `x_preset.py` (.agent-research/results/N011-fast-preset/):
     #
-    #   exact, lean step            3.393 ms      500/400 steps    2.1 s/design
-    #   fast                        see notes     250/200 steps    see notes
+    #                        reporting step   lean step   per design
+    #   exact                    4.381 ms      3.568 ms     1.43 s
+    #   exact + TF32 only        3.719 ms      2.996 ms     1.20 s
+    #   fast without TF32        4.385 ms      3.563 ms     0.72 s
+    #   fast                     3.614 ms      2.894 ms     0.58 s
     #
-    # Quality gate on 8 de-novo designs at L=100, which this preset must pass
-    # and which the notebook item records: CA-CA mean 3.70-3.85 A, no NaN, Rg
-    # in a sane range, ordered (helix+strand) fraction not collapsed.
+    # i.e. TF32 is -16 to -19 % of the step and halving the schedule is the
+    # other 2x. JAX salad is 1.56 s per design, so this is ~2.7x JAX and
+    # ~2.5x the exact path.
+    #
+    # Quality gate, 8 de-novo designs at L=100 (`ss.py`, seed 42), exact in
+    # brackets: CA-CA 3.7572 +- 0.0160 A [3.7601 +- 0.0062], Rg 12.9 +- 0.9 A
+    # [12.5 +- 0.8], helix 0.591 [0.605], strand 0.328 [0.319], coil 0.081
+    # [0.076], 0 NaN. Ordered fraction 0.919 against 0.924: not collapsed.
+    #
+    # REFUTED and deliberately absent - each measured, none of them free:
+    #   * K 64 -> 32 on both attention branches: -10 % of the step, but coil
+    #     0.076 -> 0.109 and CA-CA clashes 0.1 -> 1.1 per design. The only
+    #     candidate that visibly degraded the structures. Dropped.
+    #   * one shared self-conditioning Gumbel draw for all six blocks:
+    #     2.894 vs 2.882 ms, i.e. NOTHING, measured with the switch verified
+    #     live (6.45 A change in `pos`). A deviation with no payoff.
+    #   * bypassing the conditioning-cache key: 3.563 vs 3.568 ms, nothing -
+    #     and after N010/S1 a weakened cache key is a bug, not a trade.
+    #   * `topk` for the stable argsort (+5.6 %), `need_aux=False` (no change),
+    #     bf16 inside the GEMM via matmul_precision("medium") (2.856 vs 2.760,
+    #     i.e. slower than TF32). See RESULTS.md section 5.
     "fast": dict(
         lean_steps=True,
         skip_pair_cond=True,
-        # measured 3.416 vs 3.393 ms - turning it off buys NOTHING even here,
-        # so the fast preset does not pay its behavioural cost either.
         need_aux=True,
-        # TF32: 10 mantissa bits instead of 24 in every fp32 matmul. This is
-        # the single largest lever in the whole preset and it is the one the
-        # exact path must refuse - N005 measured TF32 moving coordinates by
-        # ~6e-3 A while leaving `aatype` untouched, i.e. it looks fine and is
-        # not fp32. Here that is the point.
+        # TF32: 10 mantissa bits instead of 24 in every fp32 matmul. The single
+        # largest lever in the preset, and the one the exact path must refuse -
+        # N005 measured TF32 moving coordinates by ~6e-3 A while leaving
+        # `aatype` untouched, i.e. it looks fine and is not fp32. Here that is
+        # the point. For scale: CUDA's own run-to-run nondeterminism on this
+        # model is 2.2e-04 A (N010), so TF32 is a real perturbation, ~1500x the
+        # noise floor - but three orders of magnitude smaller than what
+        # shrinking the neighbourhood does.
         tf32=True,
-        # one self-conditioning Gumbel draw for all six blocks; see
-        # salad_torch/fastopt.py.
-        shared_cond_draw=True,
-        # skip the per-step conditioning-cache verification (12 GPU syncs a
-        # step) and rely on the caller's invalidate_condition_cache().
-        trust_cond_cache=True,
         # halve the sampler: 250 steps reporting at 200 instead of 500/400.
         # The schedule is `raw_t = 1 - step/num_steps`, so halving BOTH keeps
-        # the trajectory's start and end points (raw_t 1.0 -> 0.2) and only
-        # coarsens it. `scripts/generate.py` applies this, and only when the
-        # command line did not set --num_steps/--out_steps itself.
+        # the trajectory's endpoints (raw_t 1.0 -> 0.2) and only coarsens it.
+        # `scripts/generate.py` applies this, and only when the command line
+        # did not set --num_steps/--out_steps itself.
         steps_scale=0.5,
     ),
 }
@@ -111,10 +126,6 @@ _OUT_NAMES = ("pos", "local", "trajectory", "aa", "aa_features", "dssp",
 #: what `forward_core(need_aa=False)` returns - the three tensors the sampler
 #: feeds back, and nothing else
 _OUT_NAMES_LEAN = ("pos", "local", "trajectory")
-
-#: cache key for `trust_cond_cache`: a sentinel that compares equal to itself
-#: and to nothing else, so only `invalidate_condition_cache()` clears the entry
-_TRUSTED = object()
 
 
 class FastDenoiser(nn.Module):
@@ -164,12 +175,11 @@ class FastDenoiser(nn.Module):
             # "Cannot prepare for replay during capturing stage". The manual
             # graph needs a plain compile underneath it.
             mode = "default"
-        # Preset switches that are PROCESS-GLOBAL, applied before the compile
-        # so Dynamo traces the right code. Both are set unconditionally, in
-        # both directions: building an "exact" denoiser after a "fast" one must
-        # put the process back on the parity path rather than inherit TF32.
+        # PROCESS-GLOBAL, and applied before the compile so inductor selects
+        # kernels for the right precision. Set in BOTH directions on purpose:
+        # building an "exact" denoiser after a "fast" one must put the process
+        # back on the parity path rather than silently inherit TF32.
         torch.set_float32_matmul_precision("high" if p.get("tf32") else "highest")
-        fastopt.configure(shared_cond_draw=bool(p.get("shared_cond_draw")))
         self.n_draws = uniform_draw_count(model.config)
         # NB skipping the inference-dead aux heads (dssp, distogram neighbours)
         # was tried and MEASURED SLOWER (6.48 -> 6.9 ms at L=100, variance
@@ -185,9 +195,6 @@ class FastDenoiser(nn.Module):
         # `opt.SKIP_PAIR_COND` is the benchmark override; it can only ever
         # turn the preset's choice OFF.
         self.allow_pair_cond_skip = bool(p["skip_pair_cond"]) and opt.SKIP_PAIR_COND
-        #: trust `invalidate_condition_cache()` instead of re-deriving the
-        #: conditioning cache key (12 GPU syncs) every step - fast preset only
-        self.trust_cond_cache = bool(p.get("trust_cond_cache"))
         #: whether this design actually HAS pair conditioning. None until the
         #: first real forward has seen the conditioning tensors; the blank
         #: warmup inputs must never be allowed to answer this.

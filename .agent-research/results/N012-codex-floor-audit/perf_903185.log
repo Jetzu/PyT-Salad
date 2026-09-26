@@ -1,0 +1,73 @@
+### Starting TaskPrologue of job 903185 on h13-12 at Sat Sep 26 09:03:55 CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 09:03:55 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+torch 2.5.1+cu121 gpu NVIDIA H100 cache /tmp/salad_n012_perf_903185
+GEMM 4800 400 64 mm_launch_us 14.837013880411783 mm_graphed_us 17.92051124572754 six_graphed_us 91.79606628417969 bmm_graphed_us 49.126399993896484
+BMM_DIFF 400 max 8.392333984375e-05 equal False
+GEMM 4800 240 64 mm_launch_us 11.168106396993002 mm_graphed_us 15.494336128234863 six_graphed_us 73.6720962524414 bmm_graphed_us 30.53887939453125
+BMM_DIFF 240 max 0.0 equal True
+GEMM 4800 60 64 mm_launch_us 7.035520076751709 mm_graphed_us 9.882271766662598 six_graphed_us 32.80131149291992 bmm_graphed_us 15.461343765258789
+BMM_DIFF 60 max 0.0 equal True
+GEMM 4800 9 64 mm_launch_us 7.102186679840088 mm_graphed_us 8.251359939575195 six_graphed_us 23.235328674316406 bmm_graphed_us 10.893119812011719
+BMM_DIFF 9 max 0.0 equal True
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+PROFILE captured kernels_per_call 921 gpu_busy_ms 3.4100801999999955
+PROFILE_TOP captured [('triton_', 524, 1.2384), ('sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 120, 0.8289), ('sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 24, 0.2657), ('sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 18, 0.2651), ('sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 31, 0.1872), ('void cutlass::Kernel<cutlass_80_simt_sgemm_64x64_8x5_nn_align1>(cutlass_80_simt_sgemm_64x64_8x5_nn_align1::Params)', 30, 0.1394), ('void gemv2N_kernel<int, int, float, float, float, float, 128, 4, 4, 4, 1, false, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float> >(cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float>)', 24, 0.0762), ('void splitKreduce_kernel<32, 16, int, float, float, float, float, true, false, false>(cublasSplitKParams<float>, float const*, float const*, float*, float const*, float const*, float const*, float const*, float*, void*, long, float*, int*)', 38, 0.0673), ('sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 18, 0.0613), ('sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 12, 0.049), ('std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float, float, false, true, false, false, 5, false, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float> >(cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float>)', 12, 0.0466), ('memcpy32_post', 36, 0.0431)]
+PROFILE noncaptured kernels_per_call 74993 gpu_busy_ms 2276.094317399892
+PROFILE_TOP noncaptured [('void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<int>, at::detail::Array<char*, 1> >(int, at::native::FillFunctor<int>, at::detail::Array<char*, 1>)', 19473, 2098.3282), ('triton_', 24131, 74.8631), ('Memcpy DtoD (Device -> Device)', 18264, 24.1461), ('sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 756, 19.3642), ('sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 1407, 11.7952), ('void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespace)::OpaqueType<4u>, unsigned int, 3, 64, 64>(at::native::(anonymous namespace)::OpaqueType<4u>*, at::native::(anonymous namespace)::CatArrInputTensorMetadata<at::native::(anonymous namespace)::OpaqueType<4u>, unsigned int, 64, 64>, at::native::(anonymous namespace)::TensorSizeStride<unsigned int, 4u>, int, unsigned int)', 1964, 7.1276), ('void gemmSN_NN_kernel<float, 128, 2, 4, 8, 4, 4, false, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float> >(cublasGemmSmallNParams<cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float const>, cublasGemvTensorStridedBatched<float>, float>)', 69, 5.5683), ('sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 884, 4.8333), ('sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 418, 4.4236), ('sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas', 315, 3.9617), ('void cutlass::Kernel<cutlass_80_simt_sgemm_128x32_8x5_tn_align1>(cutlass_80_simt_sgemm_128x32_8x5_tn_align1::Params)', 155, 3.2731), ('void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<float>, at::detail::Array<char*, 1> >(int, at::native::FillFunctor<float>, at::detail::Array<char*, 1>)', 2936, 2.9416)]
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/cuda/graphs.py:84: UserWarning: The CUDA Graph is empty. This usually means that the graph was attempted to be captured on wrong device or stream. (Triggered internally at ../aten/src/ATen/cuda/CUDAGraph.cpp:208.)
+  super().capture_end()
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N012-codex-floor-audit/perf_audit.py", line 55, in <module>
+    print('REPLAY_US',graph_bench(g.replay,reps=500),flush=True)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N012-codex-floor-audit/perf_audit.py", line 24, in graph_bench
+    with torch.cuda.graph(g): fn()
+                              ^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/cuda/graphs.py", line 88, in replay
+    super().replay()
+RuntimeError: Cannot prepare for replay during capturing stage. during CUDA graph capture. If you need this call to be captured, please file an issue. Current cudaStreamCaptureStatus: cudaStreamCaptureStatusActive
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 09:08:24 CEST 2026
+= Job-ID             : 903185 on helma
+= Job-Name           : perf.sbatch
+= Job-Command        : .agent-research/results/N012-codex-floor-audit/perf.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:55:00
+= Elapsed runtime    : 00:04:45
+= Total RAM usage    : 8.1 GiB of assigned 175 GiB (4.6%)
+= Node list          : h13-12
+= Subm/Elig/Start/End: 2026-09-26T09:03:39 / 2026-09-26T09:03:39 / 2026-09-26T09:03:39 / 2026-09-26T09:08:24
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.1G   104.9G   209.7G        N/A     454K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      71K      61K      81K  5d23h41m27s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 1735079, 11 %, 11 %, 1838 MiB, 264771 ms

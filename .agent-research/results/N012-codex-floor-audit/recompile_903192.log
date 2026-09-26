@@ -1,0 +1,47 @@
+### Starting TaskPrologue of job 903192 on h12-06 at Sat Sep 26 09:05:57 CEST 2026
+Running on cores 0-31 with governor ondemand
+Sat Sep 26 09:05:57 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   35C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+VARIANT False False BEFORE {'frames': {'total': 1, 'ok': 1}, 'inductor': {'pattern_matcher_count': 1526, 'pattern_matcher_nodes': 1526, 'benchmarking.TritonBenchmarker.benchmark_gpu': 361, 'benchmarking.TritonBenchmarker.triton_do_bench': 1, 'fxgraph_cache_miss': 1, 'extern_calls': 303}, 'inline_call': {}, 'stats': {'calls_captured': 5804, 'unique_graphs': 1}, 'aot_autograd': {'total': 1, 'ok': 1}} AFTER {'frames': {'total': 1, 'ok': 1}, 'inductor': {'pattern_matcher_count': 1526, 'pattern_matcher_nodes': 1526, 'benchmarking.TritonBenchmarker.benchmark_gpu': 361, 'benchmarking.TritonBenchmarker.triton_do_bench': 1, 'fxgraph_cache_miss': 1, 'extern_calls': 303}, 'inline_call': {}, 'stats': {'calls_captured': 5804, 'unique_graphs': 1}, 'aot_autograd': {'total': 1, 'ok': 1}}
+V0926 09:07:35.739000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/1] [__recompiles] Recompiling function forward_core in /home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:210
+V0926 09:07:35.739000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V0926 09:07:35.739000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/1] [__recompiles]     - 0/0: ___check_obj_id(L['pair_cond'], 94045740585152)             
+VARIANT False True BEFORE {'frames': {'total': 2, 'ok': 2}, 'inductor': {'pattern_matcher_count': 3178, 'pattern_matcher_nodes': 3178, 'benchmarking.TritonBenchmarker.benchmark_gpu': 661, 'benchmarking.TritonBenchmarker.triton_do_bench': 1, 'fxgraph_cache_miss': 2, 'extern_calls': 630}, 'inline_call': {}, 'stats': {'calls_captured': 12197, 'unique_graphs': 2}, 'aot_autograd': {'total': 2, 'ok': 2}} AFTER {'frames': {'total': 2, 'ok': 2}, 'inductor': {'pattern_matcher_count': 3178, 'pattern_matcher_nodes': 3178, 'benchmarking.TritonBenchmarker.benchmark_gpu': 661, 'benchmarking.TritonBenchmarker.triton_do_bench': 1, 'fxgraph_cache_miss': 2, 'extern_calls': 630}, 'inline_call': {}, 'stats': {'calls_captured': 12197, 'unique_graphs': 2}, 'aot_autograd': {'total': 2, 'ok': 2}}
+V0926 09:08:57.097000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/2] [__recompiles] Recompiling function forward_core in /home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:210
+V0926 09:08:57.097000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/2] [__recompiles]     triggered by the following guard failure(s):
+V0926 09:08:57.097000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/2] [__recompiles]     - 0/1: ___check_obj_id(L['need_aa'], 94045740585152)               
+V0926 09:08:57.097000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/2] [__recompiles]     - 0/0: ___check_obj_id(L['need_aa'], 94045740585152)               
+V0926 09:10:40.422000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/3] [__recompiles] Recompiling function forward_core in /home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:210
+V0926 09:10:40.422000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/3] [__recompiles]     triggered by the following guard failure(s):
+V0926 09:10:40.422000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/3] [__recompiles]     - 0/2: not G['__import_salad_torch_dot_geometry_dot_sidechain']._DEVICE_CACHE
+V0926 09:10:40.422000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/3] [__recompiles]     - 0/1: ___check_obj_id(L['need_aa'], 94045740585152)               
+V0926 09:10:40.422000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/3] [__recompiles]     - 0/0: ___check_obj_id(L['need_aa'], 94045740585152)               
+VARIANT True False BEFORE {'frames': {'total': 3, 'ok': 3}, 'inductor': {'pattern_matcher_count': 5137, 'pattern_matcher_nodes': 5137, 'benchmarking.TritonBenchmarker.benchmark_gpu': 815, 'benchmarking.TritonBenchmarker.triton_do_bench': 1, 'fxgraph_cache_miss': 3, 'extern_calls': 1029}, 'inline_call': {}, 'stats': {'calls_captured': 19347, 'unique_graphs': 3}, 'aot_autograd': {'total': 3, 'ok': 3}} AFTER {'frames': {'total': 4, 'ok': 4}, 'inductor': {'pattern_matcher_count': 7096, 'pattern_matcher_nodes': 7096, 'benchmarking.TritonBenchmarker.benchmark_gpu': 815, 'benchmarking.TritonBenchmarker.triton_do_bench': 1, 'fxgraph_cache_miss': 4, 'extern_calls': 1424}, 'inline_call': {}, 'stats': {'calls_captured': 26493, 'unique_graphs': 4}, 'aot_autograd': {'total': 4, 'ok': 4}}
+V0926 09:11:44.761000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/4] [__recompiles] Recompiling function forward_core in /home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/modules/diffusion.py:210
+V0926 09:11:44.761000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/4] [__recompiles]     triggered by the following guard failure(s):
+V0926 09:11:44.761000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/4] [__recompiles]     - 0/3: ___check_obj_id(L['pair_cond'], 94045740585152)             
+V0926 09:11:44.761000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/4] [__recompiles]     - 0/2: not G['__import_salad_torch_dot_geometry_dot_sidechain']._DEVICE_CACHE
+V0926 09:11:44.761000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/4] [__recompiles]     - 0/1: ___check_obj_id(L['need_aa'], 94045740585152)               
+V0926 09:11:44.761000 3595797 site-packages/torch/_dynamo/guards.py:2813] [0/4] [__recompiles]     - 0/0: ___check_obj_id(L['need_aa'], 94045740585152)               

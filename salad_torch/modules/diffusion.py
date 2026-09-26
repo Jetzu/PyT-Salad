@@ -20,7 +20,7 @@ from ..geometry.neighbours import (extract_neighbours, get_index_neighbours,
 from ..geometry.rigid import vec_norm
 from .basic import MLP, HkLayerNorm, HkLinear, gelu
 from ..config import uses_init_pos
-from .. import fastopt, opt
+from .. import opt
 from .blocks import (DiffusionStack, condition_neighbour_prologue,
                      condition_neighbour_tail, extract_condition_neighbours,
                      extract_motif_neighbours)
@@ -320,15 +320,6 @@ class Diffusion(nn.Module):
 
         def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
             base = 1 + block_idx * per_block
-            # N011 fast preset: give every block the SAME self-conditioning
-            # draw. `cond_neighbours` is then one tensor for the whole trunk
-            # (its other three stages are already block-invariant after the P6
-            # hoist), so `pair_2`'s geometric features become the same
-            # expression on the same inputs in all six blocks and the compiler
-            # builds them once. NOT applied to `current`, whose neighbour list
-            # legitimately changes with `pos`, and not reachable on the
-            # multi_motif route, which draws no condition randomness at all.
-            cbase = 1 if fastopt.SHARED_COND_DRAW else base
             current = extract_neighbours(16, 16, 32)(
                 cur_pos, resi, chain, batch, mask, uniform=draws[base],
                 index_neighbours=index_neighbours)
@@ -337,12 +328,12 @@ class Diffusion(nn.Module):
             elif hoist:
                 cond = condition_neighbour_tail(16, num_block)(
                     cond_dist, cond_seed, pc_used, batch, mask,
-                    uniform=draws[cbase + 1], uniform2=draws[cbase + 2])
+                    uniform=draws[base + 1], uniform2=draws[base + 2])
             else:
                 cond = extract_condition_neighbours(
                     16, 16, 16, num_block)(cond_pos, pc_used, resi, chain, batch,
-                                           mask, uniform=draws[cbase + 1],
-                                           uniform2=draws[cbase + 2])
+                                           mask, uniform=draws[base + 1],
+                                           uniform2=draws[base + 2])
             return current, cond
 
         local, pos, trajectory = self.diffusion_stack(
