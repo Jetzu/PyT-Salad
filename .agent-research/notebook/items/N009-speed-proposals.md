@@ -1,6 +1,6 @@
 # N009 · Implement the ranked speed proposals (N007 PLAN P2-P8)
 
-type: task · date: 2026-09-26 · status: open
+type: task · date: 2026-09-26 · status: done · commit: bd38a0a
 
 ## Goal
 Take one denoiser forward from the measured 4.95 ms (L=100, manual whole-forward
