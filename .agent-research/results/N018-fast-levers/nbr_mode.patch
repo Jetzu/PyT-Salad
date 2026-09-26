@@ -1,0 +1,113 @@
+--- a/salad_torch/opt.py
++++ b/salad_torch/opt.py
+@@ -23,7 +23,7 @@
+ import os
+ 
+ __all__ = ["GATHER_ONEHOT", "HOIST_NEIGHBOURS", "SKIP_PAIR_COND", "LEAN_STEPS",
+-           "NEED_AUX"]
++           "NEED_AUX", "NBR_MODE"]
+ 
+ 
+ def _flag(name: str, default: bool = True) -> bool:
+@@ -62,3 +62,19 @@
+ #: back when the forward was 30 broken Dynamo graphs. `SALAD_OPT_AUX=0`
+ #: re-tests it against the single-graph forward.
+ NEED_AUX = _flag("SALAD_OPT_AUX")
++
++#: N018 EXPERIMENT (this worktree only - not landed, not in the shared tree).
++#: Shrinks the neighbourhood `forward_core` builds, read once at import like
++#: every switch above.
++#:
++#: "full"     - unchanged: current (16,16,32)=64, condition (16,16,16)=48.
++#: "half"     - N011's K64->32 patch, reproduced exactly: current (16,8,8)=32,
++#:              condition (16,8,8)=32 (spatial AND random halved on both
++#:              branches).
++#: "randhalf" - a milder cut: only the RANDOM component is halved; spatial
++#:              neighbours (nearest in 3-D, carrying most of the local
++#:              geometric signal) are left untouched. current (16,16,16)=48,
++#:              condition (16,16,8)=40.
++NBR_MODE = os.environ.get("SALAD_X_NBR_MODE", "full")
++if NBR_MODE not in ("full", "half", "randhalf"):
++    raise ValueError(f"SALAD_X_NBR_MODE={NBR_MODE!r} not in full/half/randhalf")
+--- a/salad_torch/modules/diffusion.py
++++ b/salad_torch/modules/diffusion.py
+@@ -310,28 +310,36 @@
+         # it produces are the same bits the unhoisted code produced twelve and
+         # six times respectively.
+         hoist = opt.HOIST_NEIGHBOURS
++        # N018 EXPERIMENT (this worktree only): shrink the neighbourhood
++        # forward_core builds. "full" reproduces the unmodified (16,16,32) /
++        # (16,16,16) shapes exactly; see opt.NBR_MODE for what "half" and
++        # "randhalf" change.
++        _cur_sp, _cur_rd = {"full": (16, 32), "half": (8, 8),
++                            "randhalf": (16, 16)}[opt.NBR_MODE]
++        _co_sp, _co_rd = {"full": (16, 16), "half": (8, 8),
++                          "randhalf": (16, 8)}[opt.NBR_MODE]
+         index_neighbours = cond_dist = cond_seed = None
+         if hoist:
+             index_neighbours = get_index_neighbours(16)(resi, chain, batch, mask)
+             if not self.multi_motif:
+-                cond_dist, cond_seed = condition_neighbour_prologue(16, 16)(
++                cond_dist, cond_seed = condition_neighbour_prologue(16, _co_sp)(
+                     prev_pos, pc_used, resi, chain, batch, mask,
+                     index_neighbours=index_neighbours)
+ 
+         def neighbour_fn(cur_pos, cond_pos, block_idx: int = 0):
+             base = 1 + block_idx * per_block
+-            current = extract_neighbours(16, 16, 32)(
++            current = extract_neighbours(16, _cur_sp, _cur_rd)(
+                 cur_pos, resi, chain, batch, mask, uniform=draws[base],
+                 index_neighbours=index_neighbours)
+             if self.multi_motif:
+                 cond = extract_motif_neighbours(32)(pair_condition)
+             elif hoist:
+-                cond = condition_neighbour_tail(16, num_block)(
++                cond = condition_neighbour_tail(_co_rd, num_block)(
+                     cond_dist, cond_seed, pc_used, batch, mask,
+                     uniform=draws[base + 1], uniform2=draws[base + 2])
+             else:
+                 cond = extract_condition_neighbours(
+-                    16, 16, 16, num_block)(cond_pos, pc_used, resi, chain, batch,
++                    16, _co_sp, _co_rd, num_block)(cond_pos, pc_used, resi, chain, batch,
+                                            mask, uniform=draws[base + 1],
+                                            uniform2=draws[base + 2])
+             return current, cond
+--- a/salad_torch/modules/fast.py
++++ b/salad_torch/modules/fast.py
+@@ -151,6 +151,22 @@
+         # this port has run. Structural gates cannot answer designability.
+         steps_scale=0.5,
+     ),
++    # ------------------------------------------------------------------
++    # N018 EXPERIMENTS (this worktree only, NOT landed in the shared tree) -
++    # re-test N011's "K 64 -> 32" rejection at adequate n, plus a milder cut this
++    # task proposes. Both stack on top of "fast"'s TF32; steps_scale is left
++    # at 1.0 here on purpose so a speed comparison against these presets
++    # isolates the neighbourhood lever from the schedule lever (the brief's
++    # explicit requirement) - callers wanting the schedule cut too still pass
++    # --num_steps/--out_steps or use "fast" itself.
++    "fast_halfnbr": dict(
++        lean_steps=True, skip_pair_cond=True, need_aux=True, tf32=True,
++        steps_scale=1.0, nbr_mode="half",
++    ),
++    "fast_randhalf": dict(
++        lean_steps=True, skip_pair_cond=True, need_aux=True, tf32=True,
++        steps_scale=1.0, nbr_mode="randhalf",
++    ),
+ }
+ 
+ #: the tensor arguments of `Diffusion.forward_core`, in order
+@@ -216,6 +232,13 @@
+         # building an "exact" denoiser after a "fast" one must put the process
+         # back on the parity path rather than silently inherit TF32.
+         torch.set_float32_matmul_precision("high" if p.get("tf32") else "highest")
++        # N018 EXPERIMENT (this worktree only): same PROCESS-GLOBAL / set-in-
++        # BOTH-directions pattern as the TF32 line above, for the same reason
++        # - a preset without "nbr_mode" must put the process back on "full"
++        # rather than silently inherit a previous preset's shrink. Read by
++        # `Diffusion.forward_core` at trace time (see opt.NBR_MODE), so it has
++        # to be set before `torch.compile` below.
++        opt.NBR_MODE = p.get("nbr_mode", "full")
+         self.n_draws = uniform_draw_count(model.config)
+         # NB skipping the inference-dead aux heads (dssp, distogram neighbours)
+         # was tried and MEASURED SLOWER (6.48 -> 6.9 ms at L=100, variance

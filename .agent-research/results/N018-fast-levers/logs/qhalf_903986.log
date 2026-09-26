@@ -1,0 +1,386 @@
+### Starting TaskPrologue of job 903986 on h13-11 at Sat Sep 26 12:49:29 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 12:49:29 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+worktree HEAD: a8533a7e4fade5be755070d1349bf47683b15734
+NVIDIA H100
+########## fast_halfnbr  seed=42  n=40
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+fast path (fast_halfnbr) compiled + captured in 307s (one-time)
+  design 0:    1.2s  CA-CA 3.788 A (min 3.692 max 3.898)  Rg 11.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_0.pdb
+  design 1:    1.1s  CA-CA 3.767 A (min 3.572 max 3.936)  Rg 12.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_1.pdb
+  design 2:    1.1s  CA-CA 3.769 A (min 3.548 max 3.881)  Rg 11.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_2.pdb
+  design 3:    1.1s  CA-CA 3.785 A (min 3.698 max 3.877)  Rg 12.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_3.pdb
+  design 4:    1.1s  CA-CA 3.754 A (min 3.614 max 3.863)  Rg 15.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_4.pdb
+  design 5:    1.1s  CA-CA 3.784 A (min 3.680 max 3.914)  Rg 11.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_5.pdb
+  design 6:    1.1s  CA-CA 3.759 A (min 3.623 max 3.912)  Rg 13.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_6.pdb
+  design 7:    1.1s  CA-CA 3.772 A (min 3.572 max 3.865)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_7.pdb
+  design 8:    1.1s  CA-CA 3.760 A (min 3.621 max 3.879)  Rg 14.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_8.pdb
+  design 9:    1.1s  CA-CA 3.786 A (min 3.636 max 3.972)  Rg 13.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_9.pdb
+  design 10:    1.1s  CA-CA 3.763 A (min 3.608 max 3.947)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_10.pdb
+  design 11:    1.1s  CA-CA 3.764 A (min 3.651 max 3.975)  Rg 15.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_11.pdb
+  design 12:    1.1s  CA-CA 3.755 A (min 3.349 max 3.904)  Rg 12.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_12.pdb
+  design 13:    1.1s  CA-CA 3.746 A (min 3.000 max 3.875)  Rg 12.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_13.pdb
+  design 14:    1.1s  CA-CA 3.746 A (min 3.604 max 3.977)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_14.pdb
+  design 15:    1.1s  CA-CA 3.754 A (min 3.562 max 3.925)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_15.pdb
+  design 16:    1.1s  CA-CA 3.776 A (min 3.618 max 3.927)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_16.pdb
+  design 17:    1.1s  CA-CA 3.773 A (min 3.631 max 3.856)  Rg 13.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_17.pdb
+  design 18:    1.1s  CA-CA 3.749 A (min 3.596 max 3.929)  Rg 14.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_18.pdb
+  design 19:    1.1s  CA-CA 3.753 A (min 3.612 max 3.894)  Rg 13.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_19.pdb
+  design 20:    1.1s  CA-CA 3.740 A (min 3.602 max 3.942)  Rg 12.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_20.pdb
+  design 21:    1.1s  CA-CA 3.752 A (min 3.574 max 3.988)  Rg 12.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_21.pdb
+  design 22:    1.1s  CA-CA 3.776 A (min 3.632 max 3.939)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_22.pdb
+  design 23:    1.1s  CA-CA 3.773 A (min 3.641 max 3.891)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_23.pdb
+  design 24:    1.1s  CA-CA 3.775 A (min 3.554 max 3.961)  Rg 11.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_24.pdb
+  design 25:    1.1s  CA-CA 3.741 A (min 3.620 max 3.839)  Rg 19.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_25.pdb
+  design 26:    1.1s  CA-CA 3.764 A (min 3.589 max 3.937)  Rg 11.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_26.pdb
+  design 27:    1.1s  CA-CA 3.764 A (min 3.632 max 3.872)  Rg 11.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_27.pdb
+  design 28:    1.1s  CA-CA 3.759 A (min 3.660 max 3.862)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_28.pdb
+  design 29:    1.1s  CA-CA 3.746 A (min 3.597 max 3.868)  Rg 11.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_29.pdb
+  design 30:    1.1s  CA-CA 3.759 A (min 3.598 max 3.920)  Rg 13.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_30.pdb
+  design 31:    1.1s  CA-CA 3.762 A (min 3.556 max 3.860)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_31.pdb
+  design 32:    1.1s  CA-CA 3.764 A (min 3.615 max 3.886)  Rg 11.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_32.pdb
+  design 33:    1.1s  CA-CA 3.745 A (min 3.579 max 3.917)  Rg 12.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_33.pdb
+  design 34:    1.1s  CA-CA 3.767 A (min 3.614 max 3.887)  Rg 10.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_34.pdb
+  design 35:    1.1s  CA-CA 3.779 A (min 3.639 max 3.952)  Rg 11.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_35.pdb
+  design 36:    1.1s  CA-CA 3.758 A (min 3.614 max 3.952)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_36.pdb
+  design 37:    1.1s  CA-CA 3.755 A (min 3.675 max 3.936)  Rg 21.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_37.pdb
+  design 38:    1.1s  CA-CA 3.772 A (min 3.616 max 3.858)  Rg 15.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_38.pdb
+  design 39:    1.1s  CA-CA 3.775 A (min 3.612 max 3.918)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42/design_39.pdb
+
+40 designs of 100 aa: median 1.1s, total 45.3s
+########## fast_halfnbr  seed=1234  n=120
+device: NVIDIA H100
+config default_vp  L=100  steps=500 out_steps=(400,)
+fast path (fast_halfnbr) compiled + captured in 71s (one-time)
+  design 0:    1.2s  CA-CA 3.740 A (min 3.590 max 3.902)  Rg 12.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_0.pdb
+  design 1:    1.1s  CA-CA 3.766 A (min 3.645 max 3.831)  Rg 15.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_1.pdb
+  design 2:    1.1s  CA-CA 3.762 A (min 3.691 max 3.841)  Rg 13.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_2.pdb
+  design 3:    1.1s  CA-CA 3.751 A (min 3.516 max 3.887)  Rg 21.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_3.pdb
+  design 4:    1.1s  CA-CA 3.757 A (min 3.681 max 3.835)  Rg 21.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_4.pdb
+  design 5:    1.1s  CA-CA 3.770 A (min 3.596 max 3.870)  Rg 15.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_5.pdb
+  design 6:    1.1s  CA-CA 3.805 A (min 3.709 max 3.937)  Rg 10.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_6.pdb
+  design 7:    1.1s  CA-CA 3.752 A (min 3.630 max 3.842)  Rg 12.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_7.pdb
+  design 8:    1.1s  CA-CA 3.737 A (min 3.606 max 3.969)  Rg 13.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_8.pdb
+  design 9:    1.1s  CA-CA 3.763 A (min 3.640 max 3.918)  Rg 12.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_9.pdb
+  design 10:    1.1s  CA-CA 3.764 A (min 3.594 max 3.983)  Rg 11.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_10.pdb
+  design 11:    1.1s  CA-CA 3.734 A (min 3.616 max 3.814)  Rg 20.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_11.pdb
+  design 12:    1.1s  CA-CA 3.772 A (min 3.574 max 3.901)  Rg 11.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_12.pdb
+  design 13:    1.1s  CA-CA 3.751 A (min 2.907 max 3.889)  Rg 11.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_13.pdb
+  design 14:    1.1s  CA-CA 3.727 A (min 2.840 max 3.901)  Rg 11.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_14.pdb
+  design 15:    1.1s  CA-CA 3.794 A (min 3.631 max 3.907)  Rg 10.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_15.pdb
+  design 16:    1.1s  CA-CA 3.763 A (min 3.623 max 3.840)  Rg 12.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_16.pdb
+  design 17:    1.1s  CA-CA 3.759 A (min 3.643 max 3.888)  Rg 12.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_17.pdb
+  design 18:    1.1s  CA-CA 3.770 A (min 3.614 max 3.835)  Rg 12.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_18.pdb
+  design 19:    1.1s  CA-CA 3.765 A (min 3.582 max 3.916)  Rg 11.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_19.pdb
+  design 20:    1.1s  CA-CA 3.756 A (min 3.650 max 3.833)  Rg 15.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_20.pdb
+  design 21:    1.1s  CA-CA 3.766 A (min 3.602 max 3.912)  Rg 11.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_21.pdb
+  design 22:    1.1s  CA-CA 3.779 A (min 3.651 max 3.864)  Rg 13.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_22.pdb
+  design 23:    1.1s  CA-CA 3.754 A (min 3.532 max 3.917)  Rg 12.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_23.pdb
+  design 24:    1.1s  CA-CA 3.762 A (min 3.604 max 3.987)  Rg 12.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_24.pdb
+  design 25:    1.1s  CA-CA 3.722 A (min 3.588 max 3.960)  Rg 21.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_25.pdb
+  design 26:    1.1s  CA-CA 3.757 A (min 3.505 max 3.961)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_26.pdb
+  design 27:    1.1s  CA-CA 3.759 A (min 3.631 max 3.886)  Rg 13.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_27.pdb
+  design 28:    1.1s  CA-CA 3.735 A (min 3.516 max 3.856)  Rg 12.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_28.pdb
+  design 29:    1.1s  CA-CA 3.791 A (min 3.705 max 3.897)  Rg 12.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_29.pdb
+  design 30:    1.1s  CA-CA 3.775 A (min 3.682 max 3.898)  Rg 14.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_30.pdb
+  design 31:    1.1s  CA-CA 3.768 A (min 3.654 max 3.938)  Rg 13.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_31.pdb
+  design 32:    1.1s  CA-CA 3.746 A (min 3.669 max 3.841)  Rg 16.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_32.pdb
+  design 33:    1.1s  CA-CA 3.784 A (min 3.701 max 3.910)  Rg 14.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_33.pdb
+  design 34:    1.1s  CA-CA 3.753 A (min 3.600 max 3.927)  Rg 14.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_34.pdb
+  design 35:    1.1s  CA-CA 3.764 A (min 3.644 max 3.891)  Rg 12.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_35.pdb
+  design 36:    1.1s  CA-CA 3.748 A (min 3.627 max 3.841)  Rg 13.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_36.pdb
+  design 37:    1.1s  CA-CA 3.737 A (min 3.491 max 3.851)  Rg 11.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_37.pdb
+  design 38:    1.1s  CA-CA 3.754 A (min 3.623 max 3.898)  Rg 12.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_38.pdb
+  design 39:    1.1s  CA-CA 3.765 A (min 3.601 max 3.931)  Rg 12.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_39.pdb
+  design 40:    1.1s  CA-CA 3.750 A (min 3.610 max 3.879)  Rg 21.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_40.pdb
+  design 41:    1.1s  CA-CA 3.763 A (min 3.609 max 3.942)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_41.pdb
+  design 42:    1.1s  CA-CA 3.789 A (min 3.619 max 3.911)  Rg 10.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_42.pdb
+  design 43:    1.1s  CA-CA 3.759 A (min 3.640 max 3.887)  Rg 12.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_43.pdb
+  design 44:    1.1s  CA-CA 3.766 A (min 3.614 max 3.899)  Rg 14.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_44.pdb
+  design 45:    1.1s  CA-CA 3.744 A (min 3.607 max 3.947)  Rg 15.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_45.pdb
+  design 46:    1.1s  CA-CA 3.732 A (min 3.617 max 3.813)  Rg 14.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_46.pdb
+  design 47:    1.1s  CA-CA 3.760 A (min 3.656 max 3.873)  Rg 12.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_47.pdb
+  design 48:    1.1s  CA-CA 3.737 A (min 3.639 max 3.810)  Rg 14.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_48.pdb
+  design 49:    1.1s  CA-CA 3.765 A (min 3.651 max 3.915)  Rg 11.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_49.pdb
+  design 50:    1.1s  CA-CA 3.767 A (min 3.652 max 3.884)  Rg 16.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_50.pdb
+  design 51:    1.1s  CA-CA 3.720 A (min 3.440 max 4.002)  Rg 11.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_51.pdb
+  design 52:    1.1s  CA-CA 3.763 A (min 3.618 max 3.908)  Rg 12.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_52.pdb
+  design 53:    1.1s  CA-CA 3.775 A (min 3.649 max 3.862)  Rg 14.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_53.pdb
+  design 54:    1.1s  CA-CA 3.791 A (min 3.674 max 3.954)  Rg 12.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_54.pdb
+  design 55:    1.1s  CA-CA 3.752 A (min 3.621 max 3.832)  Rg 21.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_55.pdb
+  design 56:    1.1s  CA-CA 3.780 A (min 3.615 max 3.875)  Rg 11.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_56.pdb
+  design 57:    1.1s  CA-CA 3.730 A (min 3.516 max 3.802)  Rg 20.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_57.pdb
+  design 58:    1.1s  CA-CA 3.741 A (min 3.635 max 3.867)  Rg 18.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_58.pdb
+  design 59:    1.1s  CA-CA 3.754 A (min 3.630 max 3.906)  Rg 13.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_59.pdb
+  design 60:    1.1s  CA-CA 3.783 A (min 3.699 max 3.877)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_60.pdb
+  design 61:    1.1s  CA-CA 3.755 A (min 3.635 max 3.836)  Rg 18.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_61.pdb
+  design 62:    1.1s  CA-CA 3.753 A (min 3.597 max 3.851)  Rg 14.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_62.pdb
+  design 63:    1.1s  CA-CA 3.760 A (min 3.664 max 3.903)  Rg 11.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_63.pdb
+  design 64:    1.1s  CA-CA 3.744 A (min 3.573 max 3.929)  Rg 12.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_64.pdb
+  design 65:    1.1s  CA-CA 3.754 A (min 2.770 max 3.857)  Rg 11.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_65.pdb
+  design 66:    1.1s  CA-CA 3.772 A (min 3.596 max 3.865)  Rg 12.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_66.pdb
+  design 67:    1.1s  CA-CA 3.724 A (min 3.608 max 3.865)  Rg 13.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_67.pdb
+  design 68:    1.1s  CA-CA 3.772 A (min 3.698 max 3.864)  Rg 12.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_68.pdb
+  design 69:    1.1s  CA-CA 3.755 A (min 3.604 max 4.021)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_69.pdb
+  design 70:    1.1s  CA-CA 3.794 A (min 3.673 max 3.907)  Rg 11.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_70.pdb
+  design 71:    1.1s  CA-CA 3.731 A (min 3.606 max 3.883)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_71.pdb
+  design 72:    1.1s  CA-CA 3.736 A (min 3.565 max 3.915)  Rg 14.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_72.pdb
+  design 73:    1.1s  CA-CA 3.745 A (min 3.603 max 3.952)  Rg 12.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_73.pdb
+  design 74:    1.1s  CA-CA 3.789 A (min 3.550 max 3.892)  Rg 11.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_74.pdb
+  design 75:    1.1s  CA-CA 3.750 A (min 3.629 max 3.897)  Rg 14.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_75.pdb
+  design 76:    1.1s  CA-CA 3.748 A (min 3.574 max 3.919)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_76.pdb
+  design 77:    1.1s  CA-CA 3.776 A (min 3.660 max 3.861)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_77.pdb
+  design 78:    1.1s  CA-CA 3.756 A (min 3.653 max 3.847)  Rg 12.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_78.pdb
+  design 79:    1.1s  CA-CA 3.780 A (min 3.585 max 3.921)  Rg 11.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_79.pdb
+  design 80:    1.1s  CA-CA 3.781 A (min 3.703 max 3.884)  Rg 12.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_80.pdb
+  design 81:    1.1s  CA-CA 3.742 A (min 3.611 max 3.874)  Rg 14.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_81.pdb
+  design 82:    1.1s  CA-CA 3.742 A (min 3.598 max 3.855)  Rg 14.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_82.pdb
+  design 83:    1.1s  CA-CA 3.757 A (min 3.617 max 3.875)  Rg 13.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_83.pdb
+  design 84:    1.1s  CA-CA 3.754 A (min 3.552 max 3.889)  Rg 13.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_84.pdb
+  design 85:    1.1s  CA-CA 3.740 A (min 3.569 max 3.868)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_85.pdb
+  design 86:    1.1s  CA-CA 3.780 A (min 3.615 max 3.893)  Rg 11.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_86.pdb
+  design 87:    1.1s  CA-CA 3.780 A (min 3.552 max 3.887)  Rg 11.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_87.pdb
+  design 88:    1.1s  CA-CA 3.739 A (min 3.596 max 3.891)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_88.pdb
+  design 89:    1.1s  CA-CA 3.768 A (min 3.604 max 3.926)  Rg 10.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_89.pdb
+  design 90:    1.1s  CA-CA 3.724 A (min 3.557 max 3.860)  Rg 13.3 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_90.pdb
+  design 91:    1.1s  CA-CA 3.734 A (min 3.589 max 3.847)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_91.pdb
+  design 92:    1.1s  CA-CA 3.764 A (min 3.617 max 3.845)  Rg 12.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_92.pdb
+  design 93:    1.1s  CA-CA 3.753 A (min 3.551 max 3.905)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_93.pdb
+  design 94:    1.1s  CA-CA 3.781 A (min 3.554 max 3.891)  Rg 11.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_94.pdb
+  design 95:    1.1s  CA-CA 3.766 A (min 3.624 max 3.873)  Rg 14.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_95.pdb
+  design 96:    1.1s  CA-CA 3.750 A (min 3.638 max 3.865)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_96.pdb
+  design 97:    1.1s  CA-CA 3.745 A (min 3.614 max 3.848)  Rg 13.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_97.pdb
+  design 98:    1.1s  CA-CA 3.764 A (min 3.659 max 3.851)  Rg 12.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_98.pdb
+  design 99:    1.1s  CA-CA 3.766 A (min 3.612 max 3.831)  Rg 12.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_99.pdb
+  design 100:    1.1s  CA-CA 3.741 A (min 3.470 max 3.913)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_100.pdb
+  design 101:    1.1s  CA-CA 3.763 A (min 3.648 max 3.903)  Rg 12.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_101.pdb
+  design 102:    1.1s  CA-CA 3.759 A (min 3.579 max 3.881)  Rg 12.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_102.pdb
+  design 103:    1.1s  CA-CA 3.749 A (min 3.561 max 3.902)  Rg 14.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_103.pdb
+  design 104:    1.1s  CA-CA 3.720 A (min 3.442 max 3.907)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_104.pdb
+  design 105:    1.1s  CA-CA 3.736 A (min 3.564 max 3.884)  Rg 11.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_105.pdb
+  design 106:    1.1s  CA-CA 3.749 A (min 3.595 max 3.850)  Rg 12.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_106.pdb
+  design 107:    1.1s  CA-CA 3.761 A (min 3.578 max 3.852)  Rg 13.2 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_107.pdb
+  design 108:    1.1s  CA-CA 3.781 A (min 3.660 max 3.871)  Rg 14.1 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_108.pdb
+  design 109:    1.1s  CA-CA 3.759 A (min 3.641 max 3.839)  Rg 15.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_109.pdb
+  design 110:    1.1s  CA-CA 3.771 A (min 3.630 max 3.866)  Rg 11.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_110.pdb
+  design 111:    1.1s  CA-CA 3.756 A (min 3.594 max 3.893)  Rg 12.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_111.pdb
+  design 112:    1.1s  CA-CA 3.766 A (min 3.624 max 3.911)  Rg 10.5 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_112.pdb
+  design 113:    1.1s  CA-CA 3.782 A (min 3.689 max 3.894)  Rg 13.9 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_113.pdb
+  design 114:    1.1s  CA-CA 3.763 A (min 3.614 max 3.852)  Rg 14.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_114.pdb
+  design 115:    1.1s  CA-CA 3.757 A (min 3.643 max 3.869)  Rg 15.8 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_115.pdb
+  design 116:    1.1s  CA-CA 3.783 A (min 3.567 max 3.900)  Rg 11.0 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_116.pdb
+  design 117:    1.1s  CA-CA 3.800 A (min 3.610 max 3.901)  Rg 11.7 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_117.pdb
+  design 118:    1.1s  CA-CA 3.763 A (min 3.605 max 3.895)  Rg 10.6 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_118.pdb
+  design 119:    1.1s  CA-CA 3.773 A (min 3.656 max 3.942)  Rg 13.4 A  -> /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234/design_119.pdb
+
+120 designs of 100 aa: median 1.1s, total 135.4s
+########## RAW ss.py SUMMARY
+== /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s42   n_designs=40  L=100
+   design_0.pdb             CA-CA 3.788 (min 3.69 max 3.90)  Rg  11.1  H 0.87 E 0.08 c 0.05  clash<4A   5  nan 0
+   design_1.pdb             CA-CA 3.767 (min 3.57 max 3.94)  Rg  12.4  H 0.00 E 0.89 c 0.11  clash<4A   2  nan 0
+   design_10.pdb            CA-CA 3.763 (min 3.61 max 3.95)  Rg  12.2  H 0.94 E 0.05 c 0.01  clash<4A   4  nan 0
+   design_11.pdb            CA-CA 3.764 (min 3.65 max 3.97)  Rg  15.2  H 0.17 E 0.68 c 0.15  clash<4A   1  nan 0
+   design_12.pdb            CA-CA 3.755 (min 3.35 max 3.90)  Rg  12.3  H 0.92 E 0.00 c 0.08  clash<4A   1  nan 0
+   design_13.pdb            CA-CA 3.746 (min 3.00 max 3.88)  Rg  12.7  H 0.00 E 0.81 c 0.19  clash<4A   0  nan 0
+   design_14.pdb            CA-CA 3.746 (min 3.60 max 3.98)  Rg  12.2  H 0.05 E 0.78 c 0.17  clash<4A   1  nan 0
+   design_15.pdb            CA-CA 3.754 (min 3.56 max 3.93)  Rg  12.0  H 0.00 E 0.90 c 0.10  clash<4A   3  nan 0
+   design_16.pdb            CA-CA 3.776 (min 3.62 max 3.93)  Rg  12.2  H 0.00 E 0.81 c 0.19  clash<4A   1  nan 0
+   design_17.pdb            CA-CA 3.773 (min 3.63 max 3.86)  Rg  13.5  H 0.91 E 0.08 c 0.01  clash<4A   0  nan 0
+   design_18.pdb            CA-CA 3.749 (min 3.60 max 3.93)  Rg  14.1  H 0.18 E 0.72 c 0.10  clash<4A   2  nan 0
+   design_19.pdb            CA-CA 3.753 (min 3.61 max 3.89)  Rg  13.0  H 0.05 E 0.76 c 0.19  clash<4A   2  nan 0
+   design_2.pdb             CA-CA 3.769 (min 3.55 max 3.88)  Rg  11.1  H 0.93 E 0.03 c 0.04  clash<4A   5  nan 0
+   design_20.pdb            CA-CA 3.740 (min 3.60 max 3.94)  Rg  12.8  H 0.05 E 0.81 c 0.14  clash<4A   0  nan 0
+   design_21.pdb            CA-CA 3.752 (min 3.57 max 3.99)  Rg  12.8  H 0.00 E 0.89 c 0.11  clash<4A   0  nan 0
+   design_22.pdb            CA-CA 3.776 (min 3.63 max 3.94)  Rg  11.9  H 0.93 E 0.00 c 0.07  clash<4A   1  nan 0
+   design_23.pdb            CA-CA 3.773 (min 3.64 max 3.89)  Rg  11.9  H 0.96 E 0.00 c 0.04  clash<4A   2  nan 0
+   design_24.pdb            CA-CA 3.775 (min 3.55 max 3.96)  Rg  11.3  H 0.96 E 0.00 c 0.04  clash<4A  14  nan 0
+   design_25.pdb            CA-CA 3.741 (min 3.62 max 3.84)  Rg  19.5  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_26.pdb            CA-CA 3.764 (min 3.59 max 3.94)  Rg  11.7  H 0.22 E 0.64 c 0.14  clash<4A   1  nan 0
+   design_27.pdb            CA-CA 3.764 (min 3.63 max 3.87)  Rg  11.6  H 0.59 E 0.31 c 0.10  clash<4A   3  nan 0
+   design_28.pdb            CA-CA 3.759 (min 3.66 max 3.86)  Rg  12.0  H 0.96 E 0.00 c 0.04  clash<4A   5  nan 0
+   design_29.pdb            CA-CA 3.746 (min 3.60 max 3.87)  Rg  11.8  H 0.12 E 0.80 c 0.08  clash<4A   2  nan 0
+   design_3.pdb             CA-CA 3.785 (min 3.70 max 3.88)  Rg  12.6  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_30.pdb            CA-CA 3.759 (min 3.60 max 3.92)  Rg  13.3  H 0.10 E 0.83 c 0.07  clash<4A   3  nan 0
+   design_31.pdb            CA-CA 3.762 (min 3.56 max 3.86)  Rg  11.9  H 0.92 E 0.00 c 0.08  clash<4A   5  nan 0
+   design_32.pdb            CA-CA 3.764 (min 3.61 max 3.89)  Rg  11.5  H 0.54 E 0.40 c 0.06  clash<4A   0  nan 0
+   design_33.pdb            CA-CA 3.745 (min 3.58 max 3.92)  Rg  12.5  H 0.33 E 0.57 c 0.10  clash<4A   1  nan 0
+   design_34.pdb            CA-CA 3.767 (min 3.61 max 3.89)  Rg  10.9  H 0.92 E 0.00 c 0.08  clash<4A   5  nan 0
+   design_35.pdb            CA-CA 3.779 (min 3.64 max 3.95)  Rg  11.7  H 0.86 E 0.03 c 0.11  clash<4A   9  nan 0
+   design_36.pdb            CA-CA 3.758 (min 3.61 max 3.95)  Rg  11.9  H 0.05 E 0.85 c 0.10  clash<4A   1  nan 0
+   design_37.pdb            CA-CA 3.755 (min 3.68 max 3.94)  Rg  21.2  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_38.pdb            CA-CA 3.772 (min 3.62 max 3.86)  Rg  15.6  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_39.pdb            CA-CA 3.775 (min 3.61 max 3.92)  Rg  11.9  H 0.20 E 0.65 c 0.15  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.754 (min 3.61 max 3.86)  Rg  15.3  H 0.90 E 0.00 c 0.10  clash<4A   0  nan 0
+   design_5.pdb             CA-CA 3.784 (min 3.68 max 3.91)  Rg  11.6  H 0.97 E 0.00 c 0.03  clash<4A   4  nan 0
+   design_6.pdb             CA-CA 3.759 (min 3.62 max 3.91)  Rg  13.7  H 0.56 E 0.32 c 0.12  clash<4A   1  nan 0
+   design_7.pdb             CA-CA 3.772 (min 3.57 max 3.86)  Rg  12.0  H 0.97 E 0.00 c 0.03  clash<4A   9  nan 0
+   design_8.pdb             CA-CA 3.760 (min 3.62 max 3.88)  Rg  14.1  H 0.00 E 0.84 c 0.16  clash<4A   0  nan 0
+   design_9.pdb             CA-CA 3.786 (min 3.64 max 3.97)  Rg  13.0  H 0.98 E 0.00 c 0.02  clash<4A   5  nan 0
+   MEAN  CA-CA 3.7632 +- 0.0127  Rg 12.90 +- 2.05  H 0.548  E 0.363  c 0.088  clash 2.5  nan 0
+== /hnvme/workspace/v181bb10-salad/n018_designs/halfnbr_s1234   n_designs=120  L=100
+   design_0.pdb             CA-CA 3.740 (min 3.59 max 3.90)  Rg  12.9  H 0.14 E 0.67 c 0.19  clash<4A   1  nan 0
+   design_1.pdb             CA-CA 3.766 (min 3.65 max 3.83)  Rg  15.8  H 0.97 E 0.01 c 0.02  clash<4A   0  nan 0
+   design_10.pdb            CA-CA 3.764 (min 3.59 max 3.98)  Rg  11.8  H 0.05 E 0.82 c 0.13  clash<4A   1  nan 0
+   design_100.pdb           CA-CA 3.741 (min 3.47 max 3.91)  Rg  12.0  H 0.00 E 0.84 c 0.16  clash<4A   3  nan 0
+   design_101.pdb           CA-CA 3.763 (min 3.65 max 3.90)  Rg  12.8  H 0.53 E 0.42 c 0.05  clash<4A   0  nan 0
+   design_102.pdb           CA-CA 3.759 (min 3.58 max 3.88)  Rg  12.9  H 0.33 E 0.58 c 0.09  clash<4A   0  nan 0
+   design_103.pdb           CA-CA 3.749 (min 3.56 max 3.90)  Rg  14.1  H 0.05 E 0.84 c 0.11  clash<4A   2  nan 0
+   design_104.pdb           CA-CA 3.720 (min 3.44 max 3.91)  Rg  12.0  H 0.00 E 0.84 c 0.16  clash<4A   0  nan 0
+   design_105.pdb           CA-CA 3.736 (min 3.56 max 3.88)  Rg  11.9  H 0.05 E 0.88 c 0.07  clash<4A   5  nan 0
+   design_106.pdb           CA-CA 3.749 (min 3.60 max 3.85)  Rg  12.2  H 0.19 E 0.76 c 0.05  clash<4A   1  nan 0
+   design_107.pdb           CA-CA 3.761 (min 3.58 max 3.85)  Rg  13.2  H 0.43 E 0.54 c 0.03  clash<4A   1  nan 0
+   design_108.pdb           CA-CA 3.781 (min 3.66 max 3.87)  Rg  14.1  H 0.96 E 0.00 c 0.04  clash<4A   1  nan 0
+   design_109.pdb           CA-CA 3.759 (min 3.64 max 3.84)  Rg  15.4  H 0.92 E 0.00 c 0.08  clash<4A   7  nan 0
+   design_11.pdb            CA-CA 3.734 (min 3.62 max 3.81)  Rg  20.8  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_110.pdb           CA-CA 3.771 (min 3.63 max 3.87)  Rg  11.4  H 0.91 E 0.05 c 0.04  clash<4A   4  nan 0
+   design_111.pdb           CA-CA 3.756 (min 3.59 max 3.89)  Rg  12.0  H 0.18 E 0.74 c 0.08  clash<4A   0  nan 0
+   design_112.pdb           CA-CA 3.766 (min 3.62 max 3.91)  Rg  10.5  H 0.95 E 0.02 c 0.03  clash<4A   7  nan 0
+   design_113.pdb           CA-CA 3.782 (min 3.69 max 3.89)  Rg  13.9  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_114.pdb           CA-CA 3.763 (min 3.61 max 3.85)  Rg  14.6  H 0.98 E 0.00 c 0.02  clash<4A   2  nan 0
+   design_115.pdb           CA-CA 3.757 (min 3.64 max 3.87)  Rg  15.8  H 1.00 E 0.00 c 0.00  clash<4A   1  nan 0
+   design_116.pdb           CA-CA 3.783 (min 3.57 max 3.90)  Rg  11.0  H 0.84 E 0.00 c 0.16  clash<4A   6  nan 0
+   design_117.pdb           CA-CA 3.800 (min 3.61 max 3.90)  Rg  11.7  H 0.97 E 0.02 c 0.01  clash<4A   3  nan 0
+   design_118.pdb           CA-CA 3.763 (min 3.61 max 3.89)  Rg  10.6  H 0.90 E 0.00 c 0.10  clash<4A  20  nan 0
+   design_119.pdb           CA-CA 3.773 (min 3.66 max 3.94)  Rg  13.4  H 0.72 E 0.26 c 0.02  clash<4A   1  nan 0
+   design_12.pdb            CA-CA 3.772 (min 3.57 max 3.90)  Rg  11.3  H 0.95 E 0.00 c 0.05  clash<4A   8  nan 0
+   design_13.pdb            CA-CA 3.751 (min 2.91 max 3.89)  Rg  11.5  H 0.10 E 0.72 c 0.18  clash<4A   0  nan 0
+   design_14.pdb            CA-CA 3.727 (min 2.84 max 3.90)  Rg  11.6  H 0.10 E 0.77 c 0.13  clash<4A   2  nan 0
+   design_15.pdb            CA-CA 3.794 (min 3.63 max 3.91)  Rg  10.4  H 0.92 E 0.00 c 0.08  clash<4A  13  nan 0
+   design_16.pdb            CA-CA 3.763 (min 3.62 max 3.84)  Rg  12.6  H 0.99 E 0.01 c 0.00  clash<4A   2  nan 0
+   design_17.pdb            CA-CA 3.759 (min 3.64 max 3.89)  Rg  12.4  H 0.99 E 0.00 c 0.01  clash<4A  10  nan 0
+   design_18.pdb            CA-CA 3.770 (min 3.61 max 3.84)  Rg  12.5  H 0.98 E 0.01 c 0.01  clash<4A   2  nan 0
+   design_19.pdb            CA-CA 3.765 (min 3.58 max 3.92)  Rg  11.5  H 0.10 E 0.81 c 0.09  clash<4A   1  nan 0
+   design_2.pdb             CA-CA 3.762 (min 3.69 max 3.84)  Rg  13.9  H 1.00 E 0.00 c 0.00  clash<4A   2  nan 0
+   design_20.pdb            CA-CA 3.756 (min 3.65 max 3.83)  Rg  15.7  H 0.97 E 0.00 c 0.03  clash<4A   1  nan 0
+   design_21.pdb            CA-CA 3.766 (min 3.60 max 3.91)  Rg  11.4  H 0.22 E 0.60 c 0.18  clash<4A   1  nan 0
+   design_22.pdb            CA-CA 3.779 (min 3.65 max 3.86)  Rg  13.7  H 0.96 E 0.00 c 0.04  clash<4A   1  nan 0
+   design_23.pdb            CA-CA 3.754 (min 3.53 max 3.92)  Rg  12.5  H 0.15 E 0.76 c 0.09  clash<4A   1  nan 0
+   design_24.pdb            CA-CA 3.762 (min 3.60 max 3.99)  Rg  12.4  H 0.10 E 0.78 c 0.12  clash<4A   1  nan 0
+   design_25.pdb            CA-CA 3.722 (min 3.59 max 3.96)  Rg  21.4  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_26.pdb            CA-CA 3.757 (min 3.50 max 3.96)  Rg  12.2  H 0.05 E 0.71 c 0.24  clash<4A   1  nan 0
+   design_27.pdb            CA-CA 3.759 (min 3.63 max 3.89)  Rg  13.7  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_28.pdb            CA-CA 3.735 (min 3.52 max 3.86)  Rg  12.5  H 0.51 E 0.46 c 0.03  clash<4A   1  nan 0
+   design_29.pdb            CA-CA 3.791 (min 3.71 max 3.90)  Rg  12.1  H 0.91 E 0.03 c 0.06  clash<4A   3  nan 0
+   design_3.pdb             CA-CA 3.751 (min 3.52 max 3.89)  Rg  21.5  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_30.pdb            CA-CA 3.775 (min 3.68 max 3.90)  Rg  14.3  H 0.94 E 0.00 c 0.06  clash<4A   2  nan 0
+   design_31.pdb            CA-CA 3.768 (min 3.65 max 3.94)  Rg  13.8  H 0.86 E 0.02 c 0.12  clash<4A   0  nan 0
+   design_32.pdb            CA-CA 3.746 (min 3.67 max 3.84)  Rg  16.8  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_33.pdb            CA-CA 3.784 (min 3.70 max 3.91)  Rg  14.5  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_34.pdb            CA-CA 3.753 (min 3.60 max 3.93)  Rg  14.6  H 0.15 E 0.73 c 0.12  clash<4A   1  nan 0
+   design_35.pdb            CA-CA 3.764 (min 3.64 max 3.89)  Rg  12.4  H 0.18 E 0.76 c 0.06  clash<4A   1  nan 0
+   design_36.pdb            CA-CA 3.748 (min 3.63 max 3.84)  Rg  13.9  H 0.94 E 0.06 c 0.00  clash<4A   0  nan 0
+   design_37.pdb            CA-CA 3.737 (min 3.49 max 3.85)  Rg  11.5  H 0.00 E 0.81 c 0.19  clash<4A   3  nan 0
+   design_38.pdb            CA-CA 3.754 (min 3.62 max 3.90)  Rg  12.9  H 0.20 E 0.70 c 0.10  clash<4A   0  nan 0
+   design_39.pdb            CA-CA 3.765 (min 3.60 max 3.93)  Rg  12.8  H 0.57 E 0.40 c 0.03  clash<4A   0  nan 0
+   design_4.pdb             CA-CA 3.757 (min 3.68 max 3.83)  Rg  21.3  H 0.98 E 0.00 c 0.02  clash<4A   1  nan 0
+   design_40.pdb            CA-CA 3.750 (min 3.61 max 3.88)  Rg  21.2  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_41.pdb            CA-CA 3.763 (min 3.61 max 3.94)  Rg  12.2  H 0.00 E 0.85 c 0.15  clash<4A   2  nan 0
+   design_42.pdb            CA-CA 3.789 (min 3.62 max 3.91)  Rg  10.9  H 0.98 E 0.00 c 0.02  clash<4A  13  nan 0
+   design_43.pdb            CA-CA 3.759 (min 3.64 max 3.89)  Rg  12.3  H 0.10 E 0.73 c 0.17  clash<4A   1  nan 0
+   design_44.pdb            CA-CA 3.766 (min 3.61 max 3.90)  Rg  14.1  H 0.92 E 0.00 c 0.08  clash<4A   0  nan 0
+   design_45.pdb            CA-CA 3.744 (min 3.61 max 3.95)  Rg  15.0  H 0.05 E 0.91 c 0.04  clash<4A   2  nan 0
+   design_46.pdb            CA-CA 3.732 (min 3.62 max 3.81)  Rg  14.0  H 0.88 E 0.03 c 0.09  clash<4A   1  nan 0
+   design_47.pdb            CA-CA 3.760 (min 3.66 max 3.87)  Rg  12.6  H 0.97 E 0.00 c 0.03  clash<4A   4  nan 0
+   design_48.pdb            CA-CA 3.737 (min 3.64 max 3.81)  Rg  14.8  H 0.97 E 0.01 c 0.02  clash<4A   2  nan 0
+   design_49.pdb            CA-CA 3.765 (min 3.65 max 3.91)  Rg  11.7  H 0.88 E 0.00 c 0.12  clash<4A   4  nan 0
+   design_5.pdb             CA-CA 3.769 (min 3.60 max 3.87)  Rg  15.3  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_50.pdb            CA-CA 3.767 (min 3.65 max 3.88)  Rg  16.6  H 0.91 E 0.00 c 0.09  clash<4A   1  nan 0
+   design_51.pdb            CA-CA 3.720 (min 3.44 max 4.00)  Rg  11.5  H 0.05 E 0.86 c 0.09  clash<4A   2  nan 0
+   design_52.pdb            CA-CA 3.763 (min 3.62 max 3.91)  Rg  12.3  H 0.58 E 0.30 c 0.12  clash<4A   0  nan 0
+   design_53.pdb            CA-CA 3.775 (min 3.65 max 3.86)  Rg  14.5  H 1.00 E 0.00 c 0.00  clash<4A   4  nan 0
+   design_54.pdb            CA-CA 3.791 (min 3.67 max 3.95)  Rg  12.1  H 0.95 E 0.00 c 0.05  clash<4A  12  nan 0
+   design_55.pdb            CA-CA 3.752 (min 3.62 max 3.83)  Rg  21.0  H 0.96 E 0.00 c 0.04  clash<4A   0  nan 0
+   design_56.pdb            CA-CA 3.780 (min 3.62 max 3.88)  Rg  11.1  H 0.91 E 0.05 c 0.04  clash<4A   4  nan 0
+   design_57.pdb            CA-CA 3.730 (min 3.52 max 3.80)  Rg  20.1  H 0.96 E 0.00 c 0.04  clash<4A   1  nan 0
+   design_58.pdb            CA-CA 3.741 (min 3.63 max 3.87)  Rg  18.0  H 0.99 E 0.00 c 0.01  clash<4A   0  nan 0
+   design_59.pdb            CA-CA 3.754 (min 3.63 max 3.91)  Rg  13.7  H 0.07 E 0.81 c 0.12  clash<4A   0  nan 0
+   design_6.pdb             CA-CA 3.805 (min 3.71 max 3.94)  Rg  10.8  H 0.98 E 0.00 c 0.02  clash<4A   6  nan 0
+   design_60.pdb            CA-CA 3.783 (min 3.70 max 3.88)  Rg  12.2  H 0.95 E 0.00 c 0.05  clash<4A   1  nan 0
+   design_61.pdb            CA-CA 3.755 (min 3.64 max 3.84)  Rg  18.6  H 1.00 E 0.00 c 0.00  clash<4A   3  nan 0
+   design_62.pdb            CA-CA 3.753 (min 3.60 max 3.85)  Rg  14.4  H 0.93 E 0.00 c 0.07  clash<4A   2  nan 0
+   design_63.pdb            CA-CA 3.760 (min 3.66 max 3.90)  Rg  11.5  H 0.89 E 0.04 c 0.07  clash<4A   4  nan 0
+   design_64.pdb            CA-CA 3.744 (min 3.57 max 3.93)  Rg  12.7  H 0.27 E 0.66 c 0.07  clash<4A   1  nan 0
+   design_65.pdb            CA-CA 3.754 (min 2.77 max 3.86)  Rg  11.6  H 0.92 E 0.00 c 0.08  clash<4A   1  nan 0
+   design_66.pdb            CA-CA 3.772 (min 3.60 max 3.87)  Rg  12.7  H 0.96 E 0.00 c 0.04  clash<4A   5  nan 0
+   design_67.pdb            CA-CA 3.724 (min 3.61 max 3.87)  Rg  13.6  H 0.00 E 0.86 c 0.14  clash<4A   1  nan 0
+   design_68.pdb            CA-CA 3.772 (min 3.70 max 3.86)  Rg  12.5  H 1.00 E 0.00 c 0.00  clash<4A   0  nan 0
+   design_69.pdb            CA-CA 3.755 (min 3.60 max 4.02)  Rg  12.0  H 0.05 E 0.84 c 0.11  clash<4A   3  nan 0
+   design_7.pdb             CA-CA 3.752 (min 3.63 max 3.84)  Rg  12.5  H 0.86 E 0.10 c 0.04  clash<4A   0  nan 0
+   design_70.pdb            CA-CA 3.794 (min 3.67 max 3.91)  Rg  11.5  H 0.93 E 0.00 c 0.07  clash<4A   0  nan 0
+   design_71.pdb            CA-CA 3.731 (min 3.61 max 3.88)  Rg  12.0  H 0.05 E 0.87 c 0.08  clash<4A   2  nan 0
+   design_72.pdb            CA-CA 3.736 (min 3.57 max 3.91)  Rg  14.7  H 0.07 E 0.81 c 0.12  clash<4A   0  nan 0
+   design_73.pdb            CA-CA 3.745 (min 3.60 max 3.95)  Rg  12.8  H 0.10 E 0.79 c 0.11  clash<4A   2  nan 0
+   design_74.pdb            CA-CA 3.789 (min 3.55 max 3.89)  Rg  11.4  H 0.87 E 0.03 c 0.10  clash<4A   0  nan 0
+   design_75.pdb            CA-CA 3.749 (min 3.63 max 3.90)  Rg  14.7  H 0.98 E 0.00 c 0.02  clash<4A   0  nan 0
+   design_76.pdb            CA-CA 3.748 (min 3.57 max 3.92)  Rg  12.2  H 0.10 E 0.74 c 0.16  clash<4A   1  nan 0
+   design_77.pdb            CA-CA 3.776 (min 3.66 max 3.86)  Rg  11.9  H 0.94 E 0.00 c 0.06  clash<4A   0  nan 0
+   design_78.pdb            CA-CA 3.756 (min 3.65 max 3.85)  Rg  12.9  H 0.99 E 0.00 c 0.01  clash<4A   5  nan 0
+   design_79.pdb            CA-CA 3.780 (min 3.59 max 3.92)  Rg  11.4  H 0.86 E 0.08 c 0.06  clash<4A   0  nan 0
+   design_8.pdb             CA-CA 3.737 (min 3.61 max 3.97)  Rg  13.4  H 0.00 E 0.90 c 0.10  clash<4A   0  nan 0
+   design_80.pdb            CA-CA 3.781 (min 3.70 max 3.88)  Rg  12.8  H 0.97 E 0.00 c 0.03  clash<4A   0  nan 0
+   design_81.pdb            CA-CA 3.742 (min 3.61 max 3.87)  Rg  14.2  H 0.56 E 0.29 c 0.15  clash<4A   0  nan 0
+   design_82.pdb            CA-CA 3.742 (min 3.60 max 3.86)  Rg  14.1  H 0.96 E 0.00 c 0.04  clash<4A   3  nan 0
+   design_83.pdb            CA-CA 3.757 (min 3.62 max 3.87)  Rg  13.1  H 0.72 E 0.19 c 0.09  clash<4A   3  nan 0
+   design_84.pdb            CA-CA 3.754 (min 3.55 max 3.89)  Rg  13.1  H 0.05 E 0.89 c 0.06  clash<4A   1  nan 0
+   design_85.pdb            CA-CA 3.740 (min 3.57 max 3.87)  Rg  12.0  H 0.54 E 0.38 c 0.08  clash<4A   0  nan 0
+   design_86.pdb            CA-CA 3.780 (min 3.62 max 3.89)  Rg  11.0  H 0.91 E 0.02 c 0.07  clash<4A   2  nan 0
+   design_87.pdb            CA-CA 3.780 (min 3.55 max 3.89)  Rg  11.3  H 0.91 E 0.03 c 0.06  clash<4A   5  nan 0
+   design_88.pdb            CA-CA 3.739 (min 3.60 max 3.89)  Rg  12.2  H 0.15 E 0.75 c 0.10  clash<4A   0  nan 0
+   design_89.pdb            CA-CA 3.768 (min 3.60 max 3.93)  Rg  10.6  H 0.88 E 0.00 c 0.12  clash<4A  21  nan 0
+   design_9.pdb             CA-CA 3.763 (min 3.64 max 3.92)  Rg  12.1  H 0.00 E 0.85 c 0.15  clash<4A   2  nan 0
+   design_90.pdb            CA-CA 3.724 (min 3.56 max 3.86)  Rg  13.3  H 0.05 E 0.91 c 0.04  clash<4A   1  nan 0
+   design_91.pdb            CA-CA 3.734 (min 3.59 max 3.85)  Rg  12.2  H 0.24 E 0.69 c 0.07  clash<4A   0  nan 0
+   design_92.pdb            CA-CA 3.764 (min 3.62 max 3.84)  Rg  12.4  H 0.94 E 0.00 c 0.06  clash<4A   2  nan 0
+   design_93.pdb            CA-CA 3.753 (min 3.55 max 3.90)  Rg  12.0  H 0.10 E 0.73 c 0.17  clash<4A   1  nan 0
+   design_94.pdb            CA-CA 3.781 (min 3.55 max 3.89)  Rg  11.0  H 0.86 E 0.08 c 0.06  clash<4A   2  nan 0
+   design_95.pdb            CA-CA 3.766 (min 3.62 max 3.87)  Rg  14.0  H 0.10 E 0.80 c 0.10  clash<4A   3  nan 0
+   design_96.pdb            CA-CA 3.750 (min 3.64 max 3.86)  Rg  11.9  H 0.92 E 0.04 c 0.04  clash<4A   4  nan 0
+   design_97.pdb            CA-CA 3.745 (min 3.61 max 3.85)  Rg  13.0  H 0.92 E 0.02 c 0.06  clash<4A   5  nan 0
+   design_98.pdb            CA-CA 3.764 (min 3.66 max 3.85)  Rg  12.4  H 0.96 E 0.00 c 0.04  clash<4A   3  nan 0
+   design_99.pdb            CA-CA 3.766 (min 3.61 max 3.83)  Rg  12.9  H 1.00 E 0.00 c 0.00  clash<4A   2  nan 0
+   MEAN  CA-CA 3.7588 +- 0.0178  Rg 13.35 +- 2.43  H 0.635  E 0.295  c 0.071  clash 2.3  nan 0
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 12:59:06 CEST 2026
+= Job-ID             : 903986 on helma
+= Job-Name           : n018_qhalf
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N018-fast-levers/run_quality_halfnbr.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N018-fast-levers
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:55:00
+= Elapsed runtime    : 00:09:52
+= Total RAM usage    : 4.3 GiB of assigned 175 GiB (2.5%)
+= Node list          : h13-11
+= Subm/Elig/Start/End: 2026-09-26T12:49:13 / 2026-09-26T12:49:13 / 2026-09-26T12:49:14 / 2026-09-26T12:59:06
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.9G   104.9G   209.7G        N/A     456K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      74K      61K      81K  5d19h50m45s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 315092, 18 %, 7 %, 1340 MiB, 362416 ms
+NVIDIA H100, 00000000:A6:00.0, 318892, 62 %, 4 %, 980 MiB, 209778 ms
