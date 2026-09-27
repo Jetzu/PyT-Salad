@@ -1,0 +1,176 @@
+### Starting TaskPrologue of job 904739 on h11-17 at Sat Sep 26 07:17:45 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 19:17:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+NVIDIA H100
+########## F1 GOOD compiled, fast preset
+  distinct_bit_patterns    24
+  d_min                    0.015248298645019531
+  d_median                 0.03705322742462158
+  d_max                    0.5879487991333008
+  d_mean                   0.08552176019419795
+  frac_above_1e3           1.0
+  frac_above_1e2           1.0
+  all_pairs_max            0.6702022552490234
+  hashes_head              ['dc9e515a63d82184', '0cbdaf8edb66b589', '5678ecb4b9c24c00', '2d4da46bee043db0', '0f153b31a041cc85', 'c327a0753ce18bff']
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n025_x/x_floor.py", line 106, in <module>
+    json.dump(res, open(a.out, "w"), indent=2)
+                   ^^^^^^^^^^^^^^^^
+OSError: [Errno 122] Disk quota exceeded: '/hnvme/workspace/v181bb10-salad/n025_x/traj/floor_good_fast.json'
+########## F2 HEAD compiled, fast preset
+W0926 19:26:47.402000 2786422 site-packages/torch/_inductor/codecache.py:604] [0/2]     pickler.dump(obj)
+W0926 19:26:47.402000 2786422 site-packages/torch/_inductor/codecache.py:604] [0/2] AttributeError: Can't pickle local object 'FastDenoiser.__init__.<locals>._cse_pass'
+[x] tf32 = True DETSEG = False BATCH_COND = True AGGR = True
+  repeats                  24
+  distinct_bit_patterns    24
+  d_min                    0.013941764831542969
+  d_median                 0.23040246963500977
+  d_max                    0.2437148094177246
+  d_mean                   0.16852498054504395
+  frac_above_1e3           1.0
+  frac_above_1e2           1.0
+  all_pairs_max            0.25628018379211426
+  hashes_head              ['fa647ccad260e452', '249bb9b3a0db98c4', 'f3dbe56e94214986', '443df0e3f94457ef', '8816acb9fffe7c69', '93026d1b2ccce3b6']
+[x] wrote /hnvme/workspace/v181bb10-salad/n025_x/traj/floor_head_fast.json
+########## F3 HEAD compiled, fast preset, CSE VETOED
+  distinct_bit_patterns    24
+  d_min                    0.011223316192626953
+  d_median                 0.034395694732666016
+  d_max                    0.31756162643432617
+  d_mean                   0.09280531302742336
+  frac_above_1e3           1.0
+  frac_above_1e2           1.0
+  all_pairs_max            0.31756162643432617
+  hashes_head              ['4bdf57aadc6191b9', '30fb64815e8b63a2', '13584bc492f2defa', 'd8a35e7df58a8bb9', '73414381d437147c', 'd7f8547aa03c68e5']
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n025_x/x_floor.py", line 106, in <module>
+    json.dump(res, open(a.out, "w"), indent=2)
+                   ^^^^^^^^^^^^^^^^
+OSError: [Errno 122] Disk quota exceeded: '/hnvme/workspace/v181bb10-salad/n025_x/traj/floor_head_nocse.json'
+########## F4 HEAD compiled, fast preset, AGGRFUSE=0
+  distinct_bit_patterns    24
+  d_min                    0.10369205474853516
+  d_median                 0.10690879821777344
+  d_max                    0.21117925643920898
+  d_mean                   0.1178176506705906
+  frac_above_1e3           1.0
+  frac_above_1e2           1.0
+  all_pairs_max            0.22014522552490234
+  hashes_head              ['65b415960e93547e', '4f1ddb5b2f4daf3b', '621d87133bf3befd', '3aa8fb41449ecc1f', '7a7f8af9db3188c9', '39951809f25a9298']
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n025_x/x_floor.py", line 106, in <module>
+    json.dump(res, open(a.out, "w"), indent=2)
+                   ^^^^^^^^^^^^^^^^
+OSError: [Errno 122] Disk quota exceeded: '/hnvme/workspace/v181bb10-salad/n025_x/traj/floor_head_noaggr.json'
+########## F5 HEAD compiled, fast preset, BATCHCOND=0
+  distinct_bit_patterns    24
+  d_min                    0.006712913513183594
+  d_median                 0.010390281677246094
+  d_max                    0.017501235008239746
+  d_mean                   0.011057086612867273
+  frac_above_1e3           1.0
+  frac_above_1e2           0.5652173913043478
+  all_pairs_max            0.03246104717254639
+  hashes_head              ['20510af6a92cbdc7', '20e62a938ee52f8a', 'b895f2e5dc32b6d2', '7bc5af8fe47cbd31', '68449a7a6ecc8390', '33135b52a712a246']
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n025_x/x_floor.py", line 106, in <module>
+    json.dump(res, open(a.out, "w"), indent=2)
+                   ^^^^^^^^^^^^^^^^
+OSError: [Errno 122] Disk quota exceeded: '/hnvme/workspace/v181bb10-salad/n025_x/traj/floor_head_nop7.json'
+########## F6 HEAD compiled, fast preset, DETSEG=1
+  distinct_bit_patterns    1
+  d_min                    0.0
+  d_median                 0.0
+  d_max                    0.0
+  d_mean                   0.0
+  frac_above_1e3           0.0
+  frac_above_1e2           0.0
+  all_pairs_max            0.0
+  hashes_head              ['12b1f87fab87901a', '12b1f87fab87901a', '12b1f87fab87901a', '12b1f87fab87901a', '12b1f87fab87901a', '12b1f87fab87901a']
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n025_x/x_floor.py", line 106, in <module>
+    json.dump(res, open(a.out, "w"), indent=2)
+                   ^^^^^^^^^^^^^^^^
+OSError: [Errno 122] Disk quota exceeded: '/hnvme/workspace/v181bb10-salad/n025_x/traj/floor_head_detseg.json'
+########## F7 GOOD EAGER
+  distinct_bit_patterns    24
+  d_min                    1.3589859008789062e-05
+  d_median                 2.8133392333984375e-05
+  d_max                    5.078315734863281e-05
+  d_mean                   2.8216320535411004e-05
+  frac_above_1e3           0.0
+  frac_above_1e2           0.0
+  all_pairs_max            6.127357482910156e-05
+  hashes_head              ['818ab18b773e8b50', '1521d973d6232795', '57f89062fe69a811', '299de666b44f6368', 'efee10f57783c676', 'baf90a81fc3f89b2']
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n025_x/x_floor.py", line 106, in <module>
+    json.dump(res, open(a.out, "w"), indent=2)
+                   ^^^^^^^^^^^^^^^^
+OSError: [Errno 122] Disk quota exceeded: '/hnvme/workspace/v181bb10-salad/n025_x/traj/floor_good_eager.json'
+########## F8 HEAD EAGER
+  distinct_bit_patterns    24
+  d_min                    7.62939453125e-06
+  d_median                 1.1444091796875e-05
+  d_max                    3.4332275390625e-05
+  d_mean                   1.3019727623980978e-05
+  frac_above_1e3           0.0
+  frac_above_1e2           0.0
+  all_pairs_max            4.506111145019531e-05
+  hashes_head              ['be771ab89265798f', '0d065625cebefb41', '350d8147eb0f2aa9', 'ca4d70bb25d07955', 'ea2ddf2571abfe66', 'b889353d597dead0']
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n025_x/x_floor.py", line 106, in <module>
+    json.dump(res, open(a.out, "w"), indent=2)
+                   ^^^^^^^^^^^^^^^^
+OSError: [Errno 122] Disk quota exceeded: '/hnvme/workspace/v181bb10-salad/n025_x/traj/floor_head_eager.json'
+ALL DONE
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 19:43:40 CEST 2026
+= Job-ID             : 904739 on helma
+= Job-Name           : n025_floor
+= Job-Command        : /hnvme/workspace/v181bb10-salad/n025_x/job8_floor.sbatch
+= Initial workdir    : /hnvme/workspace/v181bb10-salad/n025_x
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 04:00:00
+= Elapsed runtime    : 00:26:18
+= Total RAM usage    : 4.6 GiB of assigned 175 GiB (2.6%)
+= Node list          : h11-17
+= Subm/Elig/Start/End: 2026-09-26T19:17:21 / 2026-09-26T19:17:21 / 2026-09-26T19:17:22 / 2026-09-26T19:43:40
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.2G   104.9G   209.7G        N/A     474K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A     101K      61K      81K  5d13h6m11s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 1300941, 48 %, 25 %, 45438 MiB, 2757876 ms
+NVIDIA H100, 00000000:A6:00.0, 2740123, 8 %, 8 %, 1348 MiB, 310892 ms
+NVIDIA H100, 00000000:A6:00.0, 2786422, 7 %, 7 %, 1410 MiB, 287154 ms
+NVIDIA H100, 00000000:A6:00.0, 2836921, 6 %, 7 %, 1528 MiB, 330719 ms
+NVIDIA H100, 00000000:A6:00.0, 2895486, 10 %, 10 %, 1482 MiB, 174085 ms
+NVIDIA H100, 00000000:A6:00.0, 2927286, 6 %, 6 %, 1464 MiB, 248628 ms
+NVIDIA H100, 00000000:A6:00.0, 2973087, 7 %, 7 %, 1468 MiB, 177451 ms
+NVIDIA H100, 00000000:A6:00.0, 3021300, 25 %, 0 %, 798 MiB, 3914 ms
+NVIDIA H100, 00000000:A6:00.0, 3022093, 22 %, 0 %, 1004 MiB, 3423 ms

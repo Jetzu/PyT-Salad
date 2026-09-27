@@ -42,3 +42,29 @@
 - N003 did not test "batch of two == two separate runs" for `training/` — `loop.py` was being edited concurrently by N004.
 
 ## Unresolvable
+- T8 (N025, BLOCKER): decide P7's fate. `SALAD_OPT_BATCHCOND=0` restores c5ab7a0's
+  numbers exactly (0/160, CA-CA 3.7632, Rg 12.94, job 906549), so the switch is
+  free; P7's win was -9.27 %/-11.00 % whole-forward at L=100 falling to -2.26 %
+  at L=400 (N014). Options measured: turn `batch_cond_pair` off in every preset;
+  or keep it and set `torch._inductor.config.max_fusion_size = 1`, which fixes the
+  miscompile (2.77e-05) but is a global de-optimisation and was NOT benchmarked.
+  Not fixed here - N025 was diagnose-only.
+- T9 (N025): the miscompile is not root-caused below "a two-node fusion in the P7
+  graph is enough" (`max_fusion_size=1` correct, `=2` wrong; `aggressive_fusion`,
+  `pattern_matcher`, `epilogue_fusion`, `inline_inbuilt_nn_modules` and
+  `reduce-overhead` all return the BIT-IDENTICAL wrong answer). Next step is to
+  dump the generated Triton for the fused node that first writes a wrong value
+  (the error is present at block 0's output) - prime suspect is the prologue's
+  inline LayerNorm (`pair.mean(-1)` + `pair.var(-1, unbiased=False)` over the last
+  dim of a `(6, N*K, 64)` tensor) fused with its neighbours. Worth an upstream
+  PyTorch report if confirmed. Jobs 906656's `nosplitred`/`nopersred`/
+  `nomultikern` arms were still running when N025 closed - read them first.
+- T10 (N025): `tests/test_design_quality.py` (the only gate that can see this
+  class) is not wired into anything. Make it a pre-commit requirement for any
+  change under `salad_torch/modules/` or `scripts/generate.py`, and add a
+  COMPILED-vs-EAGER whole-forward check on a real mid-rollout state
+  (`results/N025-regression-mechanism/scripts2/x_p7.py`) - every existing parity
+  test runs eager and is blind (K021).
+- T11 (N025, hygiene): `modules/fast.py` `_pack_inputs` ends with an unreachable
+  `return inputs, pair_cond` left over from the `b9dd416` split. Harmless, but it
+  is dead code in the hot path's source.

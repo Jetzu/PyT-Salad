@@ -1,0 +1,63 @@
+### Starting TaskPrologue of job 906583 on h13-03 at Sun Sep 27 07:22:52 AM CEST 2026
+Running on cores 32-63 with governor performance
+Sun Sep 27 07:22:52 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+TMPDIR=/tmp/906583.helma
+##### 1_c5ab7a0_good  (c5ab7a0)
+64 designs of 100 aa: median 0.6s, total 40.1s
+ARMRESULT 1_c5ab7a0_good n= 64 diverged=  0 frac=  0.00% ca_ca=3.7618 rg= 13.06
+##### 2_603051e_P7  (603051e)
+64 designs of 100 aa: median 0.6s, total 36.3s
+ARMRESULT 2_603051e_P7   n= 64 diverged= 11 frac= 17.19% ca_ca=3.8738 rg= 20.75
+##### 3_b9dd416_grp  (b9dd416)
+64 designs of 100 aa: median 0.6s, total 36.5s
+ARMRESULT 3_b9dd416_grp  n= 64 diverged= 11 frac= 17.19% ca_ca=3.8791 rg= 20.80
+##### 4_fd9ba32_cse  (fd9ba32)
+64 designs of 100 aa: median 0.5s, total 35.2s
+ARMRESULT 4_fd9ba32_cse  n= 64 diverged= 15 frac= 23.44% ca_ca=3.8610 rg= 20.56
+CBISECT_DONE
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 07:42:39 CEST 2026
+= Job-ID             : 906583 on helma
+= Job-Name           : cbisect
+= Job-Command        : /hnvme/workspace/v181bb10-salad/cbisect.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 02:30:00
+= Elapsed runtime    : 00:20:02
+= Total RAM usage    : 4.1 GiB of assigned 175 GiB (2.3%)
+= Node list          : h13-03
+= Subm/Elig/Start/End: 2026-09-27T07:22:32 / 2026-09-27T07:22:32 / 2026-09-27T07:22:37 / 2026-09-27T07:42:39
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.1G   104.9G   209.7G        N/A     459K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      77K      61K      81K  5d1h7m12s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 1376579, 17 %, 8 %, 1344 MiB, 366009 ms
+NVIDIA H100, 00000000:26:00.0, 1381391, 15 %, 7 %, 1556 MiB, 377135 ms
+NVIDIA H100, 00000000:26:00.0, 1387843, 34 %, 5 %, 1238 MiB, 101571 ms
+NVIDIA H100, 00000000:26:00.0, 1388523, 16 %, 7 %, 1532 MiB, 325399 ms

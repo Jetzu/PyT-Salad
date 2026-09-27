@@ -1,0 +1,30 @@
+### Starting TaskPrologue of job 906656 on h13-03 at Sun Sep 27 08:02:29 AM CEST 2026
+Running on cores 32-63 with governor performance
+Sun Sep 27 08:02:29 2026       
++-----------------------------------------------------------------------------------------+
++-----------------------------------------+------------------------+----------------------+
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+node=h13-03
+NVIDIA H100
+[b] probe=none mode=default BATCH_COND=True compiled=False aggr=False patmatch=True inline=True
+[b] dumped step 30, prev_pos|max|=24.476
+[b] wrote /tmp/906656.helma/fuse/ref.npz traj shape (6, 100, 20, 3)
+########## EAGER P7on = reference. Probes below are all COMPILED, P7 ON.
+--- probe fuse2
+[b] probe=fuse2 mode=default BATCH_COND=True compiled=True aggr=False patmatch=True inline=True
+[b] wrote /tmp/906656.helma/fuse/p_fuse2.npz traj shape (6, 100, 20, 3)
+BLK probe=fuse2 vs EAGER                 pos=9.586e+00 first_block>1e-3= 0  per-block=[3.68e-01 4.16e+00 5.95e+00 5.51e+00 8.58e+00 9.59e+00]
+--- probe fuse4
+[b] probe=fuse4 mode=default BATCH_COND=True compiled=True aggr=False patmatch=True inline=True
+[b] wrote /tmp/906656.helma/fuse/p_fuse4.npz traj shape (6, 100, 20, 3)
+BLK probe=fuse4 vs EAGER                 pos=9.586e+00 first_block>1e-3= 0  per-block=[3.68e-01 4.16e+00 5.95e+00 5.51e+00 8.58e+00 9.59e+00]
+--- probe fuse8
+[b] probe=fuse8 mode=default BATCH_COND=True compiled=True aggr=False patmatch=True inline=True
+[b] wrote /tmp/906656.helma/fuse/p_fuse8.npz traj shape (6, 100, 20, 3)
+BLK probe=fuse8 vs EAGER                 pos=9.586e+00 first_block>1e-3= 0  per-block=[3.68e-01 4.16e+00 5.95e+00 5.51e+00 8.58e+00 9.59e+00]
+--- probe fuse16
