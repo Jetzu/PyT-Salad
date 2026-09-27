@@ -59,39 +59,11 @@ single script, `scripts/generate.py`, and selected with flags.
 **The eager path runs on CPU; `--fast`, `--group_size` and `--batch_size`**
 **require a CUDA device.**
 
-## License
-
-This repository combines material under three licences; see
-[`LICENSE`](LICENSE) for the full text.
-
-### Original salad code
-Copyright (c) 2025 European Molecular Biology Laboratory (EMBL), licensed under
-the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). The model
-architecture and algorithms originate there.
-
-### Model parameters
-Licensed by EMBL under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). They are downloaded
-separately and their licence is unchanged by this repository.
-
-### This port
-The PyTorch implementation, the code written for it, the tests and the
-documentation are licensed under
-[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) — free to share
-and adapt for non-commercial purposes, with attribution.
-
-This applies only to the material added here. The Apache-2.0 material above
-remains available under its own terms.
-
 # Table of contents
 
 - [salad-torch](#salad-torch)
   - [What's salad?](#whats-salad)
   - [What's in this repository?](#whats-in-this-repository)
-  - [License](#license)
-    - [Original salad code](#original-salad-code)
-    - [Model parameters](#model-parameters)
-    - [This port](#this-port)
 - [Getting started](#getting-started)
   - [Installing salad-torch](#installing-salad-torch)
   - [Generating your first proteins](#generating-your-first-proteins)
@@ -140,6 +112,8 @@ remains available under its own terms.
     - [--screw_angle](#--screwangle)
 - [Training](#training)
 - [Tests](#tests)
+- [License](#license)
+- [Citation](#citation)
 
 # Getting started
 ## Installing salad-torch
@@ -876,3 +850,35 @@ Note when comparing sampling trajectories: a single forward pass is
 reproducible to about 2e-7, but feeding the output back in for 500 steps
 amplifies floating-point reduction-order differences. Compare against a rerun
 of the same code, not against a fixed absolute tolerance.
+
+# License
+
+This repository combines material under three licences; see
+[`LICENSE`](LICENSE) for the full text.
+
+**Original salad code** — Copyright (c) 2025 European Molecular Biology
+Laboratory (EMBL), licensed under the
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). The model
+architecture and algorithms originate there.
+
+**Model parameters** — licensed by EMBL under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). They are downloaded
+separately and their licence is unchanged by this repository.
+
+**This port** — the PyTorch implementation, the code written for it, the tests
+and the documentation are licensed under the
+[PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/):
+free to use, modify and share for noncommercial purposes, which includes
+personal use, research, education and use by charitable organisations.
+
+This applies only to the material added here. The Apache-2.0 material above
+remains available under its own terms.
+
+# Citation
+
+If you use this software, please cite the original work:
+
+```
+Jendrusch, M. et al. Efficient protein structure generation with sparse
+denoising models. bioRxiv 2025.01.31.635780.
+```
