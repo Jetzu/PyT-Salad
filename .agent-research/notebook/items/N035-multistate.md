@@ -129,3 +129,13 @@ DSSP (used the port's own P-SEA CA-only tool as instructed, reused not reimpleme
 - No further work planned for this feature; upstream's `--variants` (restart-branching at
   an out-step) was deliberately not ported for EITHER the single- or multi-state path (out
   of this port's existing scope, not something this task asked for).
+
+## Post-commit note
+Landed as 3 commits: `fd7737a` (feature), `7e23c99` (fix: a plain `git add` re-staging step
+after a concurrent index write reset `salad_torch/inference/__init__.py` picked up the
+blobs sibling's still-uncommitted `from .blobs import ...` line too - caught immediately by
+a `git archive`-based isolated-checkout import check, fixed via `git hash-object`/
+`update-index` rather than another plain `git add`), `1856da7` (INDEX row commit hash).
+Final isolated-checkout verification (`git archive HEAD | tar -x` into a scratch dir,
+fresh `python -c "import scripts.generate"`) confirms both this feature and sibling N036's
+work import and compile cleanly from a clean checkout of the final HEAD.
