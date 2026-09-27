@@ -191,9 +191,14 @@ Known gaps, stated plainly:
 ## Installing salad-torch
 
 1. Clone this repository and enter it.
-2. Create a fresh environment, e.g. `conda create -n salad-torch python=3.11`.
-3. Install PyTorch (>= 2.4; this port is developed and measured on 2.5.1+cu121)
-   and then `pip install -e .`.
+2. Create the environment: `conda env create -f environment.yml`
+3. `conda activate salad-torch && pip install -e .`
+
+`environment.yml` pins Python 3.11, torch 2.5.1+cu121 and numpy 1.26 - the
+versions this port is measured on. Drop the `pytorch-cuda` line for a CPU-only
+install; the eager path works there, `--fast`/`--group_size`/`--batch_size` are
+CUDA-only. numpy is pinned below 2.0 because the released checkpoints are
+pickles of JAX arrays and need the 1.x ABI.
 
 No JAX is required. The released JAX checkpoints are pickles of JAX arrays and
 are read directly:

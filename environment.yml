@@ -1,0 +1,47 @@
+# Conda environment for salad-torch.
+#
+#   conda env create -f environment.yml
+#   conda activate salad-torch
+#   pip install -e .
+#
+# Verified on: Python 3.11.15, torch 2.5.1+cu121, numpy 1.26.4, CUDA 12.1,
+# NVIDIA H100 (sm_90), Linux.
+#
+# CUDA: the pytorch-cuda pin must match a CUDA version your driver supports.
+# For Blackwell / RTX 50-series (sm_120) you need CUDA >= 12.8 and torch >= 2.7
+# instead. Nothing in this port is architecture-specific, but the 2.5.1+cu121
+# build pinned here cannot target sm_120 at all.
+#
+# CPU-only: drop the `pytorch-cuda` line. The eager path works; `--fast`,
+# `--group_size` and `--batch_size` are CUDA-only.
+#
+# numpy is pinned <2 deliberately: the released salad checkpoints are pickles of
+# JAX arrays, unpickled directly, which needs the numpy 1.x ABI.
+
+name: salad-torch
+
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - pip
+
+  # --- required to run the model ---
+  - pytorch=2.5.1
+  - pytorch-cuda=12.1        # drop this line for a CPU-only install
+  - numpy=1.26.*             # <2 required, see note above
+
+  # --- NOT required to run the port or its tests ---
+  # jax and dm-haiku are needed only to REGENERATE parity fixtures
+  # (scripts/gen_fixtures_*.py, tests/harness/gen_*_ref.py, scripts/bench_jax.py).
+  # The test suite reads fixtures that are already stored, so a normal install
+  # needs neither. Installing JAX beside torch in one environment works but is
+  # fiddly; a separate environment is usually less trouble.
+  #
+  # - pip:
+  #   - jax==0.5.0           # upstream pins 0.5.0; 0.5.1-0.5.3 break symmetry
+  #   - jaxlib==0.5.0
+  #   - dm-haiku
