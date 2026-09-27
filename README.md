@@ -223,14 +223,18 @@ available options.
 All numbers below were measured on one H100, on the 500-step default schedule,
 and are seconds per finished design.
 
-| length | reference (JAX) | `--preset exact` | `--preset fast` | `fast` + `--group_size auto` |
-|---|---|---|---|---|
-| 50 | 1.8 s | 1.06 s | 0.84 s | 0.145 s |
-| 100 | 2.0 s | 1.28 s | 1.00 s | 0.22 s |
-| 200 | 2.6 s | — | — | 0.563 s |
-| 400 | 3.8 s | — | — | 1.130 s |
-| 600 | 5.4 s | — | — | — |
-| 1000 | 8.9 s | — | — | 2.855 s |
+| length | reference (JAX) | `--preset exact` | `--preset fast` |
+|---|---|---|---|
+| 50 | 1.8 s | 1.06 s | 0.84 s |
+| 100 | 2.0 s | 1.28 s | 1.00 s |
+| 200 | 2.6 s | 1.71 s | 1.42 s |
+| 400 | 3.8 s | 2.72 s | 2.39 s |
+| 600 | 5.4 s | 3.89 s | 3.30 s |
+| 1000 | 8.9 s | 5.90 s | 5.17 s |
+
+These are single designs, one at a time. Adding `--group_size`, and
+`--batch_size` at short lengths, reduces them substantially further — see the
+table below.
 
 Without `--fast` the eager path takes about 30 seconds per design; it exists
 for debugging and for CPU, not for production runs.
