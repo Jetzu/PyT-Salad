@@ -1,33 +1,280 @@
-# salad-torch
+# salad-torch - a PyTorch port of salad
 
-A PyTorch port of [**salad**](https://github.com/mjendrusch/salad) (sparse
-all-atom denoising), the protein structure generation model from Michael
-Jendrusch / EMBL. The original is JAX + dm-haiku; this reimplements it in
-PyTorch and loads the released weights unchanged.
+**This is a PyTorch port of [salad](https://github.com/mjendrusch/salad)
+(sparse all-atom denoising) by Michael Jendrusch / EMBL. The original is
+JAX + dm-haiku. This reimplements the model in PyTorch and loads the released
+JAX checkpoints unchanged.**
+
+**What changed.** The model is the same model: `--preset exact` reproduces the
+JAX original to **0.00002 A** on all four released checkpoints, with an identical
+predicted sequence, and the geometry layer matches on 38 of 38 functions. What
+is different is everything around it. The denoiser is compiled and captured in a
+CUDA graph, so a design that takes JAX 1.56 s takes **1.27 s** at full parity and
+**~0.22 s** with the faster preset and design grouping - roughly **7x**. Two new
+flags have no counterpart upstream: `--preset` chooses how much numerical
+deviation you will accept, and `--group_size` advances several independent
+designs through one CUDA graph without changing any of them. The training loop,
+all twelve loss terms and the data pipeline are ported too; gradients match JAX
+to a cosine similarity of 0.99999863.
+
+Upstream's own quirks are reproduced deliberately, including the ones that look
+like bugs - see *Things that will bite you* at the end. The point is to match
+the released model, not to improve it.
 
 > **salad is not FlexCraft.** [`flexcraft`](https://github.com/mjendrusch/flexcraft)
-> is a separate repo by the same author that *uses* salad for backbone
-> generation and adds ProteinMPNN plus AF2/Boltz/Protenix filtering. salad is
-> the generative model, and it is what this ports.
+> is a separate repository by the same author that *uses* salad for backbone
+> generation and adds ProteinMPNN plus AF2/Boltz/Protenix filtering. salad is the
+> generative model, and it is what this ports.
 
-Paper: *Efficient protein structure generation with sparse denoising models*,
-bioRxiv 2025.01.31.635780.
 
-## Status
+## What's salad?
+
+salad (**s**parse **al**l-**a**tom **d**enoising) is the name of a family of machine learning models for controlled protein structure generation.
+Like many previous approaches to protein structure generation (e.g. [RFdiffusion](https://github.com/RosettaCommons/RFdiffusion), [Genie2](https://github.com/aqlaboratory/genie2) and [Chroma](https://github.com/generatebio/chroma)), salad is based on denoising diffusion models and is trained to gradually transform random noise into realistic protein structures.
+
+Unlike previous approaches, salad was developed from the ground up with efficiency in mind. salad outperforms its predecessors by a large margin and thus allows for higher-throughput structure generation. To give an example of how fast salad really is in comparison to previous methods, imagine you want to generate a set of 1,000 amino acid proteins on your previous generation RTX 3090. You start generation and go on a 10 minute coffee break. If you used salad with default settings, you come back to ~45 generated structures. If you used RFdiffusion, you might come back to find one or two.
+
+<p align="center">
+  <img src="./assets/SALADRuntimeDark.png" alt="alt text" width="400px" align="middle"/>
+</p>
+
+*Comparison of per-structure runtime for salad models compared to Chroma, Genie2 and RFdiffusion.*
+
+Like previous models, salad models can generate protein structures for a variety of protein design tasks:
+* [unconditional protein generation](#de-novo-protein-design-script)
+   up to [~1,000 amino acids](#large-protein-generation-with-domain-shaped-noise)
+* [symmetric and repeat protein generation](#symmetric--repeat-protein-generation)
+  (currently cyclic and screw-axis symmetry)
+* [protein motif scaffolding](#multi-motif-scaffolding)
+  (with one or more independent motifs)
+* [shape-conditioned protein generation](#shape-conditioned-protein-generation)
+* [multi-state protein design](#multi-state-design)
+
+While unconditional protein generation, as well as protein motif scaffolding are fairly standard for current protein structure generators, salad reaches larger proteins up to 1,000 amino acids and can successfully perform on less standard tasks, such as multi-state protein design, shape-conditioned protein generation and repeat protein design. The full extent of what salad can do is described in our [manuscript](https://www.biorxiv.org/content/10.1101/2025.01.31.635780v1.abstract).
+
+## What's in this repository?
+
+The PyTorch port of the models described in "Efficient protein structure
+generation with sparse denoising models". Module names differ from upstream:
+
+```
+salad_torch/
+  config.py            the configurations with released weights
+  geometry/            frames, neighbour selection, pair features, segment ops, sidechains
+  modules/             base layers, sparse IPA, diffusion blocks, decoders, the model
+                       fast.py - the compiled + CUDA-graph inference path and its presets
+  diffusion/           noise schedules, forward noising, preconditioning, sampling
+  losses/              the training loss terms
+  io/                  PDB output, residue constants
+  convert/             JAX/Haiku checkpoint -> PyTorch state dict
+  training/            the training loop and data pipeline
+scripts/generate.py    the one generation entry point
+tests/                 parity suites - run them, they are the point
+docs/USAGE.md          every CLI flag
+```
+
+Upstream's `salad.modules.noise_schedule_benchmark` becomes
+`salad_torch.modules.diffusion` + `modules/blocks.py`; `salad.modules.geometric`
+becomes `salad_torch/geometry/`; the autoencoders are in `modules/encoder.py`.
+
+`tests/` is worth emphasising. `test_model_parity.py` checks all four
+checkpoints against stored JAX outputs, and `test_design_quality.py` generates
+real designs and checks they are proteins - the two ask different questions and
+this port needed both.
+
+**NOTE: developed and tested on Linux with CUDA. The eager path runs on CPU;**
+**`--fast`, `--group_size` and `--batch_size` are CUDA-only.**
+
+
+## License
+Copyright (c) 2025 European Molecular Biology Laboratory (EMBL)
+
+### Code license
+Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+  > > [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+### Model parameter license
+ <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">The model parameters</span> are licensed under <a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Creative Commons Attribution 4.0 International<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""></a></p> 
+
+# Table of contents
+
+- [salad-torch - a PyTorch port of salad](#salad-torch---a-pytorch-port-of-salad)
+  - [What's salad?](#whats-salad)
+  - [What's in this repository?](#whats-in-this-repository)
+  - [License](#license)
+    - [Code license](#code-license)
+    - [Model parameter license](#model-parameter-license)
+- [Status](#status)
+- [Getting started](#getting-started)
+  - [Installing salad-torch](#installing-salad-torch)
+  - [Generating your first proteins](#generating-your-first-proteins)
+  - [Speed](#speed)
+    - [Choosing a configuration](#choosing-a-configuration)
+    - [What this cost, and what it did not buy](#what-this-cost-and-what-it-did-not-buy)
+  - [Sequence redesign and benchmarking](#sequence-redesign-and-benchmarking)
+    - [Running ProteinMPNN](#running-proteinmpnn)
+    - [Running novobench](#running-novobench)
+  - [Using the salad protein autoencoders](#using-the-salad-protein-autoencoders)
+- [salad scripts documentation](#salad-scripts-documentation)
+  - [_De novo_ protein design script](#de-novo-protein-design-script)
+    - [--config](#--config)
+    - [--params](#--params)
+    - [--out_path](#--outpath)
+    - [--num_aa](#--numaa)
+    - [--merge_chains (default: False)](#--mergechains-default-false)
+    - [--num_steps (default: 500)](#--numsteps-default-500)
+    - [--out_steps (default: 400)](#--outsteps-default-400)
+    - [--num_designs (default: 10)](#--numdesigns-default-10)
+    - [--prev_threshold (default: 0.8)](#--prevthreshold-default-08)
+    - [--timescale_pos (default: "cosine(t)")](#--timescalepos-default-cosinet)
+    - [--cloud_std (default: "none")](#--cloudstd-default-none)
+    - [--dssp (default: "none")](#--dssp-default-none)
+    - [--template (default: "none")](#--template-default-none)
+  - [Large protein generation with domain-shaped noise](#large-protein-generation-with-domain-shaped-noise)
+  - [Shape-conditioned protein generation](#shape-conditioned-protein-generation)
+  - [Multi-motif scaffolding](#multi-motif-scaffolding)
+  - [Symmetric / repeat protein generation](#symmetric--repeat-protein-generation)
+    - [--num_aa](#--numaa)
+    - [--replicate_count](#--replicatecount)
+    - [--screw_translation](#--screwtranslation)
+    - [--screw_radius](#--screwradius)
+    - [--screw_angle](#--screwangle)
+    - [--fixcenter_threshold](#--fixcenterthreshold)
+    - [--compact_lr](#--compactlr)
+    - [--clash_lr](#--clashlr)
+    - [--f_small](#--fsmall)
+    - [--f_strand](#--fstrand)
+    - [--mix_output (couple or replicate)](#--mixoutput-couple-or-replicate)
+    - [--mode (screw or rotation)](#--mode-screw-or-rotation)
+    - [--sym_noise (default: True)](#--symnoise-default-true)
+  - [Multi-state design](#multi-state-design)
+- [salad datasets and training](#salad-datasets-and-training)
+  - [PDB data setup](#pdb-data-setup)
+- [get PDB structures](#get-pdb-structures)
+- [get PDB sequences](#get-pdb-sequences)
+- [get chemical component dictionary](#get-chemical-component-dictionary)
+  - [training salad models](#training-salad-models)
+
+# Status
 
 | | |
 |---|---|
-| geometry layer | exact parity vs JAX (38/38 functions) |
-| 6-layer trunk, released weights | 0.0003 A max coordinate deviation |
-| **whole denoiser, released weights** | **0.00002 A max, identical predicted sequence** |
-| all four released checkpoints | load with `strict=True` |
-| sampling loop | generates proteins; verified against the chaos noise floor |
-| training losses | all 12 terms implemented, gradients match JAX (cosine 0.99999863) |
-| training loop | complete and verified; batches by bin-packing, like upstream |
-| real-PDB datasource | implemented, **untested** - no preprocessed `.npz` tree on the dev machine |
-| **performance** | **1.09-4.7x FASTER than JAX** (see below) |
+| geometry layer | exact parity vs JAX, 38/38 functions |
+| whole denoiser, released weights | **0.00002 A** max deviation, identical predicted sequence |
+| all four verified checkpoints | load with `strict=True` |
+| sampling loop | verified against the chaos noise floor |
+| design quality | 0/160 diverged on all three presets |
+| training losses | all 12 terms; gradients match JAX (cosine 0.99999863) |
+| training loop | complete; batches by bin-packing, like upstream |
+| real-PDB datasource | implemented, **untested** - no preprocessed tree on the dev machine |
+| performance | 1.87-7x faster than JAX (see [Speed](#speed)) |
 
-## Performance
+Known gaps, stated plainly:
+
+- Eight of the twelve released checkpoints have no parity fixture. They load;
+  nobody has checked them.
+- `NpzAssemblySource` (training on real PDB data) has never ingested a
+  structure. The synthetic source works.
+- **No designability validation.** Every quality claim here is bond geometry,
+  radius of gyration, secondary-structure composition and clash rate - never
+  ProteinMPNN plus a folding model. This is the largest untested assumption in
+  the port.
+- Nothing has been measured on a non-H100 GPU. Blackwell (sm_120) needs
+  CUDA 12.8+ and torch >= 2.7; this port is developed on 2.5.1+cu121, which
+  cannot target it. Nothing in the code is architecture-specific.
+- Deliberately not ported, because they are dead in every released config:
+  `config.symm`, the class-based `Screw`, the trunk-side `use_omap` embedding,
+  an aa-conditioned encoder variant, and a `violation.py` branch whose result
+  upstream discards. Cluster-scaling machinery (`rebatch`/`multigpu`/`pmap`) is
+  also out of scope for a single-process port.
+
+
+# Getting started
+## Installing salad-torch
+
+1. Clone this repository and enter it.
+2. Create a fresh environment, e.g. `conda create -n salad-torch python=3.11`.
+3. Install PyTorch (>= 2.4; this port is developed and measured on 2.5.1+cu121)
+   and then `pip install -e .`.
+
+No JAX is required. The released JAX checkpoints are pickles of JAX arrays and
+are read directly:
+
+```
+wget https://zenodo.org/records/14711580/files/salad_params.tar.gz
+tar -xzf salad_params.tar.gz
+```
+
+Four configurations have verified parity against the JAX original:
+`default_vp`, `default_vp_scaled`, `default_ve_scaled` and `multimotif_vp`.
+The other eight released checkpoints load, but have no parity fixture.
+
+
+## Generating your first proteins
+
+Everything goes through one script, `scripts/generate.py` - there is no separate
+entry point for large proteins, and no separate script per feature.
+
+```bash
+python scripts/generate.py \
+    --config default_vp \
+    --params params/default_vp-200k.jax \
+    --out_path output/my_first_protein/ \
+    --num_aa 100 \
+    --num_designs 10 \
+    --fast --preset fast --group_size auto
+```
+
+The first five options mean exactly what they do upstream: `--config` and
+`--params` pick a model and its checkpoint, `--out_path` is the output
+directory, `--num_aa` is the length (colon-separated for several chains, e.g.
+`100:50`, and a `c` prefix makes a chain cyclic), and `--num_designs` is how
+many to generate.
+
+The last three are new and are the whole reason this port exists:
+
+`--fast` compiles the denoiser and captures it in a CUDA graph. It costs about
+five minutes once and makes every step ~20x cheaper, so use it for anything
+beyond two or three designs. GPU only, one fixed length per process.
+
+`--preset` chooses how much numerical deviation you will accept:
+`exact` (the default) reproduces JAX salad to its parity floor, `fast` trades
+some numerics for roughly a 25% faster step and half the sampling schedule, and
+`deterministic` makes `--seed` actually pin a CUDA run.
+
+`--group_size auto` advances several independent designs through one CUDA graph.
+It is **not** a batch axis: each design keeps its own buffers, noise and RNG
+stream and comes out bit-identical to generating it alone. `auto` measures the
+right group size on your actual GPU.
+
+Large proteins use the same script - no `scripts/generate.py` equivalent is needed,
+though `default_ve_scaled` is still the better checkpoint for them:
+
+```bash
+python scripts/generate.py \
+    --config default_ve_scaled \
+    --params params/default_ve_scaled-200k.jax \
+    --out_path output/my_large_protein/ \
+    --num_aa 1000 \
+    --num_designs 10 \
+    --fast --preset fast
+```
+
+At L=1000, drop `--group_size`: a single forward already saturates the GPU, so
+grouping buys nothing (see below).
+
+**[Every flag, in detail: `docs/USAGE.md`](docs/USAGE.md)**
+
+## Speed
 
 Measured on an H100 at L=100, against the JAX original on the same node.
 
@@ -38,112 +285,772 @@ Measured on an H100 at L=100, against the JAX original on the same node.
 | `--fast --preset fast` | **2.00 ms** | 1.00 s | **2.37x** |
 | `--fast --preset fast --group_size auto` | 2.00 ms | **~0.22 s** | **~7x** |
 
-`exact` holds the released checkpoints' parity floor (0.00002 A, 0.00020 A for
-`multimotif_vp`) on all four configs. `fast` adds TF32, a halved sampling
-schedule and two further reassociations; every deviating change is validated at
-**160 designs per arm** against `exact` on bond geometry, radius of gyration,
-secondary-structure composition, clash count and divergence rate.
-`--group_size` advances N independent designs through one CUDA graph and is
-**bit-identical** to generating them one at a time.
+Without `--fast` the eager path runs at about 30 s per design; it exists for
+debugging and for CPU, not for production.
 
-Getting here meant rejecting more than shipping. Measured and *not* shipped:
-inductor matmul templates (-14 %, but not bit-exact and the autotune is a timing
-race), `einsum`->`mm` lowering, neighbour-count reduction (-28 % at L=400, 9x the
-clashes), bf16 (slower - the model is launch-bound, not math-bound), and
-`TORCHINDUCTOR_FREEZING` (passes the Angstrom floor while not being fp32-exact).
+### Choosing a configuration
 
-One of the shipped optimisations silently destroyed 17-21 % of designs for a
-while: `batch_cond_pair` triggers a **PyTorch 2.5.1 inductor miscompile** that
-emits an impossible load mask, and every parity test passed straight through it
-because they all drive the eager path. It is fixed behind a `torch.library.custom_op`
-fusion barrier; the standalone reproducer and the generated Triton are in the
-repository history. The lesson is now a test: `tests/test_design_quality.py`
-generates real designs and checks they are proteins, which no single-forward
-comparison can do.
+`--group_size` pays when the GPU is idle between one design's kernel launches,
+which is a short-protein situation. Throughput saturates at about 16 designs in
+flight; past that it flattens and then regresses.
 
-Both presets still sit ~10x above this model's measured theoretical floor
-(0.258 ms/step): it is kernel-launch-bound, not arithmetic- or bandwidth-bound
-(arithmetic peaks at 11 % of fp32 peak, L2 at 21 % of its rate).
+| length | best configuration | s/design | speedup |
+|---|---|---|---|
+| 50 | `--batch_size 8 --group_size 4` | 0.145 | 3.4x |
+| 100 | `--batch_size 8 --group_size 2` | 0.281 | 2.1x |
+| 200 | `--batch_size 4 --group_size 2` | 0.563 | 1.44x |
+| 400 | `--batch_size 2 --group_size 2` | 1.130 | 1.20x |
+| 1000 | `--group_size 2` only | 2.855 | 1.03x |
 
-**[Full flag reference: `docs/USAGE.md`](docs/USAGE.md)**
+The rule is `B x L` in 400-800 residues: pick `B ~ 600/L` rounded to a power of
+two, then `--group_size auto`. At L=1000 packing *loses* - above about 208
+residues arithmetic rather than launch latency becomes the binding constraint,
+and a single long forward already fills the machine.
 
-## Layout
+Peak VRAM is `(5.73*L + 235) + (N-1)*4.00*L` MiB and stays linear to L=1000. A
+single design fits in 8 GB even at L=1000; on a 24 GB card the practical limit
+is about `--group_size 5` at L=1000, and roughly 16 at L=100.
 
+### What this cost, and what it did not buy
+
+Most of the work was rejecting things. Measured and *not* shipped: inductor
+matmul templates (-14%, but not bit-exact and their autotune is a timing race -
+three cold compiles disagree), `einsum`->`mm` lowering, neighbour-count
+reduction (-28% at L=400 but 9x the clashes), bf16 (slower, because the model is
+launch-bound rather than math-bound) and `TORCHINDUCTOR_FREEZING` (passes an
+Angstrom tolerance while not being fp32-exact).
+
+One shipped optimisation silently destroyed 17-21% of designs for a while. It
+triggers a **PyTorch 2.5.1 inductor miscompile** that emits an impossible load
+mask, and every parity test passed straight through it because they all drive
+the eager path. It is fixed behind a `torch.library.custom_op` fusion barrier.
+The lesson became a test: `tests/test_design_quality.py` generates real designs
+and asks whether they are proteins, which no single-forward comparison can do.
+
+Both presets still sit about 10x above this model's measured theoretical floor
+of 0.258 ms/step. It is kernel-launch-bound: arithmetic peaks at 11% of fp32
+peak and L2 runs at 21% of its rate.
+
+
+## Sequence redesign and benchmarking
+### Running ProteinMPNN
+First, install ProteinMPNN in a separate conda environment following the instructions [here](https://github.com/dauparas/ProteinMPNN) and activate the environment.
+
+Then, set an environment variable to point to that directory and activate
+the corresponding conda environment you created for ProteinMPNN:
+```bash
+export PROTEINMPNN=/path/to/proteinmpnn/
+conda activate pmpnn
 ```
-salad_torch/
-  config.py            the four configs with released weights
-  geometry/            frames, neighbour selection, pair features, segment ops, sidechains
-  modules/             base layers, sparse IPA, diffusion blocks, decoders, the model
-  diffusion/           noise schedules, forward noising, preconditioning, sampling
-  losses/              the training loss terms
-  io/                  PDB output, residue constants
-  convert/             Haiku checkpoint -> PyTorch state dict
-tests/                 parity suites (run them, they are the point)
-notes/                 architecture write-ups and measured results
-notes/specs/           the implementation specs the port was written from
+
+You will then be able to run ProteinMPNN for unconditional designs
+using:
+```bash
+bash scripts/pmpnn.sh path/to/pdbs/ path/to/outputs/
+```
+This will put the generated fasta files in `path/to/outputs/seqs/`.
+
+For motif scaffolding, you can run
+```bash
+bash scripts/pmpnn_fixed.sh path/to/pdbs/ path/to/motif.pdb path/to/outputs/
+```
+with a motif PDB file in the [Genie2 motif PDB format](https://github.com/aqlaboratory/genie2?tab=readme-ov-file#format-of-motif-scaffolding-problem-definition-file).
+
+For repeat protein and homooligomer design, you can use
+```bash
+bash scripts/pmpnn_tied.sh path/to/pdbs/ path/to/outputs/ <repeat length> <repeat count>
+```
+for example for three repeats of a 50 amino acid repeat unit you could call
+```bash
+bash scripts/pmpnn_tied.sh path/to/pdbs/ path/to/outputs/ 50 3
 ```
 
-## Quick start
+Finally, to design sequences for multi-state proteins like the ones described in "Efficient protein structure generation with sparse denoising models", you can use
+```bash
+bash scripts/pmpnn_confchange.sh path/to/pdbs/ path/to/outputs/ 0.5
+```
 
-Generate eight 100-residue designs:
+### Running novobench
+First, install `novobench` following the instructions [here](https://github.com/mjendrusch/novobench) and activate the corresponding conda environment.
+
+Then, you can point `novobench` at a directory of PDB files and a corresponding directory of ProteinMPNN fasta files to compute ESMfold pLDDTs and scRMSDs:
+```bash
+python -m novobench.run \
+    --pdb-path path/to/pdbs/ \
+    --fasta-path path/to/fastas/seqs/ \
+    --out-path path/to/outputs/esm/ \
+    --model esm
+```
+The first time you run this, it might take a while, as ESMfold needs to download and cache its parameters.
+
+Running `novobench` will create a directory `predictions/` and a CSV file `scores.csv` in the output directory. `predictions/` contains one subdirectory per PDB file in `path/to/pdbs/`, which will contain one PDB file named `design_N.pdb` for each sequence in the corresponding fasta file, in order (`design_0.pdb`, `design_1.pdb`, etc.) which contain the ESMfold predicted structure for that sequence.
+
+`scores.csv` contains one row per PDB file and fasta sequence, with the `name` of the PDB file, the `index` of the sequence in the fasta file, the `sequence` in one-letter code, and a set of ESMfold-derived metrics:
+* `sc_rmsd`, `sc_tm`: RMSD / TMscore between the predicted structure for that sequence and the salad-generated structure.
+* `plddt`, `ptm`: ESMfold pLDDT and pTM scores
+* `ipae`, `mpae`: mean and minimum interface pAE for complexes
+
+Running `novobench` for multi-state design might require running separate instances of `novobench` for each state. As `salad.train.eval_split_change.py` writes files suffixed `_s0.pdb`, `_s1.pdb`, `_s2.pdb` for the three designed states, you can do this by telling `novobench` to use only designs which contain one of these suffixes:
+```bash
+python -m novobench.run \
+    --pdb-path path/to/pdbs/ \
+    --fasta-path path/to/fastas/seqs/ \
+    --out-path path/to/outputs/esm/ \
+    --model esm \
+    --filter-name _s0
+``` 
+
+## Using the salad protein autoencoders
+While the sparse protein structure autoencoders described in "Efficient protein structure generation with sparse denoising models" are more of a side-note, we still provide scripts and parameters for applying these models to your protein structures.
+
+To use these, please download and unpack the autoencoder parameters first:
+```bash
+wget https://zenodo.org/records/14711580/files/ae_params.tar.gz
+tar -xzf ae_params.tar.gz
+```
+This will create a directory `ae_params`, which contains the following autoencoder checkpoints:
+* `small_inner-200k.jax`: sparse autoencoder with inner product-based distance prediction for neighbour selection.
+* `small_none-200k.jax`: sparse autoencoder with only structure-based neighbour selection.
+* `small_semiequivariant-200k.jax`: same as `small_inner`, but using additional non-equivariant features.
+
+In addition to these checkpoints, there are also corresponding VQ-VAE checkpoints (named e.g. `small_inner_vq-200k.jax`).
+
+As for the above salad models, checkpoints names have the format "< config >-< training step >.jax".
+
+You can then autoencode a protein structure in a PDB file by running:
+```bash
+python scripts/generate.py \
+    --config small_inner \
+    --params ae_params/small_inner-200k.jax \
+    --diagnostics True \
+    --path path-to-input-pdbs/ \
+    --num_recycle 10 \
+    --out_path path-to-ae-outputs/
+```
+
+Remember to match the config and corresponding parameter names.
+`--diagnostics True` writes a numpy archive containing the encoded latents for each structure in the input directory.
+
+# salad scripts documentation
+
+> **One script, not many.** Upstream ships a separate evaluation script per task
+> (`eval_noise_schedule_benchmark`, `eval_ve_large`, `eval_ve_shape`,
+> `eval_multi_motif`, `eval_motif_benchmark`, `eval_structure_autoencoder`).
+> This port has a single entry point, `scripts/generate.py`, and the task is
+> chosen by flags instead. The option documentation below is upstream's and the
+> flag semantics are reproduced faithfully, including the quirks; where a code
+> block still shows a per-task script name it has been rewritten to
+> `scripts/generate.py`, but the surrounding prose is upstream's.
+>
+> **[`docs/USAGE.md`](docs/USAGE.md) is the authoritative flag reference for
+> this port** - it covers all 36 flags including the ones with no upstream
+> counterpart (`--fast`, `--preset`, `--group_size`, `--batch_size`,
+> `--timing_json`) and the environment flags.
+
+## _De novo_ protein design script
+To generate protein structures _de novo_, without structure-editing
+or multi-motif scaffolding, you can use the script  `scripts/generate.py`. It allows the use of different
+model configurations and checkpoints and allows to apply simple
+constraints such as secondary structure, motifs, length and number of chains, etc.
+
+For example, to use a variance-preserving (VP) salad model to generate
+a set of 100 amino acid proteins, you could run the following:
 
 ```bash
 python scripts/generate.py \
-    --config default_vp --params params/default_vp-200k.jax \
-    --num_aa 100 --num_designs 8 \
-    --fast --preset fast --group_size auto \
-    --out_path outputs/my_designs
+    --config default_vp \
+    --params params/default_vp-200k.jax \
+    --out_path path_to_outputs/ \
+    --num_aa 100 \
+    --num_steps 500 \
+    --out_steps 400 \
+    --num_designs 10 \
+    --prev_threshold 0.8 \
+    --timescale_pos "cosine(t)"
 ```
 
-Every flag — conditioning, symmetry, schedules, reproducibility — is documented
-in **[`docs/USAGE.md`](docs/USAGE.md)**.
+If instead you wish to generate a complex of a 100 amino acid protein
+and a 8 amino acid cyclic peptide ligand, you merely need to set
+`--num_aa 100:c8`.
 
-From Python:
+To change the type of model you want to use, choose a different
+`--config` and adjust the selected `--params` and other options
+accordingly. For example, to instead run a VE variance-expanding (VE)
+model, you could run:
+```bash
+python scripts/generate.py \
+    --config default_ve_scaled \
+    --params params/default_ve_scaled-200k.jax \
+    --out_path path_to_outputs/ \
+    --num_aa 100 \
+    --num_steps 500 \
+    --out_steps 400 \
+    --num_designs 10 \
+    --prev_threshold 0.99 \
+    --timescale_pos "ve(t)"
+```
+Here, you need to change the noise schedule (`--timescale_pos`)
+to a VE noise schedule and adjust `--prev_threshold` to 0.99 to
+prevent over-use of self-conditioning which results in decreased
+designability of generated structures. Recommended values for each
+model and each setting are described below.
 
-```python
-import torch
-from salad_torch.config import get_config
-from salad_torch.modules.model import StructureDiffusionInference
-from salad_torch.convert.haiku_to_torch import load_model, load_param_npz
+For a VP model with input-dependent variance, you could use:
 
-config = get_config("default_vp")
-model = StructureDiffusionInference(config).eval()
-load_model(model.predict, load_param_npz("default_vp-200k.npz"), config, strict=True)
+```bash
+python scripts/generate.py \
+    --config default_vp_scaled \
+    --params params/default_vp_scaled-200k.jax \
+    --out_path path_to_outputs/ \
+    --num_aa 100 \
+    --num_steps 500 \
+    --out_steps 400 \
+    --num_designs 10 \
+    --prev_threshold 0.8 \
+    --timescale_pos "cosine(t)" \
+    --cloud_std "default(num_aa)"
+```
+Here, you need to specify the standard deviation of the
+noise distribution using `--cloud_std`. The resulting protein
+structures will have a standard deviation of atom positions
+close to this value. In this example we set `--cloud_std` to
+the `default` function, which was implemented to approximate
+the distribution of atom position standard deviations for proteins
+of a given length `num_aa`.
+
+Further usage examples can be found in the `scripts/` directory,
+which contains all generation and benchmarking scripts that were
+used for evaluating salad in the corresponding preprint.
+
+Below you can find an in-depth explanation of all parameters that
+can be passed to `scripts/generate.py`, as well as their
+default and recommended values.
+
+### --config
+Model configuration in (default_vp, default_vp_scaled, default_ve_scaled).
+* `default_vp` is the configuration for the fixed-variance
+  variance-preserving (VP) model with variance 10 Å.
+* `multimotif_vp` is a version of `default_vp` with multi-motif
+  conditioning for motif scaffolding.
+* `default_vp_scaled` is the configuration for input-dependent
+  variance VP model. The standard deviation of the noise distribution
+  has to be specified by setting `--cloud_std <value in angstroms>`
+  (see below).
+* `default_ve_scaled` is the configuration for the variance-expanding
+  (VE) model. Using this configuration requires setting
+  `--timescale_pos "ve(t)"`,
+  or another diffusion time scale compatible with VE diffusion.
+  In addition, it is highly recommended to set
+  `--prev_threshold` to a value between 0.95 and 0.99.
+
+The full list of implemented configurations can be found in salad/modules/config/noise_schedule_benchmark.py.
+
+### --params
+Path to a set of parameters compatible with the selected `--config`.
+
+Parameters can be downloaded from Zenodo ([10.5281/zenodo.14711580](https://doi.org/10.5281/zenodo.14711580)), or obtained from the most recent `salad` code release on GitHub. Parameter sets are named after the underlying configuration and the conditions the parameter checkpoint was saved at. E.g. `default_vp-200k.jax` is a checkpoint
+for the `default_vp` configuration taken at 200,000 training steps.
+
+Currently, the following checkpoints are available:
+| name | config | notes |
+|---|---|---|
+|default_vp-200k.jax|default_vp| ~|
+|default_vp_scaled-200k.jax|default_vp_scaled| ~|
+|default_ve_scaled-200k.jax|default_ve_scaled| ~|
+|multimotif_vp-200k.jax|multimotif_vp| VP multi-motif scaffolding model|
+|default_vp-pdb256-200k.jax|default_vp| trained on proteins in PDB with <= 256 amino acids |
+|default_vp-synthete256-200k.jax|default_vp| trained on synthetic data with <= 256 amino acids |
+
+### --out_path
+Path to the output directory where the generated PDB files
+will be saved. The directory will be created if it does not exist.
+Running `salad` multiple times with the same `--out_path` will 
+replace the outputs of previous runs.
+
+### --num_aa
+Specifies the number of amino acids in each chain that will be
+generated by `salad`.
+
+`--num_aa` can be:
+* an integer like `--num_aa 100`, to specify a single chain
+  of amino acids.
+* an integer prefixed with "c", like `--num_aa c100`, to specify
+  a cyclic chain of amino acids (cyclised with a peptide bond).
+* a list of (prefixed) integers, separated by ":" like
+  `--num_aa 100:c50`, to generate a complex with two or
+  more chains of amino acids (linear or cyclic).
+
+For instance, generating a 100 amino acid proteins with 8
+amino acid cyclic ligands would be specified as:
+`--num_aa 100:c8`
+
+### --merge_chains (default: False)
+Specifies if different chains should use the same chain_index
+during generation and instead be separated by a gap in the
+residue_index. This is not relevant for complex generation
+unless using a model that has not been exposed to protein
+complexes during training (e.g. the pdb256 and synthete256
+checkpoints).
+
+### --num_steps (default: 500)
+The total number of diffusion steps to subdivide the interval
+$[0, 1]$ of diffusion times. E.g. to set up diffusion over
+200 total steps, specify `--num_steps 200`.
+
+### --out_steps (default: 400)
+The number of diffusion steps after which to write an output
+PDB file. Similar to RFdiffusion, we return structures early
+by default (at 400 steps of 500 total steps), as the resulting
+structure shows very little change after that point.
+
+`--out_steps` can be:
+* a single integer step-count, like `--out_steps 400`.
+* a comma-separated list of step-counts, like `--out_steps 0,100,200`.
+  This writes a PDB file at _each_ of the specified step counts.
+
+### --num_designs (default: 10)
+The number of generated PDB files.
+
+### --prev_threshold (default: 0.8)
+Diffusion time threshold for using self-conditioning.
+A `--prev_threshold` of 0.8 signifies that self-conditioning should
+be used only for diffusion times between 0.8 and 1.0, early in the
+denoising process.
+
+`--prev_threshold` should be set to:
+* **0.8** for `vp` and `vp_scaled` models.
+  Models still produce reasonable results for values > 0.6 and
+  start losing quality for lower values.
+* **0.99** for `ve_scaled` models. Values > 0.95 still produce 
+  reasonable results, but lower values result in an overabundance
+  of beta sheet structures.
+
+### --timescale_pos (default: "cosine(t)")
+Function mapping diffusion time to a noise schedule. By default,
+this is set to a cosine noise schedule "cosine(t)" for VP models.
+For VE models, it should be set to "ve(t)".
+
+`--timescale_pos` can be:
+* any expression depending on diffusion time "t", that can be 
+  expressed in raw python + numpy (as np).
+* one of the following pre-defined noise schedules:
+  * cosine(t): a cosine noise schedule
+  * ve(t, sigma_max=80.0, rho=7.0): the EDM noise schedule
+    where sigma_max is the starting standard deviation and
+    rho is the exponent. Results in the manuscript were
+    generated with sigma_max = 80 Å and sigma_max = 100 Å
+
+### --cloud_std (default: "none")
+Expression defining the standard deviation of the noise distribution
+for input-dependent variance VP models (`default_vp_scaled`).
+
+`--cloud_std` can be:
+* "none", when not used with a VP-scaled model.
+* any expression dependent on `num_aa`, the number of amino acids
+  and evaluating to a positive number. E.g. `"num_aa ** 0.4"`
+* use the default standard deviation scale `"default(num_aa)"`. 
+  **This is a reasonable default for generating protein structures**
+  **with VP-scaled diffusion and was used throughout the preprint.**
+
+### --dssp (default: "none")
+Secondary structure specification. Overrides `--num_aa`.
+This is a string of letters "L" (for Loops), "H" (for Helices),
+"E" (for shEets) and "_" (for unspecified secondary structure).
+E.g.:
+```
+___HHHHHHHH___EEEEEE___EEEEEE___EEEEE___HHHHHHHH____
+```
+Alternatively, you may set `--dssp random`. This randomly samples
+a secondary structure string of the shape specified in `--num_aa`
+and can be used to increase the diversity of generated structures.
+
+By default, no secondary structure constraints are applied.
+
+**NOTE: currently non-random dssp cannot be mixed with other**
+**options, such as cyclicity constraints or symmetry constraints.**
+**We plan to address this in a future release.**
+
+### --template (default: "none")
+Specifies an ad-hoc template PDB file for single-motif scaffolding.
+Template is a comma-separated tuple of a path to a motif PDB file
+and a constraint string:
+```
+path_to/template.pdb,XXXXXXXXXXFFFFFFXXXXFFFFXXXXXFFFFXXXXXXXXX
+```
+The constraint string specifies the structure of which amino acids
+is specified in the template PDB file. The Nth position marked with
+"F" in the constraint string corresponds to the Nth amino acid in the
+template PDB file. The constraint string **must** contain exactly as
+many "F"s as the number of amino acids in `template.pdb`. "X"s specify
+amino acids that can be freely designed.
+
+Please make sure to insert "X"s only at positions where the template
+PDB file has gaps in the amino acid chain, otherwise you will generate
+nonsensical structures.
+
+**NOTE: as the constraint string specifies the number and sequence**
+**positions of freely designable amino acids, this overrides**
+**--num_aa and is currently incompatible with --dssp specifications.**
+**We plan to address this in a future release.**
+
+**For multi-motif scaffolding, please use the `eval_motif_benchmark*.py` scripts.**
+
+## Large protein generation with domain-shaped noise
+To generate proteins of size up to 1,000 amino acids, you can use the
+script `scripts/generate.py`. It accepts the same 
+arguments as `scripts/generate.py`, but it should be used
+only with `--config default_ve_scaled` and the corresponding set of
+parameters `--params params/default_ve_scaled-200k.jax`.
+
+Generating a set of 1,000 amino acid proteins is as simple as running:
+```bash
+python scripts/generate.py \
+    --config default_ve_scaled \
+    --params params/default_ve_scaled-200k.jax \
+    --out_path path_to_outputs/ \
+    --num_aa 1000 \
+    --num_steps 500 \
+    --out_steps 400 \
+    --num_designs 10 \
+    --prev_threshold 0.99 \
+    --timescale_pos "ve(t, sigma_max=80.0)"
 ```
 
-Checkpoints come from Zenodo record
-[14711580](https://doi.org/10.5281/zenodo.14711580). They are pickles of JAX
-arrays; `convert.haiku_to_torch.load_param_jax` reads them without JAX
-installed, or convert once to `.npz`.
+**NOTE: while this script technically accepts secondary structure**
+**and template constraints, as well as multi-chain and cyclic** **--num_aa, it has not been tested with that in mind, so we cannot**
+**give any guarantees that it will produce meaningful structures**
+**if used this way. We plan to address this in a future release.**
 
-## Things that will bite you
+## Shape-conditioned protein generation
+To generate proteins with a fixed shape, you can use the script
+`scripts/generate.py`. This script is compatible with
+VE models (`default_ve_scaled`, `params/default_ve_scaled-200k.jax`).
+Instead of taking a `--num_aa` input, it takes a list of coordinates
+and amino acid counts in CSV format:
+```csv
+x,y,z,num_aa
+0.0,-11.79,-16.45,100
+0.0,-12.09,-3.08,100
+0.0,-0.87,-2.98,100
+0.0,-11.59,10.40,100
+0.0,0.46,21.17,100
+0.0,12.01,10.65,100
+0.0,11.56,-3.24,100
+0.0,12.31,-16.45,100
+```
+Each row specifies a number of consecutive amino acids to place
+at the specified coordinates. VE noise will then arrange amino acids
+in a normal distribution around each of the specified locations.
 
-These are all reproduced deliberately, because the point is to match the
-released model rather than to improve it.
+The CSV-file is passed to the script using `--blobs blobs.csv`.
+The coordinates can be optionally scaled by a factor using `--blob_scale <factor>`.
+
+To generate letter shapes as described in the manuscript, you can
+run:
+```
+python scripts/generate.py \
+    --params params/default_ve_scaled-200k.jax \
+    --out_path path_to_outputs/ \
+    --blobs letters/s_shape.csv \
+    --blob_scale 1.8 \
+    --num_designs 50 \
+    --num_steps 500 \
+    --out_steps 400
+```
+
+The `letters/` directory contains example shape specifications for
+a number of letters. Those letter shapes were manually generated and
+`--blob_scale` was gradually adjusted until generated protein 
+structures had legible letter-shapes.
+
+This script takes the same denoising-process arguments as
+`scripts/generate.py`: --num_designs, --num_steps,
+--out_steps, --prev_threshold, --config, --params, --timescale_pos.
+All values are set to reasonable defaults and changes are unlikely
+to be necessary.
+
+## Multi-motif scaffolding
+To scaffold one or more protein motifs, you can use the scripts
+`scripts/generate.py` and `scripts/generate.py`.
+The former implements (multi-)motif scaffolding for models which
+were trained with multi-motif conditioning, while the latter uses
+structure-editing to scaffold motifs without explicit motif conditioning.
+
+Both scripts take the same denoising-process arguments as above
+(--num_designs, --num_steps,
+--out_steps, --prev_threshold, --config, --params, --timescale_pos).
+Instead of providing `--num_aa`, both scripts accept a `--template`
+argument, e.g. `--template motif_structure.pdb`.
+
+Here, `motif_structure.pdb` must be a motif-annotated PDB file as
+described in [the Genie2 repository](https://github.com/aqlaboratory/genie2?tab=readme-ov-file#format-of-motif-scaffolding-problem-definition-file).
+The scripts then generate designs according to the specification in that `motif_structure.pdb` file. For example:
+```
+python scripts/generate.py \
+    --config multimotif_vp \
+    --params params/multimotif_vp-200k.jax \
+    --out_path path_to_outputs/ \
+    --num_steps 500 --out_steps 400 --prev_threshold 0.8 \
+    --num_designs 1000 --timescale_pos "cosine(t)" \
+    --template motif_structure.pdb
+```
+Using `scripts/generate.py` requires a multi-motif conditioned
+checkpoint, such as `multimotif_vp-200k.jax`. To use _any_ salad
+model, you can instead use `scripts/generate.py`:
+```bash
+config=default_vp
+python scripts/generate.py \
+    --config $config \
+    --params params/${config}-200k.jax \
+    --out_path path_to_outputs/ \
+    --num_steps 500 --out_steps 400 --prev_threshold 0.8 \
+    --num_designs 1000 --timescale_pos "cosine(t)" \
+    --template motif_structure.pdb
+```
+Usage of both scripts is the same.
+
+## Symmetric / repeat protein generation
+To generate rotation or superhelical (screw) symmetric repeat proteins,
+you can use the script `scripts/generate.py`.
+Currently, this script only supports cyclic or screw-axis symmetries.
+By specifying an angle of rotation, distance from center and translation
+along the symmetry axis, this allows generating superhelical repeat
+proteins with a fully specified geometry.
+
+This script takes the usual denoising process settings (--num_designs, --num_steps, --out_steps, --prev_threshold, --config, --params, --timescale_pos),
+as well as `--num_aa` compatible with `scripts/generate.py`.
+In addition, it requires inputs for `--screw_radius`, which specifies
+the repeat unit distance from the symmetry axis in angstroms (center-of-mass radius
+of the resulting superhelix); `--screw_angle`, which specifies the
+rotation angle around the symmetry axis for successive repeat units;
+`--screw_translation`, which specifies the translation along the symmetry
+axis in angstroms between two successive repeat units.
+
+For example, generating C3-symmetric repeat proteins works as follows:
+```bash
+monomer_size=50
+repeat_count=3
+total_count=$(($monomer_size * $repeat_count))
+python scripts/generate.py \
+    --config default_ve_scaled \
+    --params params/default_ve_scaled \
+    --num_aa $total_count \
+    --out_path path_to_output/ \
+    --num_steps 500 --out_steps "400" \
+    --prev_threshold 0.98 --num_designs 20 --timescale_pos "ve(t)" \ 
+    --screw_radius 10.0 --screw_angle 120.0 \
+    --screw_translation 0.0 --replicate_count 3 \
+    --mode "screw" --mix_output couple \
+    --sym_noise True
+```
+To generate a screw-symmetric structure instead, it suffices to set
+`--screw_translation` to a non-zero value.
+
+While this script can be used with any model configuration, generating
+screw-symmetric proteins works best with VE models.
+
+A detailed explanation of all arguments to `scripts/generate.py` is given below.
+
+### --num_aa
+This works as in `scripts/generate.py`. However, care needs
+to be taken that the chain lengths specified are compatible with the
+applied symmetry operation. E.g. for --replicate_count 3, --num_aa needs
+to be divisible by 3, or consist of 3 chains of equal length, e.g.:
+```
+--num_aa 150
+--num_aa 50:50:50
+```
+
+### --replicate_count
+Number of copies of a repeat. E.g. for a C3-symmetric repeat protein,
+one should use --replicate_count 3.
+
+### --screw_translation
+Translation along the central axis of rotation between two successive
+repeat units. If this is 0.0, this will result in a repeat protein
+or assembly with cyclic symmetry. Otherwise it will result in a 
+superhelical (screw) symmetry.
+
+### --screw_radius
+Radius in angstroms at which repeats should be placed from the central
+axis of rotation. Allows to control the radius of a cyclic or 
+screw-symmetric repeat protein or assembly.
+
+### --screw_angle
+Angle of rotation between two successive repeat units around the central
+axis of rotation. For designs with --screw_translation 0.0 this needs to
+be less than or equal to 360 / --replicate_count, as it will result in
+clashing structures otherwise.
+
+### --fixcenter_threshold
+Noise level above which the center of mass of each repeat unit is held
+fixed exactly at the specified --screw_radius. Default: 0.0001.
+
+### --compact_lr
+Learning rate for compactness loss, which improves repeat unit globularity.
+Default: 0.0 (disabled). Reasonable values lie in the range 1e-4 to 1e-3.
+
+### --clash_lr
+Learning rate for anti-clash loss, which counteracts clashes in generated structures.
+Default: 0.0 (disabled). Reasonable values lie in the range 5e-3 to 1e-1.
+
+### --f_small
+Maximum fraction of small amino acids (ALA / GLY) in generated structures.
+This filters high-ALA/GLY structures which are unlikely to be designable
+without the need for structure prediction.
+Small amino acids can also be reduced by increasing --clash_lr.
+Default: 1.0 (disabled). Reasonable values are 0.10 (strict), 0.20 (lax)
+
+### --f_strand
+Maximum fraction of beta strand residues in generated structures.
+This filters high-strand structures which are unlikely to be designable
+without the need for structure prediction.
+Default: 1.0 (disabled). An example reasonable value is 0.3, if you want no all-beta folds.
+
+### --mix_output (couple or replicate)
+Specifies if repeat units should be averaged for symmetrization (couple)
+or if one repeat unit should be picked and replicated, discarding all 
+other repeat units (replicate).
+
+### --mode (screw or rotation)
+If --mode is "screw", aligns repeat units by moving them all to the
+origin and inverting the applied rotation. Then, the repeat units (optionally averaged) are moved to a fixed radius from the center
+and rotation and translation are applied.
+
+If --mode is "rotation", aligns repeat units by inverting rotation only.
+This disables `--screw_radius`, but is closer to the way structures are 
+symmetrized in [RFdiffusion](https://github.com/RosettaCommons/RFdiffusion).
+
+### --sym_noise (default: True)
+If True, applies symmetry operation (screw or rotation) to the input
+noise. Otherwise, only applies symmetry operations to the _output_ of
+the denoising model.
+
+## Multi-state design
+The script `scripts/generate.py` allows the user to
+produce backbones for the multi-state protein design task described by
+[Lisanza _et al._, 2024](https://www.nature.com/articles/s41587-024-02395-w): Here, the goal is to design a _parent_ protein with
+a specified secondary structure, which results in two _child_ proteins
+when split into an N-terminal and C-terminal part. These child proteins
+should adopt a different secondary structure from the parent.
+
+In addition to the usual denoising process arguments (--num_designs, --num_steps, --out_steps, --prev_threshold, --config, --params, --timescale_pos),
+it takes an argument `--dssp`, which specifies the secondary structures
+for all parent and child structures, separated by "/".
+The secondary structure is specified as a string of
+"l/L", "h/H", "e/E" and "_" for loops, helices, sheets and unspecified
+secondary structure.
+Residues with capitalized secondary structure in the parent sequence
+are constrained to have the same _tertiary_ structure in the corresponding
+child structure.
+
+For the example described by [Lisanza _et al._, 2024](https://www.nature.com/articles/s41587-024-02395-w) this looks as follows:
+```bash
+  --dssp "_HHHHHHHHHHHHHlllHHHHHHHHHHHHHllleeeeeellleeeee_______eeeeellleeeeeelllHHHHHHHHHHHHHlllHHHHHHHHHHHHH_/_HHHHHHHHHHHHHLLLHHHHHHHHHHHHHLLLHHHHHHHHHHHHHHHHHHH_/_HHHHHHHHHHHHHHLLLHHHHHHHHHHHHHLLLHHHHHHHHHHHHH_"
+```
+As the first two and last two helices of the parent are shared with the
+respective child, we can fix their tertiary structure during design.
+
+All in all, running multi-state design for this example works as follows:
+```bash
+config=default_vp
+constraint="_HHHHHHHHHHHHHlllHHHHHHHHHHHHHllleeeeeellleeeee_______eeeeellleeeeeelllHHHHHHHHHHHHHlllHHHHHHHHHHHHH_/_HHHHHHHHHHHHHLLLHHHHHHHHHHHHHLLLHHHHHHHHHHHHHHHHHHH_/_HHHHHHHHHHHHHHLLLHHHHHHHHHHHHHLLLHHHHHHHHHHHHH_"
+python scripts/generate.py
+    --config $config \
+    --params params/${config}-200k.jax \
+    --out_path path_to_outputs/ \
+    --num_steps 500 --out_steps 400 \
+    --prev_threshold 0.8 --num_designs 1000 \
+    --timescale_pos "cosine(t)" \
+    --dssp $constraint
+```
+In principle, any config and set of parameters can be used for this
+script, adjusting the denoising settings as described above.
+
+# salad datasets and training
+What follows is some minimal documentation on setting up PDB for training. We will expand this section with all the details of how to customize training datasets and scripts soon.
+
+## PDB data setup
+The directory `data/allpdb/` contains all scripts required to download and set up data files for training `salad` models.
+To set up the dataset, copy the contents of that directory to the location where you want to store the data. Then activate the `salad` conda environment you created during installation.
+
+You can now download the current version of PDB:
+```bash
+cd data/allpdb/
+# get PDB structures
+bash download_allpdb.sh
+# get PDB sequences
+bash download_seqres.sh
+# get chemical component dictionary
+wget https://files.wwpdb.org/pub/pdb/data/monomers/components.cif.gz
+```
+
+Then, you can convert all PDB files to the npz format used by the `salad` data loaders:
+```bash
+bash cifparser.sh
+```
+This could take a couple of hours to finish.
+
+Finally, you generate a list of successfully converted biological assemblies:
+```bash
+python get_chain_assemblies.py
+```
+
+Together with the files provided in this repository this should be all the data needed to use the `salad.data.allpdb.AllPDB` dataloaders.
+
+## training salad models
+Having set up PDB data, you can then train `salad` models using:
+```bash
+python -m salad.training.train_noise_schedule_benchmark.py \
+    --data_path /path/to/data/allpdb/ \
+    --config default_vp \
+    --path /path/to/output/ \
+    --suffix "specific-model-name" \
+    --num_aa 1024 \
+    --p_complex 0.5 \
+    --multigpu True \
+    --rebatch 4
+```
+
+This will run training on PDB for the `default_vp` config, showing the model up to 1024 amino acids per micro-batch, 4 micro-batches per GPU. This requires an nvidia GPU with at least 24 GB VRAM. We have found training to work well even on RTX 3090 GPUs. 
+
+
+# Things that will bite you
+
+All reproduced deliberately, because the point is to match the released model
+rather than to improve it.
 
 **Padding is not safe, and batch position changes the answer.** A `-1` "no
-neighbour" sentinel un-masks the last residue, which then gets selected twice
-and double-counted in attention. The same protein at a different offset in the
-flat residue axis, or sitting next to masked padding, comes out up to ~5 A
-different. This is deterministic, not sampling noise — verified by re-running
-with an identical random field. It is bit-identical in JAX, so the port is
-faithful and upstream is wrong. **Concatenate examples along the residue axis;
-never pad.**
+neighbour" sentinel un-masks the last residue, which is then selected twice and
+double-counted in attention. The same protein at a different offset in the flat
+residue axis comes out up to ~5 A different. This is deterministic, not sampling
+noise, and it is bit-identical in JAX - the port is faithful and upstream is
+wrong. **Concatenate examples along the residue axis; never pad.**
 
-**Sampling trajectories are chaotic.** A single forward pass matches JAX to
-2e-7, but 81 steps of feeding the output back in amplifies fp32 reduction-order
+**Residue numbering starts at 0, and each new chain starts 50 past the previous
+residue.** So `--num_aa 100:100` gives `0..99` then `149..248`, not `150..249`.
+Both the 0-based start and the off-by-one reach the output PDB.
+
+**`--seed` does not pin a CUDA run.** Segment reductions use `scatter_add`,
+whose atomic accumulation order varies; the neighbour argsort turns that into a
+discrete tie flip and 500 steps amplify it. Two identical commands differ in
+~48% of residues. Use `--preset deterministic` if you need reproducibility. CPU
+is already deterministic.
+
+**Sampling trajectories are chaotic.** A single forward matches JAX to 2e-7, but
+500 steps of feeding the output back in amplifies fp32 reduction-order
 differences. Compare trajectories as a *ratio* to an identical-code rerun, never
 against an absolute tolerance.
+
+**`jax.nn.gelu` is the tanh approximation**, while `torch.nn.functional.gelu`
+defaults to exact erf. Getting this wrong costs 0.31 A per denoiser call. It is
+handled; do not "simplify" `salad_torch/modules/basic.py`.
 
 **DDP needs `find_unused_parameters=True`.** 202 parameters never receive
 gradient: Haiku's `Linear` allocates a bias even when `bias=False`, so those
 tensors exist in the checkpoint and are never added.
 
-**`jax.nn.gelu` is the tanh approximation**, while `torch.nn.functional.gelu`
-defaults to exact erf. Getting this wrong costs 0.31 A per denoiser call. It is
-already handled; don't "simplify" `salad_torch/modules/basic.py`.
-
-## Licence
-
-Code Apache 2.0 (EMBL), model parameters CC-BY 4.0 — both permit a derivative
-port with attribution. This port carries the same terms.
+**`--fast` fixes the length.** One compiled graph per shape; generating several
+lengths in one process degrades the CUDA graphs badly. Run one length per
+process, and point `TORCHINDUCTOR_CACHE_DIR` at persistent shared storage or you
+pay the ~5 minute compile on every job (see `docs/USAGE.md`).
