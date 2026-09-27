@@ -4,7 +4,9 @@
   <img src="./assets/runtime.png" alt="Per-design runtime against chain length for salad-torch and the reference implementation, on one H100." width="620px" align="middle"/>
 </p>
 
-*Per-design runtime against chain length, measured on one H100.*
+*Per-design runtime against chain length, one H100, 500-step schedule, single
+design at a time. `--group_size` and `--batch_size` reduce this further at short
+lengths — see [Runtime](#runtime).*
 
 A PyTorch implementation of `salad`, loading the released checkpoints directly.
 No JAX installation is required to generate structures.
