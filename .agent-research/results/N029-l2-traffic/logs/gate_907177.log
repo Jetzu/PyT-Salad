@@ -1,0 +1,94 @@
+### Starting TaskPrologue of job 907177 on h31-07 at Sun Sep 27 11:22:03 CEST 2026
+Running on cores 144-191 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+98bc61b
+c0ec717e2d9db0afd1346c121aa5a370  salad_torch/geometry/features.py
+141459de7997559ad0c44cb40d354759  salad_torch/opt.py
+########## ARM pairvec_off_BASELINE
+--- model_parity default_vp
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_default_vp.npz
+exit=0
+--- model_parity default_vp_scaled
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_default_vp_scaled.npz
+exit=0
+--- model_parity default_ve_scaled
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_default_ve_scaled.npz
+exit=0
+--- model_parity multimotif_vp
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_multimotif_vp.npz
+exit=0
+--- test_geometry_parity
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n029-l2/tests/test_geometry_parity.py", line 30, in <module>
+    _D = np.load(FIX)
+         ^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/numpy/lib/npyio.py", line 427, in load
+    fid = stack.enter_context(open(os_fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/hnvme/workspace/v181bb10-salad/n029-l2/fixtures/geometry.npz'
+exit=1
+--- test_stack_parity
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/block_ref.npz
+exit=0
+--- test_encoder_parity
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/encoder_default_vp.npz
+exit=0
+--- test_sampling_parity
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/sampling_default_vp.npz
+exit=0
+SUITE_EXIT=1 ARM=pairvec_off_BASELINE
+########## ARM pairvec_on_O1_DEFAULT
+--- model_parity default_vp
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_default_vp.npz
+exit=0
+--- model_parity default_vp_scaled
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_default_vp_scaled.npz
+exit=0
+--- model_parity default_ve_scaled
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_default_ve_scaled.npz
+exit=0
+--- model_parity multimotif_vp
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/model_multimotif_vp.npz
+exit=0
+--- test_geometry_parity
+Traceback (most recent call last):
+  File "/hnvme/workspace/v181bb10-salad/n029-l2/tests/test_geometry_parity.py", line 30, in <module>
+    _D = np.load(FIX)
+         ^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/numpy/lib/npyio.py", line 427, in load
+    fid = stack.enter_context(open(os_fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/hnvme/workspace/v181bb10-salad/n029-l2/fixtures/geometry.npz'
+exit=1
+--- test_stack_parity
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/block_ref.npz
+exit=0
+--- test_encoder_parity
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/encoder_default_vp.npz
+exit=0
+--- test_sampling_parity
+SKIP: missing /hnvme/workspace/v181bb10-salad/n029-l2/fixtures/sampling_default_vp.npz
+exit=0
+SUITE_EXIT=1 ARM=pairvec_on_O1_DEFAULT
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:22:25 CEST 2026
+= Job-ID             : 907177 on helma
+= Job-Name           : n029_gate
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N029-l2-traffic/run_gate.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 04:00:00
+= Elapsed runtime    : 00:00:22
+= Total RAM usage    : 0.3 GiB of assigned 91 GiB (0.3%)
+= Node list          : h31-07
+= Subm/Elig/Start/End: 2026-09-27T11:22:02 / 2026-09-27T11:22:02 / 2026-09-27T11:22:03 / 2026-09-27T11:22:25
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.9G   104.9G   209.7G        N/A     461K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      90K      61K      81K  4d21h27m25s !!!
+======================

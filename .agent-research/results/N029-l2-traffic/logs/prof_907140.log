@@ -1,0 +1,119 @@
+### Starting TaskPrologue of job 907140 on h11-23 at Sun Sep 27 11:08:48 AM CEST 2026
+Running on cores 32-63 with governor performance
+Sun Sep 27 11:08:48 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   37C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+### node h11-23 Sun Sep 27 11:08:48 AM CEST 2026
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+PRESET=exact total GPU busy 3331.3 us over 807 kernels
+  cublas     2166.3 us     352 launches
+  memcpy       82.6 us      61 launches
+  triton     1077.6 us     392 launches
+  other         4.8 us       2 launches
+
+       us     n  kernel
+   838.60   120  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel
+   269.94    18  sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel
+   268.82    24  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_kernel
+   172.55    24  sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel
+   136.83    30  void cutlass::Kernel<cutlass_80_simt_sgemm_64x64_8x5_nn_align1>(cutlass_80_simt_sgemm_64x64_8x5_nn_align1::Par
+    99.54    24  void gemv2N_kernel<int, int, float, float, float, float, 128, 4, 4, 4, 1, false, cublasGemvParamsEx<int, cubla
+    73.41    57  Memcpy DtoD (Device -> Device)
+    69.84    38  void splitKreduce_kernel<32, 16, int, float, float, float, float, true, false, false>(cublasSplitKParams<float
+    64.55    18  sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel
+    63.37    19  triton_per_fused_sort_3
+    63.10     6  triton_poi_fused_clone_20
+    52.09    12  sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel
+    49.42     6  triton_per_fused_add_bitwise_and_cat_clamp_eq_full_like_index_mean_mul_ne_rsqrt_sub_var_where_46
+    48.60     6  triton_poi_fused_cat_27
+    48.07    12  std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float, float, false, true
+    45.67     6  triton_poi_fused_add_clone_index_mean_mul_rsqrt_sub_var_47
+    42.96     6  triton_poi_fused_clone_index_pow_sub_51
+    40.52     6  triton_poi_fused_cat_45
+    39.65     6  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel
+    39.33     7  void cutlass::Kernel<cutlass_80_simt_sgemm_128x32_8x5_nn_align1>(cutlass_80_simt_sgemm_128x32_8x5_nn_align1::P
+    38.44    12  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_alignc4_execute_split_
+    27.34     6  triton_poi_fused_cat_sub_44
+    25.00     6  triton_per_fused_add_index_mean_mul_rsqrt_sub_var_28
+    20.48     6  triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_40
+    19.66    12  triton_poi_fused_cat_37
+    18.60    12  triton_per_fused_add_mean_mul_rsqrt_sub_var_18
+    18.36    12  triton_per_fused_mean_var_19
+    17.75     6  sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_split_
+    17.19     6  triton_per_fused__softmax_add_div_full_like_mul_sub_sum_where_52
+    17.19     6  triton_poi_fused_add_gelu_29
+    17.18     6  triton_poi_fused_clone_48
+    16.41     5  triton_poi_fused_gelu_mul_scatter_add_where_zeros_like_84
+    15.90     6  triton_poi_fused_mul_sub_sum_39
+    15.69     4  triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_69
+    15.28     6  triton_poi_fused_add_gelu_49
+    14.79     6  triton_poi_fused_index_sub_41
+    13.88     6  triton_per_fused__softmax_53
+    13.41     6  triton_per_fused__softmax_32
+    13.15     6  triton_poi_fused_clone_div_24
+    11.98     6  triton_poi_fused_clone_div_42
+    11.44     6  triton_poi_fused_add_clamp_div_gelu_index_mul_where_zeros_like_62
+    10.30     1  void cutlass::Kernel<cutlass_80_simt_sgemm_128x64_8x5_nn_align1>(cutlass_80_simt_sgemm_128x64_8x5_nn_align1::P
+    10.02     6  triton_poi_fused_add_30
+     9.28     5  triton_poi_fused_index_80
+     9.19     6  triton_poi_fused_add_gelu_58
+     9.15     4  Memcpy DtoH (Device -> Pageable)
+     9.10     6  triton_poi_fused_add_50
+     8.94     6  triton_poi_fused_cat_17
+     8.90     6  triton_poi_fused__softmax_where_zeros_like_33
+     8.83     5  triton_poi_fused_cat_full_like_index_index_put_ne_where_67
+     8.81     6  triton_poi_fused_add_64
+     8.76     7  triton_poi_fused_sub_36
+     8.70     5  triton_poi_fused_full_like_index_index_put_ne_where_66
+     8.17     5  triton_poi_fused_clone_index_25
+     8.15     6  triton_poi_fused_clone_57
+     7.97     6  triton_poi_fused__softmax_where_zeros_like_54
+     7.69     6  triton_poi_fused_clone_55
+     7.67     6  triton_poi_fused_clone_34
+     7.61     2  triton_poi_fused_add_arange_div_exp_mul_neg_pow_sub_22
+     7.20     1  triton_poi_fused_clone_index_sub_95
+PROF-DONE
+--- exit 0 ---
+### done Sun Sep 27 11:14:20 AM CEST 2026
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:14:20 CEST 2026
+= Job-ID             : 907140 on helma
+= Job-Name           : n029_prof
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N029-l2-traffic/run_prof.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:00:00
+= Elapsed runtime    : 00:05:33
+= Total RAM usage    : 1.8 GiB of assigned 175 GiB (1.0%)
+= Node list          : h11-23
+= Subm/Elig/Start/End: 2026-09-27T11:08:47 / 2026-09-27T11:08:47 / 2026-09-27T11:08:47 / 2026-09-27T11:14:20
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.7G   104.9G   209.7G        N/A     460K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      88K      61K      81K  4d21h35m31s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 3627353, 7 %, 7 %, 1304 MiB, 329421 ms

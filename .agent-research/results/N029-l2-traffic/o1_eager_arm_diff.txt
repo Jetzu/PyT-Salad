@@ -1,0 +1,60 @@
+=== default_vp
+pairvec calls per arm: 16 16
+pairvec outputs differing: 10 of 16 [0, 2, 4, 6, 8]
+  first: 2.384185791015625e-07 torch.Size([48, 64, 240])
+trajectory     bitwise=False max|d|=9.060e-06
+local          bitwise=False max|d|=7.353e-04
+pos            bitwise=False max|d|=9.060e-06
+aa             bitwise=False max|d|=1.001e-05
+aa_features    bitwise=False max|d|=1.281e-06
+pos_noised     bitwise=True max|d|=0.000e+00
+dssp           bitwise=False max|d|=1.049e-05
+distogram      bitwise=False max|d|=4.196e-04
+raw_angles     bitwise=False max|d|=9.003e-04
+angles         bitwise=False max|d|=1.505e-05
+atom_pos       bitwise=False max|d|=1.526e-05
+=== default_vp_scaled
+pairvec calls per arm: 16 16
+pairvec outputs differing: 10 of 16 [0, 2, 4, 6, 8]
+  first: 2.384185791015625e-07 torch.Size([48, 64, 240])
+trajectory     bitwise=False max|d|=1.615e-05
+local          bitwise=False max|d|=4.892e-04
+pos            bitwise=False max|d|=7.629e-06
+aa             bitwise=False max|d|=5.722e-06
+aa_features    bitwise=False max|d|=1.609e-06
+pos_noised     bitwise=True max|d|=0.000e+00
+dssp           bitwise=False max|d|=8.583e-06
+distogram      bitwise=False max|d|=3.357e-04
+raw_angles     bitwise=False max|d|=4.883e-04
+angles         bitwise=False max|d|=9.548e-06
+atom_pos       bitwise=False max|d|=1.144e-05
+=== default_ve_scaled
+pairvec calls per arm: 16 16
+pairvec outputs differing: 10 of 16 [0, 2, 4, 6, 8]
+  first: 1.1920928955078125e-07 torch.Size([48, 64, 240])
+trajectory     bitwise=False max|d|=1.144e-05
+local          bitwise=False max|d|=1.221e-02
+pos            bitwise=False max|d|=1.144e-05
+aa             bitwise=False max|d|=2.289e-05
+aa_features    bitwise=False max|d|=5.327e-06
+pos_noised     bitwise=True max|d|=0.000e+00
+dssp           bitwise=False max|d|=5.035e-04
+distogram      bitwise=False max|d|=1.144e-04
+raw_angles     bitwise=False max|d|=2.588e-02
+angles         bitwise=False max|d|=7.665e-05
+atom_pos       bitwise=False max|d|=1.869e-04
+=== multimotif_vp
+pairvec calls per arm: 16 16
+pairvec outputs differing: 16 of 16 [0, 1, 2, 3, 4]
+  first: 2.384185791015625e-07 torch.Size([80, 32, 240])
+trajectory     bitwise=False max|d|=2.575e-04
+local          bitwise=False max|d|=1.101e-02
+pos            bitwise=False max|d|=1.633e-04
+aa             bitwise=False max|d|=5.579e-05
+aa_features    bitwise=False max|d|=1.359e-05
+pos_noised     bitwise=True max|d|=0.000e+00
+dssp           bitwise=False max|d|=1.655e-04
+distogram      bitwise=False max|d|=1.762e-03
+raw_angles     bitwise=False max|d|=2.380e-02
+angles         bitwise=False max|d|=9.739e-05
+atom_pos       bitwise=False max|d|=3.204e-04
