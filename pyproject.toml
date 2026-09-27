@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "salad-torch"
+version = "0.1.0"
+description = "PyTorch implementation of salad (sparse all-atom denoising) for protein backbone generation"
+readme = "README.md"
+requires-python = ">=3.10"
+# torch is deliberately NOT pinned here. The version matters (see README), the
+# right build depends on your CUDA, and pip cannot pick that for you - install
+# it from the environment file or the PyTorch index first, then this package.
+dependencies = [
+    "numpy>=1.24,<2",   # <2 required: the released checkpoints are array pickles needing the 1.x ABI
+]
+
+[project.optional-dependencies]
+# Only needed to REGENERATE parity fixtures, not to run the model or its tests.
+fixtures = ["jax==0.5.0", "jaxlib==0.5.0", "dm-haiku"]
+
+[project.scripts]
+salad-generate = "scripts.generate:main"
+
+[tool.setuptools.packages.find]
+include = ["salad_torch*"]
