@@ -55,12 +55,26 @@ def _tensors(x):
 
 
 if a.phase == "load":
+    # torch 2.7.1 footgun (found the hard way, job 908347): calling
+    # load_cache_artifacts() as the very FIRST thing to touch torch in a
+    # fresh process crashes with "cannot import name 'CacheArtifactManager'
+    # from partially initialized module 'torch.compiler._cache' (circular
+    # import)". torch.compiler.__init__ imports ._cache, whose own import
+    # chain (via _inductor.remote_cache -> _dynamo.utils -> ... -> _dynamo.pgo)
+    # re-imports torch.compiler._cache while it is still mid-import. Touching
+    # torch._dynamo ONCE, top-down, before calling load_cache_artifacts avoids
+    # ever re-entering it from the middle.
+    import torch._dynamo  # noqa: F401  (load-order fix, see comment above)
     blob = open(a.cache_file, "rb").read()
     t0 = time.perf_counter()
     torch.compiler.load_cache_artifacts(blob)
     t_load = time.perf_counter() - t0
     print(f"MEGACACHE load_cache_artifacts bytes={len(blob)} wall={t_load:.3f}s", flush=True)
 
+torch.manual_seed(0)  # else FastDenoiser's own internal (caller-unseeable)
+# neighbour/uniform draws differ between processes and confound the
+# save-vs-load output comparison with ordinary cross-process randomness that
+# has nothing to do with the cache (missed in the first run, job 908347).
 torch.set_float32_matmul_precision("highest")
 dev = torch.device("cuda")
 cfg = get_config(a.config)

@@ -1,6 +1,6 @@
 # N033 · Torch upgrade evaluation: 2.5.1+cu121 -> >=2.7 (miscompile, mega-cache, sm_120)
 
-type: task · date: 2026-09-27 · status: open
+type: task · date: 2026-09-27 · status: done
 
 Brief called this "N031" (`.agent-research/results/N031-torch-upgrade/`); N031
 was already allocated to the sibling "P7 fusion miscompile" item
@@ -91,23 +91,105 @@ under 2.7.1 (all private-API imports in those files are lazy, inside
 functions, not at module top level); `tests/test_geometry_parity.py` 38/38
 PASS on CPU under 2.7.1 with the pinned-commit snapshot.
 
-GPU jobs submitted (H100, one job per configuration, `n033_{quick,gate,speed,det}.sbatch`):
-jobid TBD - see RESULTS.md once complete.
+First batch (908271/908272/908273/908274) all failed within 2-9 minutes:
+`python:3.11-slim-bookworm` has NO C compiler at all, and Triton JIT-builds a
+tiny CPython extension (`driver.c`) on its first kernel launch even though
+Inductor itself only emits Triton/C++ source text - "Failed to find C
+compiler" on every single `torch.compile` call. Fixed by adding
+`build-essential` to the def file and rebuilding (73s). `n033_det.sbatch`
+also had its own bug (forgot `SALAD_TREE=$SNAP` on the `x_cmp.py` calls -
+`KeyError: 'SALAD_TREE'`), fixed and resubmitted alongside.
+
+Second batch, GPU (H100, one job per configuration): 908347 (quick: capability
++ reproducer + Mega-Cache attempt 1), 908348 (gate), 908349 (speed), 908350
+(det) - all COMPLETED, realistic runtimes (2-24 min). Mega-Cache's first
+attempt (908347) hit two more bugs, both mine: `load_cache_artifacts()`
+called before anything touched `torch._dynamo` crashed with a genuine
+torch-2.7.1 circular import (`torch.compiler._cache` partially initialized);
+and a missing `torch.manual_seed(0)` confounded the output-equality check
+with ordinary cross-process sampler randomness. Fixed both, reran as
+908363 (`n033_megacache2.sbatch`).
+
+Total GPU time across both batches: ~1h wall on 1x H100 per job, well under
+the 25 GPU-h approval threshold (nowhere close - this whole evaluation used
+single-digit GPU-hours).
+
+Full numbers, per deliverable, in RESULTS.md. Headlines:
+- **Reproducer: FIXED.** `minimal_conditional.py` gives 0/28800 mismatches on
+  2.7.1 (was 22,222-23,070/28,800 wrong on 2.5.1).
+- **Gate: 8/9 pass.** One narrow tolerance miss (`default_ve_scaled`'s
+  `atom_pos`, rel=2.989e-05 vs a 2e-05 floor) on ONE of four parity configs;
+  everything else including `test_design_quality.py --n 160 --preset fast`
+  (0/160 diverged, matching the 2.5.1 baseline exactly) passes clean.
+- **Speed: `fast` -15.3% (2.54ms -> 2.152ms), `exact` flat (+0.1%).** Cold
+  compile time also dropped (~310s -> ~200-250s).
+- **Rejected matmul-template optimization: UNCHANGED.** Its cross-compile
+  instability reproduces at the same ~10x-above-noise-floor magnitude on
+  2.7.1 as N020 measured on 2.5.1 (1.4-1.5e-04 A vs a 1.36e-05 A baseline
+  noise floor); the shipped `decompose_small_bmm` mechanism stays AT the
+  noise floor on both torch versions.
+- **Mega-Cache: works, 9.8x compile-time cut** (251.7s -> 25.8s), after
+  fixing the load-order bug above. Bitwise output-equality check was a wash
+  (cold-vs-save, no cache involved, already differs by the same amount as
+  save-vs-load) - not proof of bit-exactness, but no evidence Mega-Cache
+  makes cross-process agreement any worse either; the confound is this
+  harness's unpinned sampler-level randomness, not Mega-Cache.
+- **sm_120: confirmed targetable** (`torch.cuda.get_arch_list()` includes
+  `sm_120`/`compute_120`, CUDA 12.8) - capability claim, no Blackwell card
+  here to measure on.
 
 ## Outcome
 
-TBD - jobs running.
+**Recommendation: upgrade later, staged - not a same-day default-env flip,
+not "never."** Full reasoning with evidence in RESULTS.md section 7. Short
+version: the #1 blocker (miscompile) is fixed, the gate is essentially clean,
+`fast` got faster for free, Mega-Cache delivers a real 9.8x compile-time cut,
+and sm_120 is confirmed targetable - all strong "yes, eventually" signals.
+Against doing it today: one unexplained (if narrow) new parity miss needs
+root-causing first, only ONE point release (2.7.1) and one CUDA variant
+(cu128) were tested while PyPI already shows stable releases through 2.14.0
+(2026-09-02) - so picking 2.7 specifically over "whatever is current" would
+be leaving free improvements on the table by this item's own evidence trend
+- and the custom-op fusion barrier's removal needs its own in-model
+(not just standalone-reproducer) confirmation before deletion.
+
+Also recorded: mid-task, a concurrent process (sibling agent, since
+committed as `18d30d4`/`9ab8fac`) switched this shared working directory's
+branch away from `n006-manual-cudagraph` and back, sweeping this item's
+in-progress files into its own commit along the way. Content was unaffected
+(verified after `git checkout n006-manual-cudagraph` restored it) and no GPU
+evidence was at risk (every job snapshots its own pinned commit via `git
+archive` into `$TMPDIR`, never reads the live tree) - but it is the exact
+hazard class the snapshot rule anticipates, just hitting the notebook record
+instead of the port code. See RESULTS.md section 8.
 
 ## Outputs
 <!-- files in .agent-research/results/N033-slug/ + external absolute paths -->
 
 * `.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/` -
-  def file, harness scripts, job logs (copied from `salad_jobs/`), RESULTS.md.
+  `RESULTS.md` (full writeup, all 8 sections), `torch27_cu128.def`, harness
+  scripts (`x_bench_n033.py`, `x_megacache.py`, `x_cmp_megacache.py`, and
+  unmodified copies of N030's `x_common.py`/`x_arm.py`/`x_dump.py`/`x_cmp.py`
+  plus the standalone `minimal_conditional.py`), `logs/` (all 6 job logs,
+  including the first failed attempt for the record).
 * `/hnvme/workspace/v181bb10-salad/torch27_cu128.sif` - the built environment
-  (evaluation only, NOT wired into any default job path).
-* `salad_jobs/n033_{quick,gate,speed,det}.sbatch` - job scripts (hard rule:
-  job scripts live under `salad_jobs/`, not the results dir).
+  (3.8 GB, evaluation only, NOT wired into any default job path; `triad`
+  conda env on this same repo is untouched).
+* `salad_jobs/n033_{quick,gate,speed,det,megacache2}.sbatch` - job scripts
+  (hard rule: job scripts live under `salad_jobs/`, not the results dir).
 
 ## Next
 
-TBD once GPU jobs return.
+* Root-cause `default_ve_scaled`'s `atom_pos` tolerance miss (RESULTS.md
+  section 3) before any config ships against torch>=2.7.
+* Re-run this same battery against a more current stable release (2.9.1+,
+  possibly 2.14.0) before picking a specific upgrade target - the gap
+  between 2.5.1 and "current" (as of 2026-09-27) is now 9 minor versions,
+  and 2.7 was chosen here only because the brief itself framed the ask
+  around it (cu128/sm_120), not because it is necessarily the best target.
+* Re-run the P7 reproducer INSIDE the full model (not just
+  `minimal_conditional.py` standalone) before deleting the fusion barrier.
+* If upgrading, build the replacement `triad`-equivalent env with the deps
+  this evaluation's minimal image deliberately left out (`Bio`/biotite/etc.
+  for `--template` and fixture regeneration) - this container is
+  evaluation-only, not a drop-in replacement as built.

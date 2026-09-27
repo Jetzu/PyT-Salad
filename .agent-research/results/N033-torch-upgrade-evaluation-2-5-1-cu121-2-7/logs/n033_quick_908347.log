@@ -1,0 +1,161 @@
+### Starting TaskPrologue of job 908347 on h11-24 at Sun Sep 27 06:30:21 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sun Sep 27 18:30:21 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   39C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+NVIDIA H100, 9.0, 610.57.04
+===== snapshot (git archive, never the live tree - N032 may be editing it)
+snapshot commit: 4cb8ef4f6bfc5d6e436dc2d84bbf383d8ce609bc
+===== capability claim: torch/cuda version, arch list, mega-cache API existence
+torch 2.7.1+cu128
+torch.version.cuda 12.8
+cuda.is_available True
+cuda.get_device_name(0) NVIDIA H100
+cuda.get_arch_list() ['sm_75', 'sm_80', 'sm_86', 'sm_90', 'sm_100', 'sm_120', 'compute_120']
+sm_120 in arch_list: True
+has torch.compiler.save_cache_artifacts: True
+has torch.compiler.load_cache_artifacts: True
+===== reproducer: default (fused, expect the miscompile) =====
+torch 2.7.1+cu128 max_fusion_size 64 mismatches 0 of 28800 max_abs 0
+EXIT 0 : reproducer default
+===== reproducer: NOFUSE=1 control (expect 0 mismatches) =====
+torch 2.7.1+cu128 max_fusion_size 1 mismatches 0 of 28800 max_abs 0
+EXIT 0 : reproducer NOFUSE
+===== Mega-Cache: cold baseline (fresh empty cache dir, no artifact) =====
+/usr/local/lib/python3.11/site-packages/torch/_inductor/lowering.py:7007: UserWarning: 
+Online softmax is disabled on the fly since Inductor decides to
+split the reduction. Cut an issue to PyTorch if this is an
+important use case and you want to speed it up with online
+softmax.
+
+  warnings.warn(
+/usr/local/lib/python3.11/site-packages/torch/_inductor/lowering.py:7007: UserWarning: 
+Online softmax is disabled on the fly since Inductor decides to
+split the reduction. Cut an issue to PyTorch if this is an
+important use case and you want to speed it up with online
+softmax.
+
+  warnings.warn(
+MEGACACHE RESULT phase=cold  preset=fast L=100 torch=2.7.1+cu128 compile_time=251.23s
+MEGACACHE wrote 15 output tensors to /tmp/908347.helma/n033quick/out_cold.pt
+===== Mega-Cache: save (fresh empty cache dir, compile then save artifact) =====
+/usr/local/lib/python3.11/site-packages/torch/_inductor/lowering.py:7007: UserWarning: 
+Online softmax is disabled on the fly since Inductor decides to
+split the reduction. Cut an issue to PyTorch if this is an
+important use case and you want to speed it up with online
+softmax.
+
+  warnings.warn(
+/usr/local/lib/python3.11/site-packages/torch/_inductor/lowering.py:7007: UserWarning: 
+Online softmax is disabled on the fly since Inductor decides to
+split the reduction. Cut an issue to PyTorch if this is an
+important use case and you want to speed it up with online
+softmax.
+
+  warnings.warn(
+MEGACACHE RESULT phase=save  preset=fast L=100 torch=2.7.1+cu128 compile_time=251.46s
+MEGACACHE saved bytes=108423431 info=CacheInfo(inductor_artifacts=['fxedwmga3d3at3l52f37ughedbytw7jr5vngibpikwlond4fdanh', 'fsj46p7qtm3rm3ax3banzca6vkeot4dsykmd6y2ybx45mxqufj4y', 'fouzk5sazo4vejykgg6r7gsly3vfly3x4z2t5b5o5rf3wxtu72pe'], autotune_artifacts=['49c5d2d75f3e2a334a9aa00a24eef34674b2dc64d029612e0dbc2d486c249de8.best_config', '89983fed8c0008eb35e55652f815573d0206424b55075e1fac437642ae01ba9c.best_config', 'f71459f9877474830bce92fa15014bd20d6546cc26c7a7749615b0dad6069ec4.best_config', '37a78a93f5d841c184b0febc556d5da4dce041d7b85a1afa26db24557308c30e.best_config', 'e4e76a51a78890862af97b185425af87a1e09d58cd6faec2590b3f74019b228f.best_config', 'bf8c918f879e744da8c9d9d210a64d723932ad3eb305eb56d5dd3386c887fffe.best_config', '1f375b6adce6dd58b38f28d74abb148da32e2ec8013711b8e958e89a05df6e74.best_config', '0997ac1886a3a7192db9a431c65867e3c41fbe64008a1d7c4e29e4ff18149e06.best_config', 'e73162b30de1f3bf6b05284fada8cb2f1a198b2fa62689ad0c4babefa841d9fc.best_config', 'e53beee3062593c362c752ba769418c099a13087af0045167bac444eb1cecbca.best_config', 'e059a7a6f0b5bdbe7f50e3d9500044f1c28f8d30e6b6304e8a7b664a584c5ec2.best_config', '7e3a3995e4c46cb8dd0da45c472ab4f76095c7387007060eacc4b15a1a9e32d2.best_config', '318ed036bf14a9f0740cec5a99df979471972094cfe561ad2e0400c03b9a0859.best_config', '4a19c545ba0b0f85eb6bb42b129c24aebac9c4871f2dcb86ec867e3671936055.best_config', 'fdaeec1c96447f8cc7352da795e381742ef0310442c80b347c6795fd8f42eb6c.best_config', '44d136e276a79874aa5af2b60b4ca22095fe1a9b947ec4ff53faaba040d67c45.best_config', '68a3ed83646e0b301b0506745aba9f15af93324d1d2e49c380b659285fec1585.best_config', '5b153310180c71dee1bbfb9aa7b95a50467bf5eb3b5e833846661ea4aed14f3d.best_config', 'd74c4f54dc74fa568c7e7fd7503534a63b598169f100a2eb919c6636ab8ea17a.best_config', 'c2a014d5e3a912c5cd3809b2f2510da4cba510fc4da8d4b61e0ee874abe682e3.best_config', '9c559c7e6924e6b364cc35e7bed3919bc82012670fd068597c29fbb0459d7044.best_config', '472fe4c1476c38138b28f646e3b01e9840e285fd11ca7020ddd89bf59f187c63.best_config', 'ae435ef511ae3e145bb95b9c3268ed1a9f70122f9dbdbfde963ab78846b3275d.best_config', '7aa8a8bac0de5c763051225d50afaffcc1f7ac4b5436e8d277858318731c4fed.best_config', 'fea1465cc718b43a247cfdd679a4144c54781e773b3fd2e4a1becdc473a498a4.best_config', 'b7a88faad880d9ed2fad135ed8f570988e75efc7de4a958e47515990c67dcc00.best_config', '340757ab0f0104543eebeeaef724a4e5f39883ea8edd1c864e48771486043c3a.best_config', 'c52acead0681508672f8533ea9a907dde6ab23f8814348f7dce0301974fc2c24.best_config', 'a5e99d945c6fb5925ee8d2923c1c90b4056671195ec4c55cf21479509978cdf8.best_config', '6d82c4a9fb22643ded39b52752b8f6d6e7e12fbe91b1d337c90db93c481140e8.best_config', '9f79b3a2c82f3f92c43710377b33d7855c2dde51933df692208e2005b3f29f2d.best_config', '1d30cc2aeb8820b1b413f7f0f2609aadd6d86373407e9f59a249243dcdb234eb.best_config', '2915ccaba70b52d28446764b44f91a92b7180a1429d6b11aea3c5c03fe96c11a.best_config', 'acc6b827e268619e49b35488fc00349f02dd26dd5b6e19101ff3fb81916cdfba.best_config', '4d4b81414c34385024412936b4b577ac0b38d86718f52f5f8bed5a4769bbe2e4.best_config', '2c2126a769a78d15a2dcfbb70065b7973cd1f2b23bcc5d06d19db24d57b7e1fe.best_config', '8ac05c7fe3ae5ad8dbfa49600b11c6c04221fa9484daa5f1b902e51afe31e956.best_config', '4152fcea96dafea1537eafaa8521a0c6263c5b4646b09937bd7abc93170d191d.best_config', '81720309ca7aa7dbc989b742dc42f14c01992793bbe2ec6bb2a5e59b5c01a372.best_config', '53c7b016b76c45237573567a6bc97b2520d219cd2b53dd20d8e5b2b71e16e744.best_config', 'df628b9ec942f9f255576fbd63768e2b9d67c673622b37a1f226bcc0e273cdc6.best_config', '680ff7d14779034e291d28d8f9e99c4c65d71ac1ee6ad5f5111e1b6f494fcb79.best_config', '224876e98a5c3cc108b6f42b65e3ca344f809b28f63eb1e2b8ee7e7f83d372a2.best_config', '0cd86ca5044c3719c298b7230197eb81c4c18b3f1c270e59c9d2d51932422767.best_config', '93ce7828261d229a2f780e0c78a9dabcf3b5ecbedf16dfd18a335163aeeeeea9.best_config', '85b77ab7cb64fc7bb7f7bc49f11675d3e8297cae64341c0fb271a399296a7a56.best_config', '583ba7321118c91d840aa3b16ad62c766398acb55aa52f3a8cee7d89086d62f6.best_config', 'e4aabd52ff2553a497cb4118560f96e2a213dc5be24d3784d394b1453399fa1d.best_config', 'c73c74b0f48e7d190fbae198a14d006e7f0fc148f1a1134ac6334b837c89278b.best_config', '977ffc6deb9bbc0d5bfb29dfe731b54eea60479ef93c9ec447ab4b1875cd1d67.best_config', '0d7a39d0255256148f9ddb1dae52a0bd98f38503a2f98c4a80f117d4fd232c67.best_config', '8f92ced015a1fcceaaa6d2742833f7eb3ce5e89d707841c0b3f0bb9eede3fff9.best_config', 'cf1b54ec3e1d6a08535bea12dead752f3a4cf6e3b9fd979caa4ec3bf0f2e1020.best_config', '0f72834589d2c4f83570d63a11339bc3a7b3f80747eb8e9c41614ad7bff8e5f8.best_config', '8b5f8d2ab65060962c3a6a2fa482537f1dfc0002e4af35f869931d21e16203e1.best_config', '71bd2d477654a7a7c2f738b8432de2ceab6d6d50774261f03b34d2d2946e8220.best_config', '0de37110ad79ee37c5bb9dadd98def5dc4563a383ee3b8c2b338db3895e8660b.best_config', 'e6537776255f76cbc9f9af27605e9fbb714f8c8fea779b52fa605ade1788c4e2.best_config', '4e55d6b7ef3c3791ef371123737e382a752a8a1993e7d45c5808693bf4c81dbe.best_config', '65faec73ee5c58efa8034d42b4f3788af0495360b257c00f18d75e1e1e082a89.best_config', '832ab61492353c7313a09fa5dc221d2a859f6409f5205ee4ad9236c75c19600b.best_config', 'a7c0708e3227d7d67d3a474ef41501210924bb0fd0f7e860bbf81ed897ac79aa.best_config', '4d5e7d6c2eff0664d046d45a46ac98849fd275a159002720b813956eceb3ed8d.best_config', 'd847a0952d54f89dd785f821781d1484f94b075d4a4d2ef833f1b3cb5ecd54c3.best_config', 'f67eb7c1b9b52f78e95fa7d97e4bfcf439f8b0cec3147b6d6d2ceaa31d9298c9.best_config', 'f8c658f0269879bfa7275d0173447718cae8e3174c69638efe0948482ea2ba03.best_config', '90ea753d4d79938a4d6f05d8a974a47584397664f0e409a2f88e80997a73a6fa.best_config', '3c9c41326af64fc85ed57bc2bfdcbe5cff7df4fed059d456968c5b17fdc64172.best_config', '42c6d81ad64ffe1662f16c51e41cd77063156c696ce7903a358f670f2cc38bb0.best_config', 'eb6661a737202b19133c811508c4dd70bed4293e42039b02e42bda45e85c8286.best_config', 'c31f8dd5755a241d62ba83a722079c3ad866f8e3f5da99e3e8cf7a78e1b49a8a.best_config', '238c2e44c097404acbd7e167c5971b1cb60004f4cb7e4e1bc9951aa024254930.best_config', '2061c32346f814a12889e1a9599ba7e082a262cfec4439343a4de4b70a92367a.best_config', '89184a50df18f3b9718a23bc4b40167c655278a203bc210ac4921b8dfde8f0a3.best_config', 'b29de4c781ade0cad8295644f4454219fdbfaf04a4b99008065e97450e700325.best_config', 'dbe371421711d5e48c77330d0bda3eb97ad28cc54beae4a4b024ff41ed587113.best_config', '99531e5946a240da65fd51b150ec85448254cf6c3c06a26ee8aa1a60d655e4db.best_config', '1fc76521fc60db2f3f05764d5a6d1d40849db8a231736cb3423ceb6e1899f823.best_config', '96809f69bdcf2fbc333e52e1d1e9401a84c8e837e33f0054d281756cd187f546.best_config', 'cd6e1fd6c067606640ba6ace7da735249c5b3d6877786c73da1384e4a561851d.best_config', '1afe6d43e73b19bfc1b6d247e8f6067db7cf429986ed5028aedb53556aba7108.best_config', '634036cf91ddbea1d88576d12ba378fb0341b1bf7a79ce94f69a2b2bb5c7755f.best_config', '2e5365deeac8dd0eca0197d52fcd4a21f42018f5db9434b05fb748e4c8b0c7ff.best_config', '789496c5dae06a06f2d501b19f95a2f41bb9783afc2d30b875b9a3e349e738c2.best_config', '78c819e04a14dbcde4dbf55f7098392d6fc675b09442083f37b4391f1f5fce54.best_config', 'e806e0efd704454e4cdad3b0feeded6d482f67e90e030f47ddeaf1fefa24f9e8.best_config', '63c0c8aa0b1f72af0af87edc1876d88db60224b56e714d42a286e5f26862914f.best_config', 'c18ad9438f3fe9838d02bd79af4e7afba3eaf0844947e9e1973360e03df78a06.best_config', '5dda42a4efead025e4f9a2c8e0b8edc4a180a286b23bb99a336471adc3c3b9d6.best_config', '4bce2986fdad58d972a7ed743d0b221aee08594d34c6d0262e0c5b3cd7951e75.best_config', 'd013d7f1f5165738b73edc75058ab623c140c759867d9445d2d7fcad368ee17d.best_config', '87fa10a76c5dc6d393fe6802c2558f96e2256433d9b3ee7811f9e74bbdb6d4ce.best_config', '56405604db47ad89ad42f19122bc49db9ca8d1ba7dab66db630f8781cfaa15bc.best_config', 'b1cff29af156da7dc0161af8a68c3163d4f1b5f931945f479c09a18dd36b5171.best_config', '01e905e3f929b2646d499a518c4cc4c915b023a7aac752407a05e34bb2783902.best_config', 'b3abfed8bda6b7b5632699bd7605d2dc7ad571d22ae894f6d619b1d13136072a.best_config', '29093003908554588923ce5535fe5c1582c0dc1373b7688f052986e05f2af099.best_config', '17b9a988b3dfaa5f6e4570cb3a142587a4084e0f6074a47c5964c74508b5a231.best_config', 'edaaa11181c83842496ef27f04daf61ca7e208e1c908794a3e5319d65c75397f.best_config', '3d66f2b5784c6dadaf206acb8445ac7aa728e988f6b9ead5b72fbeb6acd70ff7.best_config', 'df2270be6c89969d10260336f77b3f196ee2cb316adebfd66ffdbae64640c616.best_config', 'fc49b8801555846febae6924ed5c591df5604426dab9868502e0d28f290500b5.best_config', '3c1b394b0038c1a6d5b5d7c424aff99239312a9c55191dc9762334cb61e51a04.best_config', '6a8ba78744586689f1d7a44eaa8a52efe4f26aab87533da1af84d833c2c4035e.best_config', 'd96422baffc35afcbf62f157ccca1d24c7db186d15e0c37e70125966fa2842de.best_config', 'a73c682fd15fb5c99f08b2b69320b569db2a78a04b433573a7bdbdbcea57b954.best_config', '4df577a68738ef8956fcdf174e7166cfe59aaa8a5c30c251908adb328ed560e0.best_config', 'aba9985800071c4ae9b1ddf1dfbf26a6198760d112a915c97e7414a9adde9fff.best_config', '4dd6b2cf7da57ad8c9627859107467f8f0c5c134f93bdf4bc8d4830f29ed4ce1.best_config', '427a502fb95006ac60a9137834054323b640fbd5238f02a67f8cb2c4ed4ea452.best_config', '43fa473da20a3716d7ce2954be8e602457911df8e9477d88fa87433c958b8112.best_config', 'd399b4673fa53c0dd301bbf1f416de42a159564b46e49e5cf6370c3e96661520.best_config', '31408b331d19068e8cc14369800610de4653e7636b98e81c2af54635de25f6ae.best_config', '3c7e6ee80cd6c92c3a9ca592f9c95de220c299863bbb18a3b53d9415a339eb8b.best_config', 'f12d4a0e102969950367ccabde3cf8a81e77f69678c0b6568fc61cc3ace1c2a8.best_config', '6c7549e333d0ca97271f13e4e24989c983b92f66daaa47fe6b4b0451949f3f2d.best_config', 'f8a7a208171e08c1a88ec059c5dc3ffd66850ade82fbd9e2de44fd308cd6c305.best_config', '7a9e33021051f829d38281e218cd71f3b537b1fae4a725ba9c6dd436475fa1a7.best_config', '7af3dacc9b6ed2c546760b6b076ad280b5d72ead1fa39aa3979dbef52b8b2139.best_config', '2efa9a06219b4e6f5313a94a6b0abc20482a959f8684d743dac5d81245c9ed71.best_config', 'a4893028fcfd72f8cebbf39e6d1856eb715f280a0d5efd4098c0128ccb091175.best_config', '5e77e0c27e1c164a331738d530b6593df3717f814b0bd8e7561a4c7168fae4cc.best_config', '897f4002a92fcb7d3c576b0a59adb0a8d2eb4b9e92bf7aa1ddbba9bc396123bc.best_config', 'e00d1330151938768a4853fc6d2de7c12c1abc102838b9fac425092b5b88f0a8.best_config', '638e6efbb00d33c7fb6f610ce3a76161f4c8371c4c39bce2ba1e6dc4c1653f36.best_config', '3bc3896e7f0ceae3ca57bbee4fa244955f5c49172c5eb3727074ebb8990256a9.best_config', '2a229507fef2aeec1a5be9a6471bbc41a53c419f960ce04a634ea892add8afb8.best_config', '7e2e86e89cddcccabb0a62fce4ff42bad220dec409312a74f4fb0e67d070d5d1.best_config', '2993608ae51ddd47d0d7a5c2ef9db30cad0ac09d267f3bc6bee079a65130d195.best_config', 'c2c5e01df08d741bde9d819408ebb0e4177f2e7ce09a74fdbbc1aea5b51e0abb.best_config', '14974a6763d102c0ba12075575ea1b2665bbdd20c8f7ac721b87d82f36b8b7ee.best_config', '01eecafb9d180a7b87cf10c0d26239fd06aea10deaca7efe9079293a6aac0138.best_config', '15918f7b0cc459d5c567809791c9f3a3038f3e66c315a5df95603ae932ab9aac.best_config', '7e36a354c5d579a05a7c60fbb6bded0ea48398b24df53a8ea67e7aaf241d24a3.best_config', '5b5588411af07263ad1b20d0486492570f2721057c9097f9b27c870b2a21a628.best_config', '34d0877e34e5504642e84805c9cdcd15e3be7dea7dac8e4412330a842776b0d0.best_config', '3942c13cafd87c496cb91add3ec8f26b09f29969b5c40a17c464be4c509eee93.best_config', '12ef29055796818e2ef2be185c2c91698429f6b46f4873f460a527ea09ad5e60.best_config', 'e2470515bb296a034c09248e0d719d93d6d5f37292903852d9aa64f260221614.best_config', '541570fdc44bdbb4b49b0d71475c6847f28d8ad3d73ff692fd63d9c8f7aa45de.best_config', 'f615674ca987203924d41c879f12c5df197bc0cf39061e7faa46c08b8d8fbac6.best_config', 'd59092af35507dc2bc24917a007d0a5622e275192af0a5b737ff50c490e22132.best_config', '1f15bc1ba27ae4292fc6c2989cd6ef339810856c950b5d0f0717c454fef804a3.best_config', 'fa5a688d431afa0200f61747b35ebbfdbe57ab96846cd047b7a22827d394ba50.best_config', 'f5e03751a9a8cd4176d5eda0c6075e181fe90d5648b0a4a52d643e27a41b5929.best_config', 'fed8df8bfa7915834be204fe6a4f8de17a70442781a050157d12315d6d0d518f.best_config', 'a02443e0c23d6d39b91cf409e61c89d8fbae0000b139bbc6d3ca6c948e19de88.best_config', '4e2bf292f0053e82536061d37fc27ad0cf7c7e976c9e4d57159d0a90f685fbb2.best_config', '810116a7ef76c028dad7a726507600884704f177154ef66dc36c312dc1793701.best_config', 'e433eb5607de80d709e4ec786e8c8b0a0dd9f2bdaba3f551d88feaa77ebec81b.best_config', 'e880010c638050332b8340430aaa340ef1513754c477a40958435dcea6405751.best_config', 'd3f535afe37b9f71b673790e1a6b12435cc8214f8afe6525cf23dacf70287b3e.best_config', '9644b706cc2c56f0efa01f3f9399cac1279a2b24f6d0a247a996b889d47de23c.best_config', '2bce93e5e4aa99485bbda3c117a45ec17cf2b340ef7f8b8f3d1bbf49434a0309.best_config', '1b9f2e08101761157442208a2e06d1a267e212c13e6d381351725f6723d51669.best_config', '056b9691b82b6666fdf05a144e7fbb89cd2423e27bf60dbfbc3a2f15ef8becb6.best_config', '9d774875600eca8c1c3c7672475a4e4d4d9f7f74ee2bb4257c865c4047e0d565.best_config', 'eb97e11e3f824d6efa9fd936505a9905f9cd0d0c6eac84ed3cdd62fd92178d58.best_config', 'a673b7a617b7636d65d2db9d6c02edeb8809e5d3877dbc857e8f4b7e64fc4781.best_config', 'eaf4f2dcd0468f6b0cc2106506d643d60415290cf5675636b360a4e01791ca14.best_config', 'df5298a5c304e97bfbd529cc054439ee70120912c89a866f02854875ce732e39.best_config', '900a65492db935e467fee33f85955d8b72eb5d069caf25c4344313ae2d946d88.best_config', '0aa2820ec2e3f8d970da0249b4448ba2e7f3cbaabc293cf8fa62c57492c30060.best_config', '19544c9d8dd459e6ce92ce9029eb647a5f91e6c54fc80753debe20305d24dfe7.best_config', '476b0015df81e86111a6c425b6fca730de34dec0d4b3bbc5ea9542d4b1e5da53.best_config', 'dcf9c24e4c8d7478159ed40836b899886853092ca709a52d83d5003cdf108410.best_config', '80e196a5a650a88d92ac1d404a889020d459afe458a09eb9c07388eff571df00.best_config', 'f1c99efd90158ed9862dac42c977d88495a4d3dc97d2821263773bfb9ddb7940.best_config', '717ce0f783440633bc538ecceb215812f5ab2d0ca3f5e26bcf19608af2bdacca.best_config', '5b69772959af48fbf93651dc8d2165fdbe879f7537afd4c140c45be52d82880f.best_config', '37e2c014faeb483c704d95e55be432caafc55e71951ce24772926ee2ecd91caa.best_config', '26f1aaee1edd8bbf7b4dead146bed0c8f055277fc06e966cd534df39be2bf81e.best_config', '1581ad0c4b18cd5a2f93f5ac6d62073d8c610d34f361dc31c05a912072d9bb70.best_config', 'bfaf15f99982f532543e2d2c42199a243abb241430849876001f2ce000352c6b.best_config', 'b42f90ac7b4ed316ad2a9febbe58cfe61a272a67bf78c799ab9ab22185e21204.best_config', '824f743b2a8fd4cfc84c1845de712789df4b634500b97b6c95c66b45f5131f6a.best_config', '5f62800902075df5d0e03be5eb005d2dc7d3d703096c6362fac00e0889f7d299.best_config', '1b375cac66c6b9b5acaa663db74ee1ca54d59c4361cb3fc073defc37ea1f3544.best_config', '92ee785fa013879b65494f2afeda85feaed56bdbd6dbd20597beeb8784f0f769.best_config', '73aea02dfa9a5b05170d4467d368cba9dd8f173d22e479fd2cbab1e12adeae1d.best_config', '5371e3e713e64147e219373f243a83e3e7e7fb54151eade7b0c6c297967bc771.best_config', 'd643415c39fdaa9df92c5c2b0aa4daeb793e56b1ca78f8f8dcd4eb6cd6a3afde.best_config', 'ac1ef99c8106aed5fac20c759e606e17cd4740e6182c69a8121e2708381a3bc1.best_config', '664608c131465d02acc20e71006b1e7c7d30a5ec62c95b1ac9d6e4c1495c7704.best_config', '7a32ae10f7677ee96a3dd9c4aa12867ae7b8fecfe0560f3511d282487bc37a82.best_config', '64717b39282baa79b9a44d42e07c1a8bb7873a7338896e1aa4e14f2d228fa0be.best_config', 'b6c0023fa09c8737b0c02b74fad5d5b72385911a7b7de38468bf55334df6b336.best_config'], aot_autograd_artifacts=['aq7lzk2ekdgl4mff75hbr4e3pv4qgrx7iwthz4d63w7ozksznjlm', 'aowg75gwdzmniagjfmsraqegjhkvxjm7wb66abizhyb4tppi5cqi', 'a2qjwhwm3chvwa2pzonpxbb6s5erfok2cfll2cn5634ofhmt7fw3'], pgo_artifacts=[])
+MEGACACHE wrote 15 output tensors to /tmp/908347.helma/n033quick/out_save.pt
+===== Mega-Cache: load (DIFFERENT fresh empty cache dir, preload artifact first) =====
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/x_megacache.py", line 60, in <module>
+    torch.compiler.load_cache_artifacts(blob)
+  File "/usr/local/lib/python3.11/site-packages/torch/compiler/__init__.py", line 464, in load_cache_artifacts
+    from ._cache import CacheArtifactManager, CacheInfo
+  File "/usr/local/lib/python3.11/site-packages/torch/compiler/_cache.py", line 8, in <module>
+    from torch._inductor.remote_cache import JsonDataTy, RemoteCacheJsonSerde
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/remote_cache.py", line 16, in <module>
+    from torch._dynamo.utils import dynamo_timed
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/__init__.py", line 13, in <module>
+    from . import config, convert_frame, eval_frame, resume_execution
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 52, in <module>
+    from torch._dynamo.symbolic_convert import TensorifyState
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 57, in <module>
+    from . import (
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/trace_rules.py", line 32, in <module>
+    from .variables import (
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/variables/__init__.py", line 19, in <module>
+    from .base import VariableTracker
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/variables/base.py", line 581, in <module>
+    from . import builder
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/variables/builder.py", line 79, in <module>
+    from ..pgo import (
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/pgo.py", line 38, in <module>
+    from torch.compiler._cache import CacheArtifactManager, CacheArtifactType
+ImportError: cannot import name 'CacheArtifactManager' from partially initialized module 'torch.compiler._cache' (most likely due to a circular import) (/usr/local/lib/python3.11/site-packages/torch/compiler/_cache.py)
+===== Mega-Cache: bitwise compare save vs load, and vs cold =====
+  tensor[0] shape=(100, 20, 3) dtype=torch.float32 bitwise=False maxabs=4.397e+00
+  tensor[1] shape=(100, 128) dtype=torch.float32 bitwise=False maxabs=1.431e+02
+  tensor[2] shape=(6, 100, 20, 3) dtype=torch.float32 bitwise=False maxabs=5.335e+00
+  tensor[3] shape=(100, 20) dtype=torch.float32 bitwise=False maxabs=4.062e-01
+  tensor[4] shape=(100, 128) dtype=torch.float32 bitwise=False maxabs=1.577e-01
+  tensor[5] shape=(100, 3) dtype=torch.float32 bitwise=False maxabs=5.935e-01
+  tensor[6] shape=(100, 64) dtype=torch.int64 bitwise=False maxabs=6.177e+03
+  tensor[7] shape=(100, 7, 2) dtype=torch.float32 bitwise=False maxabs=3.963e+02
+  tensor[8] shape=(100, 7, 2) dtype=torch.float32 bitwise=False maxabs=1.989e+00
+  tensor[9] shape=(100,) dtype=torch.int64 bitwise=False maxabs=2.600e+01
+  tensor[10] shape=(100, 14, 3) dtype=torch.float32 bitwise=False maxabs=7.619e+00
+  tensor[11] shape=(100, 20, 3) dtype=torch.float32 bitwise=True maxabs=0.000e+00
+  tensor[12] shape=(100,) dtype=torch.int64 bitwise=True maxabs=0.000e+00
+  tensor[13] shape=(100, 20, 3) dtype=torch.float32 bitwise=False maxabs=4.397e+00
+  tensor[14] shape=(100, 128) dtype=torch.float32 bitwise=False maxabs=1.431e+02
+CMP_MEGACACHE /tmp/908347.helma/n033quick/out_cold.pt vs /tmp/908347.helma/n033quick/out_save.pt: bit_identical=False max_abs_over_all=3.963e+02
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/x_cmp_megacache.py", line 6, in <module>
+    b = torch.load(sys.argv[2])
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 1479, in load
+    with _open_file_like(f, "rb") as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 759, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 740, in __init__
+    super().__init__(open(name, mode))
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/908347.helma/n033quick/out_load.pt'
+N033_QUICK_DONE
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 18:39:51 CEST 2026
+= Job-ID             : 908347 on helma
+= Job-Name           : n033_quick
+= Job-Command        : /home/hpc/v181bb/v181bb10/salad_jobs/n033_quick.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/salad_jobs
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:09:33
+= Total RAM usage    : 8.4 GiB of assigned 175 GiB (4.8%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-27T18:30:17 / 2026-09-27T18:30:17 / 2026-09-27T18:30:18 / 2026-09-27T18:39:51
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.3G   104.9G   209.7G        N/A     464K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      73K      61K      81K   4d14h10m !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 2662016, 0 %, 0 %, 678 MiB, 9279 ms
+NVIDIA H100, 00000000:A6:00.0, 2662821, 0 %, 0 %, 678 MiB, 8163 ms
+NVIDIA H100, 00000000:A6:00.0, 2663573, 1 %, 1 %, 1262 MiB, 259173 ms
+NVIDIA H100, 00000000:A6:00.0, 2687002, 1 %, 1 %, 1262 MiB, 259588 ms

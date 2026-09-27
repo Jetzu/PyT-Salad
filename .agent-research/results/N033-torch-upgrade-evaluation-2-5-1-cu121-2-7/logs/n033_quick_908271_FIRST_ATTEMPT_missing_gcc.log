@@ -1,0 +1,427 @@
+### Starting TaskPrologue of job 908271 on h11-24 at Sun Sep 27 06:17:17 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sun Sep 27 18:17:17 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   39C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+NVIDIA H100, 9.0, 610.57.04
+===== snapshot (git archive, never the live tree - N032 may be editing it)
+snapshot commit: 4cb8ef4f6bfc5d6e436dc2d84bbf383d8ce609bc
+===== capability claim: torch/cuda version, arch list, mega-cache API existence
+torch 2.7.1+cu128
+torch.version.cuda 12.8
+cuda.is_available True
+cuda.get_device_name(0) NVIDIA H100
+cuda.get_arch_list() ['sm_75', 'sm_80', 'sm_86', 'sm_90', 'sm_100', 'sm_120', 'compute_120']
+sm_120 in arch_list: True
+has torch.compiler.save_cache_artifacts: True
+has torch.compiler.load_cache_artifacts: True
+===== reproducer: default (fused, expect the miscompile) =====
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/minimal_conditional.py", line 38, in <module>
+    compiled=torch.compile(fn,mode='default',dynamic=False)(*args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 663, in _fn
+    raise e.remove_dynamo_frames() from None  # see TORCHDYNAMO_VERBOSE=1
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 760, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 745, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1295, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1197, in codegen_and_compile
+    compiled_fn = graph.compile_to_module().call
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2083, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2091, in _compile_to_module
+    self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+                                                             ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2002, in codegen
+    self.scheduler.codegen()
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4135, in codegen
+    else self._codegen(self.nodes)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4264, in _codegen
+    self.get_backend(device).codegen_node(node)
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/cuda_combined_scheduling.py", line 104, in codegen_node
+    return self._triton_scheduling.codegen_node(node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1320, in codegen_node
+    return self.codegen_node_schedule(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1365, in codegen_node_schedule
+    src_code = kernel.codegen_kernel()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3603, in codegen_kernel
+    **self.inductor_meta_common(),
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3427, in inductor_meta_common
+    "backend_hash": torch.utils._triton.triton_hash_with_backend(),
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 111, in triton_hash_with_backend
+    backend = triton_backend()
+              ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 103, in triton_backend
+    target = driver.active.get_current_target()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 23, in __getattr__
+    self._initialize_obj()
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 20, in _initialize_obj
+    self._obj = self._init_fn()
+                ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 9, in _create_driver
+    return actives[0]()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 535, in __init__
+    self.utils = CudaUtils()  # TODO: make static
+                 ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 89, in __init__
+    mod = compile_module_from_src(Path(os.path.join(dirname, "driver.c")).read_text(), "cuda_utils")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 66, in compile_module_from_src
+    so = _build(name, src_path, tmpdir, library_dirs(), include_dir, libraries)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/build.py", line 18, in _build
+    raise RuntimeError("Failed to find C compiler. Please specify via CC environment variable.")
+torch._inductor.exc.InductorError: RuntimeError: Failed to find C compiler. Please specify via CC environment variable.
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+
+EXIT 1 : reproducer default
+===== reproducer: NOFUSE=1 control (expect 0 mismatches) =====
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/minimal_conditional.py", line 38, in <module>
+    compiled=torch.compile(fn,mode='default',dynamic=False)(*args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 663, in _fn
+    raise e.remove_dynamo_frames() from None  # see TORCHDYNAMO_VERBOSE=1
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 760, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 745, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1295, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1197, in codegen_and_compile
+    compiled_fn = graph.compile_to_module().call
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2083, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2091, in _compile_to_module
+    self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+                                                             ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2002, in codegen
+    self.scheduler.codegen()
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4135, in codegen
+    else self._codegen(self.nodes)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4264, in _codegen
+    self.get_backend(device).codegen_node(node)
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/cuda_combined_scheduling.py", line 104, in codegen_node
+    return self._triton_scheduling.codegen_node(node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1320, in codegen_node
+    return self.codegen_node_schedule(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1365, in codegen_node_schedule
+    src_code = kernel.codegen_kernel()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3603, in codegen_kernel
+    **self.inductor_meta_common(),
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3427, in inductor_meta_common
+    "backend_hash": torch.utils._triton.triton_hash_with_backend(),
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 111, in triton_hash_with_backend
+    backend = triton_backend()
+              ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 103, in triton_backend
+    target = driver.active.get_current_target()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 23, in __getattr__
+    self._initialize_obj()
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 20, in _initialize_obj
+    self._obj = self._init_fn()
+                ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 9, in _create_driver
+    return actives[0]()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 535, in __init__
+    self.utils = CudaUtils()  # TODO: make static
+                 ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 89, in __init__
+    mod = compile_module_from_src(Path(os.path.join(dirname, "driver.c")).read_text(), "cuda_utils")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 66, in compile_module_from_src
+    so = _build(name, src_path, tmpdir, library_dirs(), include_dir, libraries)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/build.py", line 18, in _build
+    raise RuntimeError("Failed to find C compiler. Please specify via CC environment variable.")
+torch._inductor.exc.InductorError: RuntimeError: Failed to find C compiler. Please specify via CC environment variable.
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+
+EXIT 1 : reproducer NOFUSE
+===== Mega-Cache: cold baseline (fresh empty cache dir, no artifact) =====
+/usr/local/lib/python3.11/site-packages/torch/_inductor/lowering.py:7007: UserWarning: 
+Online softmax is disabled on the fly since Inductor decides to
+split the reduction. Cut an issue to PyTorch if this is an
+important use case and you want to speed it up with online
+softmax.
+
+  warnings.warn(
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/x_megacache.py", line 86, in <module>
+    fast = FastDenoiser(m, L, device=dev, preset=a.preset).warmup(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/908271.helma/salad_snap_n033/salad_torch/modules/fast.py", line 651, in warmup
+    self._build(True, want_pc, iters=iters)
+  File "/tmp/908271.helma/salad_snap_n033/salad_torch/modules/fast.py", line 618, in _build
+    out = self._compiled(*args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 663, in _fn
+    raise e.remove_dynamo_frames() from None  # see TORCHDYNAMO_VERBOSE=1
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 760, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 745, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1295, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1197, in codegen_and_compile
+    compiled_fn = graph.compile_to_module().call
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2083, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2091, in _compile_to_module
+    self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+                                                             ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2002, in codegen
+    self.scheduler.codegen()
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4135, in codegen
+    else self._codegen(self.nodes)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4264, in _codegen
+    self.get_backend(device).codegen_node(node)
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/cuda_combined_scheduling.py", line 104, in codegen_node
+    return self._triton_scheduling.codegen_node(node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1320, in codegen_node
+    return self.codegen_node_schedule(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1365, in codegen_node_schedule
+    src_code = kernel.codegen_kernel()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3603, in codegen_kernel
+    **self.inductor_meta_common(),
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3427, in inductor_meta_common
+    "backend_hash": torch.utils._triton.triton_hash_with_backend(),
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 111, in triton_hash_with_backend
+    backend = triton_backend()
+              ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 103, in triton_backend
+    target = driver.active.get_current_target()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 23, in __getattr__
+    self._initialize_obj()
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 20, in _initialize_obj
+    self._obj = self._init_fn()
+                ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 9, in _create_driver
+    return actives[0]()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 535, in __init__
+    self.utils = CudaUtils()  # TODO: make static
+                 ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 89, in __init__
+    mod = compile_module_from_src(Path(os.path.join(dirname, "driver.c")).read_text(), "cuda_utils")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 66, in compile_module_from_src
+    so = _build(name, src_path, tmpdir, library_dirs(), include_dir, libraries)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/build.py", line 18, in _build
+    raise RuntimeError("Failed to find C compiler. Please specify via CC environment variable.")
+torch._inductor.exc.InductorError: RuntimeError: Failed to find C compiler. Please specify via CC environment variable.
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+
+===== Mega-Cache: save (fresh empty cache dir, compile then save artifact) =====
+/usr/local/lib/python3.11/site-packages/torch/_inductor/lowering.py:7007: UserWarning: 
+Online softmax is disabled on the fly since Inductor decides to
+split the reduction. Cut an issue to PyTorch if this is an
+important use case and you want to speed it up with online
+softmax.
+
+  warnings.warn(
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/x_megacache.py", line 86, in <module>
+    fast = FastDenoiser(m, L, device=dev, preset=a.preset).warmup(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/908271.helma/salad_snap_n033/salad_torch/modules/fast.py", line 651, in warmup
+    self._build(True, want_pc, iters=iters)
+  File "/tmp/908271.helma/salad_snap_n033/salad_torch/modules/fast.py", line 618, in _build
+    out = self._compiled(*args)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 663, in _fn
+    raise e.remove_dynamo_frames() from None  # see TORCHDYNAMO_VERBOSE=1
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 760, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 745, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1295, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1197, in codegen_and_compile
+    compiled_fn = graph.compile_to_module().call
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2083, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2091, in _compile_to_module
+    self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+                                                             ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/graph.py", line 2002, in codegen
+    self.scheduler.codegen()
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4135, in codegen
+    else self._codegen(self.nodes)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 4264, in _codegen
+    self.get_backend(device).codegen_node(node)
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/cuda_combined_scheduling.py", line 104, in codegen_node
+    return self._triton_scheduling.codegen_node(node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1320, in codegen_node
+    return self.codegen_node_schedule(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/simd.py", line 1365, in codegen_node_schedule
+    src_code = kernel.codegen_kernel()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3603, in codegen_kernel
+    **self.inductor_meta_common(),
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/_inductor/codegen/triton.py", line 3427, in inductor_meta_common
+    "backend_hash": torch.utils._triton.triton_hash_with_backend(),
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 111, in triton_hash_with_backend
+    backend = triton_backend()
+              ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/utils/_triton.py", line 103, in triton_backend
+    target = driver.active.get_current_target()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 23, in __getattr__
+    self._initialize_obj()
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 20, in _initialize_obj
+    self._obj = self._init_fn()
+                ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/driver.py", line 9, in _create_driver
+    return actives[0]()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 535, in __init__
+    self.utils = CudaUtils()  # TODO: make static
+                 ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 89, in __init__
+    mod = compile_module_from_src(Path(os.path.join(dirname, "driver.c")).read_text(), "cuda_utils")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/backends/nvidia/driver.py", line 66, in compile_module_from_src
+    so = _build(name, src_path, tmpdir, library_dirs(), include_dir, libraries)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/triton/runtime/build.py", line 18, in _build
+    raise RuntimeError("Failed to find C compiler. Please specify via CC environment variable.")
+torch._inductor.exc.InductorError: RuntimeError: Failed to find C compiler. Please specify via CC environment variable.
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+
+===== Mega-Cache: load (DIFFERENT fresh empty cache dir, preload artifact first) =====
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/x_megacache.py", line 58, in <module>
+    blob = open(a.cache_file, "rb").read()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/908271.helma/n033quick/megacache.bin'
+===== Mega-Cache: bitwise compare save vs load, and vs cold =====
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/x_cmp_megacache.py", line 5, in <module>
+    a = torch.load(sys.argv[1])
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 1479, in load
+    with _open_file_like(f, "rb") as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 759, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 740, in __init__
+    super().__init__(open(name, mode))
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/908271.helma/n033quick/out_cold.pt'
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N033-torch-upgrade-evaluation-2-5-1-cu121-2-7/x_cmp_megacache.py", line 5, in <module>
+    a = torch.load(sys.argv[1])
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 1479, in load
+    with _open_file_like(f, "rb") as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 759, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/torch/serialization.py", line 740, in __init__
+    super().__init__(open(name, mode))
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/908271.helma/n033quick/out_save.pt'
+N033_QUICK_DONE
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 18:19:45 CEST 2026
+= Job-ID             : 908271 on helma
+= Job-Name           : n033_quick
+= Job-Command        : /home/hpc/v181bb/v181bb10/salad_jobs/n033_quick.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/salad_jobs
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:02:30
+= Total RAM usage    : 2.3 GiB of assigned 175 GiB (1.3%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-27T18:17:13 / 2026-09-27T18:17:13 / 2026-09-27T18:17:14 / 2026-09-27T18:19:44
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.2G   104.9G   209.7G        N/A     464K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      73K      61K      81K  4d14h30m6s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 2641952, 0 %, 0 %, 618 MiB, 7639 ms
+NVIDIA H100, 00000000:A6:00.0, 2642741, 0 %, 0 %, 618 MiB, 6797 ms
+NVIDIA H100, 00000000:A6:00.0, 2643432, 1 %, 0 %, 886 MiB, 49456 ms
+NVIDIA H100, 00000000:A6:00.0, 2645245, 1 %, 0 %, 886 MiB, 49708 ms
