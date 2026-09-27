@@ -1,0 +1,96 @@
+### Starting TaskPrologue of job 907161 on h11-10 at Sun Sep 27 11:16:31 AM CEST 2026
+Running on cores 0-31 with governor performance
+Sun Sep 27 11:16:31 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   35C    P0             66W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+2fcd1e5b9731f5c5a7d18f88b68165df  salad_torch/geometry/frames.py
+72dbfaeed884945e14747c1b02be317b  salad_torch/geometry/features.py
+00bf20a1b92f097e17a040baed63ec56  salad_torch/modules/attention.py
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "floor_L64", "L": 64, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": false, "FRAME_MULSUM": false}, "pos": 0.0005776882171630859, "local": 0.01788330078125, "trajectory": 0.0005776882171630859, "aa": 0.000179290771484375, "aa_features": 1.8417835235595703e-05, "dssp": 9.226799011230469e-05, "distogram_neighbours": 0.0, "raw_angles": 0.0186309814453125, "angles": 0.00024116039276123047, "angle_pos": 0.00030744075775146484, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o6_L64", "L": 64, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": true, "FRAME_MULSUM": false}, "pos": 0.0006158351898193359, "local": 0.01568603515625, "trajectory": 0.0006158351898193359, "aa": 0.00012493133544921875, "aa_features": 1.3113021850585938e-05, "dssp": 8.64863395690918e-05, "distogram_neighbours": 0.0, "raw_angles": 0.0154266357421875, "angles": 0.0002199709415435791, "angle_pos": 0.0002688169479370117, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o8_L64", "L": 64, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": false, "FRAME_MULSUM": true}, "pos": 0.0008893013000488281, "local": 0.01953125, "trajectory": 0.0008893013000488281, "aa": 0.00020885467529296875, "aa_features": 2.0831823348999023e-05, "dssp": 9.60230827331543e-05, "distogram_neighbours": 0.0, "raw_angles": 0.0301666259765625, "angles": 0.00026911497116088867, "angle_pos": 0.0003895759582519531, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o2_L64", "L": 64, "flags": {"IPA_MULSUM": true, "PAIR_FEAT_MERGE": false, "FRAME_MULSUM": false}, "pos": 0.0006537437438964844, "local": 0.01434326171875, "trajectory": 0.0006537437438964844, "aa": 0.00014495849609375, "aa_features": 1.4901161193847656e-05, "dssp": 7.665157318115234e-05, "distogram_neighbours": 0.0, "raw_angles": 0.0199737548828125, "angles": 0.00020003318786621094, "angle_pos": 0.0003228187561035156, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o6o8_L64", "L": 64, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": true, "FRAME_MULSUM": true}, "pos": 0.0009293556213378906, "local": 0.01904296875, "trajectory": 0.0009293556213378906, "aa": 0.000278472900390625, "aa_features": 2.7216970920562744e-05, "dssp": 8.726119995117188e-05, "distogram_neighbours": 0.0, "raw_angles": 0.0347747802734375, "angles": 0.00026285648345947266, "angle_pos": 0.0008254051208496094, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "all_L64", "L": 64, "flags": {"IPA_MULSUM": true, "PAIR_FEAT_MERGE": true, "FRAME_MULSUM": true}, "pos": 0.0006051063537597656, "local": 0.01873779296875, "trajectory": 0.0006051063537597656, "aa": 0.00020313262939453125, "aa_features": 2.288818359375e-05, "dssp": 9.292364120483398e-05, "distogram_neighbours": 0.0, "raw_angles": 0.02452850341796875, "angles": 0.0002505183219909668, "angle_pos": 0.0006183385848999023, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "floor_L100", "L": 100, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": false, "FRAME_MULSUM": false}, "pos": 0.00039386749267578125, "local": 0.0106201171875, "trajectory": 0.00039386749267578125, "aa": 4.291534423828125e-05, "aa_features": 7.309019565582275e-06, "dssp": 7.081031799316406e-05, "distogram_neighbours": 0.0, "raw_angles": 0.018463134765625, "angles": 0.00015251338481903076, "angle_pos": 0.0002052783966064453, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o6_L100", "L": 100, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": true, "FRAME_MULSUM": false}, "pos": 0.00037026405334472656, "local": 0.010986328125, "trajectory": 0.00037026405334472656, "aa": 6.4849853515625e-05, "aa_features": 8.478760719299316e-06, "dssp": 8.177757263183594e-05, "distogram_neighbours": 0.0, "raw_angles": 0.02099609375, "angles": 0.0001866072416305542, "angle_pos": 0.00019747018814086914, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o8_L100", "L": 100, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": false, "FRAME_MULSUM": true}, "pos": 0.0005142688751220703, "local": 0.010498046875, "trajectory": 0.0005142688751220703, "aa": 6.771087646484375e-05, "aa_features": 9.469687938690186e-06, "dssp": 9.870529174804688e-05, "distogram_neighbours": 0.0, "raw_angles": 0.016998291015625, "angles": 0.0001570582389831543, "angle_pos": 0.00026619434356689453, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o2_L100", "L": 100, "flags": {"IPA_MULSUM": true, "PAIR_FEAT_MERGE": false, "FRAME_MULSUM": false}, "pos": 0.00034999847412109375, "local": 0.00848388671875, "trajectory": 0.00034999847412109375, "aa": 6.29425048828125e-05, "aa_features": 6.496906280517578e-06, "dssp": 8.368492126464844e-05, "distogram_neighbours": 0.0, "raw_angles": 0.01080322265625, "angles": 0.00018668919801712036, "angle_pos": 0.0001927018165588379, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "o6o8_L100", "L": 100, "flags": {"IPA_MULSUM": false, "PAIR_FEAT_MERGE": true, "FRAME_MULSUM": true}, "pos": 0.0002765655517578125, "local": 0.00927734375, "trajectory": 0.0002765655517578125, "aa": 7.724761962890625e-05, "aa_features": 8.597970008850098e-06, "dssp": 7.319450378417969e-05, "distogram_neighbours": 0.0, "raw_angles": 0.017974853515625, "angles": 0.00015257298946380615, "angle_pos": 0.00014984607696533203, "aatype": 0.0}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+CEVE {"tag": "all_L100", "L": 100, "flags": {"IPA_MULSUM": true, "PAIR_FEAT_MERGE": true, "FRAME_MULSUM": true}, "pos": 0.0006430149078369141, "local": 0.0120849609375, "trajectory": 0.0006430149078369141, "aa": 6.67572021484375e-05, "aa_features": 1.1831521987915039e-05, "dssp": 0.0001125335693359375, "distogram_neighbours": 0.0, "raw_angles": 0.021270751953125, "angles": 0.00024149566888809204, "angle_pos": 0.00033080577850341797, "aatype": 0.0}
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:41:31 CEST 2026
+= Job-ID             : 907161 on helma
+= Job-Name           : n028_ce
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/ce.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:30:00
+= Elapsed runtime    : 00:25:05
+= Total RAM usage    : 4.1 GiB of assigned 175 GiB (2.3%)
+= Node list          : h11-10
+= Subm/Elig/Start/End: 2026-09-27T11:16:25 / 2026-09-27T11:16:25 / 2026-09-27T11:16:26 / 2026-09-27T11:41:31
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.1G   104.9G   209.7G        N/A     462K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      83K      61K      81K  4d21h8m20s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 1485124, 17 %, 17 %, 1286 MiB, 136094 ms
+NVIDIA H100, 00000000:06:00.0, 1488499, 20 %, 21 %, 1284 MiB, 109572 ms
+NVIDIA H100, 00000000:06:00.0, 1491948, 17 %, 18 %, 1284 MiB, 105475 ms
+NVIDIA H100, 00000000:06:00.0, 1495130, 21 %, 22 %, 1060 MiB, 115774 ms
+NVIDIA H100, 00000000:06:00.0, 1499097, 17 %, 18 %, 1280 MiB, 103520 ms
+NVIDIA H100, 00000000:06:00.0, 1502540, 17 %, 18 %, 1056 MiB, 107048 ms
+NVIDIA H100, 00000000:06:00.0, 1509319, 16 %, 17 %, 1312 MiB, 136732 ms
+NVIDIA H100, 00000000:06:00.0, 1512904, 16 %, 17 %, 1312 MiB, 134341 ms
+NVIDIA H100, 00000000:06:00.0, 1516650, 14 %, 14 %, 1312 MiB, 130294 ms
+NVIDIA H100, 00000000:06:00.0, 1519629, 18 %, 19 %, 1332 MiB, 137212 ms
+NVIDIA H100, 00000000:06:00.0, 1523872, 14 %, 14 %, 1312 MiB, 127590 ms
+NVIDIA H100, 00000000:06:00.0, 1527000, 15 %, 15 %, 1312 MiB, 127671 ms

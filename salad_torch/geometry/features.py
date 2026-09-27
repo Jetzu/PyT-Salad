@@ -15,6 +15,7 @@ __all__ = [
     "fourier_time_embedding", "sequence_relative_position",
     "distance_features", "direction_features", "rotation_features",
     "position_rotation_features", "pair_vector_features",
+    "direction_and_pair_vector_features",
 ]
 
 
@@ -212,3 +213,70 @@ def pair_vector_features(pos: Tensor, neighbours: Tensor, scale: float = 0.1) ->
     directions = vec_normalized(local).reshape(n, k, 2 * a * 3)
     coords = (scale * local).reshape(n, k, 2 * a * 3)
     return torch.cat([directions, coords], dim=-1)
+
+
+def direction_and_pair_vector_features(pos: Tensor, neighbours: Tensor,
+                                       scale: float = 0.1) -> tuple[Tensor, Tensor]:
+    """N028/O6: `direction_features` and `pair_vector_features` sharing work.
+
+    `DiffusionPairFeatures.forward` calls both on the SAME `(pos, neighbours)`,
+    and both start by computing `aa_frames_t(pos)` and gathering
+    `pos[neighbours]`. Sharing THOSE two - and calling each function's own
+    `apply_inverse_t`/`vec_normalized` exactly once, at exactly the shape it
+    already uses - removes one frame computation and one neighbour gather.
+
+    `fx_graph_cse` (N017/O1) cannot see this on its own: `pair_vector_features`
+    feeds `apply_inverse_t` a `cat([self_pos, neigh_pos])`, so its subgraph is
+    not syntactically equal to `direction_features`'s, even though the first
+    A rows of one computation reuse values the other also needs.
+
+    BIT-EXACT, measured not just argued: a neighbour gather has no rounding,
+    so reusing `neigh_pos` is free. But do NOT go further and also share the
+    `apply_inverse_t`/`vec_normalized` CALLS themselves (e.g. transforming
+    `self_pos` and `neigh_pos` separately and concatenating the transformed
+    halves, or transforming `cat([self_pos, neigh_pos])` once and slicing the
+    neighbour half back out for `direction`) - every such reshuffle was tried
+    and DIFFERS from today's shipped output by ~1e-7 starting at diffusion
+    block 2, but ONLY inside a live model forward (a fresh, isolated call on
+    the exact same captured tensors reproduces bit-for-bit). This is eager
+    CPU PyTorch's batched-linalg lowering picking a different low-level
+    kernel/rounding for the SAME math depending on the surrounding call
+    context, not a bug in the arithmetic - see RESULTS.md section 3 for the
+    two-process, block-by-block trace that isolated it. The only variant
+    verified safe is this one: each of the two functions' own
+    `apply_inverse_t`+`vec_normalized` call runs exactly as it does today,
+    unchanged in shape and in call count, on inputs whose VALUES (not
+    necessarily computation history) are identical to today's.
+
+    Returns ``(direction, pair_vector)`` == ``(direction_features(pos, nb),
+    pair_vector_features(pos, nb, scale))``.
+    """
+    rot, trans, _ = aa_frames_t(pos)
+    n, a, _ = pos.shape
+    k = neighbours.shape[1]
+    neigh_pos = pos[neighbours]                           # (N, K, A, 3)
+
+    # `direction_features`'s OWN computation, verbatim - same shape, same
+    # single call as the unmerged function, just fed a `neigh_pos` gathered
+    # once instead of twice. A pure index gather has no rounding, so this is
+    # bit-identical to calling `direction_features(pos, neighbours)` itself.
+    direction = vec_normalized(
+        apply_inverse_t(rot, trans, neigh_pos, k=2)).reshape(n, k, a * 3)
+
+    # `pair_vector_features`'s OWN computation, verbatim - same (2A)-shaped
+    # single `apply_inverse_t`/`vec_normalized` call as the unmerged function.
+    # See the docstring below: concatenating self_pos/neigh_pos and reusing
+    # `direction`'s already-transformed neighbour half here is NOT safe in
+    # eager mode (measured, not theoretical - splitting or re-batching this
+    # exact call perturbs its low bits by ~1e-7 inside a live forward pass,
+    # even though every intermediate is mathematically identical). Reusing
+    # only `rot`/`trans`/`neigh_pos` - none of which round anything - and
+    # calling `apply_inverse_t`/`vec_normalized` exactly ONCE, at exactly the
+    # shape production already uses, is the only combination verified
+    # bit-identical; see RESULTS.md.
+    self_pos = pos[:, None].expand(n, k, a, 3)            # (N, K, A, 3)
+    both = torch.cat([self_pos, neigh_pos], dim=-2)       # (N, K, 2A, 3)
+    local = apply_inverse_t(rot, trans, both, k=2)
+    directions = vec_normalized(local).reshape(n, k, 2 * a * 3)
+    coords = (scale * local).reshape(n, k, 2 * a * 3)
+    return direction, torch.cat([directions, coords], dim=-1)

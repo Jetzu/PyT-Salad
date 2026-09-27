@@ -1,0 +1,237 @@
+### Starting TaskPrologue of job 907725 on h31-07 at Sun Sep 27 14:52:17 CEST 2026
+Running on cores 48-95 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+frozen from HEAD: 40a85be50ff7714cbeca444370f8b1359b640b9b (uncommitted diff below)
+ salad_torch/geometry/features.py | 44 +++++++++++++++++++++++++++++++++++++---
+ salad_torch/geometry/frames.py   |  6 ++++++
+ salad_torch/geometry/rigid.py    |  8 ++++++++
+ salad_torch/modules/blocks.py    | 11 ++++++++--
+ salad_torch/modules/fast.py      | 21 +++++++++++++++++++
+ salad_torch/opt.py               | 44 +++++++++++++++++++++++++++++++++++++++-
+ 6 files changed, 128 insertions(+), 6 deletions(-)
+############### O8 CPU BITWISE CONTROL (on top of default O6)
+wrote /tmp/907725.helma/n028Bbits_907725/base_64 tensors 11
+wrote /tmp/907725.helma/n028Bbits_907725/o8_64 tensors 11
+===== L=64  O8 (FRAME_MULSUM) vs base  -- reassociation, checking whether it happens to be bit-exact
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=1.184940e-04
+  local                  bitwise=False  max|d|=3.189087e-03
+  trajectory             bitwise=False  max|d|=1.802444e-04
+  aa                     bitwise=False  max|d|=1.430511e-05
+  aa_features            bitwise=False  max|d|=2.652407e-06
+  dssp                   bitwise=False  max|d|=2.241135e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=1.467896e-02
+  angles                 bitwise=False  max|d|=1.229644e-04
+  angle_pos              bitwise=False  max|d|=3.719330e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=64 o8 bit_identical=False  differing_tensors=9
+wrote /tmp/907725.helma/n028Bbits_907725/base_100 tensors 11
+wrote /tmp/907725.helma/n028Bbits_907725/o8_100 tensors 11
+===== L=100  O8 (FRAME_MULSUM) vs base  -- reassociation, checking whether it happens to be bit-exact
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=7.438660e-05
+  local                  bitwise=False  max|d|=2.258301e-03
+  trajectory             bitwise=False  max|d|=9.632111e-05
+  aa                     bitwise=False  max|d|=5.722046e-06
+  aa_features            bitwise=False  max|d|=1.668930e-06
+  dssp                   bitwise=False  max|d|=1.072884e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=4.577637e-03
+  angles                 bitwise=False  max|d|=5.201995e-05
+  angle_pos              bitwise=False  max|d|=4.291534e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=100 o8 bit_identical=False  differing_tensors=9
+############### PARITY SUITE, default state (frame_mulsum only True under --preset fast)
+===== test_model_parity default_vp
+config: default_vp
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=1.498e-07  abs=1.01e-05
+[PASS] local       rel=4.504e-07  abs=7.32e-04
+[PASS] trajectory  rel=7.132e-07  abs=4.86e-05
+[PASS] aa          rel=1.582e-06  abs=1.34e-05
+[PASS] atom_pos    rel=4.510e-07  abs=3.05e-05
+[PASS] angles      rel=1.551e-05  abs=1.55e-05  (tol 1e-03)
+[PASS] raw_angles  rel=4.805e-06  abs=1.60e-03  (tol 1e-04)
+[PASS] dssp        rel=7.366e-07  abs=8.82e-06
+[PASS] distogram   rel=6.688e-06  abs=8.70e-04
+[PASS] prev_pos    rel=1.498e-07  abs=1.01e-05
+[PASS] prev_local  rel=4.504e-07  abs=7.32e-04
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00001 A
+OK
+EXIT 0 : test_model_parity default_vp
+===== test_model_parity default_vp_scaled
+config: default_vp_scaled
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=1.415e-07  abs=9.54e-06
+[PASS] local       rel=4.544e-07  abs=7.04e-04
+[PASS] trajectory  rel=2.298e-07  abs=1.56e-05
+[PASS] aa          rel=1.539e-06  abs=1.34e-05
+[PASS] atom_pos    rel=2.263e-07  abs=1.53e-05
+[PASS] angles      rel=7.447e-06  abs=7.45e-06  (tol 1e-03)
+[PASS] raw_angles  rel=1.079e-06  abs=6.71e-04  (tol 1e-04)
+[PASS] dssp        rel=1.332e-06  abs=1.34e-05
+[PASS] distogram   rel=3.868e-06  abs=4.04e-04
+[PASS] prev_pos    rel=1.415e-07  abs=9.54e-06
+[PASS] prev_local  rel=4.544e-07  abs=7.04e-04
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00001 A
+OK
+EXIT 0 : test_model_parity default_vp_scaled
+===== test_model_parity default_ve_scaled
+config: default_ve_scaled
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=2.080e-07  abs=1.53e-05
+[PASS] local       rel=1.477e-06  abs=1.31e-02
+[PASS] trajectory  rel=2.055e-07  abs=1.53e-05
+[PASS] aa          rel=2.445e-06  abs=2.43e-05
+[PASS] atom_pos    rel=8.947e-07  abs=6.48e-05
+[PASS] angles      rel=3.934e-05  abs=3.93e-05  (tol 1e-03)
+[PASS] raw_angles  rel=4.704e-06  abs=3.37e-02  (tol 1e-04)
+[PASS] dssp        rel=3.109e-06  abs=6.07e-04
+[PASS] distogram   rel=6.747e-06  abs=2.82e-04
+[PASS] prev_pos    rel=2.080e-07  abs=1.53e-05
+[PASS] prev_local  rel=1.477e-06  abs=1.31e-02
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00002 A
+OK
+EXIT 0 : test_model_parity default_ve_scaled
+===== test_model_parity multimotif_vp
+config: multimotif_vp
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=6.145e-07  abs=6.82e-05
+[PASS] local       rel=3.593e-06  abs=6.16e-03
+[PASS] trajectory  rel=9.004e-07  abs=1.03e-04
+[PASS] aa          rel=3.044e-06  abs=2.57e-05
+[PASS] atom_pos    rel=6.875e-07  abs=7.63e-05
+[PASS] angles      rel=5.382e-05  abs=5.38e-05  (tol 1e-03)
+[PASS] raw_angles  rel=1.208e-05  abs=1.37e-02  (tol 1e-04)
+[PASS] dssp        rel=5.825e-06  abs=5.82e-05
+[PASS] distogram   rel=8.218e-06  abs=1.59e-03
+[PASS] prev_pos    rel=6.145e-07  abs=6.82e-05
+[PASS] prev_local  rel=3.593e-06  abs=6.16e-03
+[PASS] aatype      0/80 differ
+
+coordinate deviation: mean 0.00001 A, max 0.00009 A
+OK
+EXIT 0 : test_model_parity multimotif_vp
+===== test_geometry_parity
+[PASS] from_two_vectors                    max|d|=1.19e-07
+[PASS] rot_apply_to_point                  max|d|=1.79e-07
+[PASS] rot_apply_inverse_to_point          max|d|=2.38e-07
+[PASS] vec_norm                            max|d|=3.81e-06
+[PASS] vec_norm2                           max|d|=0.00e+00
+[PASS] vec_normalized                      max|d|=1.19e-07
+[PASS] extract_aa_frames.frames            max|d|=4.77e-07
+[PASS] extract_aa_frames.local_pos         max|d|=3.58e-06
+[PASS] make_transform_from_reference       max|d|=4.77e-07
+[PASS] compute_pseudo_cb                   max|d|=0.00e+00
+[PASS] positions_to_ncacocb                max|d|=0.00e+00
+[PASS] distance_rbf_0_22_64                max|d|=5.96e-08
+[PASS] distance_rbf_0_22_16                max|d|=5.96e-08
+[PASS] distance_rbf_0_10_16                max|d|=5.96e-08
+[PASS] distance_one_hot_0_22_64            max|d|=0.00e+00
+[PASS] linear_centers_0_22_64              max|d|=1.91e-06
+[PASS] linear_centers_step_0_22_64         max|d|=1.91e-06
+[PASS] gaussian_rbf                        max|d|=3.35e-06
+[PASS] fourier_time_embedding_256          max|d|=5.96e-08
+[PASS] get_index_neighbours_16             max|d|=0.00e+00
+[PASS] get_spatial_neighbours_16_chained   max|d|=0.00e+00
+[PASS] get_spatial_neighbours_20_fresh     max|d|=0.00e+00
+[PASS] get_neighbours_12                   max|d|=0.00e+00
+[PASS] get_neighbours_12_chained           max|d|=0.00e+00
+[PASS] seq_relpos_32_onehot                max|d|=0.00e+00
+[PASS] seq_relpos_32_raw                   max|d|=0.00e+00
+[PASS] seq_relpos_32_cyclic                max|d|=0.00e+00
+[PASS] distance_features                   max|d|=1.25e-06
+[PASS] direction_features                  max|d|=5.07e-07
+[PASS] position_rotation_features          max|d|=4.77e-07
+[PASS] pair_vector_features                max|d|=9.54e-07
+[PASS] rotation_features                   max|d|=4.77e-07
+[PASS] index_sum                           max|d|=0.00e+00
+[PASS] index_mean                          max|d|=0.00e+00
+[PASS] index_max                           max|d|=0.00e+00
+[PASS] index_std                           max|d|=1.19e-07
+[PASS] index_count                         max|d|=0.00e+00
+[PASS] unique_chain                        max|d|=0.00e+00
+
+38/38 passed
+EXIT 0 : test_geometry_parity
+===== test_stack_parity
+loaded 576 tensors into the 6-layer stack (strict=True)
+[PASS] local       rel=6.387e-06  max|d|=1.328e-01
+[PASS] pos         rel=2.219e-06  max|d|=2.031e-04
+[PASS] trajectory  rel=2.025e-06  max|d|=2.031e-04
+[PASS] coordinates  mean=0.0000 A  max=0.0002 A
+
+OK
+EXIT 0 : test_stack_parity
+===== test_encoder_parity
+[PASS] L16c1 local  rel=4.030e-07  max|d|=1.431e-06
+[PASS] L16c1 pos    rel=1.759e-07  max|d|=4.768e-06
+[PASS] L16c1 coords mean=0.00000 A max=0.00001 A
+[PASS] L64c1 local  rel=1.850e-06  max|d|=8.166e-06
+[PASS] L64c1 pos    rel=7.663e-08  max|d|=7.629e-06
+[PASS] L64c1 coords mean=0.00000 A max=0.00001 A
+[PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+OK
+EXIT 0 : test_encoder_parity
+===== test_sampling_parity
+steps: 81 (ref 81)
+   step    0  max|d| = 4.808e-05 A
+   step   10  max|d| = 1.536e-03 A
+   step   20  max|d| = 1.497e-01 A
+   step   30  max|d| = 5.848e-01 A
+   step   40  max|d| = 1.337e+00 A
+   step   50  max|d| = 4.200e-01 A
+   step   60  max|d| = 5.111e-01 A
+   step   70  max|d| = 5.889e-01 A
+   step   80  max|d| = 6.014e-01 A
+   step   80  max|d| = 6.014e-01 A
+worst per-step deviation over the whole trajectory: 4.202e+00 A
+[PASS] worst/noise-floor ratio = 7.2x (self-divergence 0.583 A)
+[PASS] final_pos       rel=2.228e-02
+[PASS] final_local     rel=4.630e-03
+[FAIL] final_aa        rel=7.518e-02
+[PASS] atom_pos backbone rel=1.504e-02
+[PASS] atom_pos agreeing rel=2.940e-02
+       (7 residue(s) flipped identity -> different rotamer: [15, 22, 28, 29, 46, 48, 53])
+[FAIL] final_aatype    7/64 residues differ
+
+final structure deviation: mean 0.25160 A, max 0.60137 A   (self-divergence floor: mean 0.00650 A)
+[FAIL] final/noise-floor ratio = 38.7x
+generated CA-CA: mean 3.763 A (native ~3.8)
+FAILED
+EXIT 1 : test_sampling_parity
+CPU_SUITE_EXIT=1
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 14:59:27 CEST 2026
+= Job-ID             : 907725 on helma
+= Job-Name           : n028B_cpu
+= Job-Command        : /home/hpc/v181bb/v181bb10/salad_jobs/n028_stageB_cpu.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/salad_jobs
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 02:00:00
+= Elapsed runtime    : 00:07:10
+= Total RAM usage    : 9.9 GiB of assigned 91 GiB (10.9%)
+= Node list          : h31-07
+= Subm/Elig/Start/End: 2026-09-27T14:52:16 / 2026-09-27T14:52:16 / 2026-09-27T14:52:17 / 2026-09-27T14:59:27
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.1G   104.9G   209.7G        N/A     463K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+    /home/vault           774.0G  1048.6G  2097.2G        N/A     122K     200K     400K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      89K      61K      81K  4d17h50m24s !!!
+======================

@@ -24,7 +24,7 @@ import os
 
 __all__ = ["GATHER_ONEHOT", "HOIST_NEIGHBOURS", "SKIP_PAIR_COND", "LEAN_STEPS",
            "NEED_AUX", "BATCH_COND", "DET_SEGMENT", "AGGRESSIVE_FUSION",
-           "MM_MODE", "GEMM_TEMPLATES"]
+           "MM_MODE", "GEMM_TEMPLATES", "PAIR_FEAT_MERGE"]
 
 
 def _flag(name: str, default: bool = True) -> bool:
@@ -198,3 +198,40 @@ if MM_MODE is None:
 #: structural validation - see N015's method - which has NOT been run) but no
 #: shipped preset requests it.
 GEMM_TEMPLATES = _flag("SALAD_OPT_GEMMTPL", default=False)
+
+
+#: N028/O6 - `DiffusionPairFeatures` calls `direction_features(pos, nb)` and
+#: `pair_vector_features(pos, nb)` on the SAME arguments; both start by
+#: computing `aa_frames_t(pos)` and gathering `pos[neighbours]`. Sharing THOSE
+#: two - a per-residue frame and a pure index gather, neither of which rounds
+#: anything - removes one frame computation and one neighbour gather.
+#:
+#: `fx_graph_cse` (N017/O1) cannot reach this: `pair_vector_features` feeds
+#: `apply_inverse_t` a `cat([self_pos, neigh_pos])`, so its subgraph is not
+#: syntactically identical to `direction_features`'s. Structural redundancy of
+#: this kind needs a SOURCE change.
+#:
+#: MEASURED, not just argued, to stop at the gather: an earlier version of
+#: this also shared the `apply_inverse_t`/`vec_normalized` CALLS (batching the
+#: neighbour and self transforms together, or transforming once and slicing).
+#: Every such variant was bit-identical function-by-function and in the
+#: compiled CPU `forward_core` control, YET diverged from today's shipped
+#: output by ~1e-7 starting at diffusion block 2 - but ONLY inside a live
+#: model forward; a fresh process replaying the exact same captured tensors
+#: reproduced the reference exactly. That is eager CPU PyTorch's batched
+#: linear-algebra lowering picking a different low-level kernel/rounding for
+#: the SAME math depending on call context, not a bug in the arithmetic - see
+#: N028's RESULTS.md for the two-process block-by-block trace that isolated
+#: it, and do not re-widen the sharing without repeating that trace.
+#:
+#: The current, narrower form - reuse only the frame and the gather, run each
+#: function's own transform/normalise unchanged in shape and call count - is
+#: verified BIT-EXACT this way: whole compiled `forward_core`, CPU, all eleven
+#: outputs, L=64 and L=100, max|d| = 0.0; AND (the sharp instrument the naive
+#: version failed) eager `tests/test_sampling_parity.py` on CPU, both flag
+#: states, block-by-block trace 0.0 at every block. `SALAD_OPT_PAIRFEAT=0`
+#: restores the two fully separate calls. Same preset-gated / AND-veto
+#: contract as `BATCH_COND` (default True; a preset decides whether it is
+#: live at all, the env var can only turn it off) - see `fast.py`.
+PAIR_FEAT_MERGE = _flag("SALAD_OPT_PAIRFEAT")
+

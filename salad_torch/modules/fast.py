@@ -39,6 +39,10 @@ __all__ = ["FastDenoiser", "GroupFastDenoiser", "PRESETS", "memory_bound_group"]
 _ENV_DET_SEGMENT = opt.DET_SEGMENT
 #: ...and `SALAD_OPT_BATCHCOND=0` forces P7 off for every preset.
 _ENV_BATCH_COND = opt.BATCH_COND
+#: ...and `SALAD_OPT_PAIRFEAT=0` forces N028/O6 off for every preset (same
+#: veto-only, `batch_cond_pair` contract - the preset decides, the env var can
+#: only turn it off).
+_ENV_PAIR_FEAT_MERGE = opt.PAIR_FEAT_MERGE
 
 #: Inference presets. **"exact" is the default and must stay so.**
 #:
@@ -96,6 +100,11 @@ PRESETS: dict[str, dict] = {
         # P7, the batched condition-branch prologue: -9.2 % of a lean step.
         # Reassociation only (bmm vs six mm); see `batch_cond_pair` below.
         batch_cond_pair=True,
+        # N028/O6 - the pair-feature sharing (aa_frames_t + neighbour gather
+        # reused between `direction_features` and `pair_vector_features`).
+        # BIT-EXACT (see `opt.PAIR_FEAT_MERGE`) - takes every preset, same as
+        # `aggressive_fusion` above.
+        pair_feat_merge=True,
         # N020: inductor's matmul templates (`max_autotune_gemm`) - REJECTED
         # from every preset. -14% at L=100 (eroding to -6.4% at L=400) but NOT
         # bit-exact: whole-forward H100/DETSEG control measured pos
@@ -203,6 +212,8 @@ PRESETS: dict[str, dict] = {
         steps_scale=0.5,
         aggressive_fusion=True,
         batch_cond_pair=True,
+        # N028/O6 - bit-exact, takes every preset. See `opt.PAIR_FEAT_MERGE`.
+        pair_feat_merge=True,
         # N020: rejected everywhere (not bit-exact, no n=160 validation done
         # for `fast` yet) - see the `exact` preset's comment above and
         # .agent-research/results/N020-matmul-lowering/RESULTS.md.
@@ -262,6 +273,8 @@ PRESETS: dict[str, dict] = {
         steps_scale=1.0,
         aggressive_fusion=True,
         batch_cond_pair=True,
+        # N028/O6 - bit-exact, takes every preset. See `opt.PAIR_FEAT_MERGE`.
+        pair_feat_merge=True,
         # N020: rejected everywhere - see the `exact` preset's comment above.
         gemm_templates=False,
         det_segment=True,
@@ -419,6 +432,9 @@ class FastDenoiser(nn.Module):
         # P7, same contract: the preset chooses, `SALAD_OPT_BATCHCOND=0` can
         # only veto. Also process-global, and also set before the compile.
         opt.BATCH_COND = bool(p.get("batch_cond_pair")) and _ENV_BATCH_COND
+        # N028/O6, same veto-only contract: the preset chooses, the env var
+        # can only turn it off. Process-global, set before the compile.
+        opt.PAIR_FEAT_MERGE = bool(p.get("pair_feat_merge")) and _ENV_PAIR_FEAT_MERGE
         # P7's stacked condition-branch weights are a CACHE of the per-block
         # parameters, normally refreshed by a `load_state_dict` post-hook.
         # Refresh once more here so a model whose weights arrived some other

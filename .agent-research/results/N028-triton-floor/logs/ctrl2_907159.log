@@ -1,0 +1,128 @@
+### Starting TaskPrologue of job 907159 on h31-07 at Sun Sep 27 11:16:13 CEST 2026
+Running on cores 96-143 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+3a9222a0c950a9ffcaa4c9420143555d  salad_torch/modules/blocks.py
+72dbfaeed884945e14747c1b02be317b  salad_torch/geometry/features.py
+2fcd1e5b9731f5c5a7d18f88b68165df  salad_torch/geometry/frames.py
+8bedde46fffb8221b897d9c78fcf7ec7  salad_torch/geometry/rigid.py
+731b1f20d0a8831e893ebfbd38b41989  salad_torch/opt.py
+wrote /tmp/907159.helma/n028bits_907159/base_64 tensors 11
+wrote /tmp/907159.helma/n028bits_907159/o6_64 tensors 11
+wrote /tmp/907159.helma/n028bits_907159/o8_64 tensors 11
+wrote /tmp/907159.helma/n028bits_907159/o6o8_64 tensors 11
+===== L=64  o6 vs base
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=True  max|d|=0.000000e+00
+  local                  bitwise=True  max|d|=0.000000e+00
+  trajectory             bitwise=True  max|d|=0.000000e+00
+  aa                     bitwise=True  max|d|=0.000000e+00
+  aa_features            bitwise=True  max|d|=0.000000e+00
+  dssp                   bitwise=True  max|d|=0.000000e+00
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=True  max|d|=0.000000e+00
+  angles                 bitwise=True  max|d|=0.000000e+00
+  angle_pos              bitwise=True  max|d|=0.000000e+00
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=64 o6 bit_identical=True  differing_tensors=0
+===== L=64  o8 vs base
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=1.184940e-04
+  local                  bitwise=False  max|d|=3.189087e-03
+  trajectory             bitwise=False  max|d|=1.802444e-04
+  aa                     bitwise=False  max|d|=1.430511e-05
+  aa_features            bitwise=False  max|d|=2.652407e-06
+  dssp                   bitwise=False  max|d|=2.241135e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=1.467896e-02
+  angles                 bitwise=False  max|d|=1.229644e-04
+  angle_pos              bitwise=False  max|d|=3.719330e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=64 o8 bit_identical=False  differing_tensors=9
+===== L=64  o6o8 vs base
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=1.184940e-04
+  local                  bitwise=False  max|d|=3.189087e-03
+  trajectory             bitwise=False  max|d|=1.802444e-04
+  aa                     bitwise=False  max|d|=1.430511e-05
+  aa_features            bitwise=False  max|d|=2.652407e-06
+  dssp                   bitwise=False  max|d|=2.241135e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=1.467896e-02
+  angles                 bitwise=False  max|d|=1.229644e-04
+  angle_pos              bitwise=False  max|d|=3.719330e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=64 o6o8 bit_identical=False  differing_tensors=9
+wrote /tmp/907159.helma/n028bits_907159/base_100 tensors 11
+wrote /tmp/907159.helma/n028bits_907159/o6_100 tensors 11
+wrote /tmp/907159.helma/n028bits_907159/o8_100 tensors 11
+wrote /tmp/907159.helma/n028bits_907159/o6o8_100 tensors 11
+===== L=100  o6 vs base
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=True  max|d|=0.000000e+00
+  local                  bitwise=True  max|d|=0.000000e+00
+  trajectory             bitwise=True  max|d|=0.000000e+00
+  aa                     bitwise=True  max|d|=0.000000e+00
+  aa_features            bitwise=True  max|d|=0.000000e+00
+  dssp                   bitwise=True  max|d|=0.000000e+00
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=True  max|d|=0.000000e+00
+  angles                 bitwise=True  max|d|=0.000000e+00
+  angle_pos              bitwise=True  max|d|=0.000000e+00
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=100 o6 bit_identical=True  differing_tensors=0
+===== L=100  o8 vs base
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=7.438660e-05
+  local                  bitwise=False  max|d|=2.258301e-03
+  trajectory             bitwise=False  max|d|=9.632111e-05
+  aa                     bitwise=False  max|d|=5.722046e-06
+  aa_features            bitwise=False  max|d|=1.668930e-06
+  dssp                   bitwise=False  max|d|=1.072884e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=4.577637e-03
+  angles                 bitwise=False  max|d|=5.201995e-05
+  angle_pos              bitwise=False  max|d|=4.291534e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=100 o8 bit_identical=False  differing_tensors=9
+===== L=100  o6o8 vs base
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=7.438660e-05
+  local                  bitwise=False  max|d|=2.258301e-03
+  trajectory             bitwise=False  max|d|=9.632111e-05
+  aa                     bitwise=False  max|d|=5.722046e-06
+  aa_features            bitwise=False  max|d|=1.668930e-06
+  dssp                   bitwise=False  max|d|=1.072884e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=4.577637e-03
+  angles                 bitwise=False  max|d|=5.201995e-05
+  angle_pos              bitwise=False  max|d|=4.291534e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS L=100 o6o8 bit_identical=False  differing_tensors=9
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:36:26 CEST 2026
+= Job-ID             : 907159 on helma
+= Job-Name           : n028_ctrl2
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/control2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 02:00:00
+= Elapsed runtime    : 00:20:13
+= Total RAM usage    : 9.4 GiB of assigned 91 GiB (10.3%)
+= Node list          : h31-07
+= Subm/Elig/Start/End: 2026-09-27T11:16:11 / 2026-09-27T11:16:11 / 2026-09-27T11:16:13 / 2026-09-27T11:36:26
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.0G   104.9G   209.7G        N/A     462K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      82K      61K      81K  4d21h13m25s !!!
+======================

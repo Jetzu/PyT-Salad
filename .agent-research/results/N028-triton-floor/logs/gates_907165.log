@@ -1,0 +1,246 @@
+### Starting TaskPrologue of job 907165 on h11-09 at Sun Sep 27 11:18:16 AM CEST 2026
+Running on cores 32-63 with governor performance
+Sun Sep 27 11:18:16 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   37C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+2fcd1e5b9731f5c5a7d18f88b68165df  /home/hpc/v181bb/v181bb10/n028wt_o8/salad_torch/geometry/frames.py
+8bedde46fffb8221b897d9c78fcf7ec7  /home/hpc/v181bb/v181bb10/n028wt_o8/salad_torch/geometry/rigid.py
+72dbfaeed884945e14747c1b02be317b  /home/hpc/v181bb/v181bb10/n028wt_o8/salad_torch/geometry/features.py
+00bf20a1b92f097e17a040baed63ec56  /home/hpc/v181bb/v181bb10/n028wt_o8/salad_torch/modules/attention.py
+3a9222a0c950a9ffcaa4c9420143555d  /home/hpc/v181bb/v181bb10/n028wt_o8/salad_torch/modules/blocks.py
+731b1f20d0a8831e893ebfbd38b41989  /home/hpc/v181bb/v181bb10/n028wt_o8/salad_torch/opt.py
+################ PARITY SUITE arm=shipdefault PAIRFEAT=1 FRAMEMULSUM=0 IPAMULSUM=0
+gates on: /home/hpc/v181bb/v181bb10/n028wt_o8   HEAD 98bc61b
+[default_vp] [PASS] aatype      0/48 differ
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] [PASS] aatype      0/48 differ
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] [PASS] aatype      0/48 differ
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] [PASS] aatype      0/80 differ
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00015 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] index_count                         max|d|=0.00e+00
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] trajectory  rel=2.244e-06  max|d|=2.251e-04
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0003 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] final structure deviation: mean 0.08153 A, max 0.81345 A   (self-divergence floor: mean 0.00650 A)
+[test_sampling_parity] [PASS] final/noise-floor ratio = 12.5x
+[test_sampling_parity] generated CA-CA: mean 3.763 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=0
+################ PARITY SUITE arm=o6 PAIRFEAT=1 FRAMEMULSUM=0 IPAMULSUM=0
+gates on: /home/hpc/v181bb/v181bb10/n028wt_o8   HEAD 98bc61b
+[default_vp] [PASS] aatype      0/48 differ
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] [PASS] aatype      0/48 differ
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] [PASS] aatype      0/48 differ
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] [PASS] aatype      0/80 differ
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00015 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] index_count                         max|d|=0.00e+00
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] trajectory  rel=2.244e-06  max|d|=2.251e-04
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0003 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] final structure deviation: mean 0.08153 A, max 0.81345 A   (self-divergence floor: mean 0.00650 A)
+[test_sampling_parity] [PASS] final/noise-floor ratio = 12.5x
+[test_sampling_parity] generated CA-CA: mean 3.763 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=0
+################ PARITY SUITE arm=o8 PAIRFEAT=0 FRAMEMULSUM=1 IPAMULSUM=0
+gates on: /home/hpc/v181bb/v181bb10/n028wt_o8   HEAD 98bc61b
+[default_vp] [PASS] aatype      0/48 differ
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] [PASS] aatype      0/48 differ
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] [PASS] aatype      0/48 differ
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_ve_scaled] FAILED
+[default_ve_scaled] exit=1
+[multimotif_vp] [PASS] aatype      0/80 differ
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00026 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] index_count                         max|d|=0.00e+00
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] trajectory  rel=2.073e-06  max|d|=2.079e-04
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0003 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] final structure deviation: mean 0.05716 A, max 0.36859 A   (self-divergence floor: mean 0.00650 A)
+[test_sampling_parity] [PASS] final/noise-floor ratio = 8.8x
+[test_sampling_parity] generated CA-CA: mean 3.762 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=1
+################ PARITY SUITE arm=o2 PAIRFEAT=0 FRAMEMULSUM=0 IPAMULSUM=1
+gates on: /home/hpc/v181bb/v181bb10/n028wt_o8   HEAD 98bc61b
+[default_vp] [PASS] aatype      0/48 differ
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] [PASS] aatype      0/48 differ
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] [PASS] aatype      0/48 differ
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00001 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] [PASS] aatype      0/80 differ
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00013 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] index_count                         max|d|=0.00e+00
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] trajectory  rel=2.113e-06  max|d|=2.120e-04
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0002 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 local  rel=1.317e-06  max|d|=5.484e-06
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] final structure deviation: mean 0.16398 A, max 0.40925 A   (self-divergence floor: mean 0.00650 A)
+[test_sampling_parity] [FAIL] final/noise-floor ratio = 25.2x
+[test_sampling_parity] generated CA-CA: mean 3.763 A (native ~3.8)
+[test_sampling_parity] FAILED
+[test_sampling_parity] exit=1
+SUITE_EXIT=1
+################ PARITY SUITE arm=alloff
+gates on: /home/hpc/v181bb/v181bb10/n028wt_o8   HEAD 98bc61b
+[default_vp] [PASS] aatype      0/48 differ
+[default_vp] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp] OK
+[default_vp] exit=0
+[default_vp_scaled] [PASS] aatype      0/48 differ
+[default_vp_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_vp_scaled] OK
+[default_vp_scaled] exit=0
+[default_ve_scaled] [PASS] aatype      0/48 differ
+[default_ve_scaled] coordinate deviation: mean 0.00000 A, max 0.00002 A
+[default_ve_scaled] OK
+[default_ve_scaled] exit=0
+[multimotif_vp] [PASS] aatype      0/80 differ
+[multimotif_vp] coordinate deviation: mean 0.00001 A, max 0.00020 A
+[multimotif_vp] OK
+[multimotif_vp] exit=0
+[test_geometry_parity] [PASS] index_count                         max|d|=0.00e+00
+[test_geometry_parity] [PASS] unique_chain                        max|d|=0.00e+00
+[test_geometry_parity] 
+[test_geometry_parity] 38/38 passed
+[test_geometry_parity] exit=0
+[test_stack_parity] [PASS] trajectory  rel=2.206e-06  max|d|=2.213e-04
+[test_stack_parity] [PASS] coordinates  mean=0.0000 A  max=0.0003 A
+[test_stack_parity] 
+[test_stack_parity] OK
+[test_stack_parity] exit=0
+[test_encoder_parity] [PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[test_encoder_parity] [PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[test_encoder_parity] [PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+[test_encoder_parity] OK
+[test_encoder_parity] exit=0
+[test_sampling_parity] final structure deviation: mean 0.05374 A, max 0.35083 A   (self-divergence floor: mean 0.00650 A)
+[test_sampling_parity] [PASS] final/noise-floor ratio = 8.3x
+[test_sampling_parity] generated CA-CA: mean 3.762 A (native ~3.8)
+[test_sampling_parity] OK
+[test_sampling_parity] exit=0
+SUITE_EXIT=0
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:20:48 CEST 2026
+= Job-ID             : 907165 on helma
+= Job-Name           : n028_gates
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/gates.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:30:00
+= Elapsed runtime    : 00:02:34
+= Total RAM usage    : 0.7 GiB of assigned 175 GiB (0.4%)
+= Node list          : h11-09
+= Subm/Elig/Start/End: 2026-09-27T11:18:13 / 2026-09-27T11:18:13 / 2026-09-27T11:18:14 / 2026-09-27T11:20:48
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.9G   104.9G   209.7G        N/A     461K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      90K      61K      81K  4d21h29m3s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]

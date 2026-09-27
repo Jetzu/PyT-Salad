@@ -1,0 +1,722 @@
+### Starting TaskPrologue of job 907726 on h12-11 at Sun Sep 27 02:52:17 PM CEST 2026
+Running on cores 64-95 with governor performance
+Sun Sep 27 14:52:17 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   36C    P0             69W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+frozen from HEAD: 40a85be50ff7714cbeca444370f8b1359b640b9b
+NVIDIA H100
+############### PARITY SUITE, default state
+===== test_model_parity default_vp
+config: default_vp
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=1.498e-07  abs=1.01e-05
+[PASS] local       rel=4.504e-07  abs=7.32e-04
+[PASS] trajectory  rel=7.132e-07  abs=4.86e-05
+[PASS] aa          rel=1.582e-06  abs=1.34e-05
+[PASS] atom_pos    rel=4.510e-07  abs=3.05e-05
+[PASS] angles      rel=1.551e-05  abs=1.55e-05  (tol 1e-03)
+[PASS] raw_angles  rel=4.805e-06  abs=1.60e-03  (tol 1e-04)
+[PASS] dssp        rel=7.366e-07  abs=8.82e-06
+[PASS] distogram   rel=6.688e-06  abs=8.70e-04
+[PASS] prev_pos    rel=1.498e-07  abs=1.01e-05
+[PASS] prev_local  rel=4.504e-07  abs=7.32e-04
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00001 A
+OK
+EXIT 0 : test_model_parity default_vp
+===== test_model_parity default_vp_scaled
+config: default_vp_scaled
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=1.415e-07  abs=9.54e-06
+[PASS] local       rel=4.544e-07  abs=7.04e-04
+[PASS] trajectory  rel=2.298e-07  abs=1.56e-05
+[PASS] aa          rel=1.539e-06  abs=1.34e-05
+[PASS] atom_pos    rel=2.263e-07  abs=1.53e-05
+[PASS] angles      rel=7.447e-06  abs=7.45e-06  (tol 1e-03)
+[PASS] raw_angles  rel=1.079e-06  abs=6.71e-04  (tol 1e-04)
+[PASS] dssp        rel=1.332e-06  abs=1.34e-05
+[PASS] distogram   rel=3.868e-06  abs=4.04e-04
+[PASS] prev_pos    rel=1.415e-07  abs=9.54e-06
+[PASS] prev_local  rel=4.544e-07  abs=7.04e-04
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00001 A
+OK
+EXIT 0 : test_model_parity default_vp_scaled
+===== test_model_parity default_ve_scaled
+config: default_ve_scaled
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=2.080e-07  abs=1.53e-05
+[PASS] local       rel=1.477e-06  abs=1.31e-02
+[PASS] trajectory  rel=2.055e-07  abs=1.53e-05
+[PASS] aa          rel=2.445e-06  abs=2.43e-05
+[PASS] atom_pos    rel=8.947e-07  abs=6.48e-05
+[PASS] angles      rel=3.934e-05  abs=3.93e-05  (tol 1e-03)
+[PASS] raw_angles  rel=4.704e-06  abs=3.37e-02  (tol 1e-04)
+[PASS] dssp        rel=3.109e-06  abs=6.07e-04
+[PASS] distogram   rel=6.747e-06  abs=2.82e-04
+[PASS] prev_pos    rel=2.080e-07  abs=1.53e-05
+[PASS] prev_local  rel=1.477e-06  abs=1.31e-02
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00002 A
+OK
+EXIT 0 : test_model_parity default_ve_scaled
+===== test_model_parity multimotif_vp
+config: multimotif_vp
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=1.190e-06  abs=1.32e-04
+[PASS] local       rel=3.895e-06  abs=6.68e-03
+[PASS] trajectory  rel=1.336e-06  abs=1.54e-04
+[PASS] aa          rel=4.651e-06  abs=3.93e-05
+[PASS] atom_pos    rel=1.719e-06  abs=1.91e-04
+[PASS] angles      rel=7.278e-05  abs=7.28e-05  (tol 1e-03)
+[PASS] raw_angles  rel=1.074e-05  abs=1.22e-02  (tol 1e-04)
+[PASS] dssp        rel=9.167e-06  abs=9.16e-05
+[PASS] distogram   rel=6.921e-06  abs=1.34e-03
+[PASS] prev_pos    rel=1.190e-06  abs=1.32e-04
+[PASS] prev_local  rel=3.895e-06  abs=6.68e-03
+[PASS] aatype      0/80 differ
+
+coordinate deviation: mean 0.00001 A, max 0.00015 A
+OK
+EXIT 0 : test_model_parity multimotif_vp
+===== test_geometry_parity
+[PASS] from_two_vectors                    max|d|=1.19e-07
+[PASS] rot_apply_to_point                  max|d|=1.79e-07
+[PASS] rot_apply_inverse_to_point          max|d|=2.38e-07
+[PASS] vec_norm                            max|d|=3.81e-06
+[PASS] vec_norm2                           max|d|=0.00e+00
+[PASS] vec_normalized                      max|d|=1.19e-07
+[PASS] extract_aa_frames.frames            max|d|=4.77e-07
+[PASS] extract_aa_frames.local_pos         max|d|=3.58e-06
+[PASS] make_transform_from_reference       max|d|=4.77e-07
+[PASS] compute_pseudo_cb                   max|d|=0.00e+00
+[PASS] positions_to_ncacocb                max|d|=0.00e+00
+[PASS] distance_rbf_0_22_64                max|d|=5.96e-08
+[PASS] distance_rbf_0_22_16                max|d|=5.96e-08
+[PASS] distance_rbf_0_10_16                max|d|=5.96e-08
+[PASS] distance_one_hot_0_22_64            max|d|=0.00e+00
+[PASS] linear_centers_0_22_64              max|d|=1.91e-06
+[PASS] linear_centers_step_0_22_64         max|d|=1.91e-06
+[PASS] gaussian_rbf                        max|d|=3.35e-06
+[PASS] fourier_time_embedding_256          max|d|=5.96e-08
+[PASS] get_index_neighbours_16             max|d|=0.00e+00
+[PASS] get_spatial_neighbours_16_chained   max|d|=0.00e+00
+[PASS] get_spatial_neighbours_20_fresh     max|d|=0.00e+00
+[PASS] get_neighbours_12                   max|d|=0.00e+00
+[PASS] get_neighbours_12_chained           max|d|=0.00e+00
+[PASS] seq_relpos_32_onehot                max|d|=0.00e+00
+[PASS] seq_relpos_32_raw                   max|d|=0.00e+00
+[PASS] seq_relpos_32_cyclic                max|d|=0.00e+00
+[PASS] distance_features                   max|d|=1.25e-06
+[PASS] direction_features                  max|d|=5.07e-07
+[PASS] position_rotation_features          max|d|=4.77e-07
+[PASS] pair_vector_features                max|d|=9.54e-07
+[PASS] rotation_features                   max|d|=4.77e-07
+[PASS] index_sum                           max|d|=0.00e+00
+[PASS] index_mean                          max|d|=0.00e+00
+[PASS] index_max                           max|d|=0.00e+00
+[PASS] index_std                           max|d|=1.19e-07
+[PASS] index_count                         max|d|=0.00e+00
+[PASS] unique_chain                        max|d|=0.00e+00
+
+38/38 passed
+EXIT 0 : test_geometry_parity
+===== test_stack_parity
+loaded 576 tensors into the 6-layer stack (strict=True)
+[PASS] local       rel=5.307e-06  max|d|=1.104e-01
+[PASS] pos         rel=2.281e-06  max|d|=2.089e-04
+[PASS] trajectory  rel=2.244e-06  max|d|=2.251e-04
+[PASS] coordinates  mean=0.0000 A  max=0.0003 A
+
+OK
+EXIT 0 : test_stack_parity
+===== test_encoder_parity
+[PASS] L16c1 local  rel=4.030e-07  max|d|=1.431e-06
+[PASS] L16c1 pos    rel=1.759e-07  max|d|=4.768e-06
+[PASS] L16c1 coords mean=0.00000 A max=0.00001 A
+[PASS] L64c1 local  rel=1.850e-06  max|d|=8.166e-06
+[PASS] L64c1 pos    rel=7.663e-08  max|d|=7.629e-06
+[PASS] L64c1 coords mean=0.00000 A max=0.00001 A
+[PASS] L96c3 local  rel=1.374e-06  max|d|=5.722e-06
+[PASS] L96c3 pos    rel=5.155e-08  max|d|=7.629e-06
+[PASS] L96c3 coords mean=0.00000 A max=0.00001 A
+OK
+EXIT 0 : test_encoder_parity
+===== test_sampling_parity
+steps: 81 (ref 81)
+   step    0  max|d| = 7.997e-05 A
+   step   10  max|d| = 1.133e-03 A
+   step   20  max|d| = 3.503e-01 A
+   step   30  max|d| = 8.746e-01 A
+   step   40  max|d| = 6.930e-01 A
+   step   50  max|d| = 2.985e-01 A
+   step   60  max|d| = 3.087e-01 A
+   step   70  max|d| = 3.174e-01 A
+   step   80  max|d| = 8.135e-01 A
+   step   80  max|d| = 8.135e-01 A
+worst per-step deviation over the whole trajectory: 3.503e+00 A
+[PASS] worst/noise-floor ratio = 6.0x (self-divergence 0.583 A)
+[PASS] final_pos       rel=2.560e-02
+[PASS] final_local     rel=5.794e-03
+[PASS] final_aa        rel=4.770e-02
+[PASS] atom_pos backbone rel=1.500e-02
+[PASS] atom_pos agreeing rel=2.103e-02
+       (2 residue(s) flipped identity -> different rotamer: [15, 46])
+[PASS] final_aatype    2/64 residues differ
+
+final structure deviation: mean 0.08153 A, max 0.81345 A   (self-divergence floor: mean 0.00650 A)
+[PASS] final/noise-floor ratio = 12.5x
+generated CA-CA: mean 3.763 A (native ~3.8)
+OK
+EXIT 0 : test_sampling_parity
+############### n=160 DESIGN QUALITY: base vs O8 (env-forced), fast preset
+########## ARM base seed 42 n 40 (FRAMEMULSUM=0)
+[gate] /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python scripts/generate.py --config default_vp --num_aa 100 --num_designs 40 --seed 42 --out_path /dev/shm/n028Bdesigns_907726/base_s42 --fast --preset fast
+
+    design  nres     CA-CA       Rg   verdict
+design_0.pdb   100     3.758    12.97   
+design_1.pdb   100     3.769    12.71   
+design_10.pdb   100     3.768    13.18   
+design_11.pdb   100     3.741    13.11   
+design_12.pdb   100     3.791    11.92   
+design_13.pdb   100     3.771    12.62   
+design_14.pdb   100     3.778    12.81   
+design_15.pdb   100     3.766    12.28   
+design_16.pdb   100     3.766    12.11   
+design_17.pdb   100     3.755    13.01   
+design_18.pdb   100     3.749    12.34   
+design_19.pdb   100     3.742    15.89   
+design_2.pdb   100     3.770    12.94   
+design_20.pdb   100     3.771    13.15   
+design_21.pdb   100     3.753    17.89   
+design_22.pdb   100     3.765    12.23   
+design_23.pdb   100     3.754    12.07   
+design_24.pdb   100     3.763    12.49   
+design_25.pdb   100     3.751    12.78   
+design_26.pdb   100     3.755    13.33   
+design_27.pdb   100     3.776    13.46   
+design_28.pdb   100     3.762    13.37   
+design_29.pdb   100     3.762    14.67   
+design_3.pdb   100     3.763    11.98   
+design_30.pdb   100     3.738    12.20   
+design_31.pdb   100     3.762    12.99   
+design_32.pdb   100     3.788    11.79   
+design_33.pdb   100     3.751    12.28   
+design_34.pdb   100     3.766    12.20   
+design_35.pdb   100     3.763    12.71   
+design_36.pdb   100     3.753    13.55   
+design_37.pdb   100     3.766    12.34   
+design_38.pdb   100     3.760    12.66   
+design_39.pdb   100     3.741    12.16   
+design_4.pdb   100     3.750    16.37   
+design_5.pdb   100     3.778    11.79   
+design_6.pdb   100     3.770    12.41   
+design_7.pdb   100     3.739    13.86   
+design_8.pdb   100     3.781    11.87   
+design_9.pdb   100     3.758    12.02   
+
+converged (n=40): CA-CA 3.7617  Rg 12.96
+diverged: 0/40 = 0.0%  (limit 10%)
+
+[PASS]
+GATE_EXIT arm=base seed=42 rc=0
+########## ARM base seed 1234 n 120 (FRAMEMULSUM=0)
+[gate] /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python scripts/generate.py --config default_vp --num_aa 100 --num_designs 120 --seed 1234 --out_path /dev/shm/n028Bdesigns_907726/base_s1234 --fast --preset fast
+
+    design  nres     CA-CA       Rg   verdict
+design_0.pdb   100     3.770    12.28   
+design_1.pdb   100     3.755    12.24   
+design_10.pdb   100     3.762    12.39   
+design_100.pdb   100     3.788    11.72   
+design_101.pdb   100     3.766    12.05   
+design_102.pdb   100     3.750    13.52   
+design_103.pdb   100     3.752    11.99   
+design_104.pdb   100     3.762    12.77   
+design_105.pdb   100     3.755    12.85   
+design_106.pdb   100     3.767    12.34   
+design_107.pdb   100     3.756    12.68   
+design_108.pdb   100     3.775    13.46   
+design_109.pdb   100     3.744    12.64   
+design_11.pdb   100     3.767    12.56   
+design_110.pdb   100     3.743    12.34   
+design_111.pdb   100     3.768    11.95   
+design_112.pdb   100     3.750    13.80   
+design_113.pdb   100     3.766    13.02   
+design_114.pdb   100     3.776    12.10   
+design_115.pdb   100     3.769    12.85   
+design_116.pdb   100     3.770    12.16   
+design_117.pdb   100     3.766    12.63   
+design_118.pdb   100     3.773    11.72   
+design_119.pdb   100     3.799    13.22   
+design_12.pdb   100     3.764    12.03   
+design_13.pdb   100     3.765    12.73   
+design_14.pdb   100     3.772    11.80   
+design_15.pdb   100     3.761    11.82   
+design_16.pdb   100     3.750    14.53   
+design_17.pdb   100     3.763    13.30   
+design_18.pdb   100     3.782    12.06   
+design_19.pdb   100     3.781    12.72   
+design_2.pdb   100     3.760    11.77   
+design_20.pdb   100     3.758    13.01   
+design_21.pdb   100     3.777    12.16   
+design_22.pdb   100     3.771    12.28   
+design_23.pdb   100     3.741    12.65   
+design_24.pdb   100     3.752    12.89   
+design_25.pdb   100     3.758    13.61   
+design_26.pdb   100     3.766    12.32   
+design_27.pdb   100     3.782    14.26   
+design_28.pdb   100     3.776    11.52   
+design_29.pdb   100     3.770    11.68   
+design_3.pdb   100     3.756    12.15   
+design_30.pdb   100     3.760    12.34   
+design_31.pdb   100     3.778    12.15   
+design_32.pdb   100     3.781    12.46   
+design_33.pdb   100     3.738    12.30   
+design_34.pdb   100     3.750    11.69   
+design_35.pdb   100     3.772    13.14   
+design_36.pdb   100     3.766    11.90   
+design_37.pdb   100     3.759    13.12   
+design_38.pdb   100     3.777    12.57   
+design_39.pdb   100     3.774    15.53   
+design_4.pdb   100     3.755    13.02   
+design_40.pdb   100     3.756    12.04   
+design_41.pdb   100     3.764    13.80   
+design_42.pdb   100     3.747    12.30   
+design_43.pdb   100     3.774    12.11   
+design_44.pdb   100     3.770    12.31   
+design_45.pdb   100     3.750    12.41   
+design_46.pdb   100     3.778    13.19   
+design_47.pdb   100     3.738    12.82   
+design_48.pdb   100     3.760    13.36   
+design_49.pdb   100     3.770    13.07   
+design_5.pdb   100     3.741    12.47   
+design_50.pdb   100     3.754    12.26   
+design_51.pdb   100     3.750    13.15   
+design_52.pdb   100     3.774    12.34   
+design_53.pdb   100     3.778    12.03   
+design_54.pdb   100     3.733    23.72   
+design_55.pdb   100     3.761    12.79   
+design_56.pdb   100     3.754    11.99   
+design_57.pdb   100     3.742    12.31   
+design_58.pdb   100     3.771    12.01   
+design_59.pdb   100     3.757    12.05   
+design_6.pdb   100     3.744    13.24   
+design_60.pdb   100     3.773    12.13   
+design_61.pdb   100     3.787    11.75   
+design_62.pdb   100     3.766    13.11   
+design_63.pdb   100     3.737    13.04   
+design_64.pdb   100     3.757    12.90   
+design_65.pdb   100     3.762    11.90   
+design_66.pdb   100     3.739    13.10   
+design_67.pdb   100     3.756    13.17   
+design_68.pdb   100     3.729    13.29   
+design_69.pdb   100     3.770    12.36   
+design_7.pdb   100     3.766    12.02   
+design_70.pdb   100     3.756    13.48   
+design_71.pdb   100     3.755    13.02   
+design_72.pdb   100     3.768    12.36   
+design_73.pdb   100     3.774    12.63   
+design_74.pdb   100     3.756    13.36   
+design_75.pdb   100     3.733    13.30   
+design_76.pdb   100     3.756    13.57   
+design_77.pdb   100     3.756    13.20   
+design_78.pdb   100     3.752    13.14   
+design_79.pdb   100     3.788    11.68   
+design_8.pdb   100     3.759    15.27   
+design_80.pdb   100     3.762    12.15   
+design_81.pdb   100     3.746    11.97   
+design_82.pdb   100     3.760    11.91   
+design_83.pdb   100     3.748    13.35   
+design_84.pdb   100     3.789    11.73   
+design_85.pdb   100     3.776    12.11   
+design_86.pdb   100     3.765    13.18   
+design_87.pdb   100     3.755    12.00   
+design_88.pdb   100     3.759    12.31   
+design_89.pdb   100     3.761    12.39   
+design_9.pdb   100     3.749    12.03   
+design_90.pdb   100     3.788    11.64   
+design_91.pdb   100     3.776    12.58   
+design_92.pdb   100     3.783    11.93   
+design_93.pdb   100     3.764    20.85   
+design_94.pdb   100     3.776    11.83   
+design_95.pdb   100     3.751    13.41   
+design_96.pdb   100     3.758    12.21   
+design_97.pdb   100     3.765    11.92   
+design_98.pdb   100     3.760    12.39   
+design_99.pdb   100     3.750    15.40   
+
+converged (n=120): CA-CA 3.7622  Rg 12.78
+diverged: 0/120 = 0.0%  (limit 10%)
+
+[PASS]
+GATE_EXIT arm=base seed=1234 rc=0
+########## ARM o8 seed 42 n 40 (FRAMEMULSUM=1)
+[gate] /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python scripts/generate.py --config default_vp --num_aa 100 --num_designs 40 --seed 42 --out_path /dev/shm/n028Bdesigns_907726/o8_s42 --fast --preset fast
+
+    design  nres     CA-CA       Rg   verdict
+design_0.pdb   100     3.757    12.94   
+design_1.pdb   100     3.749    12.01   
+design_10.pdb   100     3.757    12.16   
+design_11.pdb   100     3.742    13.11   
+design_12.pdb   100     3.770    12.48   
+design_13.pdb   100     3.772    13.01   
+design_14.pdb   100     3.788    12.73   
+design_15.pdb   100     3.759    12.91   
+design_16.pdb   100     3.768    12.01   
+design_17.pdb   100     3.767    11.94   
+design_18.pdb   100     3.778    13.33   
+design_19.pdb   100     3.750    15.83   
+design_2.pdb   100     3.753    12.48   
+design_20.pdb   100     3.767    13.21   
+design_21.pdb   100     3.754    23.83   
+design_22.pdb   100     3.754    12.42   
+design_23.pdb   100     3.772    12.76   
+design_24.pdb   100     3.767    11.91   
+design_25.pdb   100     3.779    12.86   
+design_26.pdb   100     3.756    13.26   
+design_27.pdb   100     3.748    12.98   
+design_28.pdb   100     3.777    13.42   
+design_29.pdb   100     3.764    12.49   
+design_3.pdb   100     3.747    13.36   
+design_30.pdb   100     3.740    12.00   
+design_31.pdb   100     3.764    13.03   
+design_32.pdb   100     3.779    11.87   
+design_33.pdb   100     3.761    12.07   
+design_34.pdb   100     3.771    12.11   
+design_35.pdb   100     3.789    11.61   
+design_36.pdb   100     3.757    13.89   
+design_37.pdb   100     3.771    12.37   
+design_38.pdb   100     3.756    12.85   
+design_39.pdb   100     3.766    12.49   
+design_4.pdb   100     3.754    13.73   
+design_5.pdb   100     3.765    11.89   
+design_6.pdb   100     3.754    12.72   
+design_7.pdb   100     3.768    12.33   
+design_8.pdb   100     3.773    11.98   
+design_9.pdb   100     3.755    12.34   
+
+converged (n=40): CA-CA 3.7630  Rg 12.97
+diverged: 0/40 = 0.0%  (limit 10%)
+
+[PASS]
+GATE_EXIT arm=o8 seed=42 rc=0
+########## ARM o8 seed 1234 n 120 (FRAMEMULSUM=1)
+[gate] /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python scripts/generate.py --config default_vp --num_aa 100 --num_designs 120 --seed 1234 --out_path /dev/shm/n028Bdesigns_907726/o8_s1234 --fast --preset fast
+
+    design  nres     CA-CA       Rg   verdict
+design_0.pdb   100     3.749    12.41   
+design_1.pdb   100     3.764    13.93   
+design_10.pdb   100     3.761    12.50   
+design_100.pdb   100     3.766    11.93   
+design_101.pdb   100     3.767    11.95   
+design_102.pdb   100     3.743    14.45   
+design_103.pdb   100     3.769    12.27   
+design_104.pdb   100     3.763    12.43   
+design_105.pdb   100     3.761    12.28   
+design_106.pdb   100     3.770    12.53   
+design_107.pdb   100     3.784    11.63   
+design_108.pdb   100     3.755    12.13   
+design_109.pdb   100     3.751    13.98   
+design_11.pdb   100     3.755    13.25   
+design_110.pdb   100     3.763    12.31   
+design_111.pdb   100     3.760    11.77   
+design_112.pdb   100     3.768    12.18   
+design_113.pdb   100     3.771    11.92   
+design_114.pdb   100     3.806    11.92   
+design_115.pdb   100     3.772    11.57   
+design_116.pdb   100     3.751    11.74   
+design_117.pdb   100     3.761    13.30   
+design_118.pdb   100     3.786    12.32   
+design_119.pdb   100     3.768    13.24   
+design_12.pdb   100     3.789    11.90   
+design_13.pdb   100     3.752    13.22   
+design_14.pdb   100     3.762    12.02   
+design_15.pdb   100     3.773    12.04   
+design_16.pdb   100     3.738    13.27   
+design_17.pdb   100     3.778    12.09   
+design_18.pdb   100     3.768    12.26   
+design_19.pdb   100     3.746    12.86   
+design_2.pdb   100     3.781    11.84   
+design_20.pdb   100     3.760    13.26   
+design_21.pdb   100     3.757    12.72   
+design_22.pdb   100     3.754    12.59   
+design_23.pdb   100     3.760    13.30   
+design_24.pdb   100     3.796    11.74   
+design_25.pdb   100     3.760    12.70   
+design_26.pdb   100     3.765    13.08   
+design_27.pdb   100     3.752    11.98   
+design_28.pdb   100     3.771    11.86   
+design_29.pdb   100     3.779    11.94   
+design_3.pdb   100     3.764    11.90   
+design_30.pdb   100     3.768    12.74   
+design_31.pdb   100     3.762    13.12   
+design_32.pdb   100     3.765    12.60   
+design_33.pdb   100     3.761    12.88   
+design_34.pdb   100     3.774    12.04   
+design_35.pdb   100     3.775    12.58   
+design_36.pdb   100     3.745    12.17   
+design_37.pdb   100     3.781    12.69   
+design_38.pdb   100     3.762    11.79   
+design_39.pdb   100     3.774    15.54   
+design_4.pdb   100     3.749    13.09   
+design_40.pdb   100     3.779    11.59   
+design_41.pdb   100     3.775    12.14   
+design_42.pdb   100     3.777    12.23   
+design_43.pdb   100     3.752    12.31   
+design_44.pdb   100     3.749    12.05   
+design_45.pdb   100     3.745    12.76   
+design_46.pdb   100     3.768    12.76   
+design_47.pdb   100     3.747    12.57   
+design_48.pdb   100     3.754    12.02   
+design_49.pdb   100     3.759    12.54   
+design_5.pdb   100     3.755    13.34   
+design_50.pdb   100     3.764    12.26   
+design_51.pdb   100     3.725    13.58   
+design_52.pdb   100     3.752    12.00   
+design_53.pdb   100     3.758    12.48   
+design_54.pdb   100     3.739    23.76   
+design_55.pdb   100     3.764    12.10   
+design_56.pdb   100     3.769    11.79   
+design_57.pdb   100     3.783    11.82   
+design_58.pdb   100     3.748    11.96   
+design_59.pdb   100     3.758    12.16   
+design_6.pdb   100     3.754    12.81   
+design_60.pdb   100     3.760    12.71   
+design_61.pdb   100     3.763    11.94   
+design_62.pdb   100     3.766    12.41   
+design_63.pdb   100     3.790    11.66   
+design_64.pdb   100     3.770    12.82   
+design_65.pdb   100     3.769    12.00   
+design_66.pdb   100     3.757    13.12   
+design_67.pdb   100     3.752    13.03   
+design_68.pdb   100     3.723    13.29   
+design_69.pdb   100     3.761    12.09   
+design_7.pdb   100     3.788    11.74   
+design_70.pdb   100     3.760    13.02   
+design_71.pdb   100     3.764    12.43   
+design_72.pdb   100     3.761    12.12   
+design_73.pdb   100     3.759    12.51   
+design_74.pdb   100     3.750    13.33   
+design_75.pdb   100     3.757    13.11   
+design_76.pdb   100     3.761    12.57   
+design_77.pdb   100     3.733    11.68   
+design_78.pdb   100     3.749    13.31   
+design_79.pdb   100     3.748    12.41   
+design_8.pdb   100     3.779    12.03   
+design_80.pdb   100     3.779    11.97   
+design_81.pdb   100     3.752    12.96   
+design_82.pdb   100     3.750    13.53   
+design_83.pdb   100     3.787    12.29   
+design_84.pdb   100     3.753    12.09   
+design_85.pdb   100     3.763    12.63   
+design_86.pdb   100     3.741    13.19   
+design_87.pdb   100     3.755    13.00   
+design_88.pdb   100     3.781    11.53   
+design_89.pdb   100     3.778    12.02   
+design_9.pdb   100     3.766    12.90   
+design_90.pdb   100     3.778    12.42   
+design_91.pdb   100     3.770    12.22   
+design_92.pdb   100     3.764    12.10   
+design_93.pdb   100     3.771    13.39   
+design_94.pdb   100     3.765    12.07   
+design_95.pdb   100     3.757    13.66   
+design_96.pdb   100     3.783    12.03   
+design_97.pdb   100     3.765    12.61   
+design_98.pdb   100     3.756    12.38   
+design_99.pdb   100     3.758    15.35   
+
+converged (n=120): CA-CA 3.7629  Rg 12.62
+diverged: 0/120 = 0.0%  (limit 10%)
+
+[PASS]
+GATE_EXIT arm=o8 seed=1234 rc=0
+===== quality n=64 exact
+[gate] /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python scripts/generate.py --config default_vp --num_aa 100 --num_designs 64 --seed 42 --out_path /tmp/907726.helma/f2_907726 --fast --preset exact
+
+    design  nres     CA-CA       Rg   verdict
+design_0.pdb   100     3.760    11.73   
+design_1.pdb   100     3.749    13.17   
+design_10.pdb   100     3.765    12.62   
+design_11.pdb   100     3.761    13.21   
+design_12.pdb   100     3.781    13.12   
+design_13.pdb   100     3.764    12.69   
+design_14.pdb   100     3.765    13.99   
+design_15.pdb   100     3.770    12.34   
+design_16.pdb   100     3.783    13.26   
+design_17.pdb   100     3.781    12.31   
+design_18.pdb   100     3.758    13.24   
+design_19.pdb   100     3.749    13.41   
+design_2.pdb   100     3.740    12.94   
+design_20.pdb   100     3.774    14.28   
+design_21.pdb   100     3.769    12.13   
+design_22.pdb   100     3.779    12.31   
+design_23.pdb   100     3.762    12.33   
+design_24.pdb   100     3.783    11.78   
+design_25.pdb   100     3.745    12.49   
+design_26.pdb   100     3.734    13.63   
+design_27.pdb   100     3.755    12.31   
+design_28.pdb   100     3.759    11.73   
+design_29.pdb   100     3.744    12.53   
+design_3.pdb   100     3.780    12.25   
+design_30.pdb   100     3.772    13.11   
+design_31.pdb   100     3.757    12.68   
+design_32.pdb   100     3.767    11.82   
+design_33.pdb   100     3.773    15.31   
+design_34.pdb   100     3.763    13.58   
+design_35.pdb   100     3.751    11.90   
+design_36.pdb   100     3.768    11.81   
+design_37.pdb   100     3.773    11.45   
+design_38.pdb   100     3.753    12.22   
+design_39.pdb   100     3.756    13.88   
+design_4.pdb   100     3.741    12.07   
+design_40.pdb   100     3.767    12.10   
+design_41.pdb   100     3.757    13.04   
+design_42.pdb   100     3.784    12.09   
+design_43.pdb   100     3.767    11.92   
+design_44.pdb   100     3.743    12.86   
+design_45.pdb   100     3.742    25.29   
+design_46.pdb   100     3.745    13.82   
+design_47.pdb   100     3.771    12.18   
+design_48.pdb   100     3.750    12.22   
+design_49.pdb   100     3.770    11.55   
+design_5.pdb   100     3.772    11.75   
+design_50.pdb   100     3.778    12.32   
+design_51.pdb   100     3.787    12.84   
+design_52.pdb   100     3.770    12.26   
+design_53.pdb   100     3.759    12.00   
+design_54.pdb   100     3.722    13.16   
+design_55.pdb   100     3.747    11.96   
+design_56.pdb   100     3.754    12.51   
+design_57.pdb   100     3.757    12.77   
+design_58.pdb   100     3.763    12.88   
+design_59.pdb   100     3.745    12.18   
+design_6.pdb   100     3.784    14.62   
+design_60.pdb   100     3.760    12.44   
+design_61.pdb   100     3.771    12.51   
+design_62.pdb   100     3.748    13.13   
+design_63.pdb   100     3.758    13.44   
+design_7.pdb   100     3.778    12.91   
+design_8.pdb   100     3.747    12.43   
+design_9.pdb   100     3.781    11.83   
+
+converged (n=64): CA-CA 3.7619  Rg 12.85
+diverged: 0/64 = 0.0%  (limit 10%)
+
+[PASS]
+EXIT 0 : quality exact n=64
+############### POOLED n=160 STATS (N015 methodology)
+
+================ ALL DESIGNS ================
+arm          n        CA-CA (A)           Rg (A)            helix           strand             coil     clash/design  diverged
+base       160   3.7621+-0.0132      12.83+-1.42     0.582+-0.302     0.338+-0.275     0.080+-0.051       0.23+-0.49         0
+o8         160   3.7629+-0.0132      12.71+-1.44     0.597+-0.291     0.319+-0.260     0.083+-0.053       0.14+-0.39         0
+
+-- Welch t-test vs base (p < 0.05 flagged *, p < 0.01 **)
+arm                         CA-CA (A)                     Rg (A)                      helix                     strand                       coil               clash/design
+o8         d=+0.0008 t=+0.55 p=0.583    d=-0.12 t=-0.75 p=0.456   d=+0.015 t=+0.45 p=0.652   d=-0.018 t=-0.61 p=0.544   d=+0.003 t=+0.56 p=0.576    d=-0.08 t=-1.65 p=0.100 
+
+================ CONVERGED ONLY (diverged designs dropped) ================
+arm          n        CA-CA (A)           Rg (A)            helix           strand             coil     clash/design  diverged
+base       160   3.7621+-0.0132      12.83+-1.42     0.582+-0.302     0.338+-0.275     0.080+-0.051       0.23+-0.49         0
+o8         160   3.7629+-0.0132      12.71+-1.44     0.597+-0.291     0.319+-0.260     0.083+-0.053       0.14+-0.39         0
+
+-- Welch t-test vs base (p < 0.05 flagged *, p < 0.01 **)
+arm                         CA-CA (A)                     Rg (A)                      helix                     strand                       coil               clash/design
+o8         d=+0.0008 t=+0.55 p=0.583    d=-0.12 t=-0.75 p=0.456   d=+0.015 t=+0.45 p=0.652   d=-0.018 t=-0.61 p=0.544   d=+0.003 t=+0.56 p=0.576    d=-0.08 t=-1.65 p=0.100 
+
+per-design metrics -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/per_design.json
+
+-- what n=160 (converged) could have detected (two-sided alpha=0.05, power 0.80)
+metric          sd(exact)   SE(diff)        MDE   largest |observed d|
+CA-CA (A)          0.0132     0.0015     0.0041                 0.0008
+Rg (A)               1.42       0.16       0.45                   0.12
+helix               0.302      0.033      0.093                  0.015
+strand              0.275      0.030      0.084                  0.018
+coil                0.051      0.006      0.016                  0.003
+clash/design         0.49       0.05       0.14                   0.08
+
+-- spread vs a_exact, CONVERGED only: Brown-Forsythe (median-centred Levene)
+arm                             CA-CA (A)                         Rg (A)                          helix                         strand                           coil                   clash/design
+o8         sd 0.0132/0.0132 W= 0.11 p=0.7408  sd 1.44/1.42 W= 0.26 p=0.6078  sd 0.291/0.302 W= 0.08 p=0.7802  sd 0.260/0.275 W= 0.26 p=0.6105  sd 0.053/0.051 W= 0.85 p=0.3563  sd 0.39/0.49 W= 2.73 p=0.0997 
+
+-- tail counts, CONVERGED only (threshold = exact mean +- 3 sd of the EXACT arm)
+CA-CA (A)      outside [3.7225, 3.8018]: base 0 o8 1
+Rg (A)         outside [8.58, 17.07]: base 3 o8 2
+
+-- distribution shape vs a_exact, CONVERGED only: two-sample KS
+arm                     CA-CA (A)                 Rg (A)                  helix                 strand                   coil
+o8              D=0.056 p=0.9628       D=0.081 p=0.6681       D=0.050 p=0.9887       D=0.056 p=0.9628       D=0.075 p=0.7608 
+
+-- diverged designs: Fisher exact vs a_exact
+o8         0/160 vs 0/160   p=1.0000 
+
+-- NOTE: 6 mean tests + 6 spread tests + 5 KS tests were run. Bonferroni over the 6 tests of one family is alpha=0.0083; a single p in the 0.01-0.05 range does not survive it.
+
+-- tails (worst single design per arm)
+base       CA-CA min 3.036 max 3.993   per-design CA-CA mean range 3.7294..3.7991   Rg range 11.5..23.7  max clash 2
+o8         CA-CA min 2.688 max 4.010   per-design CA-CA mean range 3.7230..3.8056   Rg range 11.5..23.8  max clash 2
+############### FLAG-ACTUALLY-FIRED CONTROL
+FIREDCHECK arm=o8 seed=42 identical_pdbs=0 / 40
+FIREDCHECK arm=o8 seed=1234 identical_pdbs=0 / 120
+===== speed re-baseline L=100 (exact vs fast [frame_mulsum still off in the dict] vs fast+O8 via env)
+RESULT headB_exact_r1 L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.807 ms  lean  3.011 ms   500-step   1.51 s   compile    67 s
+RESULT headB_exact_r2 L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.807 ms  lean  3.009 ms   500-step   1.51 s   compile    69 s
+RESULT headB_fast_r1 L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.283 ms  lean  2.569 ms   500-step   1.29 s   compile   161 s
+RESULT headB_fast_r2 L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.279 ms  lean  2.579 ms   500-step   1.29 s   compile    64 s
+RESULT headB_fast_o8_r1 L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  2.706 ms  lean  2.097 ms   500-step   1.05 s   compile   174 s
+RESULT headB_fast_o8_r2 L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  2.690 ms  lean  2.108 ms   500-step   1.05 s   compile    61 s
+GPU_SUITE_EXIT=0
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 15:25:07 CEST 2026
+= Job-ID             : 907726 on helma
+= Job-Name           : n028B_gpu
+= Job-Command        : /home/hpc/v181bb/v181bb10/salad_jobs/n028_stageB_gpu.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/salad_jobs
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 03:00:00
+= Elapsed runtime    : 00:32:50
+= Total RAM usage    : 4.6 GiB of assigned 175 GiB (2.6%)
+= Node list          : h12-11
+= Subm/Elig/Start/End: 2026-09-27T14:52:16 / 2026-09-27T14:52:16 / 2026-09-27T14:52:17 / 2026-09-27T15:25:07
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.0G   104.9G   209.7G        N/A     463K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      89K      61K      81K  4d17h24m44s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 2627656, 14 %, 9 %, 1410 MiB, 325335 ms
+NVIDIA H100, 00000000:A6:00.0, 2634989, 46 %, 7 %, 1250 MiB, 135125 ms
+NVIDIA H100, 00000000:A6:00.0, 2636701, 12 %, 8 %, 1360 MiB, 312461 ms
+NVIDIA H100, 00000000:A6:00.0, 2669173, 43 %, 9 %, 1262 MiB, 115409 ms
+NVIDIA H100, 00000000:A6:00.0, 2669470, 26 %, 10 %, 1410 MiB, 382591 ms
+NVIDIA H100, 00000000:A6:00.0, 2674845, 0 %, 0 %, 1248 MiB, 69064 ms
+NVIDIA H100, 00000000:A6:00.0, 2675329, 0 %, 0 %, 1248 MiB, 71004 ms
+NVIDIA H100, 00000000:A6:00.0, 2675860, 3 %, 3 %, 1248 MiB, 167557 ms
+NVIDIA H100, 00000000:A6:00.0, 2676256, 0 %, 0 %, 1248 MiB, 66053 ms
+NVIDIA H100, 00000000:A6:00.0, 2676757, 8 %, 8 %, 1474 MiB, 180272 ms
+NVIDIA H100, 00000000:A6:00.0, 2678677, 0 %, 0 %, 1262 MiB, 62651 ms

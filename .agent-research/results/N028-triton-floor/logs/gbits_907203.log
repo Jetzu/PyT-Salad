@@ -1,0 +1,205 @@
+### Starting TaskPrologue of job 907203 on h11-23 at Sun Sep 27 11:25:39 AM CEST 2026
+Running on cores 64-95 with governor performance
+Sun Sep 27 11:25:39 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/base_64 IPA_MULSUM False PAIR_FEAT_MERGE False FRAME_MULSUM False
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/baserep_64 IPA_MULSUM False PAIR_FEAT_MERGE False FRAME_MULSUM False
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/o6_64 IPA_MULSUM False PAIR_FEAT_MERGE True FRAME_MULSUM False
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/o8_64 IPA_MULSUM False PAIR_FEAT_MERGE False FRAME_MULSUM True
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/o6o8_64 IPA_MULSUM False PAIR_FEAT_MERGE True FRAME_MULSUM True
+===== GPU/DETSEG L=64  baserep vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=6.151199e-05
+  local                  bitwise=False  max|d|=2.414703e-03
+  trajectory             bitwise=False  max|d|=7.176399e-05
+  aa                     bitwise=False  max|d|=4.863739e-05
+  aa_features            bitwise=False  max|d|=4.470348e-06
+  dssp                   bitwise=False  max|d|=9.775162e-06
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=9.155273e-03
+  angles                 bitwise=False  max|d|=4.726648e-05
+  angle_pos              bitwise=False  max|d|=5.078316e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=64 baserep bit_identical=False  differing_tensors=9
+===== GPU/DETSEG L=64  o6 vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=6.151199e-05
+  local                  bitwise=False  max|d|=2.414703e-03
+  trajectory             bitwise=False  max|d|=7.176399e-05
+  aa                     bitwise=False  max|d|=4.863739e-05
+  aa_features            bitwise=False  max|d|=4.470348e-06
+  dssp                   bitwise=False  max|d|=9.775162e-06
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=9.155273e-03
+  angles                 bitwise=False  max|d|=4.726648e-05
+  angle_pos              bitwise=False  max|d|=5.078316e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=64 o6 bit_identical=False  differing_tensors=9
+===== GPU/DETSEG L=64  o8 vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=1.091957e-04
+  local                  bitwise=False  max|d|=3.372192e-03
+  trajectory             bitwise=False  max|d|=1.091957e-04
+  aa                     bitwise=False  max|d|=3.623962e-05
+  aa_features            bitwise=False  max|d|=5.125999e-06
+  dssp                   bitwise=False  max|d|=1.096725e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=6.225586e-03
+  angles                 bitwise=False  max|d|=3.790855e-05
+  angle_pos              bitwise=False  max|d|=5.912781e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=64 o8 bit_identical=False  differing_tensors=9
+===== GPU/DETSEG L=64  o6o8 vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=1.957417e-04
+  local                  bitwise=False  max|d|=3.170013e-03
+  trajectory             bitwise=False  max|d|=1.957417e-04
+  aa                     bitwise=False  max|d|=6.294250e-05
+  aa_features            bitwise=False  max|d|=5.841255e-06
+  dssp                   bitwise=False  max|d|=1.764297e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=1.269531e-02
+  angles                 bitwise=False  max|d|=4.503131e-05
+  angle_pos              bitwise=False  max|d|=8.910894e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=64 o6o8 bit_identical=False  differing_tensors=9
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/base_100 IPA_MULSUM False PAIR_FEAT_MERGE False FRAME_MULSUM False
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/baserep_100 IPA_MULSUM False PAIR_FEAT_MERGE False FRAME_MULSUM False
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/o6_100 IPA_MULSUM False PAIR_FEAT_MERGE True FRAME_MULSUM False
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/o8_100 IPA_MULSUM False PAIR_FEAT_MERGE False FRAME_MULSUM True
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+wrote /dev/shm/n028gb_907203/o6o8_100 IPA_MULSUM False PAIR_FEAT_MERGE True FRAME_MULSUM True
+===== GPU/DETSEG L=100  baserep vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=8.964539e-05
+  local                  bitwise=False  max|d|=2.441406e-03
+  trajectory             bitwise=False  max|d|=8.964539e-05
+  aa                     bitwise=False  max|d|=2.574921e-05
+  aa_features            bitwise=False  max|d|=2.995133e-06
+  dssp                   bitwise=False  max|d|=2.431870e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=3.860474e-03
+  angles                 bitwise=False  max|d|=9.121001e-05
+  angle_pos              bitwise=False  max|d|=6.103516e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=100 baserep bit_identical=False  differing_tensors=9
+===== GPU/DETSEG L=100  o6 vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=True  max|d|=0.000000e+00
+  local                  bitwise=True  max|d|=0.000000e+00
+  trajectory             bitwise=True  max|d|=0.000000e+00
+  aa                     bitwise=False  max|d|=2.861023e-06
+  aa_features            bitwise=False  max|d|=2.980232e-07
+  dssp                   bitwise=True  max|d|=0.000000e+00
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=True  max|d|=0.000000e+00
+  angles                 bitwise=True  max|d|=0.000000e+00
+  angle_pos              bitwise=True  max|d|=0.000000e+00
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=100 o6 bit_identical=False  differing_tensors=2
+===== GPU/DETSEG L=100  o8 vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=1.835823e-04
+  local                  bitwise=False  max|d|=2.414703e-03
+  trajectory             bitwise=False  max|d|=1.835823e-04
+  aa                     bitwise=False  max|d|=2.479553e-05
+  aa_features            bitwise=False  max|d|=5.185604e-06
+  dssp                   bitwise=False  max|d|=2.813339e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=6.240845e-03
+  angles                 bitwise=False  max|d|=1.206249e-04
+  angle_pos              bitwise=False  max|d|=9.256601e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=100 o8 bit_identical=False  differing_tensors=9
+===== GPU/DETSEG L=100  o6o8 vs base  (baserep is the self-floor)
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/x_cmp_bits.py:4: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  a = torch.load(sys.argv[1]); b = torch.load(sys.argv[2])
+  pos                    bitwise=False  max|d|=1.835823e-04
+  local                  bitwise=False  max|d|=2.414703e-03
+  trajectory             bitwise=False  max|d|=1.835823e-04
+  aa                     bitwise=False  max|d|=2.574921e-05
+  aa_features            bitwise=False  max|d|=5.222857e-06
+  dssp                   bitwise=False  max|d|=2.813339e-05
+  distogram_neighbours   bitwise=True  max|d|=0.000000e+00
+  raw_angles             bitwise=False  max|d|=6.240845e-03
+  angles                 bitwise=False  max|d|=1.206249e-04
+  angle_pos              bitwise=False  max|d|=9.256601e-05
+  aatype                 bitwise=True  max|d|=0.000000e+00
+BITS GPU L=100 o6o8 bit_identical=False  differing_tensors=9
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:46:34 CEST 2026
+= Job-ID             : 907203 on helma
+= Job-Name           : n028_gbits
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor/gpubits.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N028-triton-floor
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:30:00
+= Elapsed runtime    : 00:20:55
+= Total RAM usage    : 3.4 GiB of assigned 175 GiB (1.9%)
+= Node list          : h11-23
+= Subm/Elig/Start/End: 2026-09-27T11:25:38 / 2026-09-27T11:25:38 / 2026-09-27T11:25:39 / 2026-09-27T11:46:34
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.0G   104.9G   209.7G        N/A     462K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      88K      61K      81K  4d21h3m17s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 3648742, 19 %, 20 %, 1284 MiB, 117835 ms
+NVIDIA H100, 00000000:A6:00.0, 3655147, 18 %, 19 %, 1284 MiB, 122878 ms
+NVIDIA H100, 00000000:A6:00.0, 3659045, 20 %, 21 %, 1282 MiB, 109301 ms
+NVIDIA H100, 00000000:A6:00.0, 3666806, 17 %, 18 %, 1284 MiB, 104982 ms
+NVIDIA H100, 00000000:A6:00.0, 3671445, 17 %, 18 %, 1280 MiB, 103183 ms
+NVIDIA H100, 00000000:A6:00.0, 3674786, 16 %, 17 %, 1292 MiB, 135734 ms
+NVIDIA H100, 00000000:A6:00.0, 3680212, 16 %, 17 %, 1292 MiB, 137530 ms
+NVIDIA H100, 00000000:A6:00.0, 3684737, 16 %, 17 %, 1292 MiB, 134411 ms
+NVIDIA H100, 00000000:A6:00.0, 3688603, 14 %, 14 %, 1290 MiB, 129845 ms
+NVIDIA H100, 00000000:A6:00.0, 3694417, 13 %, 14 %, 1290 MiB, 127561 ms
