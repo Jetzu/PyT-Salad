@@ -1,0 +1,61 @@
+### Starting TaskPrologue of job 907766 on h11-16 at Sun Sep 27 03:05:12 PM CEST 2026
+Running on cores 32-63 with governor performance
+Sun Sep 27 15:05:12 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+40a85be50ff7714cbeca444370f8b1359b640b9b
+4f1dece2478d0af787b2c9365a8e60dc  salad_torch/gemm_exact.py
+8958265d7b6ef4a611f58f2d1234b27b  salad_torch/modules/fast.py
+1adea4b84d9923873e1d15ddd1f56c0f  salad_torch/opt.py
+9601dd640678e60fd5abef1e414bd1cd  salad_torch/modules/cond_prologue.py
+NVIDIA H100, 9.0
+########## BITS L=100 (P7 ON)
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+[arm base] compiled. {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {}}
+[arm decomp32] compiled. {"info": {"arm": "decomp32", "feats": ["decomp32"], "epilogue_fusion": true, "decomp_min_batch": 32, "max_autotune_gemm": false, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}, "filter": null, "counters": {"decompose_bmm": 103}}
+[arm base_rerun] compiled. {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {"decompose_bmm": 103}}
+[cmp base vs decomp32] bit_identical=False pos=4.959e-05 raw_angles=5.280e-03 aatype_flips=0
+[cmp base vs base_rerun] bit_identical=True pos=0.000e+00 raw_angles=0.000e+00 aatype_flips=0
+RESULT {"L": 100, "arms": ["base", "decomp32", "base_rerun"], "meta": {"base": {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {}}, "decomp32": {"info": {"arm": "decomp32", "feats": ["decomp32"], "epilogue_fusion": true, "decomp_min_batch": 32, "max_autotune_gemm": false, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}, "filter": null, "counters": {"decompose_bmm": 103}}, "base_rerun": {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {"decompose_bmm": 103}}}, "cmp": {"decomp32": {"bit_identical": false, "outputs": {"pos": {"maxabs": 4.9591064453125e-05, "bitwise": false}, "local": {"maxabs": 0.00284576416015625, "bitwise": false}, "trajectory": {"maxabs": 8.821487426757812e-05, "bitwise": false}, "aa": {"maxabs": 5.4836273193359375e-06, "bitwise": false}, "aa_features": {"maxabs": 1.7136335372924805e-06, "bitwise": false}, "dssp": {"maxabs": 1.1324882507324219e-05, "bitwise": false}, "distogram_neighbours": {"maxabs": 0.0, "bitwise": true}, "raw_angles": {"maxabs": 0.005279541015625, "bitwise": false}, "angles": {"maxabs": 7.045269012451172e-05, "bitwise": false}, "angle_pos": {"maxabs": 4.1365623474121094e-05, "bitwise": false}, "aatype": {"maxabs": 0.0, "bitwise": true}}}, "base_rerun": {"bit_identical": true, "outputs": {"pos": {"maxabs": 0.0, "bitwise": true}, "local": {"maxabs": 0.0, "bitwise": true}, "trajectory": {"maxabs": 0.0, "bitwise": true}, "aa": {"maxabs": 0.0, "bitwise": true}, "aa_features": {"maxabs": 0.0, "bitwise": true}, "dssp": {"maxabs": 0.0, "bitwise": true}, "distogram_neighbours": {"maxabs": 0.0, "bitwise": true}, "raw_angles": {"maxabs": 0.0, "bitwise": true}, "angles": {"maxabs": 0.0, "bitwise": true}, "angle_pos": {"maxabs": 0.0, "bitwise": true}, "aatype": {"maxabs": 0.0, "bitwise": true}}}}, "torch": "2.5.1+cu121", "gpu": "NVIDIA H100"}
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 15:10:49 CEST 2026
+= Job-ID             : 907766 on helma
+= Job-Name           : n030_bitsp7
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N030-cublas/j10_bits_p7on.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N030-cublas
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 02:00:00
+= Elapsed runtime    : 00:05:42
+= Total RAM usage    : 4.5 GiB of assigned 175 GiB (2.6%)
+= Node list          : h11-16
+= Subm/Elig/Start/End: 2026-09-27T15:05:03 / 2026-09-27T15:05:03 / 2026-09-27T15:05:07 / 2026-09-27T15:10:49
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.0G   104.9G   209.7G        N/A     463K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      89K      61K      81K  4d17h39m2s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 3018022, 12 %, 13 %, 1344 MiB, 332327 ms

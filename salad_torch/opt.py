@@ -24,7 +24,9 @@ import os
 
 __all__ = ["GATHER_ONEHOT", "HOIST_NEIGHBOURS", "SKIP_PAIR_COND", "LEAN_STEPS",
            "NEED_AUX", "BATCH_COND", "DET_SEGMENT", "AGGRESSIVE_FUSION",
-           "MM_MODE", "GEMM_TEMPLATES", "PAIR_FEAT_MERGE"]
+           "MM_MODE", "GEMM_TEMPLATES", "PAIR_FEAT_MERGE", "GEMM_TPL_MODE",
+           "resolve_gemm_templates", "DECOMPOSE_SMALL_BMM",
+           "resolve_decompose_small_bmm"]
 
 
 def _flag(name: str, default: bool = True) -> bool:
@@ -197,7 +199,121 @@ if MM_MODE is None:
 #: experimentation (e.g. a `fast`-preset candidate pending an n=160
 #: structural validation - see N015's method - which has NOT been run) but no
 #: shipped preset requests it.
-GEMM_TEMPLATES = _flag("SALAD_OPT_GEMMTPL", default=False)
+#: N030 - inductor's `decompose_mm_pass`. A batched `bmm` whose batch is at
+#: least `min_first_dimension_decomposition` and two of whose (m, n, k) are
+#: under 32 is rewritten as `(a[..., None] * b[..., None, :, :]).sum(-2)`, i.e.
+#: a Triton kernel (1.06 us to exist, and fusable with its neighbours) instead
+#: of a cuBLAS launch (6.08 us for arithmetic under 1 us).
+#:
+#: This model is full of such GEMMs: ~90 of the ~300 `bmm`s in the graph are
+#: 3x3 frame rotations from `rigid.py`/`frames.py` (batch 100-18432, M=K=3,
+#: 0.02-1.5 MFLOP each). Upstream's threshold is 10240, which misses every one
+#: of them; the preset asks for 32.
+#:
+#: Measured -15.5 % of a lean step at L=100 ON TOP of the P7-reenabled
+#: baseline (job 907765: 3.0721 -> 2.5946 ms; matches the pre-P7-reenable
+#: -16.6 % almost exactly, so the two do not meaningfully compete for the same
+#: launches) - LARGER than the matmul templates and at a fraction of their
+#: compile cost - but it is a REASSOCIATION (mul then tree-sum instead of
+#: cuBLAS's FMA chain), whole-forward `pos` max|d| 4.96e-05 A against a 2e-05
+#: floor (job 907766), so it can only ever be a `fast` feature.
+#: `SALAD_OPT_DECOMPBMM=0` vetoes it.
+#: `SALAD_OPT_DECOMPBMM` is a THRESHOLD, not a plain veto flag:
+#:   unset            the preset decides (this is what ships)
+#:   ``0`` / ``off``  veto - no decomposition, whatever the preset says
+#:   ``<int>``        use this min-batch threshold, overriding the preset
+#: The third form exists so the n=160 design-quality gate can run the candidate
+#: configuration without editing a preset mid-job. It deliberately lets the
+#: environment turn the feature ON as well as off - the trap this project keeps
+#: hitting is an arm that LOOKS on and is not (a preset's False ANDing the
+#: env var to False), and a threshold that can only be lowered reproduces it.
+#:
+#: UNLIKE the matmul templates below, this is NOT an autotune race: it is a
+#: pure threshold-triggered FX-graph rewrite, so it is perfectly reproducible
+#: across independent cold-cache compiles (job 907764: 3/3 compiles bitwise
+#: IDENTICAL to each other, `pos` max|d| = 0.0 in both pairwise comparisons -
+#: contrast the matmul-templates row below, which disagreed with itself by
+#: 3.46e-05 across the same 3 compiles).
+_DEC_ENV = os.environ.get("SALAD_OPT_DECOMPBMM")
+if _DEC_ENV is None:
+    DECOMPOSE_SMALL_BMM = None                     # no opinion
+elif _DEC_ENV.strip().lower() in ("0", "off", "false", "no", ""):
+    DECOMPOSE_SMALL_BMM = 0                        # veto
+elif _DEC_ENV.strip().isdigit():
+    DECOMPOSE_SMALL_BMM = int(_DEC_ENV.strip())
+else:
+    DECOMPOSE_SMALL_BMM = None
+
+
+def resolve_decompose_small_bmm(preset_value) -> int:
+    """-> the min-batch threshold, or 0 for off."""
+    if DECOMPOSE_SMALL_BMM == 0:
+        return 0
+    if DECOMPOSE_SMALL_BMM:
+        return int(DECOMPOSE_SMALL_BMM)
+    return int(preset_value) if preset_value else 0
+
+#: N030 supersedes the "REJECTED" verdict above for ONE of the three modes.
+#: `SALAD_OPT_GEMMTPL` is no longer a plain on/off flag; it selects HOW the
+#: winner among inductor's GEMM candidates is chosen:
+#:
+#:   ``0`` / ``off``  templates off - the pre-N020 behaviour             (DEFAULT)
+#:   ``1`` / ``all``  N020's arm: fastest candidate wins. -14 % at L=100 and
+#:                    REJECTED - not bit-exact (pos 5.84e-05 A) and not even
+#:                    reproducible against itself across compiles.
+#:   ``exact``        N030: the fastest candidate that is BITWISE identical to
+#:                    cuBLAS at that shape, verified at compile time on the
+#:                    machine that is compiling (`salad_torch/gemm_exact.py`).
+#:                    MEASURED NOT TO WORK EITHER: even restricted to
+#:                    per-shape-verified candidates, the whole forward is
+#:                    still not bit-exact (pos 5.44e-05 A) AND the verified
+#:                    candidate set is itself not stable across cold-cache
+#:                    compiles (job 907764: rep1 vs rep3 pos 3.46e-05, rep1
+#:                    vs rep2 exactly 0.0 - the SAME timing-race instability
+#:                    that motivated this mode in the first place still
+#:                    reaches the output, because which candidates SURVIVE
+#:                    verification is itself not perfectly reproducible, not
+#:                    only which survivor wins the subsequent speed race).
+#:                    Kept only as an opt-in research knob; no preset uses it.
+#:   ``stable``       N030: fastest candidate, but the timing race's tie-break
+#:                    is deterministic (content hash, not arrival order), so
+#:                    two compiles agree. Still NOT equal to cuBLAS, and NOT
+#:                    validated at n=160 either. Research knob only.
+#:
+#: The value ANDs with the preset the usual way: a preset that says
+#: `gemm_templates=False` cannot be turned on from the environment, and a
+#: preset that asks for a mode can be vetoed with `SALAD_OPT_GEMMTPL=0` or
+#: narrowed to another mode.
+_TPL_ENV = os.environ.get("SALAD_OPT_GEMMTPL")
+_TPL_MODES = {"0": "off", "off": "off", "false": "off", "no": "off", "": "off",
+              "1": "all", "on": "all", "true": "all", "yes": "all", "all": "all",
+              "exact": "exact", "stable": "stable"}
+GEMM_TPL_MODE = (None if _TPL_ENV is None
+                 else _TPL_MODES.get(_TPL_ENV.strip().lower()))
+if _TPL_ENV is not None and GEMM_TPL_MODE is None:
+    raise ValueError(
+        f"SALAD_OPT_GEMMTPL must be 0|all|exact|stable, got {_TPL_ENV!r}")
+#: back-compatible boolean: "did the environment ask for templates at all".
+GEMM_TEMPLATES = GEMM_TPL_MODE not in (None, "off") if _TPL_ENV is not None else True
+
+
+def resolve_gemm_templates(preset_value) -> str:
+    """Combine a preset's `gemm_templates` with the environment. -> mode name.
+
+    The preset decides whether templates run at all; the environment can only
+    veto (`0`) or pick a different mode. Returns one of
+    ``"off" | "all" | "exact" | "stable"``.
+    """
+    pv = preset_value
+    if pv is True:
+        pv = "all"
+    elif not pv:
+        pv = "off"
+    if pv == "off":
+        return "off"
+    if GEMM_TPL_MODE is None:      # no opinion from the environment
+        return pv
+    return GEMM_TPL_MODE
 
 
 #: N028/O6 - `DiffusionPairFeatures` calls `direction_features(pos, nb)` and

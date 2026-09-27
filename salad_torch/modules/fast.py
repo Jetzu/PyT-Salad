@@ -29,7 +29,7 @@ from typing import Sequence
 import torch
 from torch import Tensor, nn
 
-from .. import opt
+from .. import gemm_exact, opt
 from .diffusion import uniform_draw_count
 
 __all__ = ["FastDenoiser", "GroupFastDenoiser", "PRESETS", "memory_bound_group"]
@@ -73,7 +73,21 @@ def _cse_graph_pass(graph):
     graph.owning_module.graph = _fx_graph_cse(graph)
 
 
+def _cse_graph_pass_gemm_exact(graph):
+    """Identical to `_cse_graph_pass`; the NAME is the point - see N030 below."""
+    graph.owning_module.graph = _fx_graph_cse(graph)
+
+
+def _cse_graph_pass_gemm_stable(graph):
+    """Identical to `_cse_graph_pass`; the NAME is the point - see N030 below."""
+    graph.owning_module.graph = _fx_graph_cse(graph)
+
+
 _cse_graph_pass = _cse_graph_pass if _fx_graph_cse is not None else None
+_CSE_PASS_BY_MODE = {} if _fx_graph_cse is None else {
+    "exact": _cse_graph_pass_gemm_exact,
+    "stable": _cse_graph_pass_gemm_stable,
+}
 
 
 PRESETS: dict[str, dict] = {
@@ -118,7 +132,20 @@ PRESETS: dict[str, dict] = {
         # `SALAD_OPT_GEMMTPL=1` still works as an opt-in for experimentation;
         # it is a `fast`-preset candidate pending an n=160 structural
         # validation (N015's method) that has not been run.
+        #
+        # N030 tried to rescue this for `exact` with a per-shape bitwise-exact
+        # candidate filter (`SALAD_OPT_GEMMTPL=exact`, `gemm_exact.py`) and it
+        # did NOT work: even restricted to Triton candidates individually
+        # verified bitwise-equal to cuBLAS at their own shape, the WHOLE
+        # FORWARD is still not bit-exact (pos max|d|=5.44e-05, barely better
+        # than the unfiltered arm's 5.84e-05) and the verified-candidate SET
+        # is itself not stable across cold compiles - see RESULTS.md section 4.
         gemm_templates=False,
+        # N030: inductor's `decompose_mm_pass` (see opt.DECOMPOSE_SMALL_BMM).
+        # -15.5 % at L=100 on top of P7 but a reassociation (pos
+        # max|d|=4.96e-05 A, above the 2e-05 floor), so False here too -
+        # `exact` never takes it.
+        decompose_small_bmm=False,
     ),
     # ------------------------------------------------------------------
     # "fast" (N011) - maximum speed, ALLOWED to move the numbers. It is NOT a
@@ -214,10 +241,22 @@ PRESETS: dict[str, dict] = {
         batch_cond_pair=True,
         # N028/O6 - bit-exact, takes every preset. See `opt.PAIR_FEAT_MERGE`.
         pair_feat_merge=True,
-        # N020: rejected everywhere (not bit-exact, no n=160 validation done
-        # for `fast` yet) - see the `exact` preset's comment above and
-        # .agent-research/results/N020-matmul-lowering/RESULTS.md.
+        # N020/N030: matmul TEMPLATES (`max_autotune_gemm`) stay rejected
+        # everywhere, including `fast` - the per-shape bitwise-exact filter
+        # (`SALAD_OPT_GEMMTPL=exact`) doesn't buy exactness or determinism
+        # (see the `exact` preset's comment above) and only gets -11% at
+        # L=100, worse than `decompose_small_bmm` below, for a ~5-40x
+        # compile-time tax.
         gemm_templates=False,
+        # N030: inductor's `decompose_mm_pass` (see opt.DECOMPOSE_SMALL_BMM).
+        # -15.5 % at L=100 on top of P7 (job 907765: 3.0721 -> 2.5946 ms), a
+        # reassociation (pos max|d|=4.96e-05 A, above the 2e-05 floor, so
+        # `exact`/`deterministic` never get it) but PERFECTLY REPRODUCIBLE
+        # across cold compiles (job 907764, unlike `gemm_templates`) - and the
+        # n=160 design-quality gate is in for the ACTUAL shipped `fast`
+        # preset: 0/160 diverged, CA-CA 3.7638 A / Rg 12.96 vs baseline's
+        # 3.7625 A / 13.04 (job 907763). Ships here.
+        decompose_small_bmm=32,
     ),
     # ------------------------------------------------------------------
     # "deterministic" (N013) - `exact`, plus a segment reduction that does not
@@ -278,6 +317,8 @@ PRESETS: dict[str, dict] = {
         # N020: rejected everywhere - see the `exact` preset's comment above.
         gemm_templates=False,
         det_segment=True,
+        # N030: reassociation, never in the bitwise-reproducible preset.
+        decompose_small_bmm=False,
     ),
 }
 
@@ -392,9 +433,41 @@ class FastDenoiser(nn.Module):
         # preset (see PRESETS above) - not bit-exact end to end, so this line
         # is always `False and ...` today; kept live (not deleted) so a future
         # `fast`-only landing, once validated, is a one-line preset change.
-        _ind.max_autotune_gemm = bool(p.get("gemm_templates")) and opt.GEMM_TEMPLATES
+        #
+        # N030 changes what "on" means. `gemm_templates` is now a MODE, not a
+        # bool - `False`/`"off"`, `"all"` (N020's rejected fastest-wins race),
+        # `"exact"` (only candidates BITWISE equal to cuBLAS at that shape,
+        # measured NOT sufficient either - RESULTS.md section 4) or `"stable"`
+        # (fastest, deterministic tie-break, still not equal to cuBLAS). See
+        # `salad_torch/gemm_exact.py` and `opt.resolve_gemm_templates`.
+        _tpl_mode = opt.resolve_gemm_templates(p.get("gemm_templates"))
+        _ind.max_autotune_gemm = _tpl_mode != "off"
         if _ind.max_autotune_gemm:
             _ind.max_autotune_gemm_backends = "ATEN,TRITON"
+        if _tpl_mode in ("exact", "stable"):
+            gemm_exact.install(mode=_tpl_mode)
+        else:
+            gemm_exact.uninstall()
+        # N030 - `decompose_mm_pass`, see `opt.DECOMPOSE_SMALL_BMM`. A config
+        # value, so unlike the candidate filter it DOES take part in the
+        # FX-graph cache key and needs no salt. The pass module reads both
+        # thresholds at import time, so they are re-set on the module too for
+        # the case where a second denoiser is built in the same process.
+        _dec = opt.resolve_decompose_small_bmm(p.get("decompose_small_bmm"))
+        _pgf = dict(_ind.post_grad_fusion_options)
+        _pgf.pop("decompose_mm_pass", None)
+        if _dec:
+            _pgf["decompose_mm_pass"] = {
+                "min_first_dimension_decomposition": int(_dec),
+                "max_other_dimention_decomposition": 32}
+        _ind.post_grad_fusion_options = _pgf
+        try:
+            from torch._inductor.fx_passes import decompose_mem_bound_mm as _dmm
+            if _dec:
+                _dmm.min_first_dimension_decomposition = int(_dec)
+                _dmm.max_other_dimention_decomposition = 32
+        except Exception:
+            pass
         # N017/O1. Inductor's inference pipeline has no CSE pass: `joint_graph_passes`
         # runs remove_noop_ops, the pattern matcher and constant folding, and that is
         # all. So the denoiser rebuilds the SAME Gram-Schmidt frame 61 times per
@@ -428,7 +501,17 @@ class FastDenoiser(nn.Module):
         # Triton kernel cache still helps on a repeat length, which is why it only
         # shows up as slow cold starts rather than as an error).
         if _cse_graph_pass is not None:
-            _ind.joint_custom_post_pass = _cse_graph_pass
+            # N030. The GEMM-candidate filter is a monkeypatch on inductor's
+            # lowerings, NOT a config value, so it does NOT participate in the
+            # FX-graph cache key: without a salt, an `exact` compile would be
+            # served a cached `all` artifact (or vice versa) and the difference
+            # would silently vanish. `joint_custom_post_pass` DOES participate
+            # (that is how N022's unpicklable-closure bug was found), and a
+            # module-level function pickles as its qualified NAME - so pointing
+            # it at a differently-named function with the same body salts the
+            # key. Distinct name per mode, one line, no new config.
+            _ind.joint_custom_post_pass = _CSE_PASS_BY_MODE.get(
+                _tpl_mode, _cse_graph_pass)
         # P7, same contract: the preset chooses, `SALAD_OPT_BATCHCOND=0` can
         # only veto. Also process-global, and also set before the compile.
         opt.BATCH_COND = bool(p.get("batch_cond_pair")) and _ENV_BATCH_COND

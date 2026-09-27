@@ -1,0 +1,1234 @@
+### Starting TaskPrologue of job 907292 on h11-17 at Sun Sep 27 11:48:28 AM CEST 2026
+Running on cores 64-95 with governor performance
+Sun Sep 27 11:48:28 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+98bc61b789376915765b3522b60d8b6a729a8a83
+4f1dece2478d0af787b2c9365a8e60dc  salad_torch/gemm_exact.py
+NVIDIA H100, 9.0
+########## BITS L=100
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+[arm base] compiled. {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {}}
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x20)
+  triton_bmm_1 0.0055 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_2 0.0056 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_3 0.0056 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=2
+  triton_bmm_4 0.0056 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=2
+  triton_bmm_0 0.0056 ms 97.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  bmm 0.0062 ms 88.2% 
+SingleProcess AUTOTUNE benchmarking takes 0.6313 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 100, 1725], [1, 1725, 512]] K=1725: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE bmm(1x100x128, 1x128x768)
+  triton_bmm_44 0.0078 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_45 0.0083 ms 94.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_46 0.0083 ms 94.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_47 0.0096 ms 80.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_50 0.0097 ms 79.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  bmm 0.0106 ms 73.6% 
+  triton_bmm_49 0.0112 ms 69.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_43 0.0114 ms 68.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_51 0.0121 ms 64.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_53 0.0129 ms 60.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 2.0094 seconds and 0.0004 seconds precompiling
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x1280)
+  triton_bmm_94 0.0157 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_96 0.0158 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_95 0.0162 ms 97.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_98 0.0163 ms 96.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=8
+  triton_bmm_99 0.0163 ms 96.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_92 0.0164 ms 95.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_97 0.0164 ms 95.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_90 0.0165 ms 95.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_93 0.0165 ms 95.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_91 0.0168 ms 93.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.3803 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x6400x60, 1x60x64)
+  triton_bmm_107 0.0085 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_101 0.0088 ms 97.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_110 0.0088 ms 96.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_102 0.0089 ms 96.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_103 0.0089 ms 96.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_106 0.0090 ms 95.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_109 0.0090 ms 95.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_104 0.0092 ms 93.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  bmm 0.0092 ms 92.7% 
+  triton_bmm_100 0.0093 ms 91.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.9918 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[6400, 3, 3], [6400, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(6400x3x3, 6400x3x3)
+  triton_bmm_118 0.0097 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_119 0.0097 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_120 0.0098 ms 99.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  triton_bmm_121 0.0099 ms 98.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_122 0.0099 ms 98.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  bmm 0.0179 ms 54.5% 
+SingleProcess AUTOTUNE benchmarking takes 0.6327 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x6400x9, 1x9x64)
+  triton_bmm_124 0.0059 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_123 0.0060 ms 98.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_125 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_128 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_129 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_131 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_132 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_127 0.0061 ms 95.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_126 0.0061 ms 95.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_130 0.0062 ms 94.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.6703 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 2560]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x2560)
+  bmm 0.0220 ms 100.0% 
+  triton_bmm_144 0.0262 ms 83.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_146 0.0263 ms 83.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_140 0.0270 ms 81.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_142 0.0270 ms 81.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_143 0.0270 ms 81.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_147 0.0271 ms 80.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_148 0.0272 ms 80.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=8
+  triton_bmm_145 0.0272 ms 80.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_149 0.0272 ms 80.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 2.3997 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE bmm(1x6400x240, 1x240x64)
+  triton_bmm_159 0.0149 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_157 0.0164 ms 90.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_160 0.0165 ms 90.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_151 0.0170 ms 87.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_152 0.0173 ms 86.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_153 0.0173 ms 85.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  bmm 0.0189 ms 78.5% 
+  triton_bmm_156 0.0193 ms 77.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_161 0.0201 ms 74.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_150 0.0209 ms 71.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.9230 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x6400x64, 1x64x128)
+  bmm 0.0105 ms 100.0% 
+  triton_bmm_176 0.0105 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_175 0.0106 ms 99.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_182 0.0107 ms 98.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=128, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_178 0.0107 ms 97.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_174 0.0108 ms 97.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_173 0.0109 ms 96.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_168 0.0109 ms 95.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_169 0.0110 ms 95.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_170 0.0115 ms 91.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 2.1133 seconds and 0.0004 seconds precompiling
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x6400x128, 1x128x64)
+  triton_bmm_196 0.0107 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_197 0.0115 ms 93.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_194 0.0118 ms 90.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_189 0.0119 ms 89.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  bmm 0.0120 ms 89.3% 
+  triton_bmm_190 0.0120 ms 88.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_191 0.0125 ms 85.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_188 0.0126 ms 84.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_193 0.0126 ms 84.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_187 0.0134 ms 79.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 2.0079 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x6400x64, 1x64x8)
+  triton_bmm_207 0.0075 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_213 0.0075 ms 99.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_214 0.0075 ms 99.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_208 0.0076 ms 98.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_215 0.0077 ms 96.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_206 0.0078 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_209 0.0078 ms 95.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_212 0.0078 ms 95.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_211 0.0079 ms 95.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_205 0.0082 ms 91.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.7807 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE bmm(1x100x128, 1x128x576)
+  triton_bmm_222 0.0078 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_224 0.0082 ms 95.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_223 0.0082 ms 94.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_225 0.0096 ms 81.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_228 0.0098 ms 79.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  bmm 0.0108 ms 72.3% 
+  triton_bmm_227 0.0113 ms 68.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_221 0.0115 ms 67.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_229 0.0120 ms 65.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_235 0.0127 ms 61.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=128, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 2.0064 seconds and 0.0004 seconds precompiling
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x192)
+  bmm 0.0068 ms 100.0% 
+  triton_bmm_243 0.0069 ms 99.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_240 0.0069 ms 98.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_241 0.0069 ms 98.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_242 0.0071 ms 96.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_244 0.0071 ms 96.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_245 0.0071 ms 96.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_249 0.0071 ms 96.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_246 0.0078 ms 88.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_248 0.0079 ms 87.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.3627 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x8x64, 100x64x64)
+  triton_bmm_255 0.0076 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_261 0.0076 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_260 0.0078 ms 97.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_263 0.0078 ms 96.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_253 0.0079 ms 95.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_259 0.0079 ms 95.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_254 0.0080 ms 94.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_256 0.0080 ms 94.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_262 0.0080 ms 94.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_258 0.0083 ms 91.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.3660 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 24]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x64)
+  triton_bmm_284 0.0058 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_286 0.0059 ms 99.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_288 0.0059 ms 99.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_289 0.0059 ms 99.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_290 0.0059 ms 99.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_285 0.0059 ms 98.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_287 0.0059 ms 98.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+  bmm 0.0064 ms 90.5% 
+SingleProcess AUTOTUNE benchmarking takes 0.8373 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 960]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x960)
+  triton_bmm_360 0.0136 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_364 0.0136 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_357 0.0137 ms 99.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_359 0.0137 ms 99.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_355 0.0138 ms 98.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_356 0.0139 ms 97.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_358 0.0139 ms 97.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_361 0.0143 ms 94.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_363 0.0143 ms 94.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  bmm 0.0144 ms 94.4% 
+SingleProcess AUTOTUNE benchmarking takes 1.3753 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x4800x60, 1x60x64)
+  triton_bmm_368 0.0079 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_374 0.0082 ms 95.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_377 0.0085 ms 92.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_369 0.0086 ms 91.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_373 0.0086 ms 91.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_376 0.0087 ms 90.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  bmm 0.0087 ms 90.1% 
+  triton_bmm_370 0.0088 ms 89.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_371 0.0088 ms 89.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_367 0.0089 ms 88.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.9970 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[4800, 3, 3], [4800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(4800x3x3, 4800x3x3)
+  triton_bmm_388 0.0086 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_389 0.0086 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  triton_bmm_385 0.0087 ms 98.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_386 0.0087 ms 98.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_387 0.0087 ms 98.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  bmm 0.0148 ms 58.3% 
+SingleProcess AUTOTUNE benchmarking takes 0.6306 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x4800x9, 1x9x64)
+  triton_bmm_390 0.0058 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_391 0.0058 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_392 0.0060 ms 97.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_393 0.0060 ms 97.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_394 0.0060 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_396 0.0060 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_398 0.0060 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_395 0.0061 ms 95.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_400 0.0061 ms 95.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_397 0.0061 ms 95.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.6782 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1920]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x1920)
+  triton_bmm_413 0.0209 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_411 0.0210 ms 99.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_407 0.0214 ms 97.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_414 0.0214 ms 97.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_410 0.0214 ms 97.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_409 0.0215 ms 96.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_415 0.0217 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=8
+  triton_bmm_416 0.0217 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_412 0.0218 ms 95.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_406 0.0224 ms 93.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.3922 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE bmm(1x4800x240, 1x240x64)
+  triton_bmm_426 0.0146 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_418 0.0148 ms 98.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_424 0.0159 ms 91.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_427 0.0161 ms 90.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  bmm 0.0166 ms 87.8% 
+  triton_bmm_419 0.0172 ms 84.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_420 0.0172 ms 84.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_423 0.0187 ms 78.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_421 0.0191 ms 76.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_417 0.0195 ms 74.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.9213 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x4800x64, 1x64x128)
+  triton_bmm_436 0.0094 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_443 0.0100 ms 94.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  bmm 0.0100 ms 94.2% 
+  triton_bmm_435 0.0100 ms 93.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_438 0.0101 ms 93.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_439 0.0101 ms 93.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_437 0.0101 ms 93.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_442 0.0103 ms 91.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_445 0.0104 ms 91.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_449 0.0104 ms 91.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=128, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 2.1091 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x4800x128, 1x128x64)
+  triton_bmm_463 0.0104 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_455 0.0111 ms 93.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_461 0.0113 ms 92.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_464 0.0113 ms 92.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+  bmm 0.0115 ms 90.3% 
+  triton_bmm_456 0.0118 ms 88.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_457 0.0119 ms 87.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_458 0.0121 ms 85.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_460 0.0124 ms 83.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_454 0.0126 ms 82.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 2.0045 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x4800x64, 1x64x8)
+  triton_bmm_475 0.0071 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_481 0.0071 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_474 0.0072 ms 98.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_480 0.0072 ms 98.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_482 0.0074 ms 97.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_479 0.0074 ms 96.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_473 0.0075 ms 95.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_476 0.0075 ms 95.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_478 0.0076 ms 94.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_472 0.0080 ms 88.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.7826 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x8x48, 100x48x64)
+  triton_bmm_522 0.0072 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_528 0.0073 ms 99.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_527 0.0075 ms 95.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_520 0.0076 ms 94.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_526 0.0076 ms 94.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_530 0.0076 ms 94.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_523 0.0076 ms 94.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_521 0.0076 ms 94.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_529 0.0076 ms 94.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_519 0.0077 ms 93.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.3653 seconds and 0.0004 seconds precompiling
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 24]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE bmm(1x100x128, 1x128x512)
+  triton_bmm_635 0.0080 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_636 0.0080 ms 99.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_637 0.0081 ms 98.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_641 0.0097 ms 82.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_638 0.0099 ms 81.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  bmm 0.0106 ms 75.5% 
+  triton_bmm_640 0.0113 ms 70.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_634 0.0114 ms 70.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_642 0.0120 ms 66.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_648 0.0128 ms 62.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=128, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 2.0118 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE mm(100x100, 100x512)
+  triton_mm_692 0.0079 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_mm_694 0.0080 ms 98.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_mm_693 0.0081 ms 97.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_mm_695 0.0096 ms 81.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  mm 0.0097 ms 80.9% 
+  triton_mm_698 0.0097 ms 80.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_mm_691 0.0106 ms 74.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_mm_697 0.0112 ms 70.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_mm_699 0.0117 ms 67.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_mm_696 0.0121 ms 64.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 2.0150 seconds and 0.0003 seconds precompiling
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x20)
+  triton_bmm_806 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_805 0.0054 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_804 0.0055 ms 97.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_807 0.0055 ms 97.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=2
+  triton_bmm_808 0.0056 ms 97.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=2
+  bmm 0.0063 ms 85.4% 
+SingleProcess AUTOTUNE benchmarking takes 0.6328 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[6400, 3, 3], [6400, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 2560]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 24]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 960]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[4800, 3, 3], [4800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1920]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 24]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE bmm(1x100x128, 1x128x512)
+  triton_bmm_1406 0.0079 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_1408 0.0082 ms 96.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_1407 0.0082 ms 96.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_1409 0.0098 ms 80.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_1412 0.0098 ms 80.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  bmm 0.0107 ms 73.7% 
+  triton_bmm_1411 0.0113 ms 69.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_1405 0.0115 ms 69.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_1413 0.0119 ms 66.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_1419 0.0129 ms 61.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=128, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 2.0214 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[6400, 3, 3], [6400, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 2560]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 24]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 960]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[4800, 3, 3], [4800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1920]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 24]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[6400, 3, 3], [6400, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 2560]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 24]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 960]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[4800, 3, 3], [4800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1920]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 24]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[6400, 3, 3], [6400, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 2560]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 24]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 960]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[4800, 3, 3], [4800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1920]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 24]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[6400, 3, 3], [6400, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 2560]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 24]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 960]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[4800, 3, 3], [4800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1920]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 24]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 640]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x640)
+  triton_bmm_4618 0.0106 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_4620 0.0106 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_4619 0.0108 ms 98.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_4622 0.0108 ms 98.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=8
+  triton_bmm_4614 0.0108 ms 97.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_4621 0.0108 ms 97.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_4623 0.0108 ms 97.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=128, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4616 0.0109 ms 97.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4617 0.0109 ms 97.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_4612 0.0110 ms 95.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.3651 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 3200, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x3200x60, 1x60x64)
+  triton_bmm_4625 0.0069 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4627 0.0071 ms 97.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4626 0.0073 ms 95.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4628 0.0076 ms 91.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_4631 0.0079 ms 88.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  bmm 0.0081 ms 85.8% 
+  triton_bmm_4624 0.0081 ms 85.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_4634 0.0082 ms 84.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_4633 0.0084 ms 82.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_4630 0.0084 ms 82.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.9919 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[3200, 3, 3], [3200, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(3200x3x3, 3200x3x3)
+  triton_bmm_4643 0.0075 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_4644 0.0075 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  triton_bmm_4645 0.0075 ms 99.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_4642 0.0076 ms 98.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_4646 0.0076 ms 98.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  bmm 0.0118 ms 63.1% 
+SingleProcess AUTOTUNE benchmarking takes 0.6300 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 3200, 9], [1, 9, 64]] K=9: 0/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+AUTOTUNE bmm(1x3200x240, 1x240x64)
+  triton_bmm_4677 0.0121 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4676 0.0122 ms 99.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4675 0.0126 ms 95.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4678 0.0141 ms 85.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_4683 0.0141 ms 85.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_4681 0.0151 ms 79.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_4684 0.0155 ms 77.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  bmm 0.0157 ms 77.0% 
+  triton_bmm_4680 0.0181 ms 66.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4674 0.0184 ms 65.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+SingleProcess AUTOTUNE benchmarking takes 1.9138 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x3200x64, 1x64x128)
+  triton_bmm_4699 0.0080 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_4694 0.0084 ms 95.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4693 0.0084 ms 95.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4695 0.0084 ms 95.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4696 0.0086 ms 93.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  bmm 0.0088 ms 90.9% 
+  triton_bmm_4692 0.0089 ms 90.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_4698 0.0089 ms 90.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4700 0.0093 ms 86.6% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_4697 0.0094 ms 85.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 2.1023 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 3200, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x3200x128, 1x128x64)
+  triton_bmm_4713 0.0091 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4714 0.0091 ms 99.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_4712 0.0093 ms 96.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4720 0.0102 ms 89.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_4715 0.0104 ms 87.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=128, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_4718 0.0107 ms 85.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=64, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_4721 0.0108 ms 83.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=8
+  bmm 0.0109 ms 83.2% 
+  triton_bmm_4711 0.0119 ms 76.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_4717 0.0121 ms 74.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 2.0045 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 8]] K=64: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 32], [100, 32, 64]] K=32: 8/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x8x32, 100x32x64)
+  triton_bmm_4781 0.0064 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_4778 0.0065 ms 98.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_4782 0.0065 ms 98.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_4783 0.0065 ms 98.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=4, num_warps=4
+  triton_bmm_4777 0.0066 ms 97.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=2
+  triton_bmm_4779 0.0066 ms 97.1% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=32, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=5, num_warps=2
+  triton_bmm_4776 0.0067 ms 95.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_4780 0.0068 ms 93.5% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=True, GROUP_M=8, num_stages=2, num_warps=4
+  bmm 0.0076 ms 84.4% 
+SingleProcess AUTOTUNE benchmarking takes 0.9455 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 24]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 640]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[3200, 3, 3], [3200, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 9], [1, 9, 64]] K=9: 0/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 8]] K=64: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 32], [100, 32, 64]] K=32: 8/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 24]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 3]] K=128: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 640]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[3200, 3, 3], [3200, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 9], [1, 9, 64]] K=9: 0/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1280]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 8]] K=64: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 192]] K=3: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 32], [100, 32, 64]] K=32: 8/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 24]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 64]] K=3: 7/7 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 20]] K=128: 0/17 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 20]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 529], [1, 529, 256]] K=529: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 14]] K=256: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 3, 3], [800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(800x3x3, 800x3x3)
+  triton_bmm_5701 0.0056 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_5703 0.0056 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  triton_bmm_5702 0.0057 ms 98.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_5704 0.0057 ms 98.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_5705 0.0057 ms 98.9% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  bmm 0.0069 ms 81.9% 
+SingleProcess AUTOTUNE benchmarking takes 0.6298 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x3)
+  triton_bmm_5712 0.0052 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_5713 0.0052 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  triton_bmm_5714 0.0052 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_5711 0.0052 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_5715 0.0052 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  bmm 0.0062 ms 83.5% 
+SingleProcess AUTOTUNE benchmarking takes 0.6324 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x3)
+  triton_bmm_5718 0.0052 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  triton_bmm_5720 0.0052 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  triton_bmm_5716 0.0052 ms 98.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_5717 0.0052 ms 98.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_5719 0.0052 ms 98.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  bmm 0.0062 ms 83.0% 
+SingleProcess AUTOTUNE benchmarking takes 0.6298 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[800, 3, 3], [800, 3, 3]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(800x3x3, 800x3x3)
+  triton_bmm_5721 0.0056 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_5722 0.0056 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_5723 0.0057 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  triton_bmm_5724 0.0057 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_5725 0.0057 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  bmm 0.0068 ms 82.2% 
+SingleProcess AUTOTUNE benchmarking takes 0.6272 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[100, 9, 8], [100, 8, 14]] K=8: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x9x8, 100x8x14)
+  triton_bmm_5729 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_5730 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  triton_bmm_5726 0.0055 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_5727 0.0055 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_5728 0.0055 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  bmm 0.0064 ms 84.1% 
+SingleProcess AUTOTUNE benchmarking takes 0.6304 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1400, 3, 3], [1400, 3, 1]] K=3: 0/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1]] K=3: 0/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1]] K=3: 0/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 1]] K=3: 0/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 3, 3], [100, 3, 8]] K=3: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x3, 100x3x8)
+  triton_bmm_5754 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_5755 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  triton_bmm_5752 0.0054 ms 99.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  triton_bmm_5751 0.0054 ms 98.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_5753 0.0054 ms 98.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  bmm 0.0062 ms 86.6% 
+SingleProcess AUTOTUNE benchmarking takes 0.6291 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[100, 3, 8], [100, 8, 14]] K=8: 5/5 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(100x3x8, 100x8x14)
+  triton_bmm_5758 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=1
+  triton_bmm_5759 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=1
+  triton_bmm_5760 0.0054 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=1
+  triton_bmm_5756 0.0055 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=1
+  triton_bmm_5757 0.0055 ms 98.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=16, BLOCK_N=16, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=1
+  bmm 0.0064 ms 84.5% 
+SingleProcess AUTOTUNE benchmarking takes 0.6299 seconds and 0.0002 seconds precompiling
+[arm exact+noepi] compiled. {"info": {"arm": "exact+noepi", "feats": ["exact", "noepi"], "max_k": null, "epilogue_fusion": false, "max_autotune_gemm": true, "post_grad_fusion_options": {}}, "filter": {"shapes": 401, "verified": 400, "aten_only_by_K": 0, "aten_only_on_error": 1, "untouched": 0, "shapes_with_an_exact_template": 270, "triton_candidates": 5756, "triton_candidates_exact": 3769}, "counters": {}}
+[gemm-exact] bmm shape=[[1, 100, 1725], [1, 1725, 512]] K=1725: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x6400x9, 1x9x64)
+  triton_bmm_5862 0.0059 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_5863 0.0060 ms 98.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_5865 0.0060 ms 96.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_5864 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_5866 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_5867 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_5871 0.0061 ms 96.3% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+  triton_bmm_5868 0.0062 ms 94.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_5869 0.0062 ms 94.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_5870 0.0062 ms 94.8% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+SingleProcess AUTOTUNE benchmarking takes 1.6741 seconds and 0.0003 seconds precompiling
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+AUTOTUNE bmm(1x4800x9, 1x9x64)
+  triton_bmm_6072 0.0057 ms 100.0% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_6071 0.0058 ms 98.4% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=1, num_warps=2
+  triton_bmm_6073 0.0060 ms 95.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=32, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_6074 0.0060 ms 94.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=8
+  triton_bmm_6076 0.0060 ms 94.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=2, num_warps=4
+  triton_bmm_6078 0.0060 ms 94.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_6079 0.0060 ms 94.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=4
+  triton_bmm_6075 0.0061 ms 93.7% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=32, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=5, num_warps=4
+  triton_bmm_6077 0.0061 ms 93.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=3, num_warps=8
+  triton_bmm_6080 0.0061 ms 93.2% ACC_TYPE='tl.float32', ALLOW_TF32=False, BLOCK_K=16, BLOCK_M=64, BLOCK_N=64, B_PROLOGUE_CAST_TYPE=None, EVEN_K=False, GROUP_M=8, num_stages=4, num_warps=8
+SingleProcess AUTOTUNE benchmarking takes 1.6726 seconds and 0.0002 seconds precompiling
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 64]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 6400, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 64], [100, 64, 64]] K=64: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 64], [800, 64, 32]] K=64: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 48]] K=32: 0/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 9], [1, 9, 64]] K=9: 15/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 4800, 64], [1, 64, 8]] K=64: 16/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 48], [100, 48, 64]] K=48: 12/12 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 48], [800, 48, 32]] K=48: 0/10 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 128]] K=128: 0/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] mm shape=[[100, 100], [100, 512]] K=100: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 60]] K=128: 0/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 9], [1, 9, 64]] K=9: 0/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 8]] K=64: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 32], [100, 32, 64]] K=32: 8/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 9], [1, 9, 64]] K=9: 0/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 8]] K=64: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 32], [100, 32, 64]] K=32: 8/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 768]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 3]] K=128: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 400], [1, 400, 64]] K=400: 0/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 60], [1, 60, 64]] K=60: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 9], [1, 9, 64]] K=9: 0/15 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 240], [1, 240, 64]] K=240: 17/18 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 128]] K=64: 19/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 128], [1, 128, 64]] K=128: 18/18 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 3200, 64], [1, 64, 8]] K=64: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 576]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[100, 8, 32], [100, 32, 64]] K=32: 8/8 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[800, 1, 32], [800, 32, 32]] K=32: 0/6 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 1024], [1, 1024, 128]] K=1024: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 60], [1, 60, 256]] K=60: 0/19 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 128]] K=256: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 512]] K=128: 18/19 triton candidates are bitwise equal to cuBLAS (1 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 512], [1, 512, 128]] K=512: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 128], [1, 128, 20]] K=128: 0/17 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 529], [1, 529, 256]] K=529: 0/19 triton candidates are bitwise equal to cuBLAS (3 failed to compile/run)
+[gemm-exact] bmm shape=[[1, 100, 256], [1, 256, 14]] K=256: 0/16 triton candidates are bitwise equal to cuBLAS (0 failed to compile/run)
+[arm exact+noepi+decomp32] compiled. {"info": {"arm": "exact+noepi+decomp32", "feats": ["exact", "noepi", "decomp32"], "max_k": null, "epilogue_fusion": false, "decomp_min_batch": 32, "max_autotune_gemm": true, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}, "filter": {"shapes": 283, "verified": 283, "aten_only_by_K": 0, "aten_only_on_error": 0, "untouched": 0, "shapes_with_an_exact_template": 172, "triton_candidates": 4763, "triton_candidates_exact": 2934}, "counters": {"decompose_bmm": 118}}
+[arm decomp32] compiled. {"info": {"arm": "decomp32", "feats": ["decomp32"], "epilogue_fusion": true, "decomp_min_batch": 32, "max_autotune_gemm": false, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}, "filter": null, "counters": {"decompose_bmm": 236}}
+[arm base_rerun] compiled. {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {"decompose_bmm": 236}}
+[cmp base vs exact+noepi] bit_identical=False pos=5.436e-05 raw_angles=4.761e-03 aatype_flips=0
+[cmp base vs exact+noepi+decomp32] bit_identical=False pos=3.719e-05 raw_angles=3.159e-03 aatype_flips=0
+[cmp base vs decomp32] bit_identical=False pos=3.719e-05 raw_angles=3.159e-03 aatype_flips=0
+[cmp base vs base_rerun] bit_identical=True pos=0.000e+00 raw_angles=0.000e+00 aatype_flips=0
+RESULT {"L": 100, "arms": ["base", "exact+noepi", "exact+noepi+decomp32", "decomp32", "base_rerun"], "meta": {"base": {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {}}, "exact+noepi": {"info": {"arm": "exact+noepi", "feats": ["exact", "noepi"], "max_k": null, "epilogue_fusion": false, "max_autotune_gemm": true, "post_grad_fusion_options": {}}, "filter": {"shapes": 401, "verified": 400, "aten_only_by_K": 0, "aten_only_on_error": 1, "untouched": 0, "shapes_with_an_exact_template": 270, "triton_candidates": 5756, "triton_candidates_exact": 3769}, "counters": {}}, "exact+noepi+decomp32": {"info": {"arm": "exact+noepi+decomp32", "feats": ["exact", "noepi", "decomp32"], "max_k": null, "epilogue_fusion": false, "decomp_min_batch": 32, "max_autotune_gemm": true, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}, "filter": {"shapes": 283, "verified": 283, "aten_only_by_K": 0, "aten_only_on_error": 0, "untouched": 0, "shapes_with_an_exact_template": 172, "triton_candidates": 4763, "triton_candidates_exact": 2934}, "counters": {"decompose_bmm": 118}}, "decomp32": {"info": {"arm": "decomp32", "feats": ["decomp32"], "epilogue_fusion": true, "decomp_min_batch": 32, "max_autotune_gemm": false, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}, "filter": null, "counters": {"decompose_bmm": 236}}, "base_rerun": {"info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "filter": null, "counters": {"decompose_bmm": 236}}}, "cmp": {"exact+noepi": {"bit_identical": false, "outputs": {"pos": {"maxabs": 5.435943603515625e-05, "bitwise": false}, "local": {"maxabs": 0.00164794921875, "bitwise": false}, "trajectory": {"maxabs": 6.437301635742188e-05, "bitwise": false}, "aa": {"maxabs": 5.7220458984375e-06, "bitwise": false}, "aa_features": {"maxabs": 1.2218952178955078e-06, "bitwise": false}, "dssp": {"maxabs": 9.298324584960938e-06, "bitwise": false}, "distogram_neighbours": {"maxabs": 0.0, "bitwise": true}, "raw_angles": {"maxabs": 0.0047607421875, "bitwise": false}, "angles": {"maxabs": 9.512901306152344e-05, "bitwise": false}, "angle_pos": {"maxabs": 3.814697265625e-05, "bitwise": false}, "aatype": {"maxabs": 0.0, "bitwise": true}}}, "exact+noepi+decomp32": {"bit_identical": false, "outputs": {"pos": {"maxabs": 3.719329833984375e-05, "bitwise": false}, "local": {"maxabs": 0.0010986328125, "bitwise": false}, "trajectory": {"maxabs": 4.9591064453125e-05, "bitwise": false}, "aa": {"maxabs": 3.814697265625e-06, "bitwise": false}, "aa_features": {"maxabs": 1.430511474609375e-06, "bitwise": false}, "dssp": {"maxabs": 7.62939453125e-06, "bitwise": false}, "distogram_neighbours": {"maxabs": 0.0, "bitwise": true}, "raw_angles": {"maxabs": 0.0031585693359375, "bitwise": false}, "angles": {"maxabs": 0.00010278820991516113, "bitwise": false}, "angle_pos": {"maxabs": 2.199411392211914e-05, "bitwise": false}, "aatype": {"maxabs": 0.0, "bitwise": true}}}, "decomp32": {"bit_identical": false, "outputs": {"pos": {"maxabs": 3.719329833984375e-05, "bitwise": false}, "local": {"maxabs": 0.0010986328125, "bitwise": false}, "trajectory": {"maxabs": 4.9591064453125e-05, "bitwise": false}, "aa": {"maxabs": 3.337860107421875e-06, "bitwise": false}, "aa_features": {"maxabs": 1.3709068298339844e-06, "bitwise": false}, "dssp": {"maxabs": 7.62939453125e-06, "bitwise": false}, "distogram_neighbours": {"maxabs": 0.0, "bitwise": true}, "raw_angles": {"maxabs": 0.0031585693359375, "bitwise": false}, "angles": {"maxabs": 0.00010278820991516113, "bitwise": false}, "angle_pos": {"maxabs": 2.199411392211914e-05, "bitwise": false}, "aatype": {"maxabs": 0.0, "bitwise": true}}}, "base_rerun": {"bit_identical": true, "outputs": {"pos": {"maxabs": 0.0, "bitwise": true}, "local": {"maxabs": 0.0, "bitwise": true}, "trajectory": {"maxabs": 0.0, "bitwise": true}, "aa": {"maxabs": 0.0, "bitwise": true}, "aa_features": {"maxabs": 0.0, "bitwise": true}, "dssp": {"maxabs": 0.0, "bitwise": true}, "distogram_neighbours": {"maxabs": 0.0, "bitwise": true}, "raw_angles": {"maxabs": 0.0, "bitwise": true}, "angles": {"maxabs": 0.0, "bitwise": true}, "angle_pos": {"maxabs": 0.0, "bitwise": true}, "aatype": {"maxabs": 0.0, "bitwise": true}}}}, "torch": "2.5.1+cu121", "gpu": "NVIDIA H100"}
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 12:24:41 CEST 2026
+= Job-ID             : 907292 on helma
+= Job-Name           : n030_bits2
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N030-cublas/j7_bits.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 06:00:00
+= Elapsed runtime    : 00:36:21
+= Total RAM usage    : 6.8 GiB of assigned 175 GiB (3.9%)
+= Node list          : h11-17
+= Subm/Elig/Start/End: 2026-09-27T11:48:19 / 2026-09-27T11:48:19 / 2026-09-27T11:48:20 / 2026-09-27T12:24:41
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.0G   104.9G   209.7G        N/A     463K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      88K      61K      81K  4d20h25m10s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 2576733, 56 %, 56 %, 1430 MiB, 2169065 ms

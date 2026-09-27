@@ -1,0 +1,63 @@
+### Starting TaskPrologue of job 907765 on h11-09 at Sun Sep 27 03:05:14 PM CEST 2026
+Running on cores 96-127 with governor performance
+Sun Sep 27 15:05:14 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+40a85be50ff7714cbeca444370f8b1359b640b9b
+4f1dece2478d0af787b2c9365a8e60dc  /hnvme/workspace/v181bb10-salad/n030/salad_torch/gemm_exact.py
+8958265d7b6ef4a611f58f2d1234b27b  /hnvme/workspace/v181bb10-salad/n030/salad_torch/modules/fast.py
+1adea4b84d9923873e1d15ddd1f56c0f  /hnvme/workspace/v181bb10-salad/n030/salad_torch/opt.py
+9601dd640678e60fd5abef1e414bd1cd  /hnvme/workspace/v181bb10-salad/n030/salad_torch/modules/cond_prologue.py
+NVIDIA H100, 9.0
+########## ARM=off L=100
+[arm] {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "off_L100", "L": 100, "preset": "exact", "arm": "off", "mm_mode": "einsum", "env_gemmtpl": true, "detseg": false, "torch": "2.5.1+cu121", "gpu": "NVIDIA H100", "compile_s": 295.2671456129756, "resolved_max_autotune_gemm": false, "arm_info": {"arm": "off", "feats": ["off"], "epilogue_fusion": true, "max_autotune_gemm": false, "post_grad_fusion_options": {}}, "counters": {}, "full_ms": [3.8978401493902006, 3.878073832796266, 3.878900168153147], "lean_ms": [3.0724471008094647, 3.071890596766025, 3.0720786191523075], "census": {"triton_tem": [0, 0.0], "triton": [338.0, 997.5614000000014], "gemm": [301.0, 1870.8527999999872], "memcpy": [37.0, 43.84590000000371], "other": [2.0, 1.968000000000643]}, "kernels": 678.0, "gpu_busy_us": 2914.228099999993, "gemm_kernels": [["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 91.0, 668.2], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_al", 21.0, 235.1], ["sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 24.0, 167.7], ["void cutlass::Kernel<cutlass_80_simt_sgemm_64x64_8x5_nn_align1>(cutlass_80_simt_sgemm_64x6", 30.0, 137.1], ["void gemv2N_kernel<int, int, float, float, float, float, 128, 4, 4, 4, 1, false, cublasGem", 24.0, 96.3], ["sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize32x64x8_stage3_warpsize1x2x1_ffma_aligna4_al", 2.0, 85.4], ["sm80_xmma_gemm_f32f32_f32f32_f32_tt_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_al", 6.0, 83.5], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize128x64x8_stage3_warpsize2x2x1_ffma_aligna4_a", 2.0, 68.1], ["void splitKreduce_kernel<32, 16, int, float, float, float, float, true, false, false>(cubl", 38.0, 67.0], ["sm80_xmma_gemm_f32f32_f32f32_f32_tn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 18.0, 61.2], ["sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 12.0, 49.4], ["std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float", 12.0, 46.1], ["void cutlass::Kernel<cutlass_80_simt_sgemm_128x32_8x5_nn_align1>(cutlass_80_simt_sgemm_128", 7.0, 40.3], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize128x128x8_stage3_warpsize2x2x1_ffma_aligna4_", 1.0, 21.8], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_al", 6.0, 17.2], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 6.0, 16.0], ["void cutlass::Kernel<cutlass_80_simt_sgemm_128x64_8x5_nn_align1>(cutlass_80_simt_sgemm_128", 1.0, 10.6]], "other_kernels": [["void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<long>, at::detai", 2.0, 2.0]], "replay_us": 2904.0725708007812, "pos_sum": -1992.0838388353586, "pos_absmax": 10.010920524597168}
+########## ARM=decomp32 L=100
+[arm] {"arm": "decomp32", "feats": ["decomp32"], "epilogue_fusion": true, "decomp_min_batch": 32, "max_autotune_gemm": false, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+RESULT {"tag": "decomp32_L100", "L": 100, "preset": "exact", "arm": "decomp32", "mm_mode": "einsum", "env_gemmtpl": true, "detseg": false, "torch": "2.5.1+cu121", "gpu": "NVIDIA H100", "compile_s": 300.7475153480191, "resolved_max_autotune_gemm": false, "arm_info": {"arm": "decomp32", "feats": ["decomp32"], "epilogue_fusion": true, "decomp_min_batch": 32, "max_autotune_gemm": false, "post_grad_fusion_options": {"decompose_mm_pass": {"min_first_dimension_decomposition": 32, "max_other_dimention_decomposition": 32}}}, "counters": {"decompose_bmm": 275}, "full_ms": [3.2781212823465466, 3.286379932736357, 3.281106116871039], "lean_ms": [2.5943004991859198, 2.594505832530558, 2.594831151266893], "census": {"triton_tem": [0, 0.0], "triton": [396.0, 1104.793300000003], "gemm": [232.0, 1297.811699999999], "memcpy": [25.0, 29.76679999999908], "other": [2.0, 1.9742999999999256]}, "kernels": 655.0, "gpu_busy_us": 2434.346100000001, "gemm_kernels": [["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 84.0, 524.0], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_al", 21.0, 236.5], ["void cutlass::Kernel<cutlass_80_simt_sgemm_64x64_8x5_nn_align1>(cutlass_80_simt_sgemm_64x6", 30.0, 138.8], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize128x64x8_stage3_warpsize2x2x1_ffma_aligna4_a", 2.0, 68.7], ["void splitKreduce_kernel<32, 16, int, float, float, float, float, true, false, false>(cubl", 38.0, 67.0], ["void gemv2N_kernel<int, int, float, float, float, float, 128, 4, 4, 4, 1, false, cublasGem", 12.0, 59.8], ["sm80_xmma_gemm_f32f32_f32f32_f32_nt_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 12.0, 49.9], ["std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, float", 12.0, 46.7], ["void cutlass::Kernel<cutlass_80_simt_sgemm_128x32_8x5_nn_align1>(cutlass_80_simt_sgemm_128", 7.0, 40.7], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize128x128x8_stage3_warpsize2x2x1_ffma_aligna4_", 1.0, 21.9], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize64x64x8_stage3_warpsize1x4x1_ffma_aligna4_al", 6.0, 16.9], ["sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_al", 6.0, 16.2], ["void cutlass::Kernel<cutlass_80_simt_sgemm_128x64_8x5_nn_align1>(cutlass_80_simt_sgemm_128", 1.0, 10.8]], "other_kernels": [["void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<long>, at::detai", 2.0, 2.0]], "replay_us": 2428.3505249023438, "pos_sum": -1911.3819245230407, "pos_absmax": 9.952878952026367}
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 15:15:55 CEST 2026
+= Job-ID             : 907765 on helma
+= Job-Name           : n030_p7on
+= Job-Command        : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N030-cublas/j9_bench_p7on.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N030-cublas
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 02:00:00
+= Elapsed runtime    : 00:10:47
+= Total RAM usage    : 4.5 GiB of assigned 175 GiB (2.6%)
+= Node list          : h11-09
+= Subm/Elig/Start/End: 2026-09-27T15:05:03 / 2026-09-27T15:05:03 / 2026-09-27T15:05:07 / 2026-09-27T15:15:54
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.1G   104.9G   209.7G        N/A     463K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      89K      61K      81K  4d17h33m56s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 4007930, 8 %, 8 %, 1412 MiB, 323456 ms
+NVIDIA H100, 00000000:C6:00.0, 4014121, 8 %, 8 %, 1412 MiB, 310423 ms
