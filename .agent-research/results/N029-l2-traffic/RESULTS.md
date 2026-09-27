@@ -385,12 +385,23 @@ needing N015's n=160 structural gate, never an `exact` one.
 | 500-step design, L=100 | 1.69 s | 1.57 s | −7.1 % |
 | lean step, L=200 | 4.586 ms | **4.244 ms** | **−7.5 %** |
 
-*(The two-arm kernel census at the end of job 907152 was still compiling when
-this was written; its numbers land in `logs/o1_907152.log`. The kernel-count
-claim below does not depend on it — the twelve `(100,3,3)x(100,3,2560)` and
-`(100,3,3)x(100,3,1920)` rows of §2.4's matmul census are removed by
-construction, and the `(3,3)x(3,1280)`/`(3,3)x(3,960)` rows they collapse onto
-already exist.)*
+**Kernel census, both arms, same job (L=100, lean, profiler):**
+
+| | `=0` | `=1` (O1) | delta |
+|---|---|---|---|
+| GPU busy | 3326.9 us | 3084.2 us | **−242.7 us** |
+| total kernels | 807 | 796 | **−11** |
+| **cuBLAS** | 352 launches / **2163.0 us** | 341 / **1930.8 us** | **−11 launches, −232.2 us** |
+| Triton | 392 / 1076.2 us | 392 / 1065.7 us | **0 launches**, −10.5 us |
+| memcpy | 61 / 82.8 us | 61 / 82.9 us | 0 |
+
+**Exactly the eleven cuBLAS launches predicted** — six from `pair_1`, six from
+`pair_2`, plus one added back because `aa_frames_t(prev_pos)`'s frame-local
+coordinates become live (CSE shares that one across all six blocks). **96 % of
+the win is those eleven launches**, at 21.1 us each: well above N017's 5.98 us
+launch floor, because a `(100,3,3) x (100,3,2560)` strided-batched sgemm is
+also slow to *execute*. Triton's launch count does not move at all and its time
+moves 1 %.
 
 **−7.3 % is the largest single-change win recorded on this model since P7, and
 it is not a traffic win.** The bytes it removes are ~61 MiB of GEMM operands,

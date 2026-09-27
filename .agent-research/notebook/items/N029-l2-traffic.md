@@ -65,7 +65,11 @@ floor, so 1 MiB of logical traffic = 0.62 us and 1 cuBLAS launch = 9.6 MiB.
 `aa_frames_t`'s frame-local coordinates and `direction_features`' contraction,
 deleting twelve wide `(100,3,3)x(100,3,K*2A)` bmms. **-7.3 % at L=100 / -7.5 %
 at L=200** - the largest single-change win since P7, and a *launch* win, not a
-traffic win, which is the item's thesis in one measurement. Parity suite
+traffic win, which is the item's thesis in one measurement: the two-arm census
+shows **-11 cuBLAS launches and -232.2 us of the -242.7 us total** (21.1 us
+each - above the 5.98 us floor, because a `(100,3,3)x(100,3,2560)` strided
+batched sgemm is also slow to execute), with the Triton launch count
+**unchanged at 392** and Triton time moving 1 %. Parity suite
 SUITE_EXIT=0 both arms; `--n 160 --preset fast` 0/160 diverged both arms with
 a paired comparison finding nothing (all p >= 0.66). **But NOT bit-exact**
 (1.63e-04 A on multimotif_vp) - three checks said it was, including the CPU
