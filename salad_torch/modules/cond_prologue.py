@@ -38,6 +38,7 @@ parameters without touching the cache.
 """
 from __future__ import annotations
 
+import os
 import torch
 from torch import Tensor, nn
 
@@ -49,6 +50,38 @@ __all__ = ["StackedCondPair"]
 #: the projections `DiffusionPairFeatures.forward` applies, in the order it
 #: adds them. `dmap`/`flags` are only used when there IS pair conditioning.
 _PROJ = ("relpos", "dmap", "flags", "dist", "dir", "rot", "pairvec")
+
+
+#: How to stop inductor fusing the neighbour-index producer into its consumers.
+#: "clone"  - cheapest, may be elided by inductor
+#: "custom" - an opaque custom op, cannot be fused through
+#: "break"  - `torch._dynamo.graph_break()`, always works, splits the graph
+#: "none"   - no barrier (reproduces the miscompile)
+_P7_BARRIER = os.environ.get("SALAD_P7_BARRIER", "custom").strip().lower()
+
+try:
+    @torch.library.custom_op("salad::p7_barrier", mutates_args=())
+    def _p7_barrier_op(x: torch.Tensor) -> torch.Tensor:
+        return x.clone()
+
+    @_p7_barrier_op.register_fake
+    def _(x):
+        return torch.empty_like(x)
+except Exception:  # pragma: no cover - older torch without custom_op
+    _p7_barrier_op = None
+
+
+def _p7_barrier(x: torch.Tensor) -> torch.Tensor:
+    if _P7_BARRIER == "none":
+        return x
+    if _P7_BARRIER == "clone":
+        return x.clone()
+    if _P7_BARRIER == "break":
+        torch._dynamo.graph_break()
+        return x
+    if _p7_barrier_op is not None:
+        return _p7_barrier_op(x)
+    return x.clone()
 
 
 class StackedCondPair(nn.Module):
@@ -124,6 +157,16 @@ class StackedCondPair(nn.Module):
         off = (torch.arange(b, device=neighbours.device) * n)[:, None, None]
         nb = torch.where(neighbours >= 0, neighbours + off,
                          off + (n - 1)).reshape(b * n, k)
+        # P7 CORRECTNESS BARRIER - do not remove without reading opt.BATCH_COND.
+        # PyTorch 2.5.1's inductor fuses the op that PRODUCES this (600, 48)
+        # index tensor into the indirect gathers that CONSUME it, and emits an
+        # impossible load mask: `tmp36 & tmp4` is `(row >= 100) & (row < 100)`,
+        # false for every row, so all three `tl.load`s return their `other=0.0`
+        # fallback and the relative-position bins are computed from zeros.
+        # 23,070 of 28,800 bins wrong, max error 64 bins; downstream that is
+        # `pos` off by 9.586 A and 17-21 % of designs destroyed.
+        # `_P7_BARRIER` selects how we stop that fusion; see opt.BATCH_COND.
+        nb = _p7_barrier(nb)
         pos_t = prev_pos.repeat(b, 1, 1)
         resi_t = resi.repeat(b)
         chain_t = (chain[None] + off[:, :, 0]).reshape(-1)

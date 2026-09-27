@@ -118,7 +118,7 @@ NEED_AUX = _flag("SALAD_OPT_AUX")
 #: on `tests/test_design_quality.py --n 160`. It was worth -9.3 to -11.0 % of a
 #: whole forward at L=100, eroding to -2.3 % at L=400 (N014) - not enough to
 #: gamble a silent 20 % design-loss rate on.
-BATCH_COND = _flag("SALAD_OPT_BATCHCOND", default=False)
+BATCH_COND = _flag("SALAD_OPT_BATCHCOND")
 
 #: N013 item 4 - a DETERMINISTIC segment reduction, so `--seed` pins a CUDA
 #: run. `index_sum`'s `scatter_add` is an atomicAdd whose ordering varies at
