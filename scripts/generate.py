@@ -30,7 +30,7 @@ sys.path.insert(0, ROOT)
 
 from salad_torch import opt as salad_opt  # noqa: E402
 from salad_torch.config import get_config  # noqa: E402
-from salad_torch.convert.haiku_to_torch import load_model, load_param_npz  # noqa: E402
+from salad_torch.convert.haiku_to_torch import load_model, load_params  # noqa: E402
 from salad_torch.diffusion.sampling import (  # noqa: E402
     SamplerConfig, StepFn, make_initial_data, pack_designs, sample,
     sample_group, split_packed_snapshot)
@@ -1078,10 +1078,16 @@ def main() -> None:
         # (§5.5): DiffusionStack's length and the checkpoint layer-slicing
         # both read config.diffusion_depth at that point.
         config.diffusion_depth = int(args.depth_adjust)
-    params = args.params or f"/hnvme/workspace/v181bb10-salad/{args.config}-200k.npz"
+    params = args.params or f"params/{args.config}-200k.jax"
+    if not os.path.exists(params):
+        raise SystemExit(
+            f"--params: {params!r} not found. Download the checkpoints with\n"
+            f"    wget https://zenodo.org/records/14711580/files/salad_params.tar.gz\n"
+            f"    tar -xzf salad_params.tar.gz\n"
+            f"or pass --params explicitly.")
 
     model = StructureDiffusionInference(config).eval().to(device)
-    load_model(model.predict, load_param_npz(params), config, strict=True)
+    load_model(model.predict, load_params(params), config, strict=True)
     if args.compile:
         blocks = model.predict.diffusion.diffusion_stack.blocks
         for i in range(len(blocks)):

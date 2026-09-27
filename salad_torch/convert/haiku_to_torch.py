@@ -37,7 +37,7 @@ import numpy as np
 import torch
 from torch import nn
 
-__all__ = ["load_param_npz", "load_param_jax", "diffusion_block_map",
+__all__ = ["load_params", "load_param_npz", "load_param_jax", "diffusion_block_map",
            "build_state_dict", "load_into", "encoder_block_map", "encoder_map",
            "load_encoder"]
 
@@ -52,6 +52,20 @@ _KINDS = {
 # --------------------------------------------------------------------------
 # reading checkpoints
 # --------------------------------------------------------------------------
+def load_params(path: str | Path) -> dict[str, np.ndarray]:
+    """Load a checkpoint, dispatching on its extension.
+
+    The released checkpoints are ``.jax`` pickles; ``.npz`` is the converted
+    form. Callers should use this rather than picking a loader themselves -
+    passing a ``.jax`` file to `load_param_npz` fails with numpy's
+    "Cannot load file containing pickled data" rather than anything helpful.
+    """
+    path = Path(path)
+    if path.suffix == ".npz":
+        return load_param_npz(path)
+    return load_param_jax(path)
+
+
 def load_param_npz(path: str | Path) -> dict[str, np.ndarray]:
     """Load a converted ``.npz`` (flat ``module/path/leaf -> array``)."""
     data = np.load(str(path))
