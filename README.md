@@ -60,23 +60,28 @@ single script, `scripts/generate.py`, and selected with flags.
 **require a CUDA device.**
 
 ## License
-Copyright (c) 2025 European Molecular Biology Laboratory (EMBL)
 
-### Code license
-Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+This repository combines material under three licences; see
+[`LICENSE`](LICENSE) for the full text.
 
-  > > [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+### Original salad code
+Copyright (c) 2025 European Molecular Biology Laboratory (EMBL), licensed under
+the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). The model
+architecture and algorithms originate there.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+### Model parameters
+Licensed by EMBL under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). They are downloaded
+separately and their licence is unchanged by this repository.
 
-### Model parameter license
- <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><span property="dct:title">The model parameters</span> are licensed under <a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Creative Commons Attribution 4.0 International<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""></a></p> 
+### This port
+The PyTorch implementation, the code written for it, the tests and the
+documentation are licensed under
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) — free to share
+and adapt for non-commercial purposes, with attribution.
+
+This applies only to the material added here. The Apache-2.0 material above
+remains available under its own terms.
 
 # Table of contents
 
@@ -84,8 +89,9 @@ Licensed under the Apache License, Version 2.0 (the "License");
   - [What's salad?](#whats-salad)
   - [What's in this repository?](#whats-in-this-repository)
   - [License](#license)
-    - [Code license](#code-license)
-    - [Model parameter license](#model-parameter-license)
+    - [Original salad code](#original-salad-code)
+    - [Model parameters](#model-parameters)
+    - [This port](#this-port)
 - [Getting started](#getting-started)
   - [Installing salad-torch](#installing-salad-torch)
   - [Generating your first proteins](#generating-your-first-proteins)

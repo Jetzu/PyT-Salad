@@ -1,0 +1,77 @@
+salad-torch consists of material under three different licences. Which one
+applies depends on which part of the repository you are using.
+
+
+===============================================================================
+1. ORIGINAL salad CODE  -  Apache License 2.0
+===============================================================================
+
+Copyright (c) 2025 European Molecular Biology Laboratory (EMBL)
+
+This repository is a derivative work of salad
+(https://github.com/mjendrusch/salad). The model architecture, the algorithms,
+the noise schedules and the generation procedures originate there and remain
+licensed under the Apache License, Version 2.0:
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+As required by Section 4 of that License, this is a statement of changes: the
+model has been reimplemented in PyTorch, a compiled and CUDA-graph-captured
+inference path has been added along with its presets and the `--fast`,
+`--preset`, `--group_size` and `--batch_size` options, the per-task evaluation
+scripts have been consolidated into a single generation script, and the
+training loop and data pipeline have been reimplemented. Several upstream
+behaviours are reproduced deliberately rather than corrected; these are
+documented at their call sites.
+
+
+===============================================================================
+2. MODEL PARAMETERS  -  Creative Commons Attribution 4.0 International
+===============================================================================
+
+The released salad model parameters are licensed by EMBL under CC BY 4.0:
+
+    https://creativecommons.org/licenses/by/4.0/
+
+They are not distributed with this repository and are downloaded separately.
+Their licence is unchanged by anything here, and attribution to the original
+authors is required when using them.
+
+
+===============================================================================
+3. THE PORT  -  Creative Commons Attribution-NonCommercial 4.0 International
+===============================================================================
+
+The PyTorch implementation, the inference and training code written for it, the
+test suite and the documentation in this repository are licensed under
+CC BY-NC 4.0:
+
+    https://creativecommons.org/licenses/by-nc/4.0/
+
+You may share and adapt this material for non-commercial purposes, with
+attribution.
+
+This condition applies only to the material added by this port. It does not,
+and cannot, restrict the Apache-2.0 material described in section 1: that
+remains available under Apache 2.0 from the original repository, and this
+licence makes no claim over it.
+
+
+===============================================================================
+CITATION
+===============================================================================
+
+If you use this software, please cite the original work:
+
+    Jendrusch, M. et al. Efficient protein structure generation with sparse
+    denoising models. bioRxiv 2025.01.31.635780.
