@@ -1,20 +1,14 @@
 # salad-torch
 
 PyTorch port of [salad](https://github.com/mjendrusch/salad) (sparse all-atom
-denoising). Loads the released JAX checkpoints unchanged.
+denoising). Loads the released JAX checkpoints unchanged. No JAX dependency.
 
-- `--preset exact` matches the JAX original to 0.00002 A on all four verified
-  checkpoints, with an identical predicted sequence.
-- 1.87x faster than JAX at full parity; up to ~7x with `--preset fast` and
-  `--group_size`. See [Speed](#speed).
-- Inference and training are both ported. Training gradients match JAX to a
-  cosine similarity of 0.99999863.
-- No JAX dependency.
+`--preset exact` matches the JAX original to 0.00002 A on the four verified
+checkpoints. Inference and training are both ported.
 
-Three flags have no upstream counterpart: `--fast` (compile + CUDA graph),
-`--preset` (how much numerical deviation is acceptable) and `--group_size` /
-`--batch_size` (several designs per graph). Everything else behaves as upstream,
-including the quirks - see [Things that will bite you](#things-that-will-bite-you).
+Four flags have no upstream counterpart: `--fast` (compile + CUDA graph),
+`--preset`, `--group_size` and `--batch_size`. Everything else behaves as
+upstream.
 
 ## What's salad?
 
@@ -66,10 +60,9 @@ Upstream's `salad.modules.noise_schedule_benchmark` becomes
 `salad_torch.modules.diffusion` + `modules/blocks.py`; `salad.modules.geometric`
 becomes `salad_torch/geometry/`; the autoencoders are in `modules/encoder.py`.
 
-`tests/` is worth emphasising. `test_model_parity.py` checks all four
-checkpoints against stored JAX outputs, and `test_design_quality.py` generates
-real designs and checks they are proteins - the two ask different questions and
-this port needed both.
+`tests/test_model_parity.py` checks all four verified checkpoints against stored
+JAX outputs. `tests/test_design_quality.py` generates designs and checks their
+geometry.
 
 **NOTE: developed and tested on Linux with CUDA. The eager path runs on CPU;**
 **`--fast`, `--group_size` and `--batch_size` are CUDA-only.**
@@ -96,19 +89,17 @@ Licensed under the Apache License, Version 2.0 (the "License");
 
 # Table of contents
 
-- [salad-torch - a PyTorch port of salad](#salad-torch---a-pytorch-port-of-salad)
+- [salad-torch](#salad-torch)
   - [What's salad?](#whats-salad)
   - [What's in this repository?](#whats-in-this-repository)
   - [License](#license)
     - [Code license](#code-license)
     - [Model parameter license](#model-parameter-license)
-- [Status](#status)
 - [Getting started](#getting-started)
   - [Installing salad-torch](#installing-salad-torch)
   - [Generating your first proteins](#generating-your-first-proteins)
   - [Speed](#speed)
     - [Choosing a configuration](#choosing-a-configuration)
-    - [What this cost, and what it did not buy](#what-this-cost-and-what-it-did-not-buy)
   - [Sequence redesign and benchmarking](#sequence-redesign-and-benchmarking)
     - [Running ProteinMPNN](#running-proteinmpnn)
     - [Running novobench](#running-novobench)
@@ -152,40 +143,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 - [get PDB sequences](#get-pdb-sequences)
 - [get chemical component dictionary](#get-chemical-component-dictionary)
   - [training salad models](#training-salad-models)
-
-# Status
-
-| | |
-|---|---|
-| geometry layer | exact parity vs JAX, 38/38 functions |
-| whole denoiser, released weights | **0.00002 A** max deviation, identical predicted sequence |
-| all four verified checkpoints | load with `strict=True` |
-| sampling loop | verified against the chaos noise floor |
-| design quality | 0/160 diverged on all three presets |
-| training losses | all 12 terms; gradients match JAX (cosine 0.99999863) |
-| training loop | complete; batches by bin-packing, like upstream |
-| real-PDB datasource | implemented, **untested** - no preprocessed tree on the dev machine |
-| performance | 1.87-7x faster than JAX (see [Speed](#speed)) |
-
-Known gaps, stated plainly:
-
-- Eight of the twelve released checkpoints have no parity fixture. They load;
-  nobody has checked them.
-- `NpzAssemblySource` (training on real PDB data) has never ingested a
-  structure. The synthetic source works.
-- **No designability validation.** Every quality claim here is bond geometry,
-  radius of gyration, secondary-structure composition and clash rate - never
-  ProteinMPNN plus a folding model. This is the largest untested assumption in
-  the port.
-- Nothing has been measured on a non-H100 GPU. Blackwell (sm_120) needs
-  CUDA 12.8+ and torch >= 2.7; this port is developed on 2.5.1+cu121, which
-  cannot target it. Nothing in the code is architecture-specific.
-- Deliberately not ported, because they are dead in every released config:
-  `config.symm`, the class-based `Screw`, the trunk-side `use_omap` embedding,
-  an aa-conditioned encoder variant, and a `violation.py` branch whose result
-  upstream discards. Cluster-scaling machinery (`rebatch`/`multigpu`/`pmap`) is
-  also out of scope for a single-process port.
-
+- [Things that will bite you](#things-that-will-bite-you)
 
 # Getting started
 ## Installing salad-torch
@@ -304,26 +262,6 @@ and a single long forward already fills the machine.
 Peak VRAM is `(5.73*L + 235) + (N-1)*4.00*L` MiB and stays linear to L=1000. A
 single design fits in 8 GB even at L=1000; on a 24 GB card the practical limit
 is about `--group_size 5` at L=1000, and roughly 16 at L=100.
-
-### Measured and not shipped
-
-| | why not |
-|---|---|
-| inductor matmul templates | -14%, but not bit-exact (`pos` 5.4e-05 A) and the autotune is a timing race - three cold compiles disagree |
-| `einsum` -> `mm` lowering | -0.3%, and `pos` 5.6e-05 A, above the parity floor |
-| neighbour count 64 -> 32 | -28% at L=400, but 9x the clashes |
-| bf16 GEMMs | slower; the model is launch-bound, not math-bound |
-| `TORCHINDUCTOR_FREEZING` | passes an Angstrom tolerance while not being fp32-exact |
-| `max_fusion_size` increase | no node is ever blocked by it |
-
-`batch_cond_pair` triggers a PyTorch 2.5.1 inductor miscompile (an impossible
-load mask on a fused `stack` + indirect `index`) that corrupts 17-21% of designs
-while every parity test passes, because the parity tests drive the eager path.
-It ships behind a `torch.library.custom_op` fusion barrier. `tests/test_design_quality.py`
-exists because of this: it generates designs and checks they are proteins.
-
-Both presets sit about 10x above the measured floor of 0.258 ms/step. The model
-is kernel-launch-bound: arithmetic peaks at 11% of fp32 peak, L2 at 21% of rate.
 
 ## Sequence redesign and benchmarking
 ### Running ProteinMPNN
