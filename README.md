@@ -1,31 +1,20 @@
-# salad-torch - a PyTorch port of salad
+# salad-torch
 
-**This is a PyTorch port of [salad](https://github.com/mjendrusch/salad)
-(sparse all-atom denoising) by Michael Jendrusch / EMBL. The original is
-JAX + dm-haiku. This reimplements the model in PyTorch and loads the released
-JAX checkpoints unchanged.**
+PyTorch port of [salad](https://github.com/mjendrusch/salad) (sparse all-atom
+denoising). Loads the released JAX checkpoints unchanged.
 
-**What changed.** The model is the same model: `--preset exact` reproduces the
-JAX original to **0.00002 A** on all four released checkpoints, with an identical
-predicted sequence, and the geometry layer matches on 38 of 38 functions. What
-is different is everything around it. The denoiser is compiled and captured in a
-CUDA graph, so a design that takes JAX 1.56 s takes **1.27 s** at full parity and
-**~0.22 s** with the faster preset and design grouping - roughly **7x**. Two new
-flags have no counterpart upstream: `--preset` chooses how much numerical
-deviation you will accept, and `--group_size` advances several independent
-designs through one CUDA graph without changing any of them. The training loop,
-all twelve loss terms and the data pipeline are ported too; gradients match JAX
-to a cosine similarity of 0.99999863.
+- `--preset exact` matches the JAX original to 0.00002 A on all four verified
+  checkpoints, with an identical predicted sequence.
+- 1.87x faster than JAX at full parity; up to ~7x with `--preset fast` and
+  `--group_size`. See [Speed](#speed).
+- Inference and training are both ported. Training gradients match JAX to a
+  cosine similarity of 0.99999863.
+- No JAX dependency.
 
-Upstream's own quirks are reproduced deliberately, including the ones that look
-like bugs - see *Things that will bite you* at the end. The point is to match
-the released model, not to improve it.
-
-> **salad is not FlexCraft.** [`flexcraft`](https://github.com/mjendrusch/flexcraft)
-> is a separate repository by the same author that *uses* salad for backbone
-> generation and adds ProteinMPNN plus AF2/Boltz/Protenix filtering. salad is the
-> generative model, and it is what this ports.
-
+Three flags have no upstream counterpart: `--fast` (compile + CUDA graph),
+`--preset` (how much numerical deviation is acceptable) and `--group_size` /
+`--batch_size` (several designs per graph). Everything else behaves as upstream,
+including the quirks - see [Things that will bite you](#things-that-will-bite-you).
 
 ## What's salad?
 
@@ -311,26 +300,25 @@ Peak VRAM is `(5.73*L + 235) + (N-1)*4.00*L` MiB and stays linear to L=1000. A
 single design fits in 8 GB even at L=1000; on a 24 GB card the practical limit
 is about `--group_size 5` at L=1000, and roughly 16 at L=100.
 
-### What this cost, and what it did not buy
+### Measured and not shipped
 
-Most of the work was rejecting things. Measured and *not* shipped: inductor
-matmul templates (-14%, but not bit-exact and their autotune is a timing race -
-three cold compiles disagree), `einsum`->`mm` lowering, neighbour-count
-reduction (-28% at L=400 but 9x the clashes), bf16 (slower, because the model is
-launch-bound rather than math-bound) and `TORCHINDUCTOR_FREEZING` (passes an
-Angstrom tolerance while not being fp32-exact).
+| | why not |
+|---|---|
+| inductor matmul templates | -14%, but not bit-exact (`pos` 5.4e-05 A) and the autotune is a timing race - three cold compiles disagree |
+| `einsum` -> `mm` lowering | -0.3%, and `pos` 5.6e-05 A, above the parity floor |
+| neighbour count 64 -> 32 | -28% at L=400, but 9x the clashes |
+| bf16 GEMMs | slower; the model is launch-bound, not math-bound |
+| `TORCHINDUCTOR_FREEZING` | passes an Angstrom tolerance while not being fp32-exact |
+| `max_fusion_size` increase | no node is ever blocked by it |
 
-One shipped optimisation silently destroyed 17-21% of designs for a while. It
-triggers a **PyTorch 2.5.1 inductor miscompile** that emits an impossible load
-mask, and every parity test passed straight through it because they all drive
-the eager path. It is fixed behind a `torch.library.custom_op` fusion barrier.
-The lesson became a test: `tests/test_design_quality.py` generates real designs
-and asks whether they are proteins, which no single-forward comparison can do.
+`batch_cond_pair` triggers a PyTorch 2.5.1 inductor miscompile (an impossible
+load mask on a fused `stack` + indirect `index`) that corrupts 17-21% of designs
+while every parity test passes, because the parity tests drive the eager path.
+It ships behind a `torch.library.custom_op` fusion barrier. `tests/test_design_quality.py`
+exists because of this: it generates designs and checks they are proteins.
 
-Both presets still sit about 10x above this model's measured theoretical floor
-of 0.258 ms/step. It is kernel-launch-bound: arithmetic peaks at 11% of fp32
-peak and L2 runs at 21% of its rate.
-
+Both presets sit about 10x above the measured floor of 0.258 ms/step. The model
+is kernel-launch-bound: arithmetic peaks at 11% of fp32 peak, L2 at 21% of rate.
 
 ## Sequence redesign and benchmarking
 ### Running ProteinMPNN

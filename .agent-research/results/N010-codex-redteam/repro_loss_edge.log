@@ -1,8 +1,0 @@
-EDGE 1 normal total 94.03773498535156 finite True zero_terms []
-EDGE 1 masked total 0.0 finite True zero_terms ['aa', 'dssp', 'pos', 'pos_trajectory', 'x', 'rotation', 'rotation_trajectory', 'fape', 'fape_trajectory', 'local', 'distogram', 'violation', 'total']
-EDGE 2 normal total 108.00802612304688 finite True zero_terms []
-EDGE 2 masked total 0.0 finite True zero_terms ['aa', 'dssp', 'pos', 'pos_trajectory', 'x', 'rotation', 'rotation_trajectory', 'fape', 'fape_trajectory', 'local', 'distogram', 'violation', 'total']
-EDGE 8 normal total 130.22137451171875 finite True zero_terms []
-EDGE 8 masked total 0.0 finite True zero_terms ['aa', 'dssp', 'pos', 'pos_trajectory', 'x', 'rotation', 'rotation_trajectory', 'fape', 'fape_trajectory', 'local', 'distogram', 'violation', 'total']
-BATCH_DUP one 130.22137451171875 two 130.22137451171875 delta 0.0
-BATCH_DUP term_delta {'aa': 0.0, 'dssp': 0.0, 'pos': 0.0, 'pos_trajectory': 0.0, 'x': 0.0, 'rotation': 0.0, 'rotation_trajectory': 0.0, 'fape': 0.0, 'fape_trajectory': 0.0, 'local': 0.0, 'distogram': 0.0, 'violation': -1e-06, 'total': 0.0}

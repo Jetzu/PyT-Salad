@@ -1,6 +1,6 @@
-"""N030 - make inductor's matmul TEMPLATES bit-exact and compile-invariant.
+"""- make inductor's matmul TEMPLATES bit-exact and compile-invariant.
 
-Background (N016, N017, N020). Every `HkLinear` is an `einsum` that ATen lowers
+Background. Every `HkLinear` is an `einsum` that ATen lowers
 to a batch-1 `bmm`, and the captured lean step at L=100 spends 62 % of its
 GPU-busy time in 301 cuBLAS launches that average 5.98 us for arithmetic under
 1 us - almost pure launch latency. Turning on inductor's matmul templates
@@ -8,7 +8,7 @@ GPU-busy time in 301 cuBLAS launches that average 5.98 us for arithmetic under
 kernels and is worth -14 % of a lean step at L=100, the biggest single number
 anyone has measured on this model.
 
-N020 rejected it anyway, for two reasons, and both are about SELECTION rather
+rejected it anyway, for two reasons, and both are about SELECTION rather
 than about the templates themselves:
 
 * the winning kernel is chosen by a **timing race**, so at a shape where two
@@ -149,7 +149,7 @@ def _filter(name: str, choices, input_nodes, layout, max_k: Optional[int]):
         rec["shape"] = None
     if max_k is not None and (k is None or k > max_k):
         # a compile-time economy only: above `max_k` the template loses to
-        # cuBLAS anyway on this model's wide projections (N016 E4), so do not
+        # cuBLAS anyway on this model's wide projections , so do not
         # pay to compile and verify ~40 candidates that cannot win.
         rec.update(action="aten_only_by_K", n_exact=0)
         STATS.append(rec)
@@ -190,7 +190,7 @@ def _filter(name: str, choices, input_nodes, layout, max_k: Optional[int]):
 def _stable_pick(name, choices, input_nodes, layout, tol: float):
     """Collapse the candidate list to ONE deterministically-chosen winner.
 
-    N020 section 3d: `max_autotune_gemm`'s selection is a TIMING RACE, and at a
+    the project notes, section 3d: `max_autotune_gemm`'s selection is a TIMING RACE, and at a
     shape where two candidates are within benchmarking noise two cold-cache
     compiles of the same configuration pick different winners - so the model's
     output bits depend on a race even on one card (measured: three compiles

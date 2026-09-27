@@ -77,7 +77,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
                          "reproducibility within one backend.")
     ap.add_argument("--timing_json", default="")
     ap.add_argument("--group_size", default="",
-                    help="N019. Advance N INDEPENDENT designs through ONE "
+                    help="Advance N INDEPENDENT designs through ONE "
                          "CUDA graph instead of one at a time. Needs --fast. "
                          "Not a batch axis and not a shared trajectory: each "
                          "design keeps its own buffers, its own noise and its "
@@ -101,7 +101,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     # -- §1: symmetry -------------------------------------------------
     ap.add_argument("--batch_size", default="",
-                    help="N021. PACKED batching: B designs concatenated along "
+                    help="PACKED batching: B designs concatenated along "
                          "the flat residue axis of ONE forward, so each kernel "
                          "does B designs' work in one launch. Composes with "
                          "--group_size (G packed batches per captured graph), "
@@ -115,7 +115,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
                          "design is NOT the design the same seed produces "
                          "alone. --batch_size 1 (the default) is today's path, "
                          "unchanged. See "
-                         ".agent-research/results/N021-packed-batching/.")
+                         "the project notes.")
     sym = ap.add_argument_group("symmetry (notes/specs/06_generation_flags.md §1)")
     sym.add_argument("--sym", default="",
                      help="Screw/cyclic symmetry group. '' disables it. "
@@ -441,7 +441,7 @@ def run_grouped(args, config, model, cfg: SamplerConfig, pc: dict, num_aa: int,
                 resi: Tensor, chain: Tensor, base_chain: Tensor,
                 is_cyclic: bool, cyclic_mask: Tensor,
                 device: torch.device) -> None:
-    """`--group_size` (N019) and/or `--batch_size` (N021).
+    """`--group_size` and/or `--batch_size` .
 
     Two orthogonal axes of parallelism over designs, and they compose:
 
@@ -578,7 +578,7 @@ def run_grouped(args, config, model, cfg: SamplerConfig, pc: dict, num_aa: int,
                 prevs.append(pprev)
                 lengths.append(lens)
                 # keyed on the FIRST design of the pack, so batch_size=1
-                # reproduces N019's per-design streams exactly.
+                # reproduces earlier per-design streams exactly.
                 gens.append(design_generator(device, args.seed, ids[0]))
             gate = group.pin_conditions(datas)
 
@@ -682,7 +682,7 @@ def main() -> None:
                     screw_translation=args.screw_translation,
                     sym_mean=args.sym_mean, sym_threshold=args.sym_threshold)
 
-    # A preset may shorten the trajectory (N011's "fast" halves it). Scaling
+    # A preset may shorten the trajectory (earlier "fast" halves it). Scaling
     # num_steps and out_steps TOGETHER is what makes that a coarsening rather
     # than a different run: the schedule is `raw_t = 1 - step/num_steps`, so
     # both endpoints (raw_t 1.0 at the start, 0.2 at the reported step) are

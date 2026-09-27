@@ -1,4 +1,4 @@
-"""Inference fast-path switches (N009, executing the N007 PLAN).
+"""Inference fast-path switches .
 
 Every switch here defaults to **on** and is either bit-exact or
 reassociation-only; the environment variables exist so one benchmark job can
@@ -9,9 +9,9 @@ anything - a mutable flag would become a guard and force a recompile.
 | flag | proposal | class |
 |---|---|---|
 | ``SALAD_OPT_GATHER=0`` | P3 one-hot x matrix -> row gather | bit-exact |
-| ``SALAD_OPT_HOIST=0``  | P6 hoist loop-invariant neighbour stages | bit-exact |
-| ``SALAD_OPT_NOPC=0``   | P4+P5 skip the dead pair-conditioning work | P4 bit-exact, P5 reassociation |
-| ``SALAD_OPT_LEAN=0``   | P2 skip the AA decoder + angle head off-step | skip (see below) |
+| ``SALAD_OPT_HOIST=0`` | P6 hoist loop-invariant neighbour stages | bit-exact |
+| ``SALAD_OPT_NOPC=0`` | P4+P5 skip the dead pair-conditioning work | P4 bit-exact, P5 reassociation |
+| ``SALAD_OPT_LEAN=0`` | P2 skip the AA decoder + angle head off-step | skip (see below) |
 
 P4/P5 additionally carry a **runtime** gate: they only fire when the design has
 no pair conditioning at all (``dmap_mask`` all false AND ``flags`` all false),
@@ -66,7 +66,7 @@ LEAN_STEPS = _flag("SALAD_OPT_LEAN")
 #: re-tests it against the single-graph forward.
 NEED_AUX = _flag("SALAD_OPT_AUX")
 
-#: P7 (N013) - compute the condition branch's `pair_2` for all six blocks in
+#: P7 - compute the condition branch's `pair_2` for all six blocks in
 #: one batched prologue (`modules/cond_prologue.StackedCondPair`). Worth
 #: -9.2 % of a lean step at L=100. The feature tensors are bit-identical (the
 #: builders are elementwise on a tiled residue axis); the seven projections and
@@ -83,7 +83,7 @@ NEED_AUX = _flag("SALAD_OPT_AUX")
 #: 3.7632 / Rg 12.94, which is the pre-P7 reference (3.7605 / 13.07) exactly.
 #: Localised three ways: a commit bisect (c5ab7a0 0/64 -> 603051e 11/64), the
 #: `SALAD_OPT_BATCHCOND=0` veto at n=160, and a 6-arm toggle matrix that clears
-#: CSE, `aggressive_fusion`, TF32, CUDA-graph capture and the N019 refactor.
+#: CSE, `aggressive_fusion`, TF32, CUDA-graph capture and the refactor.
 #:
 #: P7's OWN ARITHMETIC IS CORRECT. The prologue agrees with the six sequential
 #: `pair_2` calls to 8.6e-6 absolute on a real step-30 state, with bit-identical
@@ -118,11 +118,11 @@ NEED_AUX = _flag("SALAD_OPT_AUX")
 #:
 #: Do NOT re-enable without: (a) root-causing the fusion, and (b) 0/160 diverged
 #: on `tests/test_design_quality.py --n 160`. It was worth -9.3 to -11.0 % of a
-#: whole forward at L=100, eroding to -2.3 % at L=400 (N014) - not enough to
+#: whole forward at L=100, eroding to -2.3 % at L=400 - not enough to
 #: gamble a silent 20 % design-loss rate on.
 BATCH_COND = _flag("SALAD_OPT_BATCHCOND")
 
-#: N013 item 4 - a DETERMINISTIC segment reduction, so `--seed` pins a CUDA
+#: item 4 - a DETERMINISTIC segment reduction, so `--seed` pins a CUDA
 #: run. `index_sum`'s `scatter_add` is an atomicAdd whose ordering varies at
 #: ~1.6e-7, and the neighbour argsort amplifies that into a discrete tie flip
 #: (notes/04 section 8). Replacing it with a one-hot matmul is deterministic by
@@ -130,7 +130,7 @@ BATCH_COND = _flag("SALAD_OPT_BATCHCOND")
 #: ORDER, so it is its own parity baseline - never the default.
 DET_SEGMENT = _flag("SALAD_OPT_DETSEG", default=False)
 
-#: N013 - inductor's `aggressive_fusion` scheduler knob. It merges more nodes
+#: - inductor's `aggressive_fusion` scheduler knob. It merges more nodes
 #: into one kernel and is worth -1.4 to -2.4 % of the step. Measured
 #: BIT-IDENTICAL twice over: on CPU (deterministic by construction, L=64 and
 #: L=100, all eleven outputs, `x_cpu_bits.py`) and ON THE H100 under the
@@ -141,15 +141,15 @@ DET_SEGMENT = _flag("SALAD_OPT_DETSEG", default=False)
 AGGRESSIVE_FUSION = _flag("SALAD_OPT_AGGRFUSE")
 
 
-#: N020 - how `HkLinear.forward` contracts. `"einsum"` (the DEFAULT, and the
-#: pre-N020 form) is `einsum("...k,ki->...i")`, which ATen lowers to `bmm` with
+#: - how `HkLinear.forward` contracts. `"einsum"` (the DEFAULT, and the
+#: pre-form) is `einsum("...k,ki->...i")`, which ATen lowers to `bmm` with
 #: batch=1. `"mm"` instead folds the leading axes into M and calls `torch.mm`,
 #: so the op that reaches inductor is `aten.mm`; the bias stays a separate
 #: `add`. `"addmm"` folds and calls `torch.addmm` directly.
 #:
-#:   ``SALAD_OPT_MM=einsum``  the pre-N020 form -> batch-1 bmm  (DEFAULT)
-#:   ``SALAD_OPT_MM=mm``      fold + `torch.mm` + separate bias add
-#:   ``SALAD_OPT_MM=addmm``   fold + `torch.addmm`
+#: ``SALAD_OPT_MM=einsum`` the pre-form -> batch-1 bmm (DEFAULT)
+#: ``SALAD_OPT_MM=mm`` fold + `torch.mm` + separate bias add
+#: ``SALAD_OPT_MM=addmm`` fold + `torch.addmm`
 #:
 #: REJECTED, both of them - kept only as a bisection/debug knob, never shipped:
 #: `mm` is NOT bit-identical to `einsum` (measured: CPU, all eleven
@@ -167,7 +167,7 @@ MM_MODE = {"0": "einsum", "off": "einsum", "false": "einsum", "no": "einsum",
 if MM_MODE is None:
     raise ValueError(f"SALAD_OPT_MM must be einsum|mm|addmm, got {_MM_ENV!r}")
 
-#: N020 - inductor's matmul TEMPLATES (`max_autotune_gemm`), i.e. let inductor
+#: - inductor's matmul TEMPLATES (`max_autotune_gemm`), i.e. let inductor
 #: benchmark a Triton template against cuBLAS at every GEMM shape in the graph
 #: at compile time and keep the faster one. Inductor has a `tuned_bmm` template
 #: path too, so this is reachable at the DEFAULT `MM_MODE=einsum` (batch-1
@@ -194,12 +194,12 @@ if MM_MODE is None:
 #: (`gpu_stability.sbatch`), i.e. the autotune benchmark can pick a different
 #: winning kernel at a shape where the candidates are within noise, so the
 #: bits depend on a timing race even on the SAME device. See RESULTS.md
-#: section on N020's deliverable 1 for the full table and the CPU/GPU-DETSEG
+#: section on earlier deliverable 1 for the full table and the CPU/GPU-DETSEG
 #: methodology. `SALAD_OPT_GEMMTPL=1` is left as an opt-in knob for
 #: experimentation (e.g. a `fast`-preset candidate pending an n=160
-#: structural validation - see N015's method - which has NOT been run) but no
+#: structural validation - see earlier method - which has NOT been run) but no
 #: shipped preset requests it.
-#: N030 - inductor's `decompose_mm_pass`. A batched `bmm` whose batch is at
+#: - inductor's `decompose_mm_pass`. A batched `bmm` whose batch is at
 #: least `min_first_dimension_decomposition` and two of whose (m, n, k) are
 #: under 32 is rewritten as `(a[..., None] * b[..., None, :, :]).sum(-2)`, i.e.
 #: a Triton kernel (1.06 us to exist, and fusable with its neighbours) instead
@@ -211,17 +211,17 @@ if MM_MODE is None:
 #: of them; the preset asks for 32.
 #:
 #: Measured -15.5 % of a lean step at L=100 ON TOP of the P7-reenabled
-#: baseline (job 907765: 3.0721 -> 2.5946 ms; matches the pre-P7-reenable
+#: baseline (: 3.0721 -> 2.5946 ms; matches the pre-P7-reenable
 #: -16.6 % almost exactly, so the two do not meaningfully compete for the same
 #: launches) - LARGER than the matmul templates and at a fraction of their
 #: compile cost - but it is a REASSOCIATION (mul then tree-sum instead of
 #: cuBLAS's FMA chain), whole-forward `pos` max|d| 4.96e-05 A against a 2e-05
-#: floor (job 907766), so it can only ever be a `fast` feature.
+#: floor , so it can only ever be a `fast` feature.
 #: `SALAD_OPT_DECOMPBMM=0` vetoes it.
 #: `SALAD_OPT_DECOMPBMM` is a THRESHOLD, not a plain veto flag:
-#:   unset            the preset decides (this is what ships)
-#:   ``0`` / ``off``  veto - no decomposition, whatever the preset says
-#:   ``<int>``        use this min-batch threshold, overriding the preset
+#: unset the preset decides (this is what ships)
+#: ``0`` / ``off`` veto - no decomposition, whatever the preset says
+#: ``<int>`` use this min-batch threshold, overriding the preset
 #: The third form exists so the n=160 design-quality gate can run the candidate
 #: configuration without editing a preset mid-job. It deliberately lets the
 #: environment turn the feature ON as well as off - the trap this project keeps
@@ -230,7 +230,7 @@ if MM_MODE is None:
 #:
 #: UNLIKE the matmul templates below, this is NOT an autotune race: it is a
 #: pure threshold-triggered FX-graph rewrite, so it is perfectly reproducible
-#: across independent cold-cache compiles (job 907764: 3/3 compiles bitwise
+#: across independent cold-cache compiles (: 3/3 compiles bitwise
 #: IDENTICAL to each other, `pos` max|d| = 0.0 in both pairwise comparisons -
 #: contrast the matmul-templates row below, which disagreed with itself by
 #: 3.46e-05 across the same 3 compiles).
@@ -253,32 +253,32 @@ def resolve_decompose_small_bmm(preset_value) -> int:
         return int(DECOMPOSE_SMALL_BMM)
     return int(preset_value) if preset_value else 0
 
-#: N030 supersedes the "REJECTED" verdict above for ONE of the three modes.
+#: supersedes the "REJECTED" verdict above for ONE of the three modes.
 #: `SALAD_OPT_GEMMTPL` is no longer a plain on/off flag; it selects HOW the
 #: winner among inductor's GEMM candidates is chosen:
 #:
-#:   ``0`` / ``off``  templates off - the pre-N020 behaviour             (DEFAULT)
-#:   ``1`` / ``all``  N020's arm: fastest candidate wins. -14 % at L=100 and
-#:                    REJECTED - not bit-exact (pos 5.84e-05 A) and not even
-#:                    reproducible against itself across compiles.
-#:   ``exact``        N030: the fastest candidate that is BITWISE identical to
-#:                    cuBLAS at that shape, verified at compile time on the
-#:                    machine that is compiling (`salad_torch/gemm_exact.py`).
-#:                    MEASURED NOT TO WORK EITHER: even restricted to
-#:                    per-shape-verified candidates, the whole forward is
-#:                    still not bit-exact (pos 5.44e-05 A) AND the verified
-#:                    candidate set is itself not stable across cold-cache
-#:                    compiles (job 907764: rep1 vs rep3 pos 3.46e-05, rep1
-#:                    vs rep2 exactly 0.0 - the SAME timing-race instability
-#:                    that motivated this mode in the first place still
-#:                    reaches the output, because which candidates SURVIVE
-#:                    verification is itself not perfectly reproducible, not
-#:                    only which survivor wins the subsequent speed race).
-#:                    Kept only as an opt-in research knob; no preset uses it.
-#:   ``stable``       N030: fastest candidate, but the timing race's tie-break
-#:                    is deterministic (content hash, not arrival order), so
-#:                    two compiles agree. Still NOT equal to cuBLAS, and NOT
-#:                    validated at n=160 either. Research knob only.
+#: ``0`` / ``off`` templates off - the pre-behaviour (DEFAULT)
+#: ``1`` / ``all`` earlier arm: fastest candidate wins. -14 % at L=100 and
+#: REJECTED - not bit-exact (pos 5.84e-05 A) and not even
+#: reproducible against itself across compiles.
+#: ``exact`` the fastest candidate that is BITWISE identical to
+#: cuBLAS at that shape, verified at compile time on the
+#: machine that is compiling (`salad_torch/gemm_exact.py`).
+#: MEASURED NOT TO WORK EITHER: even restricted to
+#: per-shape-verified candidates, the whole forward is
+#: still not bit-exact (pos 5.44e-05 A) AND the verified
+#: candidate set is itself not stable across cold-cache
+#: compiles (: rep1 vs rep3 pos 3.46e-05, rep1
+#: vs rep2 exactly 0.0 - the SAME timing-race instability
+#: that motivated this mode in the first place still
+#: reaches the output, because which candidates SURVIVE
+#: verification is itself not perfectly reproducible, not
+#: only which survivor wins the subsequent speed race).
+#: Kept only as an opt-in research knob; no preset uses it.
+#: ``stable`` fastest candidate, but the timing race's tie-break
+#: is deterministic (content hash, not arrival order), so
+#: two compiles agree. Still NOT equal to cuBLAS, and NOT
+#: validated at n=160 either. Research knob only.
 #:
 #: The value ANDs with the preset the usual way: a preset that says
 #: `gemm_templates=False` cannot be turned on from the environment, and a
@@ -316,13 +316,13 @@ def resolve_gemm_templates(preset_value) -> str:
     return GEMM_TPL_MODE
 
 
-#: N028/O6 - `DiffusionPairFeatures` calls `direction_features(pos, nb)` and
+#: O6 - `DiffusionPairFeatures` calls `direction_features(pos, nb)` and
 #: `pair_vector_features(pos, nb)` on the SAME arguments; both start by
 #: computing `aa_frames_t(pos)` and gathering `pos[neighbours]`. Sharing THOSE
 #: two - a per-residue frame and a pure index gather, neither of which rounds
 #: anything - removes one frame computation and one neighbour gather.
 #:
-#: `fx_graph_cse` (N017/O1) cannot reach this: `pair_vector_features` feeds
+#: `fx_graph_cse` (O1) cannot reach this: `pair_vector_features` feeds
 #: `apply_inverse_t` a `cat([self_pos, neigh_pos])`, so its subgraph is not
 #: syntactically identical to `direction_features`'s. Structural redundancy of
 #: this kind needs a SOURCE change.
@@ -337,7 +337,7 @@ def resolve_gemm_templates(preset_value) -> str:
 #: reproduced the reference exactly. That is eager CPU PyTorch's batched
 #: linear-algebra lowering picking a different low-level kernel/rounding for
 #: the SAME math depending on call context, not a bug in the arithmetic - see
-#: N028's RESULTS.md for the two-process block-by-block trace that isolated
+#: earlier RESULTS.md for the two-process block-by-block trace that isolated
 #: it, and do not re-widen the sharing without repeating that trace.
 #:
 #: The current, narrower form - reuse only the frame and the gather, run each
@@ -352,7 +352,7 @@ def resolve_gemm_templates(preset_value) -> str:
 PAIR_FEAT_MERGE = _flag("SALAD_OPT_PAIRFEAT")
 
 
-#: N028/O8 - how the 3x3 frame algebra contracts. `apply_t`, `apply_inverse_t`,
+#: O8 - how the 3x3 frame algebra contracts. `apply_t`, `apply_inverse_t`,
 #: `rot_apply`, `rot_apply_inverse` and `rot_compose` are `torch.einsum`
 #: (or `@`), and ATen lowers EVERY one of them to `aten.bmm`: 61 of the 303
 #: `extern_kernels.bmm` calls in the generated module have a `(..., 3, 3)`
@@ -362,7 +362,7 @@ PAIR_FEAT_MERGE = _flag("SALAD_OPT_PAIRFEAT")
 #: `SALAD_OPT_FRAMEMULSUM=1` writes them as broadcast-multiply + `sum` over the
 #: contracted axis, so each becomes an ordinary pointwise+reduction node that
 #: inductor can fuse into the surrounding elementwise work. Same class of trade
-#: as `IPA_MULSUM` (N028/O2, see `modules/attention.py`), and the same
+#: as `IPA_MULSUM` (O2, see `modules/attention.py`), and the same
 #: direction: it removes cuBLAS launches and adds (at most) Triton ones.
 #:
 #: It is a REASSOCIATION over a 3-element contraction (bitwise identical in
@@ -399,7 +399,7 @@ ENV_FRAME_MULSUM = _flag("SALAD_OPT_FRAMEMULSUM")
 FRAME_MULSUM = False
 
 
-#: N017/O2, validated in N028 - how `SparseInvariantPointAttention` contracts
+#: O2, validated in - how `SparseInvariantPointAttention` contracts
 #: its four attention products. The default (`False`) is `torch.einsum`, which
 #: ATen lowers to `bmm`; because three of the four operands are GATHERED
 #: neighbour tensors in the wrong layout for a `bmm`, inductor must materialise

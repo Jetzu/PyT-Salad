@@ -9,19 +9,19 @@ a one-step comparison, by construction.
 
 So this test does not compare against JAX at all. It GENERATES designs and asks
 whether they are proteins, against thresholds measured on a known-good commit
-(c5ab7a0, N015, n=160 per arm):
+(c5ab7a0, n=160 per arm):
 
-    CA-CA bond length   3.7613 - 3.7628 A   (sd ~0.013)
-    radius of gyration  12.89 A             (sd ~1.76)
-    diverged fraction   0 / 160
-    helix fraction      0.566 - 0.580
+    CA-CA bond length 3.7613 - 3.7628 A (sd ~0.013)
+    radius of gyration 12.89 A (sd ~1.76)
+    diverged fraction 0 / 160
+    helix fraction 0.566 - 0.580
 
 `DIVERGED` is the load-bearing one and it is deliberately crude: a real protein
 has CA-CA ~3.8 A, so a mean above `CA_CA_MAX` is not a worse protein, it is not
 a protein. That check would have caught this regression on 8 designs.
 
 Rg is checked too, because a diverged design can have PERFECT bond geometry: a
-fully extended chain at 3.739 A with Rg 28.9 A appeared in N015's own run and a
+fully extended chain at 3.739 A with Rg 28.9 A appeared in earlier own run and a
 CA-CA filter alone does not see it.
 
 Runtime is the reason this is not free: 8 designs at L=100 is ~10 s on the
@@ -30,10 +30,10 @@ that touches `salad_torch/modules/` or `scripts/generate.py`. `--n 160` is the
 statistically meaningful version and takes ~20 min; the default 8 is the smoke
 version that catches a catastrophe, not a distribution shift.
 
-    python tests/test_design_quality.py                  # 8 designs, fast preset
-    python tests/test_design_quality.py --n 160          # the real gate
+    python tests/test_design_quality.py # 8 designs, fast preset
+    python tests/test_design_quality.py --n 160 # the real gate
     python tests/test_design_quality.py --preset exact
-    python tests/test_design_quality.py --no-fast        # eager path
+    python tests/test_design_quality.py --no-fast # eager path
 
 Exit code 0 = pass, 1 = fail. Prints every per-design number on failure so the
 failure is diagnosable without a rerun.
@@ -46,7 +46,7 @@ import sys
 import numpy as np
 import torch
 
-# --- thresholds, from c5ab7a0 / N015 at n=160 -------------------------------
+# --- thresholds, from c5ab7a0 / at n=160 -------------------------------
 #: a mean CA-CA above this is not a protein. The known-good mean is 3.76 with
 #: sd 0.013, so this sits ~57 sd out - it cannot fire on noise.
 CA_CA_MAX = 4.5
@@ -54,10 +54,10 @@ CA_CA_MAX = 4.5
 CA_CA_MIN = 3.0
 #: a 100-residue globular protein has Rg ~12.9. A fully extended 100-mer is
 #: ~29. This catches the correctly-bonded-but-unfolded case a CA-CA filter
-#: misses (N015 found exactly one: 3.739 A bonds, Rg 28.9).
+#: misses (found exactly one: 3.739 A bonds, Rg 28.9).
 RG_MAX = 30.0
 #: fraction of designs allowed to diverge. Upstream JAX salad produced 1/40 in
-#: N001, so this is not zero - but 26-41 % is a regression, not the model.
+#: so this is not zero - but 26-41 % is a regression, not the model.
 DIVERGED_FRAC_MAX = 0.10
 
 

@@ -39,17 +39,17 @@ __all__ = ["FastDenoiser", "GroupFastDenoiser", "PRESETS", "memory_bound_group"]
 _ENV_DET_SEGMENT = opt.DET_SEGMENT
 #: ...and `SALAD_OPT_BATCHCOND=0` forces P7 off for every preset.
 _ENV_BATCH_COND = opt.BATCH_COND
-#: ...and `SALAD_OPT_PAIRFEAT=0` forces N028/O6 off for every preset (same
+#: ...and `SALAD_OPT_PAIRFEAT=0` forces O6 off for every preset (same
 #: veto-only, `batch_cond_pair` contract - the preset decides, the env var can
 #: only turn it off).
 _ENV_PAIR_FEAT_MERGE = opt.PAIR_FEAT_MERGE
-#: ...and `SALAD_OPT_FRAMEMULSUM=1` forces N028/O8 ON for every preset. This
+#: ...and `SALAD_OPT_FRAMEMULSUM=1` forces O8 ON for every preset. This
 #: one is `DET_SEGMENT`'s OR contract, NOT `BATCH_COND`'s AND one - see
 #: `opt.FRAME_MULSUM`'s docstring for why (it fails eager `test_model_parity`
 #: outright, so a bare default of True would break every raw parity-script
 #: invocation, not just `fast`).
 _ENV_FRAME_MULSUM = opt.ENV_FRAME_MULSUM
-#: ...and `SALAD_OPT_IPAMULSUM=1` forces N017/O2 ON for every preset (same
+#: ...and `SALAD_OPT_IPAMULSUM=1` forces O2 ON for every preset (same
 #: OR contract, same reason - see `opt.IPA_MULSUM`).
 _ENV_IPA_MULSUM = opt.ENV_IPA_MULSUM
 
@@ -73,7 +73,7 @@ except (ImportError, AttributeError):  # pragma: no cover - private torch path
 
 
 def _cse_graph_pass(graph):
-    """N017/O1's CSE pass. MODULE level on purpose - see `FastDenoiser.__init__`.
+    """O1's CSE pass. MODULE level on purpose - see `FastDenoiser.__init__`.
 
     Inductor pickles `joint_custom_post_pass` into its on-disk FX-graph cache
     key. A closure is unpicklable, inductor swallows the resulting
@@ -83,12 +83,12 @@ def _cse_graph_pass(graph):
 
 
 def _cse_graph_pass_gemm_exact(graph):
-    """Identical to `_cse_graph_pass`; the NAME is the point - see N030 below."""
+    """Identical to `_cse_graph_pass`; the NAME is the point - see below."""
     graph.owning_module.graph = _fx_graph_cse(graph)
 
 
 def _cse_graph_pass_gemm_stable(graph):
-    """Identical to `_cse_graph_pass`; the NAME is the point - see N030 below."""
+    """Identical to `_cse_graph_pass`; the NAME is the point - see below."""
     graph.owning_module.graph = _fx_graph_cse(graph)
 
 
@@ -116,19 +116,19 @@ PRESETS: dict[str, dict] = {
         # fp32 matmuls stay fp32, and the sampler keeps its 500/400 schedule.
         tf32=False,
         steps_scale=1.0,
-        # inductor scheduler knob, N013: -1.4 % at L=100 / -2.4 % at L=50, and
+        # inductor scheduler knob, -1.4 % at L=100 / -2.4 % at L=50, and
         # BIT-IDENTICAL on CPU *and* on the H100 under the deterministic
         # segment reduction. Not a numerics trade at all.
         aggressive_fusion=True,
         # P7, the batched condition-branch prologue: -9.2 % of a lean step.
         # Reassociation only (bmm vs six mm); see `batch_cond_pair` below.
         batch_cond_pair=True,
-        # N028/O6 - the pair-feature sharing (aa_frames_t + neighbour gather
+        # O6 - the pair-feature sharing (aa_frames_t + neighbour gather
         # reused between `direction_features` and `pair_vector_features`).
         # BIT-EXACT (see `opt.PAIR_FEAT_MERGE`) - takes every preset, same as
         # `aggressive_fusion` above.
         pair_feat_merge=True,
-        # N020: inductor's matmul templates (`max_autotune_gemm`) - REJECTED
+        # inductor's matmul templates (`max_autotune_gemm`) - REJECTED
         # from every preset. -14% at L=100 (eroding to -6.4% at L=400) but NOT
         # bit-exact: whole-forward H100/DETSEG control measured pos
         # max|d|=5.84e-05 at L=100 / 7.87e-04 at L=400, templates-on vs off
@@ -137,12 +137,12 @@ PRESETS: dict[str, dict] = {
         # (up to pos 8.87e-05 between two compiles of the SAME config - the
         # autotune benchmark can pick a different kernel at a shape where
         # candidates are within noise). See opt.py's GEMM_TEMPLATES docstring
-        # and .agent-research/results/N020-matmul-lowering/RESULTS.md.
+        # and the project notes
         # `SALAD_OPT_GEMMTPL=1` still works as an opt-in for experimentation;
         # it is a `fast`-preset candidate pending an n=160 structural
-        # validation (N015's method) that has not been run.
+        # validation (earlier method) that has not been run.
         #
-        # N030 tried to rescue this for `exact` with a per-shape bitwise-exact
+        # tried to rescue this for `exact` with a per-shape bitwise-exact
         # candidate filter (`SALAD_OPT_GEMMTPL=exact`, `gemm_exact.py`) and it
         # did NOT work: even restricted to Triton candidates individually
         # verified bitwise-equal to cuBLAS at their own shape, the WHOLE
@@ -150,50 +150,50 @@ PRESETS: dict[str, dict] = {
         # than the unfiltered arm's 5.84e-05) and the verified-candidate SET
         # is itself not stable across cold compiles - see RESULTS.md section 4.
         gemm_templates=False,
-        # N030: inductor's `decompose_mm_pass` (see opt.DECOMPOSE_SMALL_BMM).
+        # inductor's `decompose_mm_pass` (see opt.DECOMPOSE_SMALL_BMM).
         # -15.5 % at L=100 on top of P7 but a reassociation (pos
         # max|d|=4.96e-05 A, above the 2e-05 floor), so False here too -
         # `exact` never takes it.
         decompose_small_bmm=False,
-        # N028/O8 - the 3x3 frame-algebra mul+sum rewrite. NEVER in `exact`:
+        # O8 - the 3x3 frame-algebra mul+sum rewrite. NEVER in `exact`:
         # it is a reassociation over a 3-element contraction and the whole
         # compiled `forward_core` CPU control disagrees on 9/11 outputs.
         # See `opt.FRAME_MULSUM`.
         frame_mulsum=True,
-        # N017/O2 - the IPA mul+sum rewrite. NEVER in `exact`: it is a
+        # O2 - the IPA mul+sum rewrite. NEVER in `exact`: it is a
         # reassociation of four reductions and `test_sampling_parity` fails at
         # 7/64 residues. See `opt.IPA_MULSUM`.
         ipa_mulsum=False,
     ),
     # ------------------------------------------------------------------
-    # "fast" (N011) - maximum speed, ALLOWED to move the numbers. It is NOT a
+    # "fast" - maximum speed, ALLOWED to move the numbers. It is NOT a
     # different model: same checkpoint, same architecture, same neighbourhood
     # sizes, same sampler. What it gives up is mantissa bits in the matmuls and
     # half the trajectory's resolution - and nothing else, because nothing else
     # that was tried paid for itself. Measured at L=100 on an H100, production
-    # path, `x_preset.py` (.agent-research/results/N011-fast-preset/):
+    # path, `x_preset.py` (the project notes):
     #
-    #                        reporting step   lean step   per design
-    #   exact                    4.381 ms      3.568 ms     1.43 s
-    #   exact + TF32 only        3.719 ms      2.996 ms     1.20 s
-    #   fast without TF32        4.385 ms      3.563 ms     0.72 s
-    #   fast                     3.614 ms      2.894 ms     0.58 s
+    # reporting step lean step per design
+    # exact 4.381 ms 3.568 ms 1.43 s
+    # exact + TF32 only 3.719 ms 2.996 ms 1.20 s
+    # fast without TF32 4.385 ms 3.563 ms 0.72 s
+    # fast 3.614 ms 2.894 ms 0.58 s
     #
     # i.e. TF32 is -16 to -19 % of the step and halving the schedule is the
     # other 2x. JAX salad is 1.56 s per design, so this is ~2.7x JAX and
     # ~2.5x the exact path.
     #
     # QUALITY: validated at n=160 designs per arm, not at the n=8 this preset
-    # shipped on (N015, jobs 903264 + 903296; L=100, seeds 42 and 1234 pooled).
+    # shipped on (+ 903296; L=100, seeds 42 and 1234 pooled).
     # Halving the schedule is the only knob here that changes the TRAJECTORY
     # rather than the arithmetic, so it was factorised out and tested on its
     # own. Converged designs, `exact` in brackets:
     #
-    #                      CA-CA (A)        Rg (A)      helix  strand  diverged
-    #   exact         3.7628 +- 0.0137  12.89 +- 1.76   0.566   0.353    2/160
-    #   TF32 only     3.7615 +- 0.0123  12.89 +- 1.46   0.572   0.351    0/160
-    #   schedule only 3.7627 +- 0.0141  12.89 +- 1.56   0.575   0.345    0/160
-    #   fast          3.7613 +- 0.0131  12.90 +- 1.89   0.580   0.335    0/160
+    # CA-CA (A) Rg (A) helix strand diverged
+    # exact 3.7628 +- 0.0137 12.89 +- 1.76 0.566 0.353 2/160
+    # TF32 only 3.7615 +- 0.0123 12.89 +- 1.46 0.572 0.351 0/160
+    # schedule only 3.7627 +- 0.0141 12.89 +- 1.56 0.575 0.345 0/160
+    # fast 3.7613 +- 0.0131 12.90 +- 1.89 0.580 0.335 0/160
     #
     # Welch vs exact: every metric p >= 0.24. Two-sample KS (the shape test a
     # t-test cannot do): every metric p >= 0.13. Brown-Forsythe on the spread:
@@ -204,7 +204,7 @@ PRESETS: dict[str, dict] = {
     # in CA-CA; the largest observed shift is 0.013 / 0.019 / 0.00 / 0.0015.
     # Helix moves UP, not down.
     #
-    # The n=8 table this preset shipped on (N011 section 4) read helix 0.605 ->
+    # The n=8 table this preset shipped on (the project notes, section 4) read helix 0.605 ->
     # 0.591 and Rg 12.50 -> 12.92, i.e. exactly the feared direction. Both were
     # noise, and so was an n=40 rerun that put the fast arm's Rg sd at 2.3x
     # exact's - it came from 3 designs and vanished at n=160. Per-design SSE
@@ -213,30 +213,30 @@ PRESETS: dict[str, dict] = {
     # DIVERGED designs (CA-CA mean > 4.5 A) are a failure mode of the MODEL,
     # not of this preset: 2/160 on `exact` (worst CA-CA 28.3 A, Rg 408 A),
     # 0/160 on all three deviating arms, Fisher p=0.50. Upstream JAX produced
-    # 1/40 (N001 section 10). Filter on CA-CA downstream, on either preset.
+    # 1/40 (the project notes, section 10). Filter on CA-CA downstream, on either preset.
     #
     # REFUTED and deliberately absent - each measured, none of them free:
-    #   * K 64 -> 32 on both attention branches: -10 % of the step, but coil
-    #     0.076 -> 0.109 and CA-CA clashes 0.1 -> 1.1 per design. The only
-    #     candidate that visibly degraded the structures. Dropped.
-    #   * one shared self-conditioning Gumbel draw for all six blocks:
-    #     2.894 vs 2.882 ms, i.e. NOTHING, measured with the switch verified
-    #     live (6.45 A change in `pos`). A deviation with no payoff.
-    #   * bypassing the conditioning-cache key: 3.563 vs 3.568 ms, nothing -
-    #     and after N010/S1 a weakened cache key is a bug, not a trade.
-    #   * `topk` for the stable argsort (+5.6 %), `need_aux=False` (no change),
-    #     bf16 inside the GEMM via matmul_precision("medium") (2.856 vs 2.760,
-    #     i.e. slower than TF32). See RESULTS.md section 5.
+    # * K 64 -> 32 on both attention branches: -10 % of the step, but coil
+    # 0.076 -> 0.109 and CA-CA clashes 0.1 -> 1.1 per design. The only
+    # candidate that visibly degraded the structures. Dropped.
+    # * one shared self-conditioning Gumbel draw for all six blocks:
+    # 2.894 vs 2.882 ms, i.e. NOTHING, measured with the switch verified
+    # live (6.45 A change in `pos`). A deviation with no payoff.
+    # * bypassing the conditioning-cache key: 3.563 vs 3.568 ms, nothing -
+    # and after S1 a weakened cache key is a bug, not a trade.
+    # * `topk` for the stable argsort (+5.6 %), `need_aux=False` (no change),
+    # bf16 inside the GEMM via matmul_precision("medium") (2.856 vs 2.760,
+    # i.e. slower than TF32). See RESULTS.md section 5.
     "fast": dict(
         lean_steps=True,
         skip_pair_cond=True,
         need_aux=True,
         # TF32: 10 mantissa bits instead of 24 in every fp32 matmul. The single
         # largest lever in the preset, and the one the exact path must refuse -
-        # N005 measured TF32 moving coordinates by ~6e-3 A while leaving
+        # measured TF32 moving coordinates by ~6e-3 A while leaving
         # `aatype` untouched, i.e. it looks fine and is not fp32. Here that is
         # the point. For scale: CUDA's own run-to-run nondeterminism on this
-        # model is 2.2e-04 A (N010), so TF32 is a real perturbation, ~1500x the
+        # model is 2.2e-04 A , so TF32 is a real perturbation, ~1500x the
         # noise floor - but three orders of magnitude smaller than what
         # shrinking the neighbourhood does.
         tf32=True,
@@ -246,48 +246,48 @@ PRESETS: dict[str, dict] = {
         # `scripts/generate.py` applies this, and only when the command line
         # did not set --num_steps/--out_steps itself.
         #
-        # 0.5 STAYS, on N015's n=160-per-arm test (see QUALITY above): the
+        # 0.5 STAYS, on earlier n=160-per-arm test (see QUALITY above): the
         # schedule-only arm is indistinguishable from `exact` on mean, spread
         # and distribution shape, so there is nothing to buy by backing off to
         # 0.75, and nothing to isolate by splitting this into a second preset.
-        # A "faster" preset at 125/100 is NOT offered: N011 section 4 found it
+        # A "faster" preset at 125/100 is NOT offered: the project notes, section 4 found it
         # passes the same structural gate, but a 4x cut deserves a
         # designability check (ProteinMPNN + a folding model), which no arm in
         # this port has run. Structural gates cannot answer designability.
         steps_scale=0.5,
         aggressive_fusion=True,
         batch_cond_pair=True,
-        # N028/O6 - bit-exact, takes every preset. See `opt.PAIR_FEAT_MERGE`.
+        # O6 - bit-exact, takes every preset. See `opt.PAIR_FEAT_MERGE`.
         pair_feat_merge=True,
-        # N020/N030: matmul TEMPLATES (`max_autotune_gemm`) stay rejected
+        # /matmul TEMPLATES (`max_autotune_gemm`) stay rejected
         # everywhere, including `fast` - the per-shape bitwise-exact filter
         # (`SALAD_OPT_GEMMTPL=exact`) doesn't buy exactness or determinism
         # (see the `exact` preset's comment above) and only gets -11% at
         # L=100, worse than `decompose_small_bmm` below, for a ~5-40x
         # compile-time tax.
         gemm_templates=False,
-        # N030: inductor's `decompose_mm_pass` (see opt.DECOMPOSE_SMALL_BMM).
-        # -15.5 % at L=100 on top of P7 (job 907765: 3.0721 -> 2.5946 ms), a
+        # inductor's `decompose_mm_pass` (see opt.DECOMPOSE_SMALL_BMM).
+        # -15.5 % at L=100 on top of P7 (: 3.0721 -> 2.5946 ms), a
         # reassociation (pos max|d|=4.96e-05 A, above the 2e-05 floor, so
         # `exact`/`deterministic` never get it) but PERFECTLY REPRODUCIBLE
-        # across cold compiles (job 907764, unlike `gemm_templates`) - and the
+        # across cold compiles (, unlike `gemm_templates`) - and the
         # n=160 design-quality gate is in for the ACTUAL shipped `fast`
         # preset: 0/160 diverged, CA-CA 3.7638 A / Rg 12.96 vs baseline's
-        # 3.7625 A / 13.04 (job 907763). Ships here.
+        # 3.7625 A / 13.04 . Ships here.
         decompose_small_bmm=32,
-        # N028/O8 - the 3x3 frame-algebra mul+sum rewrite. Reassociation, not
+        # O8 - the 3x3 frame-algebra mul+sum rewrite. Reassociation, not
         # bit-exact (CPU compiled control disagrees on 9/11 outputs - see
         # `opt.FRAME_MULSUM`), but passes the n=160 structural gate at -18.3%
         # (RESULTS.md section 4 + the landing re-verification section 9).
         frame_mulsum=True,
-        # N017/O2 - see the N028 verdict recorded in `opt.IPA_MULSUM`.
-        # N028 candidate - same, flipped to True only if n=160 clears it.
+        # O2 - see the verdict recorded in `opt.IPA_MULSUM`.
+        # candidate - same, flipped to True only if n=160 clears it.
         ipa_mulsum=True,
     ),
     # ------------------------------------------------------------------
-    # "deterministic" (N013) - `exact`, plus a segment reduction that does not
+    # "deterministic" - `exact`, plus a segment reduction that does not
     # use atomics, so **`--seed` actually pins a CUDA run**. Measured at L=100
-    # on an H100 (`x_floor.py`, job 903261): 40 identical forwards produce
+    # on an H100 (`x_floor.py`): 40 identical forwards produce
     # **1 distinct bit pattern instead of 40**, and the step costs 3.634 ms
     # lean / 4.457 ms full against `exact`'s 3.558 / 4.384 in the same job,
     # i.e. **+2.1 %**.
@@ -295,15 +295,15 @@ PRESETS: dict[str, dict] = {
     # It is NOT the default because it changes the summation order of every
     # `index_sum`, so it is its own baseline - and that baseline is NOT free.
     # It is a TRADE: a reproducible CUDA run, paid for in divergence from JAX.
-    # Measured with `tests/test_sampling_parity.py` (N014), reproduced on the
-    # live tree AND independently on an isolated snapshot (job 903683); the two
+    # Measured with `tests/test_sampling_parity.py` , reproduced on the
+    # live tree AND independently on an isolated snapshot ; the two
     # agree to every digit, and the CPU run reproduces the GPU one - so this is
     # the reassociation itself, not the atomics:
     #
-    #                       DETSEG=0        DETSEG=1
-    #   final aatype     1/64 residues   **7/64 residues**   <- the real cost
-    #   final_aa rel        2.046e-02       6.019e-02
-    #   final structure     0.06166 A       0.19861 A        (~3.2x the drift)
+    # DETSEG=0 DETSEG=1
+    # final aatype 1/64 residues **7/64 residues** <- the real cost
+    # final_aa rel 2.046e-02 6.019e-02
+    # final structure 0.06166 A 0.19861 A (~3.2x the drift)
     #
     # **Lead with the aatype count.** Seven of sixty-four residues take a
     # DIFFERENT AMINO ACID - a discretely different design, which no rounding
@@ -338,16 +338,16 @@ PRESETS: dict[str, dict] = {
         steps_scale=1.0,
         aggressive_fusion=True,
         batch_cond_pair=True,
-        # N028/O6 - bit-exact, takes every preset. See `opt.PAIR_FEAT_MERGE`.
+        # O6 - bit-exact, takes every preset. See `opt.PAIR_FEAT_MERGE`.
         pair_feat_merge=True,
-        # N020: rejected everywhere - see the `exact` preset's comment above.
+        # rejected everywhere - see the `exact` preset's comment above.
         gemm_templates=False,
         det_segment=True,
-        # N030: reassociation, never in the bitwise-reproducible preset.
+        # reassociation, never in the bitwise-reproducible preset.
         decompose_small_bmm=False,
-        # N028/O8 - reassociation, never in the bitwise-reproducible preset.
+        # O8 - reassociation, never in the bitwise-reproducible preset.
         frame_mulsum=False,
-        # N017/O2 - same.
+        # O2 - same.
         ipa_mulsum=False,
     ),
 }
@@ -400,7 +400,7 @@ class FastDenoiser(nn.Module):
         self.model = model
         self.config = model.config
         self.length = length
-        # N021 - PACKED batching. `length` stays the per-design residue count;
+        # - PACKED batching. `length` stays the per-design residue count;
         # every buffer in this instance is sized for the FLAT axis, which is
         # `batch_size` designs concatenated. salad has no leading batch
         # dimension, so a batch IS a longer flat axis plus a `batch_index`
@@ -438,7 +438,7 @@ class FastDenoiser(nn.Module):
         # deterministic reduction, on the H100 itself - so `exact` takes it.
         import torch._inductor.config as _ind
         _ind.aggressive_fusion = bool(p.get("aggressive_fusion")) and opt.AGGRESSIVE_FUSION
-        # N020. Turning `max_autotune_gemm` on makes inductor BENCHMARK a
+        # . Turning `max_autotune_gemm` on makes inductor BENCHMARK a
         # Triton template against cuBLAS at every distinct GEMM shape in the
         # graph, at compile time, on the machine that is compiling, and keep
         # the winner. So the selection is per-shape AND per-device - the
@@ -464,8 +464,8 @@ class FastDenoiser(nn.Module):
         # is always `False and ...` today; kept live (not deleted) so a future
         # `fast`-only landing, once validated, is a one-line preset change.
         #
-        # N030 changes what "on" means. `gemm_templates` is now a MODE, not a
-        # bool - `False`/`"off"`, `"all"` (N020's rejected fastest-wins race),
+        # changes what "on" means. `gemm_templates` is now a MODE, not a
+        # bool - `False`/`"off"`, `"all"` (earlier rejected fastest-wins race),
         # `"exact"` (only candidates BITWISE equal to cuBLAS at that shape,
         # measured NOT sufficient either - RESULTS.md section 4) or `"stable"`
         # (fastest, deterministic tie-break, still not equal to cuBLAS). See
@@ -478,7 +478,7 @@ class FastDenoiser(nn.Module):
             gemm_exact.install(mode=_tpl_mode)
         else:
             gemm_exact.uninstall()
-        # N030 - `decompose_mm_pass`, see `opt.DECOMPOSE_SMALL_BMM`. A config
+        # - `decompose_mm_pass`, see `opt.DECOMPOSE_SMALL_BMM`. A config
         # value, so unlike the candidate filter it DOES take part in the
         # FX-graph cache key and needs no salt. The pass module reads both
         # thresholds at import time, so they are re-set on the module too for
@@ -498,7 +498,7 @@ class FastDenoiser(nn.Module):
                 _dmm.max_other_dimention_decomposition = 32
         except Exception:
             pass
-        # N017/O1. Inductor's inference pipeline has no CSE pass: `joint_graph_passes`
+        # O1. Inductor's inference pipeline has no CSE pass: `joint_graph_passes`
         # runs remove_noop_ops, the pattern matcher and constant folding, and that is
         # all. So the denoiser rebuilds the SAME Gram-Schmidt frame 61 times per
         # forward (`aa_frames_t` -> `rot_from_two_vectors`, 4-5 launches each on an
@@ -527,16 +527,16 @@ class FastDenoiser(nn.Module):
         # of the on-disk FX-graph cache key. A closure raises "Can't pickle local
         # object" during that hash, inductor swallows it, and the FX-graph cache
         # is silently disabled - every `--fast` process then pays a full 4-8 minute
-        # recompile with no cross-process reuse (N022 caught this; the lower-level
+        # recompile with no cross-process reuse (caught this; the lower-level
         # Triton kernel cache still helps on a repeat length, which is why it only
         # shows up as slow cold starts rather than as an error).
         if _cse_graph_pass is not None:
-            # N030. The GEMM-candidate filter is a monkeypatch on inductor's
+            # . The GEMM-candidate filter is a monkeypatch on inductor's
             # lowerings, NOT a config value, so it does NOT participate in the
             # FX-graph cache key: without a salt, an `exact` compile would be
             # served a cached `all` artifact (or vice versa) and the difference
             # would silently vanish. `joint_custom_post_pass` DOES participate
-            # (that is how N022's unpicklable-closure bug was found), and a
+            # (that is how earlier unpicklable-closure bug was found), and a
             # module-level function pickles as its qualified NAME - so pointing
             # it at a differently-named function with the same body salts the
             # key. Distinct name per mode, one line, no new config.
@@ -545,16 +545,16 @@ class FastDenoiser(nn.Module):
         # P7, same contract: the preset chooses, `SALAD_OPT_BATCHCOND=0` can
         # only veto. Also process-global, and also set before the compile.
         opt.BATCH_COND = bool(p.get("batch_cond_pair")) and _ENV_BATCH_COND
-        # N028/O6, same veto-only contract: the preset chooses, the env var
+        # O6, same veto-only contract: the preset chooses, the env var
         # can only turn it off. Process-global, set before the compile.
         opt.PAIR_FEAT_MERGE = bool(p.get("pair_feat_merge")) and _ENV_PAIR_FEAT_MERGE
-        # N028/O8 - `DET_SEGMENT`'s contract, not `BATCH_COND`'s: `or`, not
+        # O8 - `DET_SEGMENT`'s contract, not `BATCH_COND`'s: `or`, not
         # `and` (env can force ON for a measurement against any preset, but
         # cannot silently turn on outside one - default is False). It is read
         # inside the traced region (`geometry/frames.py`, `geometry/rigid.py`),
         # so Dynamo folds it into a guard - it must be set before `torch.compile`.
         opt.FRAME_MULSUM = bool(p.get("frame_mulsum")) and _ENV_FRAME_MULSUM
-        # N017/O2, same `DET_SEGMENT` OR contract.
+        # O2, same `DET_SEGMENT` OR contract.
         opt.IPA_MULSUM = bool(p.get("ipa_mulsum")) and _ENV_IPA_MULSUM
         # P7's stacked condition-branch weights are a CACHE of the per-block
         # parameters, normally refreshed by a `load_state_dict` post-hook.
@@ -623,7 +623,7 @@ class FastDenoiser(nn.Module):
             # A cyclic config MUST get a real buffer here, not None. The graph
             # is captured against these addresses, so a `cyclic_mask` that
             # first appears at call time has nowhere to be written: before
-            # N010/S2 it was silently dropped (the capture had traced the
+            # S2 it was silently dropped (the capture had traced the
             # None branch), and after it, it raises. Capturing an all-False
             # mask and copying the real one in is the fix - it changes no
             # arithmetic, `sequence_relative_position` reads the buffer.
@@ -696,9 +696,9 @@ class FastDenoiser(nn.Module):
         """Write `inputs` into the persistent buffers the graph was captured on.
 
         Factored out of `_run` unchanged so `GroupFastDenoiser` can drive N
-        members' buffers before a single grouped replay (N019). The single-
+        members' buffers before a single grouped replay . The single-
         design path calls it from exactly where the loop used to live, so its
-        behaviour - including the N010/S2 length refusal and the clone-on-
+        behaviour - including the S2 length refusal and the clone-on-
         first-sight - is byte-for-byte what it was.
         """
         if self._static_in:
@@ -712,12 +712,12 @@ class FastDenoiser(nn.Module):
                 elif src is not None:
                     if self._graphs:
                         # `self._graphs`, not the former single `self._graph`:
-                        # N009 keeps one captured graph per
+                        # keeps one captured graph per
                         # (need_aa, pair_cond).
                         # A captured graph reads the addresses fixed at capture
                         # time, so swapping a buffer here does nothing and the
                         # replay returns the OLD length's output (red team
-                        # N010/S2: a length-48 instance fed length-49 returned
+                        # S2: a length-48 instance fed length-49 returned
                         # 48 coordinates). Refuse rather than silently lie.
                         raise ValueError(
                             f"FastDenoiser was captured for a flat axis of "
@@ -765,7 +765,7 @@ class FastDenoiser(nn.Module):
         self._cond_pinned = False
 
     def pin_condition(self, data: dict) -> bool:
-        """Compute `prepare_condition(data)` once and stop re-keying it (N019).
+        """Compute `prepare_condition(data)` once and stop re-keying it .
 
         The content hash in `_prepare_inputs` runs `.cpu()` on every
         conditioning tensor **on every step**, i.e. a device->host sync per
@@ -814,7 +814,7 @@ class FastDenoiser(nn.Module):
                                  predict_aa=predict_aa)
 
     # ------------------------------------------------------------------
-    # forward() split in three (N019) so `GroupFastDenoiser` can interleave
+    # forward() split in three so `GroupFastDenoiser` can interleave
     # N members' host-side work around ONE grouped replay. The bodies are
     # verbatim what `forward` used to run, in the same order.
     # ------------------------------------------------------------------
@@ -833,7 +833,7 @@ class FastDenoiser(nn.Module):
                                  generator=generator).clamp_(1e-6, 1 - 1e-6)
         if getattr(self, "_cond_pinned", False):
             # `pin_condition` has already computed this design's conditioning
-            # and its P4/P5 gate; skip the per-step hash entirely (N019).
+            # and its P4/P5 gate; skip the per-step hash entirely .
             cond = self._cond_cache[0]
             pc = cond["pair_condition"]
             pair_cond = self._pc_active or not self.allow_pair_cond_skip
@@ -848,7 +848,7 @@ class FastDenoiser(nn.Module):
         # This used to sum each tensor, which collides on ANY permutation:
         # swapping two DSSP labels leaves the sum identical, so the second
         # design silently reused the first design's conditioning and came out
-        # 2.56 A wrong while looking healthy (red team N010/S1).
+        # 2.56 A wrong while looking healthy (red team S1).
         # A content hash of the raw bytes cannot collide that way. The cost is
         # one hash per step over a few (L, L) tensors, which is negligible
         # against the ~5 ms forward and is still far cheaper than recomputing
@@ -929,7 +929,7 @@ class FastDenoiser(nn.Module):
 
 
 # ======================================================================
-# N019 - N independent designs in ONE CUDA graph
+# - N independent designs in ONE CUDA graph
 # ======================================================================
 #: Hard ceiling on the auto-chosen group size. It is a *safety* cap on the
 #: search, not a tuned value: `--group_size N` overrides it in both
@@ -989,7 +989,7 @@ class GroupFastDenoiser(nn.Module):
     Each member therefore computes **exactly** what it would compute alone -
     same kernels, same shapes, same inputs, no shared reduction - and the only
     thing that changes is that the GPU is no longer idle between one design's
-    serialised launches. N016 measured a single L=100 forward leaving an H100
+    serialised launches. measured a single L=100 forward leaving an H100
     roughly 55 % idle.
 
     Portability, because this is squarely the kind of optimisation that gets
@@ -1015,7 +1015,7 @@ class GroupFastDenoiser(nn.Module):
                  autosize_cap: int = _AUTOSIZE_CAP, batch_size: int = 1):
         super().__init__()
         self.length = int(length)
-        # N021: each MEMBER may itself be a packed batch of `batch_size`
+        # each MEMBER may itself be a packed batch of `batch_size`
         # designs. The two axes compose and are orthogonal - `batch_size`
         # makes each kernel bigger, `group_size` runs more kernels at once -
         # so one replay advances ``group_size * batch_size`` designs.
@@ -1179,7 +1179,7 @@ class GroupFastDenoiser(nn.Module):
                 # private pool has also been seen to surface as a plain
                 # RuntimeError carrying the driver's text - and the text is
                 # all there is to go on. Anything else re-raises untouched.
-                if not isinstance(exc, torch.cuda.OutOfMemoryError) and \
+                if not isinstance(exc, torch.cuda.OutOfMemoryError) and\
                         "out of memory" not in str(exc).lower():
                     raise
                 if self.group_size <= 1:
@@ -1247,7 +1247,7 @@ class GroupFastDenoiser(nn.Module):
                 torch.cuda.empty_cache()
                 graph, _outs = self._capture(probe_need_aa, pair_cond)
             except RuntimeError as exc:
-                if not isinstance(exc, torch.cuda.OutOfMemoryError) and \
+                if not isinstance(exc, torch.cuda.OutOfMemoryError) and\
                         "out of memory" not in str(exc).lower():
                     raise
                 break

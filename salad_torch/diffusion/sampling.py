@@ -115,7 +115,7 @@ def make_initial_data(num_aa: int, residue_index: Tensor, chain_index: Tensor,
 
 
 # ---------------------------------------------------------------------------
-# N021 - PACKED batching: B designs concatenated along the flat residue axis
+# - PACKED batching: B designs concatenated along the flat residue axis
 # ---------------------------------------------------------------------------
 #: Conditioning fields that are dense ``(N, N)`` pair maps. Packing these is
 #: NOT a concatenation - they have to become BLOCK DIAGONAL, so design `i`'s
@@ -160,7 +160,7 @@ def pack_designs(datas: Sequence[dict], prevs: Sequence[dict]
     That bug is upstream's and is reproduced bit-for-bit by this port, so the
     only defence is to concatenate exact-length designs and never pad. A
     packed design is therefore **not** bit-identical to the same design
-    generated alone - see `.agent-research/results/N021-packed-batching/`
+    generated alone - see the project notes
     for how far apart they actually come out.
 
     Returns ``(packed_data, packed_prev, lengths)``; `lengths` is what
@@ -199,12 +199,12 @@ def pack_designs(datas: Sequence[dict], prevs: Sequence[dict]
             # `batch_index` separates the members in every op that takes
             # `same_item`, but two of salad's reductions key on `chain_index`
             # ALONE and would fuse members that both call their first chain 0:
-            #   * `modules/blocks.py` `Update`'s per-chain global gate,
-            #     `index_mean(chain_gate * local_update, chain, mask)`, in
-            #     EVERY block of the trunk;
-            #   * `geometry/features.py`'s relative-position feature, whose
-            #     chain length is `index_count(chain, ones)`, so a shared id
-            #     reports a B*L-residue chain.
+            # * `modules/blocks.py` `Update`'s per-chain global gate,
+            # `index_mean(chain_gate * local_update, chain, mask)`, in
+            # EVERY block of the trunk;
+            # * `geometry/features.py`'s relative-position feature, whose
+            # chain length is `index_count(chain, ones)`, so a shared id
+            # reports a B*L-residue chain.
             # Measured on CPU (deterministic) at L=100, B=2, one forward with
             # identical injected randomness: leaving the ids colliding moves
             # `local` by 34-38 and `pos` by ~4 A, i.e. it is a different
@@ -395,7 +395,7 @@ def sample_group(step_fn_group: Callable, datas: Sequence[dict],
                  prevs: Sequence[dict], cfg: SamplerConfig, *,
                  generators: Sequence[torch.Generator | None] | None = None,
                  ) -> list[list[dict]]:
-    """`sample`, advancing N INDEPENDENT designs in lockstep (N019).
+    """`sample`, advancing N INDEPENDENT designs in lockstep .
 
     Returns one snapshot list per design, in the order given - i.e. exactly
     what calling `sample` N times would return, design for design.

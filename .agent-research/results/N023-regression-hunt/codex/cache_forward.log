@@ -1,4 +1,0 @@
-cache_sync_after_edit False
-batched_after_edit_max_abs 0.0
-sequential_after_edit_max_abs 5.0
-batched_after_sync_max_abs 5.0

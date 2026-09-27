@@ -10,7 +10,7 @@ Run inside the container:
     apptainer run --bind /hnvme:/hnvme --bind $PWD:$PWD salad.sif \
         tests/harness/gen_encoder_ref.py
 
-Originally written as `.agent-research/results/N003-red-team-pass-fast-path-
+Originally written as the project notes
 symmetry-encoder/r05_encoder_parity_jax.py` (a same-family red-team pass that
 found the D1 crash this test exists to catch a regression of - see
 `salad_torch/modules/encoder.py`'s `unsqueeze_batch` fix); promoted here

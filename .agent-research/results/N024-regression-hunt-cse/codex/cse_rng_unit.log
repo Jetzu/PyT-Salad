@@ -1,4 +1,0 @@
-torch 2.5.1+cu121 rand_ops_before 2 rand_ops_after 2
-before_targets ['aten.rand.default', 'aten.rand.default']
-after_targets ['aten.rand.default', 'aten.rand.default']
-rand_nodes_alias_output [False, False]

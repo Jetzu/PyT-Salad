@@ -59,21 +59,21 @@ def vec_cross(a: Tensor, b: Tensor) -> Tensor:
 
 
 def rot_apply(rot: Tensor, point: Tensor) -> Tensor:
-    """R @ p  for R (..., 3, 3) and p (..., 3), broadcasting over leading dims."""
-    if opt.FRAME_MULSUM:                     # N028/O8
+    """R @ p for R (..., 3, 3) and p (..., 3), broadcasting over leading dims."""
+    if opt.FRAME_MULSUM:                     # O8
         return (rot * point.unsqueeze(-2)).sum(-1)
     return torch.einsum("...ij,...j->...i", rot, point)
 
 
 def rot_apply_inverse(rot: Tensor, point: Tensor) -> Tensor:
     """R^T @ p. Rotations are orthonormal, so the inverse is the transpose."""
-    if opt.FRAME_MULSUM:                     # N028/O8
+    if opt.FRAME_MULSUM:                     # O8
         return (rot * point.unsqueeze(-1)).sum(-2)
     return torch.einsum("...ji,...j->...i", rot, point)
 
 
 def rot_compose(a: Tensor, b: Tensor) -> Tensor:
-    if opt.FRAME_MULSUM:                     # N028/O8
+    if opt.FRAME_MULSUM:                     # O8
         return (a.unsqueeze(-1) * b.unsqueeze(-3)).sum(-2)
     return a @ b
 

@@ -170,7 +170,7 @@ def reveal_conditioning(aa_gt: Tensor, dssp_gt: Tensor, mask: Tensor,
     Three channels, not two - the PRIOR version of this function had no
     `dssp_mean` (aggregate secondary-structure-composition) conditioning at
     all, so training never exercised that pathway. What actually differed
-    from the old best-effort reconstruction (see git history / N004 report):
+    from the old best-effort reconstruction (see git history):
 
     1. The per-item reveal rate is ``U(0.2, 1.0)`` for aa/dssp (NEVER below
        20% local coverage when used), not ``U(0, 1)`` - the old version could
@@ -296,7 +296,7 @@ def prepare_batch(raw: dict, *, augment_size: int, encoder: nn.Module | None = N
         dssp_gt, _, _ = assign_dssp(atom_pos, batch_index, mask)
 
     # -- conditioning reveal (transcribed from NSB - see reveal_conditioning
-    #    docstring for exactly what the prior best-effort version missed) ----
+    # docstring for exactly what the prior best-effort version missed) ----
     (aa_condition, dssp_condition, aa_mask, dssp_mask,
     dssp_mean, dssp_mean_mask) = reveal_conditioning(
         aa_gt, dssp_gt, mask, chain, batch_index, generator=generator)
@@ -384,7 +384,7 @@ def training_step(model: nn.Module, encoder: nn.Module | None, ema: EMA,
             prev = zero_prev
 
         # -- the real pass: FRESH noise at the same (t_pos, t_seq), reused
-        #    for both the model call and every loss term (spec §1.5) --------
+        # for both the model call and every loss term (spec §1.5) --------
         data.update(apply_diffusion(model.config, data, generator=generator))
         result, _ = model(data, prev, predict_aa=False, compute_distogram=True)
 

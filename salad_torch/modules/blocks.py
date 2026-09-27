@@ -209,7 +209,7 @@ class DiffusionPairFeatures(nn.Module):
         pair = pair + self.linear_dist(
             GF.distance_features(pos, neighbours, 0.0, 22.0))
         if opt.PAIR_FEAT_MERGE:
-            # N028/O6 - one gather + one frame transform + one normalise for
+            # O6 - one gather + one frame transform + one normalise for
             # both features instead of two. BIT-EXACT; see the docstring.
             dir_f, pv_f = GF.direction_and_pair_vector_features(pos, neighbours)
         else:

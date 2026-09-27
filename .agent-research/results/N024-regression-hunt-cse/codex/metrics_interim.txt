@@ -1,2 +1,0 @@
-on n 32 diverged 7 mean_Rg_ok 20.017427398310186 mean_CA_CA_ok 3.883157821708015
-p7off n 32 diverged 0 mean_Rg_ok 13.410293102878944 mean_CA_CA_ok 3.756813985216264

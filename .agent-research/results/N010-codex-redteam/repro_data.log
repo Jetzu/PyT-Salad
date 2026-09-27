@@ -1,2 +1,0 @@
-DATA 16 ValueError low >= high
-DATA 32 valid 19 shape (32, 24, 3)

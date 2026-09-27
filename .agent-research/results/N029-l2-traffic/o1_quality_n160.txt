@@ -1,4 +1,0 @@
-paired designs: 160 (A 160, B 160)
-CA-CA  A mean 3.7621 sd 0.0138 | B mean 3.7628 sd 0.0134 | Welch p=0.661  KS p=0.761  Brown-Forsythe p=0.770
-Rg     A mean 12.9496 sd 1.8225 | B mean 13.0093 sd 2.0528 | Welch p=0.783  KS p=0.915  Brown-Forsythe p=0.798
-       Rg>18 outliers: A 4/160  B 6/160

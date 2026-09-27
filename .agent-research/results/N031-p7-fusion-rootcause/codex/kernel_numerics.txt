@@ -1,6 +1,0 @@
-kernel triton_poi_fused_add_clamp_eq_full_like_index_repeat_stack_sub_where_72 arg_count 19 nb_shape (600, 48) rel_shape (600, 48)
-arg 13 shape (100,) minmax 0 0 unique 1
-arg 14 shape (100,) minmax 0 0 unique 1
-arg 15 shape (100,) minmax 0 99 unique 100
-relpos mismatches 23070 / 28800 fraction 0.8010416626930237 max_abs 64
-first mismatch 0 1 raw_nb 1 expected 31 fused 32

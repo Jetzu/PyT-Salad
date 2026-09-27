@@ -217,7 +217,7 @@ def pair_vector_features(pos: Tensor, neighbours: Tensor, scale: float = 0.1) ->
 
 def direction_and_pair_vector_features(pos: Tensor, neighbours: Tensor,
                                        scale: float = 0.1) -> tuple[Tensor, Tensor]:
-    """N028/O6: `direction_features` and `pair_vector_features` sharing work.
+    """O6: `direction_features` and `pair_vector_features` sharing work.
 
     `DiffusionPairFeatures.forward` calls both on the SAME `(pos, neighbours)`,
     and both start by computing `aa_frames_t(pos)` and gathering
@@ -225,7 +225,7 @@ def direction_and_pair_vector_features(pos: Tensor, neighbours: Tensor,
     `apply_inverse_t`/`vec_normalized` exactly once, at exactly the shape it
     already uses - removes one frame computation and one neighbour gather.
 
-    `fx_graph_cse` (N017/O1) cannot see this on its own: `pair_vector_features`
+    `fx_graph_cse` (O1) cannot see this on its own: `pair_vector_features`
     feeds `apply_inverse_t` a `cat([self_pos, neigh_pos])`, so its subgraph is
     not syntactically equal to `direction_features`'s, even though the first
     A rows of one computation reuse values the other also needs.

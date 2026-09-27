@@ -1,4 +1,4 @@
-"""Verify two N009 claims first-hand: graph breaks, and CUDA determinism."""
+"""Verify two claims first-hand: graph breaks, and CUDA determinism."""
 import os,sys,torch
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0,ROOT)
 from salad_torch.config import get_config

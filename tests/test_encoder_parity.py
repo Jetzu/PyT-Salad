@@ -1,6 +1,6 @@
 """Parity test for `salad_torch.modules.encoder.Encoder` vs upstream JAX.
 
-Added 2026-09-25 (N004): the Encoder had NO parity test before this - it only
+Added 2026-09-25 : the Encoder had NO parity test before this - it only
 had a `load_state_dict(strict=True)` check, which verifies shapes, not
 numerics, and does not even exercise `forward()`. That gap hid a real crash
 (`frames[:, None]` on a `Rigid` that has no `__getitem__` - see `encoder.py`'s

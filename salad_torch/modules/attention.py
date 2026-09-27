@@ -77,7 +77,7 @@ class SparseInvariantPointAttention(nn.Module):
         self.qkv_global = LinearToPoints(local_size, n_points)
         self.bias = HkLinear(pair_size, heads, bias=False)
         self.gamma = nn.Parameter(torch.full((heads,), math.log(math.e - 1.0)))
-        out_width = heads * pair_size + heads * size + heads * value_points * 3 \
+        out_width = heads * pair_size + heads * size + heads * value_points * 3\
             + heads * value_points
         self.project_out = HkLinear(out_width, local_size, initializer=final_init)
 
@@ -108,7 +108,7 @@ class SparseInvariantPointAttention(nn.Module):
         # (N,1,H,QP,3) - (N,K,H,QP,3) -> (N,K,H)
         dist = dfactor * ((q_g[:, None] - k_g[neighbours]) ** 2).sum(dim=(-1, -2))
         if opt.IPA_MULSUM:
-            # N017/O2: read the gather in place instead of cloning it into
+            # O2: read the gather in place instead of cloning it into
             # `bmm` layout. Reassociation only - see `opt.IPA_MULSUM`.
             dot = math.sqrt(1.0 / s) * (q[:, None] * k[neighbours]).sum(-1)
         else:

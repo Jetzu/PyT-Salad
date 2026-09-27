@@ -40,9 +40,9 @@ def init_weight_(w: Tensor, scheme: str = "linear") -> None:
     """In-place init matching `salad.modules.basic` initialisers.
 
     - ``linear``: VarianceScaling(fan_in, scale=1.0), truncated normal
-    - ``relu``:   VarianceScaling(fan_in, scale=2.0), truncated normal
+    - ``relu``: VarianceScaling(fan_in, scale=2.0), truncated normal
     - ``glorot``: VarianceScaling(fan_avg, scale=1.0), *uniform*
-    - ``zeros``:  constant 0
+    - ``zeros``: constant 0
     """
     if scheme == "zeros":
         nn.init.zeros_(w)
@@ -72,12 +72,12 @@ class HkLinear(nn.Module):
         init_weight_(self.w, initializer)
 
     def forward(self, x: Tensor) -> Tensor:
-        # N020. This used to be `torch.einsum("...k,ki->...i", x, self.w)`, which
+        # . This used to be `torch.einsum("...k,ki->...i", x, self.w)`, which
         # ATen lowers to `bmm` with batch=1 - there was not a single `mm`/`addmm`
-        # in the whole generated module (N017 section 7). That mattered for three
+        # in the whole generated module (the project notes, section 7). That mattered for three
         # reasons, all measured: a batch-1 `bmm` is a cuBLAS launch at ~5.98 us
         # for problems whose arithmetic is under 1 us; `bmm` forecloses
-        # inductor's own matmul TEMPLATES, which N016 measured 1.21-1.37x faster
+        # inductor's own matmul TEMPLATES, which measured 1.21-1.37x faster
         # than cuBLAS on this model's narrow projections and BIT-IDENTICAL at
         # fp32; and a template is autotuned PER DEVICE at compile time, which is
         # the adaptive behaviour a consumer-GPU/Blackwell target wants and a
