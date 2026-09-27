@@ -1,0 +1,87 @@
+### Starting TaskPrologue of job 904743 on h11-24 at Sat Sep 26 19:17:54 CEST 2026
+Running on cores 32-63 with governor performance
+Sat Sep 26 19:17:54 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+node=h11-24 commit=274dfc410248386d6547d8af488edd7555a3938a date=Sat Sep 26 19:17:54 CEST 2026 TF32_OFF P7_ON CSE_ON
+preset 'fast': schedule scaled by 0.5 -> num_steps=250 out_steps=200
+device: NVIDIA H100
+config default_vp  L=100  steps=250 out_steps=(200,)
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+fast path (fast) compiled + captured in 297s (one-time)
+  design 0:    0.7s  CA-CA 3.879 A (min 3.515 max 4.606)  Rg 18.1 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_0.pdb
+  design 1:    0.7s  CA-CA 3.913 A (min 3.512 max 4.489)  Rg 23.0 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_1.pdb
+  design 2:    0.7s  CA-CA 3.873 A (min 3.402 max 4.357)  Rg 18.6 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_2.pdb
+  design 3:    0.7s  CA-CA 3.896 A (min 3.478 max 4.580)  Rg 22.4 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_3.pdb
+  design 4:    0.7s  CA-CA 3.862 A (min 3.436 max 4.344)  Rg 20.9 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_4.pdb
+  design 5:    0.7s  CA-CA 414.821 A (min 5.121 max 1138.005)  Rg 484.9 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_5.pdb
+  design 6:    0.7s  CA-CA 3.811 A (min 2.925 max 4.301)  Rg 17.9 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_6.pdb
+  design 7:    0.7s  CA-CA 3.867 A (min 3.510 max 4.503)  Rg 18.6 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_7.pdb
+  design 8:    0.7s  CA-CA 3.765 A (min 3.219 max 4.404)  Rg 20.6 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_8.pdb
+  design 9:    0.7s  CA-CA 3.864 A (min 3.483 max 4.552)  Rg 21.4 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_9.pdb
+  design 10:    0.7s  CA-CA 3.902 A (min 3.477 max 4.808)  Rg 24.5 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_10.pdb
+  design 11:    0.7s  CA-CA 3.838 A (min 3.557 max 4.473)  Rg 23.1 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_11.pdb
+  design 12:    0.7s  CA-CA 3.876 A (min 3.467 max 4.359)  Rg 18.1 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_12.pdb
+  design 13:    0.7s  CA-CA 3.906 A (min 3.510 max 4.519)  Rg 21.2 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_13.pdb
+  design 14:    0.7s  CA-CA 3.850 A (min 3.337 max 4.243)  Rg 18.2 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_14.pdb
+  design 15:    0.7s  CA-CA 556.376 A (min 11.162 max 1316.740)  Rg 528.3 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_15.pdb
+  design 16:    0.7s  CA-CA 3.863 A (min 3.350 max 4.537)  Rg 16.8 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_16.pdb
+  design 17:    0.7s  CA-CA 3.928 A (min 3.558 max 4.739)  Rg 19.9 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_17.pdb
+  design 18:    0.7s  CA-CA 3.881 A (min 3.411 max 4.306)  Rg 17.8 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_18.pdb
+  design 19:    0.7s  CA-CA 565.216 A (min 1.074 max 1339.628)  Rg 495.5 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_19.pdb
+  design 20:    0.7s  CA-CA 3.955 A (min 3.320 max 4.624)  Rg 24.1 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_20.pdb
+  design 21:    0.7s  CA-CA 3.798 A (min 3.009 max 4.376)  Rg 15.4 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_21.pdb
+  design 22:    0.7s  CA-CA 238.678 A (min 1.062 max 802.764)  Rg 540.3 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_22.pdb
+  design 23:    0.7s  CA-CA 3.899 A (min 3.535 max 4.348)  Rg 18.5 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_23.pdb
+  design 24:    0.7s  CA-CA 3.947 A (min 3.528 max 4.332)  Rg 23.1 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_24.pdb
+  design 25:    0.7s  CA-CA 3.875 A (min 3.341 max 4.266)  Rg 19.7 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_25.pdb
+  design 26:    0.7s  CA-CA 527.745 A (min 2.951 max 1109.773)  Rg 480.1 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_26.pdb
+  design 27:    0.7s  CA-CA 3.864 A (min 3.271 max 4.501)  Rg 24.8 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_27.pdb
+  design 28:    0.7s  CA-CA 550.806 A (min 91.844 max 1205.951)  Rg 506.9 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_28.pdb
+  design 29:    0.7s  CA-CA 3.915 A (min 3.455 max 4.359)  Rg 21.5 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_29.pdb
+  design 30:    0.7s  CA-CA 3.900 A (min 3.543 max 4.403)  Rg 23.3 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_30.pdb
+  design 31:    0.7s  CA-CA 421.421 A (min 2.821 max 949.243)  Rg 400.6 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N024-regression-hunt-cse/codex/pdb_tf32off/design_31.pdb
+
+32 designs of 100 aa: median 0.7s, total 21.2s
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 19:23:23 CEST 2026
+= Job-ID             : 904743 on helma
+= Job-Name           : n024-tf32
+= Job-Command        : .agent-research/results/N024-regression-hunt-cse/codex/run_tf32_isolation.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:40:00
+= Elapsed runtime    : 00:05:31
+= Total RAM usage    : 3.5 GiB of assigned 175 GiB (2.0%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T19:17:51 / 2026-09-26T19:17:51 / 2026-09-26T19:17:52 / 2026-09-26T19:23:23
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.2G   104.9G   209.7G        N/A     474K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A     102K      61K      81K  5d13h26m28s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 2263786, 14 %, 9 %, 1410 MiB, 325174 ms

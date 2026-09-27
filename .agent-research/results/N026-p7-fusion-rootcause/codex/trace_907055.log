@@ -1,0 +1,66 @@
+### Starting TaskPrologue of job 907055 on h13-04 at Sun Sep 27 10:14:32 CEST 2026
+Running on cores 0-31 with governor ondemand
+Sun Sep 27 10:14:32 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   35C    P0             70W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+node=h13-04 tmp=/tmp/907055.helma/n026trace
+NVIDIA H100
+[b] probe=none mode=default BATCH_COND=False compiled=False aggr=False patmatch=True inline=True
+[b] dumped step 30, prev_pos|max|=24.476
+off forward done
+/tmp/907055.helma/n026trace/trace_off/torchinductor/model__1_inference_1.1/ir_post_fusion.txt
+/tmp/907055.helma/n026trace/trace_off/torchinductor/model__1_inference_1.1/output_code.py
+/tmp/907055.helma/n026trace/trace_off/torchinductor/model__0_inference_0.0/ir_post_fusion.txt
+/tmp/907055.helma/n026trace/trace_off/torchinductor/model__0_inference_0.0/output_code.py
+on forward done
+/tmp/907055.helma/n026trace/trace_on/torchinductor/model__1_inference_1.1/ir_post_fusion.txt
+/tmp/907055.helma/n026trace/trace_on/torchinductor/model__1_inference_1.1/output_code.py
+/tmp/907055.helma/n026trace/trace_on/torchinductor/model__0_inference_0.0/ir_post_fusion.txt
+/tmp/907055.helma/n026trace/trace_on/torchinductor/model__0_inference_0.0/output_code.py
+pos 9.586397
+local 646.324
+trajectory 9.586397
+N026_TRACE_DONE
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 10:26:34 CEST 2026
+= Job-ID             : 907055 on helma
+= Job-Name           : n026trace
+= Job-Command        : .agent-research/results/N026-p7-fusion-rootcause/codex/trace.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 03:00:00
+= Elapsed runtime    : 00:13:15
+= Total RAM usage    : 4.2 GiB of assigned 175 GiB (2.4%)
+= Node list          : h13-04
+= Subm/Elig/Start/End: 2026-09-27T10:13:18 / 2026-09-27T10:13:18 / 2026-09-27T10:13:19 / 2026-09-27T10:26:34
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              91.7G   104.9G   209.7G        N/A     460K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      77K      61K      81K  4d22h23m17s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 1325934, 13 %, 0 %, 798 MiB, 5405 ms
+NVIDIA H100, 00000000:06:00.0, 1325995, 6 %, 6 %, 1276 MiB, 360419 ms
+NVIDIA H100, 00000000:06:00.0, 1331519, 6 %, 6 %, 1328 MiB, 342941 ms

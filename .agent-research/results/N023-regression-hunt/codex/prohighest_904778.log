@@ -1,0 +1,52 @@
+### Starting TaskPrologue of job 904778 on h11-17 at Sat Sep 26 19:49:52 CEST 2026
+Running on cores 64-95 with governor performance
+Sat Sep 26 19:49:52 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   37C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+PRECISION highest
+SYNC True
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+MODE zero compiled_vs_eager 3.814697265625e-06 equal False eager_vs_sequential 7.62939453125e-06
+MODE random compiled_vs_eager 5.507469177246094e-05 equal False eager_vs_sequential 7.62939453125e-06
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 19:50:10 CEST 2026
+= Job-ID             : 904778 on helma
+= Job-Name           : n023_prohighest
+= Job-Command        : .agent-research/results/N023-regression-hunt/codex/run_prologue_highest.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:15:00
+= Elapsed runtime    : 00:00:31
+= Total RAM usage    : 2.3 GiB of assigned 175 GiB (1.3%)
+= Node list          : h11-17
+= Subm/Elig/Start/End: 2026-09-26T19:49:38 / 2026-09-26T19:49:38 / 2026-09-26T19:49:39 / 2026-09-26T19:50:10
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.3G   104.9G   209.7G        N/A     476K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A     101K      61K      81K  5d12h59m41s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 3095940, 6 %, 5 %, 1198 MiB, 12500 ms

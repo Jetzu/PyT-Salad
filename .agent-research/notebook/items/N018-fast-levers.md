@@ -48,7 +48,7 @@ in `results/N018-fast-levers/RESULTS.md`.
 ## Outcome
 
 **Neither lever recommended.** Both are genuine per-step speedups
-(halfnbr -9.7%/-28.6% beyond TF32 at L=100/L=400; randhalf -6.2%/-13.9%) and
+(halfnbr -9.7% / -28.6% beyond TF32 at L=100/L=400; randhalf -6.2% / -13.9%) and
 both cost real structure at n=160: halfnbr reproduces N011's clash blowup far
 more decisively (2.33 vs 0.25 clash/design, p=0.000, spread p<0.0001);
 randhalf avoids the clash failure but shows a Bonferroni-surviving Rg-tail

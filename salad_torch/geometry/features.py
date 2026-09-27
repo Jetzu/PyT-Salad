@@ -6,7 +6,7 @@ import math
 import torch
 from torch import Tensor
 
-from .rigid import Rigid, vec_norm, vec_normalized
+from .rigid import Rigid, rot_compose, vec_norm, vec_normalized
 from .frames import aa_frames_t, apply_inverse_t, extract_aa_frames
 from .segment import index_count
 
@@ -188,13 +188,13 @@ def rotation_features(frames: Rigid, neighbours: Tensor) -> Tensor:
     """Relative rotation between frames -> ``(N, K, 9)``."""
     rot_i = frames.rotation[:, None]                      # (N, 1, 3, 3)
     rot_j = frames.rotation[neighbours]                   # (N, K, 3, 3)
-    rel = rot_i.transpose(-1, -2) @ rot_j
+    rel = rot_compose(rot_i.transpose(-1, -2), rot_j)
     return rel.reshape(rel.shape[0], rel.shape[1], 9)
 
 
 def position_rotation_features(pos: Tensor, neighbours: Tensor) -> Tensor:
     rot, _, _ = aa_frames_t(pos)
-    rel = rot[:, None].transpose(-1, -2) @ rot[neighbours]
+    rel = rot_compose(rot[:, None].transpose(-1, -2), rot[neighbours])
     return rel.reshape(rel.shape[0], rel.shape[1], 9)
 
 

@@ -1,0 +1,42 @@
+--- /dev/fd/63	2026-09-27 16:42:11.581006248 +0200
++++ /tmp/claude-215432/final/attention.py	2026-09-27 16:41:42.187054709 +0200
+@@ -16,6 +16,7 @@
+ import torch
+ from torch import Tensor, nn
+ 
++from .. import opt
+ from ..geometry.frames import aa_frames_t, apply_inverse_t, apply_t
+ from ..geometry.rigid import Rigid, vec_norm
+ from .basic import HkLayerNorm, HkLinear
+@@ -106,7 +107,12 @@
+ 
+         # (N,1,H,QP,3) - (N,K,H,QP,3) -> (N,K,H)
+         dist = dfactor * ((q_g[:, None] - k_g[neighbours]) ** 2).sum(dim=(-1, -2))
+-        dot = math.sqrt(1.0 / s) * torch.einsum("ihc,ijhc->ijh", q, k[neighbours])
++        if opt.IPA_MULSUM:
++            # N017/O2: read the gather in place instead of cloning it into
++            # `bmm` layout. Reassociation only - see `opt.IPA_MULSUM`.
++            dot = math.sqrt(1.0 / s) * (q[:, None] * k[neighbours]).sum(-1)
++        else:
++            dot = math.sqrt(1.0 / s) * torch.einsum("ihc,ijhc->ijh", q, k[neighbours])
+         logits = w_l * (dot + bias - dist)
+ 
+         pair_mask = mask.bool() & (neighbours != -1)
+@@ -116,9 +122,14 @@
+         # second masking after softmax: fully-masked rows would otherwise be garbage
+         attn = torch.where(pair_mask[..., None], attn, torch.zeros_like(attn))
+ 
+-        out_pair = torch.einsum("ijh,ijc->ihc", attn, pair)
+-        out_scalar = torch.einsum("ijh,ijhc->ihc", attn, v[neighbours])
+-        out_point = torch.einsum("ijh,ijhpc->ihpc", attn, v_g[neighbours])
++        if opt.IPA_MULSUM:
++            out_pair = (attn[..., None] * pair[:, :, None, :]).sum(1)
++            out_scalar = (attn[..., None] * v[neighbours]).sum(1)
++            out_point = (attn[..., None, None] * v_g[neighbours]).sum(1)
++        else:
++            out_pair = torch.einsum("ijh,ijc->ihc", attn, pair)
++            out_scalar = torch.einsum("ijh,ijhc->ihc", attn, v[neighbours])
++            out_point = torch.einsum("ijh,ijhpc->ihpc", attn, v_g[neighbours])
+         out_point = apply_inverse_t(rot, trans, out_point.to(trans.dtype), k=2)
+         out_norm = vec_norm(out_point)
+ 

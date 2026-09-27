@@ -1,0 +1,1 @@
+at603 n 32 diverged 5 mean_Rg_ok 19.74 mean_CA_CA_ok 3.8594

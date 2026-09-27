@@ -106,9 +106,9 @@ change made.
 
 **P7 PASSES its gate. Landed in `exact`** (`opt.BATCH_COND` defaults `True`;
 `PRESETS["exact"]["batch_cond_pair"] = True`). Whole-forward win: -9.27%
-full / -11.00% lean step at L=100, shrinking to -2.26%/-2.34% at L=400 (see
+full / -11.00% lean step at L=100, shrinking to -2.26% / -2.34% at L=400 (see
 D1). Combined with `aggressive_fusion` (N013), the shipped `exact` preset is
--9.27%/-11.00% at L=100 and -2.26%/-2.34% at L=400 vs neither optimisation.
+-9.27% / -11.00% at L=100 and -2.26% / -2.34% at L=400 vs neither optimisation.
 
 ## Outputs
 

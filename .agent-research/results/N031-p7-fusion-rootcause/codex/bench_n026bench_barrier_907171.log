@@ -1,0 +1,52 @@
+### Starting TaskPrologue of job 907171 on h11-24 at Sun Sep 27 11:19:53 CEST 2026
+Running on cores 0-31 with governor performance
+Sun Sep 27 11:19:53 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   36C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+node=h11-24 arm=barrier tmp=/tmp/907171.helma/n026bench
+[N026 patch] graph break after cond_nbr_stack; P7 preset enabled
+REPS full [3.38870826526545, 3.3628329324225583, 3.3594305995696536] lean [2.674614933008949, 2.67607860150747, 2.6758099324069917] P7 True
+      gate: pair_cond_active=False  graphs=[(False, False), (True, False)]
+RESULT barrier      L=100   GATHER=1 HOIST=1 NOPC=1 AUX=1 IND=[]  eager    0.00  full  3.370 ms  lean  2.676 ms   chains 1 K 48   500-step   1.34 s   compile   280 s
+N026_BENCH_DONE
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:24:45 CEST 2026
+= Job-ID             : 907171 on helma
+= Job-Name           : n026bench_barrier
+= Job-Command        : .agent-research/results/N026-p7-fusion-rootcause/codex/bench.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:00:00
+= Elapsed runtime    : 00:04:54
+= Total RAM usage    : 4.0 GiB of assigned 175 GiB (2.3%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-27T11:19:49 / 2026-09-27T11:19:49 / 2026-09-27T11:19:50 / 2026-09-27T11:24:44
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.9G   104.9G   209.7G        N/A     461K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      94K      61K      81K  4d21h25m6s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 2457613, 9 %, 9 %, 1410 MiB, 287890 ms

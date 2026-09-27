@@ -389,6 +389,18 @@ Individual optimisations, for debugging. All default **on** except `DETSEG`, and
 | `SALAD_OPT_GATHER` | on | gather instead of one-hot matmul for embeddings |
 | `SALAD_OPT_HOIST` | on | hoist loop-invariant neighbour computation |
 | `SALAD_OPT_DETSEG` | **off** | deterministic segment reduction (see `--preset deterministic`) |
+| `SALAD_OPT_PAIRFEAT` | on | share the pair-vector computation `direction_features` is a slice of |
+| `SALAD_OPT_FRAMEMULSUM` | on | 3x3 frame transforms as mul+sum instead of a cuBLAS `bmm` |
+| `SALAD_OPT_IPAMULSUM` | on | the same for IPA's contractions (`fast` only) |
+| `SALAD_OPT_GEMMTPL` | **off** | inductor matmul templates. Measured and NOT shipped: not bit-exact (`pos` 5.4-5.8e-05 A) and the autotune is a timing race - three cold compiles disagree. Research knob only. |
+
+Every flag above defaults **on** but is only *reached* if the chosen preset asks
+for it, and a preset never overrides an env veto: the applier computes
+`preset AND env`, so `SALAD_OPT_X=0` always wins. The runtime value and the env
+veto are deliberately separate objects (`opt.FRAME_MULSUM` vs
+`opt.ENV_FRAME_MULSUM`), because the eager path builds no `FastDenoiser` and so
+never applies a preset - a shared default of `True` would silently enable a
+compiled-path-only optimisation everywhere.
 
 Setting any to `0`/`false`/`no`/`off` disables it.
 

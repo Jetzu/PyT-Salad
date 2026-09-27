@@ -24,9 +24,9 @@ import os
 
 __all__ = ["GATHER_ONEHOT", "HOIST_NEIGHBOURS", "SKIP_PAIR_COND", "LEAN_STEPS",
            "NEED_AUX", "BATCH_COND", "DET_SEGMENT", "AGGRESSIVE_FUSION",
-           "MM_MODE", "GEMM_TEMPLATES", "PAIR_FEAT_MERGE", "GEMM_TPL_MODE",
-           "resolve_gemm_templates", "DECOMPOSE_SMALL_BMM",
-           "resolve_decompose_small_bmm"]
+           "MM_MODE", "GEMM_TEMPLATES", "PAIR_FEAT_MERGE", "FRAME_MULSUM",
+           "IPA_MULSUM", "GEMM_TPL_MODE", "resolve_gemm_templates",
+           "DECOMPOSE_SMALL_BMM", "resolve_decompose_small_bmm"]
 
 
 def _flag(name: str, default: bool = True) -> bool:
@@ -351,3 +351,82 @@ def resolve_gemm_templates(preset_value) -> str:
 #: live at all, the env var can only turn it off) - see `fast.py`.
 PAIR_FEAT_MERGE = _flag("SALAD_OPT_PAIRFEAT")
 
+
+#: N028/O8 - how the 3x3 frame algebra contracts. `apply_t`, `apply_inverse_t`,
+#: `rot_apply`, `rot_apply_inverse` and `rot_compose` are `torch.einsum`
+#: (or `@`), and ATen lowers EVERY one of them to `aten.bmm`: 61 of the 303
+#: `extern_kernels.bmm` calls in the generated module have a `(..., 3, 3)`
+#: operand. That is a 5.98 us cuBLAS launch for nine multiply-adds, plus the
+#: `clone` inductor emits to get the permuted operands into bmm layout.
+#:
+#: `SALAD_OPT_FRAMEMULSUM=1` writes them as broadcast-multiply + `sum` over the
+#: contracted axis, so each becomes an ordinary pointwise+reduction node that
+#: inductor can fuse into the surrounding elementwise work. Same class of trade
+#: as `IPA_MULSUM` (N028/O2, see `modules/attention.py`), and the same
+#: direction: it removes cuBLAS launches and adds (at most) Triton ones.
+#:
+#: It is a REASSOCIATION over a 3-element contraction (bitwise identical in
+#: eager CPU fp32 on synthetic/small inputs, but NOT on real trained-model
+#: activations - cuBLAS is free to contract with FMA in a different order,
+#: and it does): the whole compiled `forward_core` CPU control disagrees on
+#: 9 of 11 outputs at L=64 and L=100, so it can never enter `exact`, AND it
+#: measurably fails `test_model_parity`'s tolerance in EAGER mode too
+#: (`default_ve_scaled` atom_pos rel 2.216e-05 against a 2e-05 floor,
+#: `multimotif_vp` 0.00026 A against a 0.00020 A floor - see RESULTS.md
+#: section 4). `fast` takes it anyway because the n=160 STRUCTURAL gate
+#: passes - a different, coarser bar than parity.
+#:
+#: Because it fails a bare tolerance check in eager mode - not just the
+#: chaos-amplified `test_sampling_parity` the way `IPA_MULSUM` does - this
+#: is `DET_SEGMENT`'s contract, NOT `BATCH_COND`'s: default OFF, `preset OR
+#: env`. `BATCH_COND`'s "default True, preset AND env" veto pattern requires
+#: the flag to be HARMLESS when a raw script (never touching `FastDenoiser`/
+#: `PRESETS`) reads the bare default directly - true for `BATCH_COND` (P7's
+#: eager path is correct, only the compiled path had a bug) and for
+#: `PAIR_FEAT_MERGE` (now proven eager-bit-exact), but NOT true here: a bare
+#: default of True would make `test_model_parity.py`/`test_sampling_parity.py`
+#: - which construct `StructureDiffusionPredict` directly and never see a
+#: preset - fail two configs outright on every invocation, including the
+#: "default state" parity gate. `SALAD_OPT_FRAMEMULSUM=1` forces it on for
+#: measurement against any preset; a preset can turn it on (`fast`, once its
+#: gate clears) but nothing can silently turn it on outside that.
+#: The env var is a VETO consumed by the preset applier, NOT the runtime value.
+#: The runtime value starts False so the EAGER path can never inherit this:
+#: eager builds no `FastDenoiser`, so nothing would ever apply a preset's
+#: False, and a True default would silently enable a deviating optimisation
+#: everywhere. `fast.py` reads ENV_FRAME_MULSUM and ANDs it with the preset.
+ENV_FRAME_MULSUM = _flag("SALAD_OPT_FRAMEMULSUM")
+FRAME_MULSUM = False
+
+
+#: N017/O2, validated in N028 - how `SparseInvariantPointAttention` contracts
+#: its four attention products. The default (`False`) is `torch.einsum`, which
+#: ATen lowers to `bmm`; because three of the four operands are GATHERED
+#: neighbour tensors in the wrong layout for a `bmm`, inductor must materialise
+#: a transposed `clone` of each first (the most expensive single Triton kernel
+#: in the whole step was purely laying out a gathered `k[neighbours]` for this
+#: einsum).
+#:
+#: `SALAD_OPT_IPAMULSUM=1` writes them as explicit broadcast-multiply +
+#: `sum`, so inductor reads the gather in place and emits one fused reduction.
+#: The launch economics run the RIGHT way for once: it ADDS Triton launches and
+#: REMOVES cuBLAS ones, and a cuBLAS launch (5.98 us) is much more expensive
+#: than a Triton kernel's launch floor.
+#:
+#: It is a REASSOCIATION, not bit-exact: the same products summed in a
+#: different order. So it can never enter `exact`; `test_sampling_parity`
+#: fails at 7/64 residues (the chaotic iterated-map amplification), the same
+#: signature and magnitude as `SALAD_OPT_DETSEG=1`.
+#:
+#: Same contract as `FRAME_MULSUM` and for the same reason - see its
+#: docstring: `DET_SEGMENT`'s "default OFF, preset OR env", not `BATCH_COND`'s
+#: "default True, preset AND env", because a bare default of True would make
+#: raw eager parity scripts (which never touch a preset) fail
+#: `test_sampling_parity` on every invocation, not just under `fast`.
+#: The env var is a VETO consumed by the preset applier, NOT the runtime value.
+#: The runtime value starts False so the EAGER path can never inherit this:
+#: eager builds no `FastDenoiser`, so nothing would ever apply a preset's
+#: False, and a True default would silently enable a deviating optimisation
+#: everywhere. `fast.py` reads ENV_IPA_MULSUM and ANDs it with the preset.
+ENV_IPA_MULSUM = _flag("SALAD_OPT_IPAMULSUM")
+IPA_MULSUM = False

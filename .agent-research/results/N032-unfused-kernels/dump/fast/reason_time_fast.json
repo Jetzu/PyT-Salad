@@ -1,0 +1,211 @@
+{
+ "single_count": 185,
+ "fused_groups": 172,
+ "resolved": 175,
+ "unresolved": 10,
+ "total_triton_us": 1114.0887000000062,
+ "total_triton_launches": 357.0,
+ "overlapping": [
+  {
+   "reason": "nodeX is extern or nop",
+   "nodes": 117,
+   "resolved_nodes": 117,
+   "us": 454.2636999999999
+  },
+  {
+   "reason": "intermediate nodes between nodeX & nodeX",
+   "nodes": 149,
+   "resolved_nodes": 139,
+   "us": 401.87030000000146
+  },
+  {
+   "reason": "no shared data",
+   "nodes": 123,
+   "resolved_nodes": 113,
+   "us": 373.9109916666709
+  },
+  {
+   "reason": "memory deps did not match",
+   "nodes": 114,
+   "resolved_nodes": 104,
+   "us": 346.0521999999979
+  },
+  {
+   "reason": "numel/rnumel mismatch (...)",
+   "nodes": 106,
+   "resolved_nodes": 101,
+   "us": 344.8356000000026
+  },
+  {
+   "reason": "will increase peak memory",
+   "nodes": 65,
+   "resolved_nodes": 60,
+   "us": 147.7286749999998
+  },
+  {
+   "reason": "nodes numel incompatibility",
+   "nodes": 33,
+   "resolved_nodes": 33,
+   "us": 123.17516666666789
+  }
+ ],
+ "partitioned": [
+  {
+   "reason": "numel/rnumel mismatch (...)",
+   "nodes": 73,
+   "us": 221.66043333333465
+  },
+  {
+   "reason": "no shared data",
+   "nodes": 43,
+   "us": 148.87380000000323
+  },
+  {
+   "reason": "nodes numel incompatibility",
+   "nodes": 33,
+   "us": 123.17516666666789
+  },
+  {
+   "reason": "memory deps did not match",
+   "nodes": 29,
+   "us": 109.83449999999809
+  },
+  {
+   "reason": "will increase peak memory",
+   "nodes": 6,
+   "us": 9.664099999999554
+  },
+  {
+   "reason": "nodeX is extern or nop",
+   "nodes": 1,
+   "us": 5.872199999999975
+  }
+ ],
+ "by_signature": [
+  {
+   "sig": "aten.cat",
+   "us": 98.00219999999865,
+   "nodes": 28
+  },
+  {
+   "sig": "aten.mean,aten.sub,aten.var,aten.add,aten.rsqrt,aten.mul,aten.index,aten.sum",
+   "us": 79.03690000000105,
+   "nodes": 12
+  },
+  {
+   "sig": "aten.bmm",
+   "us": 68.38069999999998,
+   "nodes": 4
+  },
+  {
+   "sig": "aten.mul,aten.sum",
+   "us": 68.33570000000005,
+   "nodes": 24
+  },
+  {
+   "sig": "aten.sort",
+   "us": 61.2803000000014,
+   "nodes": 19
+  },
+  {
+   "sig": "aten.index,aten.mul,aten.sum",
+   "us": 55.57140000000074,
+   "nodes": 11
+  },
+  {
+   "sig": "aten.arange,aten.mul,aten.add,aten.sub,aten.pow,aten.neg,aten.div,aten.exp",
+   "us": 43.66749999999986,
+   "nodes": 7
+  },
+  {
+   "sig": "aten.add,aten.gelu",
+   "us": 33.443399999999365,
+   "nodes": 13
+  },
+  {
+   "sig": "aten.cat,aten.sub",
+   "us": 15.993700000000171,
+   "nodes": 4
+  },
+  {
+   "sig": "aten.div",
+   "us": 15.241600000001199,
+   "nodes": 7
+  },
+  {
+   "sig": "aten.add",
+   "us": 14.115000000001213,
+   "nodes": 7
+  },
+  {
+   "sig": "aten.gelu,aten.mul,aten.zeros_like,aten.index,aten.clamp,aten.div,aten.where,aten.add",
+   "us": 11.519799999999941,
+   "nodes": 6
+  },
+  {
+   "sig": "aten.mul,aten.sum,aten.add",
+   "us": 9.580399999998326,
+   "nodes": 6
+  },
+  {
+   "sig": "aten.sub,aten.mul,aten.sum",
+   "us": 7.724700000000439,
+   "nodes": 4
+  },
+  {
+   "sig": "aten.sub,aten.mul,aten.sum,aten.clamp,aten.sqrt",
+   "us": 7.683000000000879,
+   "nodes": 3
+  },
+  {
+   "sig": "aten.zeros_like,aten._softmax,aten.where",
+   "us": 6.742300000000159,
+   "nodes": 5
+  },
+  {
+   "sig": "aten.add,aten.index,aten.sub",
+   "us": 6.259599999999773,
+   "nodes": 3
+  },
+  {
+   "sig": "aten.stack",
+   "us": 4.915400000000181,
+   "nodes": 3
+  },
+  {
+   "sig": "aten._softmax,aten.zeros_like,aten.where",
+   "us": 2.688000000000647,
+   "nodes": 2
+  },
+  {
+   "sig": "aten.sub,aten.div,aten.linalg_cross",
+   "us": 2.450999999999885,
+   "nodes": 2
+  },
+  {
+   "sig": "aten.sub,aten.div,aten.mul",
+   "us": 2.387200000000439,
+   "nodes": 2
+  },
+  {
+   "sig": "aten.gelu",
+   "us": 1.5230999999993629,
+   "nodes": 1
+  },
+  {
+   "sig": "aten.add,aten.sub",
+   "us": 1.3151999999994586,
+   "nodes": 1
+  },
+  {
+   "sig": "aten.div,aten.mul,aten.sub",
+   "us": 1.2221000000000912,
+   "nodes": 1
+  },
+  {
+   "sig": "?(unresolved)",
+   "us": 0.0,
+   "nodes": 10
+  }
+ ]
+}

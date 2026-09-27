@@ -1,0 +1,8 @@
+init_sync True
+manual_edit_sync False delta 0.125
+post_load_state_dict_sync True
+post_to_float64_sync True
+second_model_sync True
+post_converter_sync True
+post_denoiser_sync True
+post_denoiser_manual_edit_sync False

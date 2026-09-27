@@ -1,0 +1,54 @@
+### Starting TaskPrologue of job 907151 on h13-04 at Sun Sep 27 11:12:18 CEST 2026
+Running on cores 64-95 with governor performance
+Sun Sep 27 11:12:18 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:A6:00.0 Off |                    0 |
+| N/A   36C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+/home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N026-p7-fusion-rootcause/codex/standalone_kernel.py:8: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  saved=torch.load(D/'real_kernel_io.pt',map_location='cpu')
+fused vs captured nb mismatch 0 / 28800 max_abs 0
+fused vs captured rel mismatch 0 / 28800 max_abs 0
+fused vs unfused nb mismatch 0 / 28800 max_abs 0
+fused vs unfused rel mismatch 23070 / 28800 max_abs 64
+first rel mismatch 0 1 raw_neighbour 1 fused 32 unfused 31
+N026_STANDALONE_DONE
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:12:27 CEST 2026
+= Job-ID             : 907151 on helma
+= Job-Name           : n026standalone
+= Job-Command        : .agent-research/results/N026-p7-fusion-rootcause/codex/standalone.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:30:00
+= Elapsed runtime    : 00:00:14
+= Total RAM usage    : 1.4 GiB of assigned 175 GiB (0.8%)
+= Node list          : h13-04
+= Subm/Elig/Start/End: 2026-09-27T11:12:10 / 2026-09-27T11:12:10 / 2026-09-27T11:12:13 / 2026-09-27T11:12:27
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.7G   104.9G   209.7G        N/A     460K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      88K      61K      81K  4d21h37m24s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:A6:00.0, 1363625, 4 %, 4 %, 860 MiB, 4534 ms

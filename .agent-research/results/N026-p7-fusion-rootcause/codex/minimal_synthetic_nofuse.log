@@ -1,0 +1,2 @@
+torch 2.5.1+cu121 max_fusion_size 1 real False
+mismatches 0 of 28800 max_abs 0

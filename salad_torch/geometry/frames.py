@@ -4,6 +4,7 @@ from __future__ import annotations
 import torch
 from torch import Tensor
 
+from .. import opt
 from .rigid import Rigid, rot_from_two_vectors, vec_cross, vec_normalized
 
 __all__ = ["extract_aa_frames", "make_transform_from_reference",
@@ -83,10 +84,15 @@ def _lift(rot: Tensor, trans: Tensor, k: int) -> tuple[Tensor, Tensor]:
 def apply_t(rot: Tensor, trans: Tensor, points: Tensor, k: int = 0) -> Tensor:
     """``R p + t``, broadcasting over `k` inserted axes."""
     rot, trans = _lift(rot, trans, k)
+    if opt.FRAME_MULSUM:
+        # N028/O8 - a 3x3 matvec as a fusable reduction, not a cuBLAS bmm.
+        return (rot * points.unsqueeze(-2)).sum(-1) + trans
     return torch.einsum("...ij,...j->...i", rot, points) + trans
 
 
 def apply_inverse_t(rot: Tensor, trans: Tensor, points: Tensor, k: int = 0) -> Tensor:
     """``R^T (p - t)``, broadcasting over `k` inserted axes."""
     rot, trans = _lift(rot, trans, k)
+    if opt.FRAME_MULSUM:
+        return (rot * (points - trans).unsqueeze(-1)).sum(-2)
     return torch.einsum("...ji,...j->...i", rot, points - trans)

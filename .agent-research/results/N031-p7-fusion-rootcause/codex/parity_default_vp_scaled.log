@@ -1,0 +1,18 @@
+[N026 patch] graph break after cond_nbr_stack; P7 preset enabled
+config: default_vp_scaled
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=1.132e-07  abs=7.63e-06
+[PASS] local       rel=4.754e-07  abs=7.36e-04
+[PASS] trajectory  rel=2.316e-07  abs=1.57e-05
+[PASS] aa          rel=1.209e-06  abs=1.05e-05
+[PASS] atom_pos    rel=2.263e-07  abs=1.53e-05
+[PASS] angles      rel=4.530e-06  abs=4.53e-06  (tol 1e-03)
+[PASS] raw_angles  rel=1.275e-06  abs=7.93e-04  (tol 1e-04)
+[PASS] dssp        rel=9.516e-07  abs=9.54e-06
+[PASS] distogram   rel=4.379e-06  abs=4.58e-04
+[PASS] prev_pos    rel=1.132e-07  abs=7.63e-06
+[PASS] prev_local  rel=4.754e-07  abs=7.36e-04
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00001 A
+OK

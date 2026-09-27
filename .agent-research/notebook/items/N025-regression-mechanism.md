@@ -135,7 +135,7 @@ case has never been tested at all.
 
 Decision deferred to the user (diagnose-only task). The measured switch is
 `SALAD_OPT_BATCHCOND=0` / dropping `batch_cond_pair` from the presets; N014
-recorded P7's win as -9.27 %/-11.00 % whole-forward at L=100, eroding to
+recorded P7's win as -9.27 % / -11.00 % whole-forward at L=100, eroding to
 -2.26 % at L=400.
 
 ## Outputs

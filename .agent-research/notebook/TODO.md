@@ -49,16 +49,20 @@
   or keep it and set `torch._inductor.config.max_fusion_size = 1`, which fixes the
   miscompile (2.77e-05) but is a global de-optimisation and was NOT benchmarked.
   Not fixed here - N025 was diagnose-only.
-- T9 (N025): the miscompile is not root-caused below "a two-node fusion in the P7
-  graph is enough" (`max_fusion_size=1` correct, `=2` wrong; `aggressive_fusion`,
-  `pattern_matcher`, `epilogue_fusion`, `inline_inbuilt_nn_modules` and
-  `reduce-overhead` all return the BIT-IDENTICAL wrong answer). Next step is to
-  dump the generated Triton for the fused node that first writes a wrong value
-  (the error is present at block 0's output) - prime suspect is the prologue's
-  inline LayerNorm (`pair.mean(-1)` + `pair.var(-1, unbiased=False)` over the last
-  dim of a `(6, N*K, 64)` tensor) fused with its neighbours. Worth an upstream
-  PyTorch report if confirmed. Jobs 906656's `nosplitred`/`nopersred`/
-  `nomultikern` arms were still running when N025 closed - read them first.
+- T9 (N025, RESOLVED by N031): the exact bad fusion is now identified -
+  **`op195` (six-block condition-neighbour `stack`) fused with `op207`
+  (indirect gather for tiled relative-position bins)**; a mask that ANDs two
+  mutually-exclusive row-range guards goes permanently false in the fused
+  kernel, so the wrong int64 bin is read on every lane (23,070/28,800
+  positions wrong, max error 64 bins). This was NOT the prologue's LayerNorm
+  - that guess is superseded. A no-SALAD minimal reproducer confirms it is an
+  upstream PyTorch 2.5.1 Inductor bug, not SALAD-specific. N031 also has a
+  tested one-line fix (`torch._dynamo.graph_break()` right after the stack,
+  `results/N031-p7-fusion-rootcause/codex/fix.patch`): 0/160 diverged at
+  L=100 `--preset fast`, 6.47% FASTER than P7-off, retains 95.1% of P7's
+  benefit. **Not yet integrated** - see N031's item file "Next" section for
+  the remaining steps (reconcile against current HEAD, complete the
+  `DET_SEGMENT=0` CPU parity control, file the upstream issue).
 - T10 (N025): `tests/test_design_quality.py` (the only gate that can see this
   class) is not wired into anything. Make it a pre-commit requirement for any
   change under `salad_torch/modules/` or `scripts/generate.py`, and add a

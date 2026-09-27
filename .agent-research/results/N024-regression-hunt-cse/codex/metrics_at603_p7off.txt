@@ -1,0 +1,1 @@
+at603_p7off n 32 diverged 0 mean_Rg_ok 13.435 mean_CA_CA_ok 3.7594

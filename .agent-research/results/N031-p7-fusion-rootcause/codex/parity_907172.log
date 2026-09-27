@@ -1,0 +1,42 @@
+### Starting TaskPrologue of job 907172 on h31-07 at Sun Sep 27 11:20:23 CEST 2026
+Running on cores 144-191 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+node=h31-07 CPU=48 four configs x12 threads
+default_vp exit=0
+config: default_vp
+coordinate deviation: mean 0.00000 A, max 0.00001 A
+OK
+default_vp_scaled exit=0
+config: default_vp_scaled
+coordinate deviation: mean 0.00000 A, max 0.00001 A
+OK
+default_ve_scaled exit=0
+config: default_ve_scaled
+coordinate deviation: mean 0.00000 A, max 0.00002 A
+FAILED
+multimotif_vp exit=0
+config: multimotif_vp
+coordinate deviation: mean 0.00001 A, max 0.00018 A
+OK
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:20:26 CEST 2026
+= Job-ID             : 907172 on helma
+= Job-Name           : n026parity
+= Job-Command        : .agent-research/results/N026-p7-fusion-rootcause/codex/parity.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 01:00:00
+= Elapsed runtime    : 00:00:03
+= Total RAM usage    : 1.8 GiB of assigned 91 GiB (2.0%)
+= Node list          : h31-07
+= Subm/Elig/Start/End: 2026-09-27T11:20:22 / 2026-09-27T11:20:22 / 2026-09-27T11:20:23 / 2026-09-27T11:20:26
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.9G   104.9G   209.7G        N/A     461K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A      90K      61K      81K  4d21h29m25s !!!
+======================

@@ -1,0 +1,4 @@
+on n 32 diverged 7 mean_Rg_ok 20.017 mean_CA_CA_ok 3.8832 diverged_ids [15, 19, 26, 27, 28, 30, 31]
+off n 32 diverged 5 mean_Rg_ok 20.621 mean_CA_CA_ok 3.8793 diverged_ids [15, 26, 28, 30, 31]
+p7off n 32 diverged 0 mean_Rg_ok 13.41 mean_CA_CA_ok 3.7568 diverged_ids []
+tf32off n 32 diverged 7 mean_Rg_ok 20.462 mean_CA_CA_ok 3.8772 diverged_ids [15, 19, 22, 26, 28, 31, 5]

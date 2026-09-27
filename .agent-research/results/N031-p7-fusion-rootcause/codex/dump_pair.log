@@ -1,0 +1,2 @@
+[b] probe=none mode=default BATCH_COND=False compiled=False aggr=False patmatch=True inline=True
+[b] dumped step 30, prev_pos|max|=24.476

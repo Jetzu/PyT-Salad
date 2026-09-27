@@ -1,0 +1,61 @@
+### Starting TaskPrologue of job 904780 on h11-24 at Sat Sep 26 19:54:19 CEST 2026
+Running on cores 0-31 with governor performance
+Sat Sep 26 19:54:19 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:06:00.0 Off |                    0 |
+| N/A   35C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+preset 'fast': schedule scaled by 0.5 -> num_steps=250 out_steps=200
+device: NVIDIA H100
+config default_vp  L=100  steps=250 out_steps=(200,)
+fast path (fast) compiled + captured in 77s (one-time)
+TRACE_STEPS 201 CA_SHAPE (100, 3)
+  design 0:    1.2s  CA-CA 3.745 A (min 3.633 max 3.845)  Rg 13.0 A  -> /home/hpc/v181bb/v181bb10/SALAD_torch/.agent-research/results/N023-regression-hunt/codex/ag603_repeat_out_a0/design_0.pdb
+
+1 designs of 100 aa: median 1.2s, total 1.2s
+REPEAT_STEP 0 max_abs 0.0
+REPEAT_STEP 1 max_abs 0.0
+REPEAT_STEP 2 max_abs 0.0
+REPEAT_STEP 10 max_abs 0.0
+REPEAT_STEP 50 max_abs 0.0
+REPEAT_STEP 100 max_abs 0.0
+REPEAT_STEP 200 max_abs 0.0
+=== JOB_STATISTICS ===
+=== current date     : Sat Sep 26 19:55:46 CEST 2026
+= Job-ID             : 904780 on helma
+= Job-Name           : n023_ag603rep
+= Job-Command        : .agent-research/results/N023-regression-hunt/codex/run_aggr603_repeat.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 00:10:00
+= Elapsed runtime    : 00:01:27
+= Total RAM usage    : 2.9 GiB of assigned 175 GiB (1.7%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-26T19:54:18 / 2026-09-26T19:54:18 / 2026-09-26T19:54:19 / 2026-09-26T19:55:46
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.3G   104.9G   209.7G        N/A     476K     500K   1,000K        N/A    
+!!! /hnvme                  8.7T     0.0K     0.0K        N/A     101K      61K      81K  5d12h54m5s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:06:00.0, 2285399, 0 %, 0 %, 1102 MiB, 79932 ms

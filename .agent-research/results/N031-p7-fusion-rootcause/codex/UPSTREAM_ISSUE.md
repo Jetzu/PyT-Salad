@@ -1,0 +1,13 @@
+# PyTorch 2.5.1 Inductor fuses `stack` into an indirect `index` with an impossible load mask
+
+Environment: `torch 2.5.1+cu121`, H100 (sm_90), fp32/int64, `torch.compile(mode="default", dynamic=False)`. No CUDA graph capture. `TORCHINDUCTOR_UNIQUE_KERNEL_NAMES=1` identifies the kernel.
+
+Standalone, no-salad reproducer: `minimal_conditional.py` in this folder. Run it on CUDA as `python minimal_conditional.py`, then `NOFUSE=1 python minimal_conditional.py` as control. On this machine the default fused version gave 22,222/28,800 wrong int64 relative-position bins (maximum absolute error 64); the unfused control gave 0/28,800 wrong (`minimal_907142.log`). The simpler `minimal_repro.py`, which stacks already-computed neighbour tensors, is correct. The conditional `cat`/`where` construction before the `stack` is needed to trigger the faulty mask (`minimal_synthetic.log`).
+
+The original model's first bad scheduler decision is `op195 + op207`: `op195` stacks six `(100,48)` integer neighbour arrays into `(600,48)`, and `op207` uses that stack as the index for three indirect gathers to compute relative-position bins. Allowing 14 scheduler-approved fusions gives 1.67e-5 A position error versus eager; allowing the 15th (`op195 + op207`) gives 9.586399 A. Vetoing exactly that pair in the otherwise fully fused graph gives 1.81e-5 A (`bisect_907076.log`, `pair_907104.log`).
+
+The exact generated source for the fused kernel is `limit15_fused_kernel.py`. Lines 216-225 emit three indirect `tl.load`s with mask `tmp102 & tmp36 & tmp4 & tmp58 & tmp80 & xmask`. `tmp4` means `row < 100` (line 63), while `tmp36` means `100 <= row < 200` (lines 92-96), so the conjunction is false for every row. Those loads return zero, corrupting the index-based result. With the pair unfused, `limit14_unfused_kernels.py:252-260` uses only `xmask` for those loads.
+
+The exact generated fused and unfused Triton kernels were run standalone on tensors captured at the call to that kernel in the real model forward (`standalone_kernel.py`, `real_kernel_io.pt`, `standalone_907151.log`). Their stacked-neighbour outputs agree bit for bit, and the fused relative-position output agrees with the captured forward bit for bit. The relative-position outputs disagree in 23,070/28,800 bins, with maximum absolute error 64. Example: row 0, neighbour 1: fused bin 32, unfused bin 31.
+
+A local workaround inserts `torch._dynamo.graph_break()` after the six neighbour arrays are stacked and before the relative-position gather. That materializes the intermediate across graph boundaries. Single-forward error returns to 1.53e-5 A (`barrier_907155.log`). End-to-end quality and speed are separately reported in `RESULTS.md` once their jobs finish.

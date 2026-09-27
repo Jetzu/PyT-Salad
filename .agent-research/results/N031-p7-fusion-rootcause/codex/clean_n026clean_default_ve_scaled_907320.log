@@ -1,0 +1,45 @@
+### Starting TaskPrologue of job 907320 on h31-10 at Sun Sep 27 11:52:02 CEST 2026
+Running on cores 144-191 with governor performance
+No GPU known
+### Finished TaskPrologue
+
+node=h31-10 config=default_ve_scaled cpu=48 P7 env on custom barrier none
+BATCH_COND True
+config: default_ve_scaled
+fixture provenance: platform=cpu matmul_precision=highest
+[PASS] pos         rel=3.121e-07  abs=2.29e-05
+[PASS] local       rel=1.380e-06  abs=1.22e-02
+[PASS] trajectory  rel=3.083e-07  abs=2.29e-05
+[PASS] aa          rel=1.918e-06  abs=1.91e-05
+[PASS] atom_pos    rel=1.195e-05  abs=8.66e-04
+[PASS] angles      rel=3.588e-04  abs=3.59e-04  (tol 1e-03)
+[PASS] raw_angles  rel=3.954e-06  abs=2.83e-02  (tol 1e-04)
+[PASS] dssp        rel=2.287e-06  abs=4.46e-04
+[PASS] distogram   rel=6.565e-06  abs=2.75e-04
+[PASS] prev_pos    rel=3.121e-07  abs=2.29e-05
+[PASS] prev_local  rel=1.380e-06  abs=1.22e-02
+[PASS] aatype      0/48 differ
+
+coordinate deviation: mean 0.00000 A, max 0.00002 A
+OK
+N026_CLEAN_PARITY_PASS
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 11:52:05 CEST 2026
+= Job-ID             : 907320 on helma
+= Job-Name           : n026clean_default_ve_scaled
+= Job-Command        : .agent-research/results/N026-p7-fusion-rootcause/codex/parity_clean.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/SALAD_torch
+= Queue/Partition    : cpu
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=48,mem=93600M,node=1,billing=48 for 00:30:00
+= Elapsed runtime    : 00:00:03
+= Total RAM usage    : 0.6 GiB of assigned 91 GiB (0.7%)
+= Node list          : h31-10
+= Subm/Elig/Start/End: 2026-09-27T11:52:01 / 2026-09-27T11:52:01 / 2026-09-27T11:52:02 / 2026-09-27T11:52:05
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              92.8G   104.9G   209.7G        N/A     462K     500K   1,000K        N/A    
+    /home/atuin           139.1G     0.0K     0.0K        N/A     499K                          N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      88K      61K      81K  4d20h57m46s !!!
+======================

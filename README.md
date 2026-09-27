@@ -33,20 +33,37 @@ Measured on an H100 at L=100, against the JAX original on the same node.
 
 | | per step | per design | vs JAX |
 |---|---|---|---|
-| JAX salad | 4.73 ms | 1.56 s | — |
-| `--fast --preset exact` | 3.18 ms | 1.34 s | 1.16x |
-| `--fast --preset fast` | 3.01 ms | 0.60 s | 2.6x |
-| `--fast --preset fast --group_size auto` | 3.01 ms | **0.334 s** | **4.7x** |
+| JAX salad | 4.73 ms | 1.56 s | - |
+| `--fast --preset exact` | **2.53 ms** | 1.27 s | **1.87x** |
+| `--fast --preset fast` | **2.00 ms** | 1.00 s | **2.37x** |
+| `--fast --preset fast --group_size auto` | 2.00 ms | **~0.22 s** | **~7x** |
 
-`exact` holds the 0.00002 A parity floor. `fast` adds TF32 and a halved
-sampling schedule, validated at 160 designs per arm as statistically
-indistinguishable from `exact` on bond geometry, radius of gyration, secondary
-structure and clash rate. `--group_size` advances N independent designs through
-one CUDA graph and is **bit-identical** to generating them one at a time.
+`exact` holds the released checkpoints' parity floor (0.00002 A, 0.00020 A for
+`multimotif_vp`) on all four configs. `fast` adds TF32, a halved sampling
+schedule and two further reassociations; every deviating change is validated at
+**160 designs per arm** against `exact` on bond geometry, radius of gyration,
+secondary-structure composition, clash count and divergence rate.
+`--group_size` advances N independent designs through one CUDA graph and is
+**bit-identical** to generating them one at a time.
 
-Both presets still sit >12x above this model's measured theoretical floor
-(0.258 ms/step): it is kernel-launch-bound, not arithmetic- or bandwidth-bound.
-Details and the remaining gap list are in `notes/04_PARITY_AND_PERF.md`.
+Getting here meant rejecting more than shipping. Measured and *not* shipped:
+inductor matmul templates (-14 %, but not bit-exact and the autotune is a timing
+race), `einsum`->`mm` lowering, neighbour-count reduction (-28 % at L=400, 9x the
+clashes), bf16 (slower - the model is launch-bound, not math-bound), and
+`TORCHINDUCTOR_FREEZING` (passes the Angstrom floor while not being fp32-exact).
+
+One of the shipped optimisations silently destroyed 17-21 % of designs for a
+while: `batch_cond_pair` triggers a **PyTorch 2.5.1 inductor miscompile** that
+emits an impossible load mask, and every parity test passed straight through it
+because they all drive the eager path. It is fixed behind a `torch.library.custom_op`
+fusion barrier; the standalone reproducer and the generated Triton are in the
+repository history. The lesson is now a test: `tests/test_design_quality.py`
+generates real designs and checks they are proteins, which no single-forward
+comparison can do.
+
+Both presets still sit ~10x above this model's measured theoretical floor
+(0.258 ms/step): it is kernel-launch-bound, not arithmetic- or bandwidth-bound
+(arithmetic peaks at 11 % of fp32 peak, L2 at 21 % of its rate).
 
 **[Full flag reference: `docs/USAGE.md`](docs/USAGE.md)**
 

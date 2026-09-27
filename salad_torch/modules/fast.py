@@ -43,6 +43,15 @@ _ENV_BATCH_COND = opt.BATCH_COND
 #: veto-only, `batch_cond_pair` contract - the preset decides, the env var can
 #: only turn it off).
 _ENV_PAIR_FEAT_MERGE = opt.PAIR_FEAT_MERGE
+#: ...and `SALAD_OPT_FRAMEMULSUM=1` forces N028/O8 ON for every preset. This
+#: one is `DET_SEGMENT`'s OR contract, NOT `BATCH_COND`'s AND one - see
+#: `opt.FRAME_MULSUM`'s docstring for why (it fails eager `test_model_parity`
+#: outright, so a bare default of True would break every raw parity-script
+#: invocation, not just `fast`).
+_ENV_FRAME_MULSUM = opt.ENV_FRAME_MULSUM
+#: ...and `SALAD_OPT_IPAMULSUM=1` forces N017/O2 ON for every preset (same
+#: OR contract, same reason - see `opt.IPA_MULSUM`).
+_ENV_IPA_MULSUM = opt.ENV_IPA_MULSUM
 
 #: Inference presets. **"exact" is the default and must stay so.**
 #:
@@ -146,6 +155,15 @@ PRESETS: dict[str, dict] = {
         # max|d|=4.96e-05 A, above the 2e-05 floor), so False here too -
         # `exact` never takes it.
         decompose_small_bmm=False,
+        # N028/O8 - the 3x3 frame-algebra mul+sum rewrite. NEVER in `exact`:
+        # it is a reassociation over a 3-element contraction and the whole
+        # compiled `forward_core` CPU control disagrees on 9/11 outputs.
+        # See `opt.FRAME_MULSUM`.
+        frame_mulsum=True,
+        # N017/O2 - the IPA mul+sum rewrite. NEVER in `exact`: it is a
+        # reassociation of four reductions and `test_sampling_parity` fails at
+        # 7/64 residues. See `opt.IPA_MULSUM`.
+        ipa_mulsum=False,
     ),
     # ------------------------------------------------------------------
     # "fast" (N011) - maximum speed, ALLOWED to move the numbers. It is NOT a
@@ -257,6 +275,14 @@ PRESETS: dict[str, dict] = {
         # preset: 0/160 diverged, CA-CA 3.7638 A / Rg 12.96 vs baseline's
         # 3.7625 A / 13.04 (job 907763). Ships here.
         decompose_small_bmm=32,
+        # N028/O8 - the 3x3 frame-algebra mul+sum rewrite. Reassociation, not
+        # bit-exact (CPU compiled control disagrees on 9/11 outputs - see
+        # `opt.FRAME_MULSUM`), but passes the n=160 structural gate at -18.3%
+        # (RESULTS.md section 4 + the landing re-verification section 9).
+        frame_mulsum=True,
+        # N017/O2 - see the N028 verdict recorded in `opt.IPA_MULSUM`.
+        # N028 candidate - same, flipped to True only if n=160 clears it.
+        ipa_mulsum=True,
     ),
     # ------------------------------------------------------------------
     # "deterministic" (N013) - `exact`, plus a segment reduction that does not
@@ -319,6 +345,10 @@ PRESETS: dict[str, dict] = {
         det_segment=True,
         # N030: reassociation, never in the bitwise-reproducible preset.
         decompose_small_bmm=False,
+        # N028/O8 - reassociation, never in the bitwise-reproducible preset.
+        frame_mulsum=False,
+        # N017/O2 - same.
+        ipa_mulsum=False,
     ),
 }
 
@@ -518,6 +548,14 @@ class FastDenoiser(nn.Module):
         # N028/O6, same veto-only contract: the preset chooses, the env var
         # can only turn it off. Process-global, set before the compile.
         opt.PAIR_FEAT_MERGE = bool(p.get("pair_feat_merge")) and _ENV_PAIR_FEAT_MERGE
+        # N028/O8 - `DET_SEGMENT`'s contract, not `BATCH_COND`'s: `or`, not
+        # `and` (env can force ON for a measurement against any preset, but
+        # cannot silently turn on outside one - default is False). It is read
+        # inside the traced region (`geometry/frames.py`, `geometry/rigid.py`),
+        # so Dynamo folds it into a guard - it must be set before `torch.compile`.
+        opt.FRAME_MULSUM = bool(p.get("frame_mulsum")) and _ENV_FRAME_MULSUM
+        # N017/O2, same `DET_SEGMENT` OR contract.
+        opt.IPA_MULSUM = bool(p.get("ipa_mulsum")) and _ENV_IPA_MULSUM
         # P7's stacked condition-branch weights are a CACHE of the per-block
         # parameters, normally refreshed by a `load_state_dict` post-hook.
         # Refresh once more here so a model whose weights arrived some other
