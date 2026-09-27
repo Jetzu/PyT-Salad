@@ -23,13 +23,12 @@ Like previous models, salad models can generate protein structures for a variety
    up to ~1,000 amino acids
 * [symmetric and repeat protein generation](#symmetric--repeat-protein-generation)
   (currently cyclic and screw-axis symmetry)
-* [protein motif scaffolding](#multi-motif-scaffolding)
+* [protein motif scaffolding and binder design](#motif-scaffolding-and-binder-design)
   (with one or more independent motifs)
+* [shape-conditioned protein generation](#shape-conditioned-generation)
+* [multi-state protein design](#multi-state-design)
 
-Shape-conditioned generation and multi-state design are described in the
-manuscript but are not implemented here; use the
-[reference implementation](https://github.com/mjendrusch/salad) for those. The
-full extent of what salad can do is described in the
+The full extent of what salad can do is described in the
 [manuscript](https://www.biorxiv.org/content/10.1101/2025.01.31.635780v1.abstract).
 
 ## What's in this repository?
@@ -104,6 +103,11 @@ single script, `scripts/generate.py`, and selected with flags.
     - [Scaffolding a single motif](#scaffolding-a-single-motif)
     - [Scaffolding several motifs](#scaffolding-several-motifs)
     - [Designing a binder against a target](#designing-a-binder-against-a-target)
+  - [Shape-conditioned generation](#shape-conditioned-generation)
+    - [--blobs](#--blobs)
+    - [--blob_scale (default: 1.8)](#--blobscale-default-18)
+    - [--replace_threshold (default: 0.0)](#--replacethreshold-default-00)
+  - [Multi-state design](#multi-state-design)
   - [Symmetric / repeat protein generation](#symmetric--repeat-protein-generation)
     - [--num_aa](#--numaa)
     - [--replicate_count](#--replicatecount)
@@ -112,6 +116,13 @@ single script, `scripts/generate.py`, and selected with flags.
     - [--screw_translation](#--screwtranslation)
     - [--screw_radius](#--screwradius)
     - [--screw_angle](#--screwangle)
+    - [--fixcenter_threshold (default: 0.0001)](#--fixcenterthreshold-default-00001)
+    - [--compact_lr (default: 0.0)](#--compactlr-default-00)
+    - [--clash_lr (default: 0.0)](#--clashlr-default-00)
+    - [--f_small / --f_strand (default: 1.0)](#--fsmall----fstrand-default-10)
+    - [--mix_output (couple or replicate)](#--mixoutput-couple-or-replicate)
+    - [--sym_noise (default: True)](#--symnoise-default-true)
+    - [--mode (screw or rotation)](#--mode-screw-or-rotation)
 - [Training](#training)
 - [Tests](#tests)
 - [License](#license)
@@ -728,6 +739,83 @@ Interface residues on the target can be left free by writing `_` at those
 positions, which lets the model adjust them rather than treating the target as
 rigid.
 
+## Shape-conditioned generation
+
+Instead of a length, supply a CSV of coordinates and residue counts. Each row
+places that many consecutive residues at one point in space, and the model fills
+in a protein that follows the resulting layout.
+
+```csv
+x,y,z,num_aa
+0.0,-11.79,-16.45,100
+0.0,-12.09,-3.08,100
+0.0,-0.87,-2.98,100
+```
+
+```bash
+python scripts/generate.py \
+    --config default_ve_scaled \
+    --params params/default_ve_scaled-200k.jax \
+    --out_path output/shape/ \
+    --num_designs 50 \
+    --blobs letters/s_shape.csv \
+    --blob_scale 1.8
+```
+
+This requires a VE configuration (`default_ve_scaled`); other configurations
+are rejected rather than silently mis-run. `--blobs` replaces `--num_aa`
+entirely, and is incompatible with `--dssp`, `--template`, `--order_agnostic`,
+`--sym`, `--group_size` and `--batch_size`.
+
+### --blobs
+Path to the CSV described above. Each row is `x,y,z,num_aa`. Every row must
+specify exactly 100 residues — the per-step anchoring works on fixed 100-residue
+blocks, and a total that is not divisible by 100 raises an error.
+
+### --blob_scale (default: 1.8)
+Multiplies every coordinate in the CSV, which scales the whole layout. Useful
+for tuning how spread out the shape is; the shipped letter examples were tuned
+this way.
+
+### --replace_threshold (default: 0.0)
+After each denoising step, while `raw_t` is above this threshold, each block's
+predicted centroid is moved back onto its blob anchor. At the default of 0.0
+this happens at every step.
+
+Turning it off (`--replace_threshold 1.1`) is instructive: the noise placement
+alone still puts most residues near the right blob, but the structure drifts
+several Ångström from the requested coordinates. With it on, centroids land
+within a few hundredths of an Ångström.
+
+## Multi-state design
+
+Design a parent protein that yields two different children when split, as
+described by Lisanza et al. (2024). Parent and children are given as one
+`--dssp` string separated by `/`:
+
+```bash
+python scripts/generate.py \
+    --config default_vp \
+    --params params/default_vp-200k.jax \
+    --out_path output/multistate/ \
+    --num_designs 100 \
+    --dssp "_HHHHHHHHHHHHHlllHHHHHHHHHHHHH_/_HHHHHHHHHHHHHLLL_/_HHHHHHHHHHHHHLLL_"
+```
+
+Each part gets its own secondary-structure conditioning, exactly as a
+single-state `--dssp` string would. The capitalisation carries the extra
+meaning: **where the parent is uppercase, that residue is additionally
+constrained to the same tertiary structure in the corresponding child**, by
+rigidly superimposing the parent's coordinates into the child's frame at every
+step. Lowercase constrains secondary structure only.
+
+The coupling is one-directional — children are pulled toward the parent, never
+the reverse.
+
+Multi-state design is incompatible with `--template`, `--sym`,
+`--order_agnostic`, `--merge_chains`, `--group_size`, `--batch_size`, `--fast`,
+`--renoise`, `--sample_final` and `--cloud_std`.
+
 ## Symmetric / repeat protein generation
 To generate rotation or superhelical (screw) symmetric repeat proteins,
 you can use the script `scripts/generate.py`.
@@ -813,6 +901,42 @@ Angle of rotation between two successive repeat units around the central
 axis of rotation. For designs with --screw_translation 0.0 this needs to
 be less than or equal to 360 / --replicate_count, as it will result in
 clashing structures otherwise.
+
+### --fixcenter_threshold (default: 0.0001)
+Re-centring of the representative subunit, and re-application of
+`--screw_radius`, happens only while the current step's scaled noise level is
+above this threshold. The default is upstream's and is effectively a no-op.
+
+### --compact_lr (default: 0.0)
+Strength of a per-subunit compactness pull applied after symmetrisation at each
+step. Raising it produces more compact subunits and measurably reduces the
+radius of gyration.
+
+### --clash_lr (default: 0.0)
+Strength of an inter-subunit clash repulsion applied at the same point. Raising
+it increases the minimum distance between chains.
+
+### --f_small / --f_strand (default: 1.0)
+Rejection filters. A design whose fraction of small residues, or of strand
+content, falls outside the requested bound is discarded and regenerated, up to
+20 attempts. At the default of 1.0 neither filter rejects anything.
+
+### --mix_output (couple or replicate)
+An alias for `--sym_mean`: `couple` averages over subunits, `replicate` selects
+one. Upstream's symmetry script uses this name; both are accepted here and
+control the same mechanism.
+
+### --sym_noise (default: True)
+Whether the symmetriser is applied to the network's noised input at each call.
+With it on, subunits are exactly symmetric; with it off, each receives
+independent noise.
+
+### --mode (screw or rotation)
+`screw` is the default and the only working value. `rotation` is rejected with
+an explanatory error: upstream's rotation class takes one fewer argument than
+its own call site passes, so every invocation raises before producing a
+structure. There is no working upstream behaviour to reproduce.
+
 
 # Training
 
