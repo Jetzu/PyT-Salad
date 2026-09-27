@@ -1372,6 +1372,8 @@ def main() -> None:
                 fast_denoiser.invalidate_condition_cache()
             data, prev = make_design_data(args, pc, num_aa, resi, chain,
                                           is_cyclic, cyclic_mask, device)
+            if blob_init_pos is not None:
+                data["pos"] = blob_init_pos.to(device)
             do_radius0 = timescale_pos_fn(1.0) > sym.fixcenter_threshold
             data["pos"] = screw_replicate(
                 data["pos"], count=sym.replicate_count, angle=sym.angle_rad,
