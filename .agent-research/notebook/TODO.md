@@ -68,3 +68,21 @@
 - T11 (N025, hygiene): `modules/fast.py` `_pack_inputs` ends with an unreachable
   `return inputs, pair_cond` left over from the `b9dd416` split. Harmless, but it
   is dead code in the hot path's source.
+- T12 (N026, Kale P0): **kill gate, ~20 GPU-h — under the 25 GPU-h approval gate, so
+  runnable without asking.** Freeze ESM-2 650M, precompute embeddings for ~50k chains,
+  train the SALAD trunk + frames head with recycling on monomers <=256 aa. Question:
+  does a k-NN graph SEEDED FROM THE pLM's ATTENTION CONTACT MAP (there are no coordinates
+  at cycle 0) reach TM > 0.5 at all? Must report a DOSE-RESPONSE curve, not an endpoint.
+  Kill if a random-init-pLM control is not clearly below it.
+- T13 (N026, Kale, open research risk): a pair-tensor-free K<=64 representation has been
+  shown to GENERATE (SALAD) but never to PREDICT at this size. SimpleFold drops the pair
+  rep but pays 2.86 B params + 500 sampling steps. Searched specifically for sparse/k-NN
+  or low-rank triangle alternatives: **no working public demonstration exists.** This is
+  the project's top risk and also its novelty.
+- T14 (N026, Kale, decide up front): if Kale needs PADDED batching, the `-1` no-neighbour
+  sentinel bug must be fixed BEFORE anything else — it un-masks residue N-1 (double-counted,
+  up to ~5 A offset-dependence), and fixing it regenerates every fixture and breaks JAX
+  parity. Decide once, early.
+- T15 (N026, Kale, measurement debt): the ~0.1 s at L=300 figure is ARITHMETIC from measured
+  SALAD block timings plus an ESTIMATED pLM cost, not an end-to-end measurement. Measure it
+  in P0 before quoting it anywhere.
