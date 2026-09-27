@@ -1,0 +1,13 @@
+  --blobs '.agent-research/results/N034-shape-conditioning/l_shape.csv': num_aa=500 from the blob file (--num_aa is not used for shape conditioning)
+device: NVIDIA H100
+config default_ve_scaled  L=500  steps=500 out_steps=(400,)
+  design 0:   28.1s  CA-CA 3.692 A (min 2.566 max 40.771)  Rg 32.8 A  -> /tmp/908578.helma/armA/design_0.pdb
+  design 1:   26.3s  CA-CA 3.670 A (min 2.370 max 33.600)  Rg 32.8 A  -> /tmp/908578.helma/armA/design_1.pdb
+  design 2:   26.3s  CA-CA 3.690 A (min 2.610 max 29.120)  Rg 32.7 A  -> /tmp/908578.helma/armA/design_2.pdb
+  design 3:   26.3s  CA-CA 3.644 A (min 2.618 max 29.320)  Rg 32.7 A  -> /tmp/908578.helma/armA/design_3.pdb
+  design 4:   26.3s  CA-CA 3.679 A (min 2.480 max 47.081)  Rg 32.7 A  -> /tmp/908578.helma/armA/design_4.pdb
+  design 5:   26.3s  CA-CA 3.614 A (min 2.558 max 45.573)  Rg 32.8 A  -> /tmp/908578.helma/armA/design_5.pdb
+  design 6:   26.3s  CA-CA 3.587 A (min 2.680 max 3.871)  Rg 32.8 A  -> /tmp/908578.helma/armA/design_6.pdb
+  design 7:   26.3s  CA-CA 3.658 A (min 2.548 max 50.310)  Rg 32.9 A  -> /tmp/908578.helma/armA/design_7.pdb
+
+8 designs of 500 aa: median 26.3s, total 212.0s

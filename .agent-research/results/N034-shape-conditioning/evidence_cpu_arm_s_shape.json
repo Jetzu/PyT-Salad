@@ -1,0 +1,48 @@
+{
+  "n_designs": 2,
+  "centroid_err_mean": 0.002920321967347831,
+  "centroid_err_max": 0.005372429617970952,
+  "placement_accuracy_mean": 0.99125,
+  "placement_accuracy_shuffled_control_mean": 0.001875,
+  "chance_accuracy": 0.125,
+  "rows": [
+    {
+      "n": 800,
+      "k": 8,
+      "centroid_err_mean": 0.00338693625447275,
+      "centroid_err_max": 0.005372429617970952,
+      "centroid_err_per_block": [
+        0.0014646159906269887,
+        0.004133388440491902,
+        0.005372429617970952,
+        0.0025182136525739806,
+        0.0022957787349838195,
+        0.00387219575951301,
+        0.004203284430062715,
+        0.003235583409558629
+      ],
+      "placement_accuracy": 0.99125,
+      "placement_accuracy_shuffled_control": 0.0025,
+      "path": "/tmp/908579.helma/cpu_arm/design_0.pdb"
+    },
+    {
+      "n": 800,
+      "k": 8,
+      "centroid_err_mean": 0.002453707680222912,
+      "centroid_err_max": 0.004579454115935219,
+      "centroid_err_per_block": [
+        0.0035349823196169816,
+        0.0032163799526887973,
+        0.004579454115935219,
+        0.0014311184437356744,
+        0.001454372717016555,
+        0.0025849177936661176,
+        0.0020231411221117916,
+        0.000805294977012162
+      ],
+      "placement_accuracy": 0.99125,
+      "placement_accuracy_shuffled_control": 0.00125,
+      "path": "/tmp/908579.helma/cpu_arm/design_1.pdb"
+    }
+  ]
+}

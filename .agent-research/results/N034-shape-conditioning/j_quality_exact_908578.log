@@ -1,0 +1,72 @@
+[gate] /home/hpc/v181bb/v181bb10/miniforge3/envs/triad/bin/python scripts/generate.py --config default_vp --num_aa 100 --num_designs 64 --seed 42 --out_path /tmp/908578.helma/qexact --fast --preset exact
+
+    design  nres     CA-CA       Rg   verdict
+design_0.pdb   100     3.767    12.32   
+design_1.pdb   100     3.791    11.97   
+design_10.pdb   100     3.767    12.98   
+design_11.pdb   100     3.763    12.55   
+design_12.pdb   100     3.762    12.14   
+design_13.pdb   100     3.755    12.59   
+design_14.pdb   100     3.764    12.95   
+design_15.pdb   100     3.753    12.26   
+design_16.pdb   100     3.799    11.76   
+design_17.pdb   100     3.751    12.93   
+design_18.pdb   100     3.771    13.69   
+design_19.pdb   100     3.780    12.36   
+design_2.pdb   100     3.753    12.52   
+design_20.pdb   100     3.750    14.11   
+design_21.pdb   100     3.763    12.12   
+design_22.pdb   100     3.767    12.20   
+design_23.pdb   100     3.758    12.73   
+design_24.pdb   100     3.756    11.77   
+design_25.pdb   100     3.746    13.07   
+design_26.pdb   100     3.757    12.05   
+design_27.pdb   100     3.782    11.88   
+design_28.pdb   100     3.778    11.61   
+design_29.pdb   100     3.756    12.65   
+design_3.pdb   100     3.745    12.60   
+design_30.pdb   100     3.754    12.94   
+design_31.pdb   100     3.754    12.16   
+design_32.pdb   100     3.729    14.62   
+design_33.pdb   100     3.772    15.36   
+design_34.pdb   100     3.769    13.56   
+design_35.pdb   100     3.784    12.24   
+design_36.pdb   100     3.765    12.23   
+design_37.pdb   100     3.754    11.52   
+design_38.pdb   100     3.757    12.83   
+design_39.pdb   100     3.770    12.23   
+design_4.pdb   100     3.758    14.27   
+design_40.pdb   100     3.758    11.45   
+design_41.pdb   100     3.788    13.17   
+design_42.pdb   100     3.771    12.11   
+design_43.pdb   100     3.747    14.30   
+design_44.pdb   100     3.764    12.07   
+design_45.pdb   100     3.789    12.25   
+design_46.pdb   100     3.773    12.90   
+design_47.pdb   100     3.753    12.97   
+design_48.pdb   100     3.764    12.39   
+design_49.pdb   100     3.772    11.52   
+design_5.pdb   100     3.777    11.43   
+design_50.pdb   100     3.744    12.00   
+design_51.pdb   100     3.738    13.05   
+design_52.pdb   100     3.780    11.70   
+design_53.pdb   100     3.763    13.41   
+design_54.pdb   100     3.759    12.17   
+design_55.pdb   100     3.777    12.67   
+design_56.pdb   100     3.738    12.81   
+design_57.pdb   100     3.746    13.11   
+design_58.pdb   100     3.781    11.96   
+design_59.pdb   100     3.773    12.52   
+design_6.pdb   100     3.761    13.67   
+design_60.pdb   100     3.784    11.83   
+design_61.pdb   100     3.769    12.82   
+design_62.pdb   100     3.750    12.12   
+design_63.pdb   100     3.748    13.40   
+design_7.pdb   100     3.763    12.94   
+design_8.pdb   100     3.751    14.02   
+design_9.pdb   100     3.751    13.00   
+
+converged (n=64): CA-CA 3.7630  Rg 12.65
+diverged: 0/64 = 0.0%  (limit 10%)
+
+[PASS]

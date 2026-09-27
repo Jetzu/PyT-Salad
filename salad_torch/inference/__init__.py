@@ -20,6 +20,7 @@ Deliberately NOT ported (see `notes/specs/06_generation_flags.md` for why):
 """
 from __future__ import annotations
 
+from .blobs import parse_blobs, replace_to_blob_anchor
 from .multistate import couple_part, update_split_change
 from .options import (DSSP_CODE, MultiStateDSSP, decode_sequence, parse_dssp,
                       parse_dssp_mean, parse_dssp_split, random_dssp,
@@ -35,4 +36,5 @@ __all__ = [
     "DSSP_CODE", "parse_dssp", "parse_dssp_mean", "random_dssp",
     "random_dssp_mean", "decode_sequence",
     "MultiStateDSSP", "parse_dssp_split", "couple_part", "update_split_change",
+    "parse_blobs", "replace_to_blob_anchor",
 ]

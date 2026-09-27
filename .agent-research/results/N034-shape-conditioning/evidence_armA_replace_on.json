@@ -1,0 +1,138 @@
+{
+  "n_designs": 8,
+  "centroid_err_mean": 0.015772769762502505,
+  "centroid_err_max": 0.03580716967312991,
+  "placement_accuracy_mean": 0.9684999999999999,
+  "placement_accuracy_shuffled_control_mean": 0.00575,
+  "chance_accuracy": 0.2,
+  "rows": [
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.018730866738327395,
+      "centroid_err_max": 0.03580716967312991,
+      "centroid_err_per_block": [
+        0.03580716967312991,
+        0.01177810680881718,
+        0.008991045545429649,
+        0.011219688052704303,
+        0.025858323611555937
+      ],
+      "placement_accuracy": 0.968,
+      "placement_accuracy_shuffled_control": 0.002,
+      "path": "/tmp/908578.helma/armA/design_0.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.010845454531111,
+      "centroid_err_max": 0.018149834709990136,
+      "centroid_err_per_block": [
+        0.01051095143172233,
+        0.013409627138738948,
+        0.005485772507133286,
+        0.018149834709990136,
+        0.0066710868679702925
+      ],
+      "placement_accuracy": 0.968,
+      "placement_accuracy_shuffled_control": 0.0,
+      "path": "/tmp/908578.helma/armA/design_1.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.015251739704540235,
+      "centroid_err_max": 0.021948327954538254,
+      "centroid_err_per_block": [
+        0.015565207997329796,
+        0.021948327954538254,
+        0.012043359165952904,
+        0.009997854769908526,
+        0.016703948634971693
+      ],
+      "placement_accuracy": 0.99,
+      "placement_accuracy_shuffled_control": 0.006,
+      "path": "/tmp/908578.helma/armA/design_2.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.015203303526550338,
+      "centroid_err_max": 0.024759941437741996,
+      "centroid_err_per_block": [
+        0.011248262087982944,
+        0.0042915381857813635,
+        0.016011314749264035,
+        0.019705461171981364,
+        0.024759941437741996
+      ],
+      "placement_accuracy": 0.972,
+      "placement_accuracy_shuffled_control": 0.0,
+      "path": "/tmp/908578.helma/armA/design_3.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.012785533383438217,
+      "centroid_err_max": 0.01874016542082965,
+      "centroid_err_per_block": [
+        0.01698934077590892,
+        0.011007506529642571,
+        0.008046098433403535,
+        0.009144555757406405,
+        0.01874016542082965
+      ],
+      "placement_accuracy": 0.968,
+      "placement_accuracy_shuffled_control": 0.004,
+      "path": "/tmp/908578.helma/armA/design_4.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.01796059754293191,
+      "centroid_err_max": 0.025824316060644028,
+      "centroid_err_per_block": [
+        0.024952294483686386,
+        0.01167243762030819,
+        0.025824316060644028,
+        0.014260448800794516,
+        0.013093490749226446
+      ],
+      "placement_accuracy": 0.958,
+      "placement_accuracy_shuffled_control": 0.026,
+      "path": "/tmp/908578.helma/armA/design_5.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.019885471452662052,
+      "centroid_err_max": 0.02485921358369467,
+      "centroid_err_per_block": [
+        0.012814846858234022,
+        0.01856565107934659,
+        0.023067292862405126,
+        0.02485921358369467,
+        0.020120352879629853
+      ],
+      "placement_accuracy": 0.968,
+      "placement_accuracy_shuffled_control": 0.0,
+      "path": "/tmp/908578.helma/armA/design_6.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 0.01551919122045888,
+      "centroid_err_max": 0.019908985408608776,
+      "centroid_err_per_block": [
+        0.019908985408608776,
+        0.01072460255673013,
+        0.01862625566236958,
+        0.009847954102262605,
+        0.01848815837232331
+      ],
+      "placement_accuracy": 0.956,
+      "placement_accuracy_shuffled_control": 0.008,
+      "path": "/tmp/908578.helma/armA/design_7.pdb"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+  --blobs '.agent-research/results/N034-shape-conditioning/s_shape.csv': num_aa=800 from the blob file (--num_aa is not used for shape conditioning)
+config default_ve_scaled  L=800  steps=60 out_steps=(59,)
+  design 0:  117.9s  CA-CA 3.801 A (min 1.457 max 31.528)  Rg 29.8 A  -> /tmp/908513.helma/cpu_arm/design_0.pdb
+  design 1:  116.1s  CA-CA 3.588 A (min 1.973 max 13.190)  Rg 29.9 A  -> /tmp/908513.helma/cpu_arm/design_1.pdb
+
+2 designs of 800 aa: median 117.0s, total 234.0s

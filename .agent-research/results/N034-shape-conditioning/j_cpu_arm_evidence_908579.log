@@ -1,0 +1,10 @@
+
+                      design     n  centroid_err_mean  centroid_err_max  placement_acc  shuffled_ctrl
+                design_0.pdb   800              0.003             0.005          0.991          0.003
+                design_1.pdb   800              0.002             0.005          0.991          0.001
+
+aggregate over 2 designs:
+  centroid_err_mean = 0.003 A (max 0.005 A)
+  placement_accuracy_mean = 0.991 vs shuffled-control 0.002 vs chance 0.125
+
+wrote .agent-research/results/N034-shape-conditioning/evidence_cpu_arm_s_shape.json

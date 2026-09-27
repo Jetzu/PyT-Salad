@@ -1,0 +1,16 @@
+
+                      design     n  centroid_err_mean  centroid_err_max  placement_acc  shuffled_ctrl
+                design_0.pdb   500              8.093            11.922          0.800          0.022
+                design_1.pdb   500              8.356            12.171          0.782          0.000
+                design_2.pdb   500              8.318            11.771          0.764          0.102
+                design_3.pdb   500              7.335            10.789          0.808          0.020
+                design_4.pdb   500              7.400            11.015          0.816          0.020
+                design_5.pdb   500              7.870            10.972          0.800          0.068
+                design_6.pdb   500              6.849            10.472          0.840          0.000
+                design_7.pdb   500              7.697            13.212          0.784          0.002
+
+aggregate over 8 designs:
+  centroid_err_mean = 7.740 A (max 13.212 A)
+  placement_accuracy_mean = 0.799 vs shuffled-control 0.029 vs chance 0.200
+
+wrote .agent-research/results/N034-shape-conditioning/evidence_armB_replace_off.json

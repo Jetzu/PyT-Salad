@@ -1,0 +1,22 @@
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+  --blobs '.agent-research/results/N034-shape-conditioning/l_shape.csv': num_aa=500 from the blob file (--num_aa is not used for shape conditioning)
+device: NVIDIA H100
+config default_ve_scaled  L=500  steps=20 out_steps=(19,)
+fast path (exact) compiled + captured in 416s (one-time)
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 1440, in <module>
+    main()
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 1338, in main
+    snaps = sample(step_fn, data, prev, cfg, generator=gen,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/diffusion/sampling.py", line 368, in sample
+    data["pos"] = post_step_fn(data["pos"], raw_t)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 1301, in post_step_fn
+    pos = replace_to_blob_anchor(pos, _blob_pos)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/inference/blobs.py", line 132, in replace_to_blob_anchor
+    return pos - centers[:, None, :] + init_pos
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!

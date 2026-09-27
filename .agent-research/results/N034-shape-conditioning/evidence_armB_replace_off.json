@@ -1,0 +1,138 @@
+{
+  "n_designs": 8,
+  "centroid_err_mean": 7.739550389348599,
+  "centroid_err_max": 13.212200310334396,
+  "placement_accuracy_mean": 0.79925,
+  "placement_accuracy_shuffled_control_mean": 0.029249999999999998,
+  "chance_accuracy": 0.2,
+  "rows": [
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 8.093181874561962,
+      "centroid_err_max": 11.92154715664877,
+      "centroid_err_per_block": [
+        11.92154715664877,
+        4.994035731610255,
+        4.245577963611079,
+        8.84686769285604,
+        10.457880828083669
+      ],
+      "placement_accuracy": 0.8,
+      "placement_accuracy_shuffled_control": 0.022,
+      "path": "/tmp/908578.helma/armB/design_0.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 8.355732661940221,
+      "centroid_err_max": 12.17109433411803,
+      "centroid_err_per_block": [
+        12.17109433411803,
+        7.198150377242756,
+        3.1710285443212287,
+        8.156057517373208,
+        11.082332536645888
+      ],
+      "placement_accuracy": 0.782,
+      "placement_accuracy_shuffled_control": 0.0,
+      "path": "/tmp/908578.helma/armB/design_1.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 8.317581027723632,
+      "centroid_err_max": 11.771267345574985,
+      "centroid_err_per_block": [
+        11.771267345574985,
+        6.940020762252802,
+        4.109977547517746,
+        9.983212143503717,
+        8.783427339768913
+      ],
+      "placement_accuracy": 0.764,
+      "placement_accuracy_shuffled_control": 0.102,
+      "path": "/tmp/908578.helma/armB/design_2.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 7.334568707893325,
+      "centroid_err_max": 10.789054809750498,
+      "centroid_err_per_block": [
+        10.789054809750498,
+        6.442904621054074,
+        1.862327318545269,
+        8.257706200422728,
+        9.320850589694057
+      ],
+      "placement_accuracy": 0.808,
+      "placement_accuracy_shuffled_control": 0.02,
+      "path": "/tmp/908578.helma/armB/design_3.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 7.399685319330258,
+      "centroid_err_max": 11.015061940561226,
+      "centroid_err_per_block": [
+        11.015061940561226,
+        6.1021834658915335,
+        3.65936555984777,
+        8.465038285944127,
+        7.756777344406635
+      ],
+      "placement_accuracy": 0.816,
+      "placement_accuracy_shuffled_control": 0.02,
+      "path": "/tmp/908578.helma/armB/design_4.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 7.870077711783116,
+      "centroid_err_max": 10.971965761694658,
+      "centroid_err_per_block": [
+        10.971965761694658,
+        7.256406358928639,
+        2.676311304202105,
+        8.065623447855723,
+        10.380081686234455
+      ],
+      "placement_accuracy": 0.8,
+      "placement_accuracy_shuffled_control": 0.068,
+      "path": "/tmp/908578.helma/armB/design_5.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 6.848644426589739,
+      "centroid_err_max": 10.471528914623699,
+      "centroid_err_per_block": [
+        10.471528914623699,
+        4.926276963884594,
+        2.5547802386898133,
+        6.760633132377471,
+        9.530002883373118
+      ],
+      "placement_accuracy": 0.84,
+      "placement_accuracy_shuffled_control": 0.0,
+      "path": "/tmp/908578.helma/armB/design_6.pdb"
+    },
+    {
+      "n": 500,
+      "k": 5,
+      "centroid_err_mean": 7.696931384966538,
+      "centroid_err_max": 13.212200310334396,
+      "centroid_err_per_block": [
+        13.212200310334396,
+        5.929271218539426,
+        2.213901497379681,
+        7.572720330904874,
+        9.556563567674313
+      ],
+      "placement_accuracy": 0.784,
+      "placement_accuracy_shuffled_control": 0.002,
+      "path": "/tmp/908578.helma/armB/design_7.pdb"
+    }
+  ]
+}

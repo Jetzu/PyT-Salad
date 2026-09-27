@@ -35,6 +35,7 @@ from salad_torch.diffusion.sampling import (  # noqa: E402
     SamplerConfig, StepFn, make_initial_data, pack_designs, sample,
     sample_group, split_packed_snapshot)
 from salad_torch.diffusion.schedules import parse_num_aa, parse_timescale  # noqa: E402
+from salad_torch.inference.blobs import parse_blobs, replace_to_blob_anchor  # noqa: E402
 from salad_torch.inference.multistate import update_split_change  # noqa: E402
 from salad_torch.inference.options import (  # noqa: E402
     decode_sequence, parse_dssp, parse_dssp_mean, parse_dssp_split)
@@ -302,6 +303,30 @@ def build_arg_parser() -> argparse.ArgumentParser:
                          "only the first N trunk blocks are built and "
                          "loaded. N > native depth is not supported (no "
                          "extra trained weights to load).")
+
+    # -- N034: --blobs shape conditioning (upstream's eval_ve_shape.py) ----
+    ap.add_argument("--blobs", default="",
+                    help="CSV path ('x,y,z,num_aa' header + rows): VE-model-"
+                         "only shape conditioning, upstream's "
+                         "eval_ve_shape.py. Replaces --num_aa entirely - "
+                         "num_aa/resi/chain/the initial point cloud all come "
+                         "from the file, one flat unnumbered chain. "
+                         "Incompatible with --dssp (literal/'random'), "
+                         "--template, --order_agnostic, --sym, --group_size, "
+                         "--batch_size (see apply_blob_chain). Requires "
+                         "--config default_ve_scaled. See "
+                         "notes/specs/08_shape_conditioning.md.")
+    ap.add_argument("--blob_scale", type=float, default=1.8,
+                    help="Multiplies every --blobs coordinate. 1.8 matches "
+                         "upstream's CLI default (also its own example "
+                         "command's value); inert without --blobs.")
+    ap.add_argument("--replace_threshold", type=float, default=0.0,
+                    help="--blobs only. While raw_t >= this, hard-recenter "
+                         "each 100-residue block's predicted CA centroid "
+                         "onto its blob anchor after every step (upstream's "
+                         "pos_centers correction). 0.0 (default, matching "
+                         "upstream) means every step; raising it relaxes "
+                         "the constraint for late, low-noise refinement.")
     return ap
 
 
@@ -633,6 +658,97 @@ def apply_precedence_chain(args: argparse.Namespace) -> dict:
                dssp_fixed=dssp_fixed, dssp_fn=dssp_fn,
                dssp_mean_fixed=dssp_mean_fixed, dssp_mean_fn=dssp_mean_fn,
                template=template)
+
+
+# ---------------------------------------------------------------------------
+# N034: --blobs / --blob_scale (shape conditioning, upstream's eval_ve_shape.py)
+# ---------------------------------------------------------------------------
+#: Flags upstream's eval_ve_shape.py either does not have at all
+#: (--template, --order_agnostic) or declares but never reads in its
+#: generation loop (--sym and friends - dead exactly like config.symm, see
+#: notes/specs/06_generation_flags.md §1.2), plus --group_size/--batch_size
+#: (this port's own grouped path never threads a post_step_fn - see
+#: sample_group's docstring). Checked by attribute name against its
+#: "inactive" default/sentinel value, same convention as run_grouped's and
+#: run_multistate's own compatibility checks.
+_BLOB_INCOMPATIBLE = (
+    ("template", ""), ("order_agnostic", False), ("sym", ""),
+    ("group_size", ""), ("batch_size", ""),
+)
+
+
+def apply_blob_chain(args: argparse.Namespace, config) -> dict:
+    """``--blobs``: replaces `apply_precedence_chain`'s step 1 (`--num_aa`)
+    entirely, mirroring upstream's ``eval_ve_shape.py::parse_blob`` - a flat,
+    single-chain `resi`/`chain` (no cyclic, no per-segment 50-residue gaps)
+    plus the actual initial point cloud. `notes/specs/08_shape_conditioning.md`.
+
+    Returns the same dict shape `apply_precedence_chain` does, plus
+    `blob_init_pos` (the caller pops/reads it, then routes the rest through
+    `make_design_data` exactly as the non-blob path does).
+
+    Rejects (`SystemExit`, not a silent shape mismatch further down):
+
+    * a non-VE `--config`: `eval_ve_shape.py` hardcodes `default_ve_scaled`
+      (`preconditioning == "edm_scaled"`) and nothing in this port's model
+      code adapts the blob mechanism to any other preconditioning.
+    * `--dssp` (literal string or ``"random"``): upstream's `eval_ve_shape.py`
+      only ever reassigns `num_aa` from the dssp string (never `resi`/
+      `chain`/the point cloud - a *different*, simpler branch than the
+      general precedence chain's step 3), and this port's own
+      `apply_precedence_chain` dssp branch rebuilds all three. Either way
+      the blob-derived point cloud silently stops matching `num_aa`, with no
+      single "faithful" resolution to reproduce - rejected rather than
+      guessed at.
+    * `--template`, `--order_agnostic`, `--sym`, `--group_size`,
+      `--batch_size` (`_BLOB_INCOMPATIBLE`): see its comment.
+
+    Composes normally with `--dssp_mean` (a pure per-residue broadcast,
+    independent of num_aa/resi/chain/the point cloud - upstream's own
+    `eval_ve_shape.py` wires this unconditionally alongside blobs) and with
+    `--merge_chains` (upstream applies it too, but it is a no-op: `chain` is
+    already all-zero from `parse_blobs`).
+    """
+    if config.preconditioning != "edm_scaled":
+        raise SystemExit(
+            f"--blobs is VE-model only (upstream's eval_ve_shape.py hardcodes "
+            f"default_ve_scaled, preconditioning='edm_scaled'); got --config "
+            f"{args.config!r} (preconditioning={config.preconditioning!r}). "
+            f"Pass --config default_ve_scaled.")
+    for name, inactive in _BLOB_INCOMPATIBLE:
+        if getattr(args, name) != inactive:
+            raise SystemExit(
+                f"--blobs is incompatible with --{name}: see "
+                f"apply_blob_chain's docstring in scripts/generate.py for "
+                f"why. Drop --{name} to run shape conditioning.")
+    if args.dssp.strip() not in ("none",):
+        raise SystemExit(
+            "--blobs is incompatible with --dssp (literal or 'random'): see "
+            "apply_blob_chain's docstring in scripts/generate.py for why. "
+            "Drop --dssp to run shape conditioning.")
+
+    num_aa, blob_init_pos, resi, chain, is_cyclic, cyclic_mask = parse_blobs(
+        args.blobs, augment_size=config.augment_size, blob_scale=args.blob_scale)
+    base_chain = chain.clone()
+    if args.merge_chains:
+        chain = torch.zeros_like(chain)   # no-op: chain is already all-zero
+    print(f"  --blobs {args.blobs!r}: num_aa={num_aa} from the blob file "
+          f"(--num_aa is not used for shape conditioning)")
+
+    dssp_mean_fixed, dssp_mean_fn = None, None
+    dssp_mean_text = args.dssp_mean.strip()
+    if dssp_mean_text not in ("none",):
+        parsed_mean = parse_dssp_mean(dssp_mean_text)
+        if callable(parsed_mean):
+            dssp_mean_fn = parsed_mean
+        elif parsed_mean is not None:
+            dssp_mean_fixed = parsed_mean
+
+    return dict(num_aa=num_aa, resi=resi, chain=chain, base_chain=base_chain,
+               is_cyclic=is_cyclic, cyclic_mask=cyclic_mask,
+               dssp_fixed=None, dssp_fn=None,
+               dssp_mean_fixed=dssp_mean_fixed, dssp_mean_fn=dssp_mean_fn,
+               template=None, blob_init_pos=blob_init_pos)
 
 
 def make_design_data(args: argparse.Namespace, pc: dict, num_aa: int,
@@ -980,7 +1096,17 @@ def main() -> None:
         run_multistate(args, config, model, device)
         return
 
-    pc = apply_precedence_chain(args)
+    blob_init_pos = None
+    if args.blobs:
+        pc = apply_blob_chain(args, config)
+        # moved to `device` ONCE, here - `post_step_fn`'s closure (below)
+        # captures this same tensor for every step of every design, so it
+        # must already be device-resident before that closure is built, not
+        # just at each design's `data["pos"] = blob_init_pos.to(device)`
+        # (which only moves the copy `data` holds, not this variable).
+        blob_init_pos = pc["blob_init_pos"].to(device)
+    else:
+        pc = apply_precedence_chain(args)
     num_aa = pc["num_aa"]
     resi, chain, base_chain = pc["resi"], pc["chain"], pc["base_chain"]
     is_cyclic, cyclic_mask = pc["is_cyclic"], pc["cyclic_mask"]
@@ -1081,6 +1207,14 @@ def main() -> None:
         data, prev = make_design_data(args, pc, num_aa, resi, chain,
                                       is_cyclic, cyclic_mask, device)
 
+        # -- N034: seed data["pos"] from --blobs, replacing the all-zero
+        # default (init_prev["pos"] built inside make_design_data is already
+        # correctly all-zero regardless - it is zeros_like'd from the
+        # pre-override cloud, and upstream's own init_prev is `zeros_like`
+        # the blob cloud too, i.e. also all-zero). ----------------------
+        if blob_init_pos is not None:
+            data["pos"] = blob_init_pos.to(device)
+
         # -- Hook A: init_pos symmetrisation (§1.4), once ------------------
         if sym.active:
             # N036: --fixcenter_threshold's do_radius at raw_t=1.0 (the
@@ -1133,35 +1267,43 @@ def main() -> None:
                         mean=False, do_radius=do_radius)
                 return model.predict(d, p)
 
-        def post_step_fn(pos, raw_t, _sym=sym, _tsfn=timescale_pos_fn,
+        def post_step_fn(pos, raw_t, _sym=sym, _blob_pos=blob_init_pos,
+                        _blob_threshold=args.replace_threshold,
+                        _tsfn=timescale_pos_fn,
                         _chain=data["chain_index"], _resi=data["residue_index"]):
             # Hook C (§1.6): post-hoc per-step symmetrisation of the x0
             # prediction, gated by --sym_threshold. The repulsion nudge
             # (chain_center) only fires for raw_t > 0.5 and scales with raw_t.
-            if not _sym.active or raw_t <= _sym.threshold:
-                return pos
-            # N036 --fixcenter_threshold: post_step_fn only gets raw_t, so
-            # recompute the SAME scaled value sample() already set on
-            # data["t_pos"] for this step (pure function of raw_t - see
-            # timescale_pos_fn's definition above).
-            scaled_t = _tsfn(raw_t)
-            do_radius = scaled_t > _sym.fixcenter_threshold
-            pos = screw_replicate(
-                pos, count=_sym.replicate_count, angle=_sym.angle_rad,
-                radius=_sym.radius, translation=_sym.translation,
-                chain_center=(raw_t > 0.5), time=raw_t, mean=_sym.mean,
-                do_radius=do_radius)
-            # N036 --compact_lr/--clash_lr: additive guidance nudges on
-            # the just-symmetrised x0, applied right here in eval_sym.py
-            # (`model_step`'s steps 2-4, before the NEXT step's noising -
-            # exactly where this runs too, since whatever post_step_fn
-            # leaves in data["pos"] is what the next step_fn call noises).
-            if _sym.compact_lr or _sym.clash_lr:
-                pos = compact_clash_update(
-                    pos, replicate_count=_sym.replicate_count,
-                    chain_index=_chain, residue_index=_resi,
-                    compact_lr=_sym.compact_lr, clash_lr=_sym.clash_lr,
-                    t=scaled_t)
+            if _sym.active and raw_t > _sym.threshold:
+                # N036 --fixcenter_threshold: post_step_fn only gets raw_t, so
+                # recompute the SAME scaled value sample() already set on
+                # data["t_pos"] for this step (pure function of raw_t - see
+                # timescale_pos_fn's definition above).
+                scaled_t = _tsfn(raw_t)
+                do_radius = scaled_t > _sym.fixcenter_threshold
+                pos = screw_replicate(
+                    pos, count=_sym.replicate_count, angle=_sym.angle_rad,
+                    radius=_sym.radius, translation=_sym.translation,
+                    chain_center=(raw_t > 0.5), time=raw_t, mean=_sym.mean,
+                    do_radius=do_radius)
+                # N036 --compact_lr/--clash_lr: additive guidance nudges on
+                # the just-symmetrised x0, applied right here in eval_sym.py
+                # (`model_step`'s steps 2-4, before the NEXT step's noising -
+                # exactly where this runs too, since whatever post_step_fn
+                # leaves in data["pos"] is what the next step_fn call noises).
+                if _sym.compact_lr or _sym.clash_lr:
+                    pos = compact_clash_update(
+                        pos, replicate_count=_sym.replicate_count,
+                        chain_index=_chain, residue_index=_resi,
+                        compact_lr=_sym.compact_lr, clash_lr=_sym.clash_lr,
+                        t=scaled_t)
+            # N034: --blobs' per-step hard replace (--replace_threshold,
+            # default 0.0 = every step, matching upstream). Mutually
+            # exclusive with --sym in practice (apply_blob_chain rejects
+            # --sym), so the order between the two branches above/below
+            # never matters for any reachable command line.
+            if _blob_pos is not None and raw_t >= _blob_threshold:
+                pos = replace_to_blob_anchor(pos, _blob_pos)
             return pos
 
         final_step_fn = None
@@ -1199,7 +1341,8 @@ def main() -> None:
             torch.cuda.synchronize()
         t0 = time.perf_counter()
         snaps = sample(step_fn, data, prev, cfg, generator=gen,
-                       post_step_fn=post_step_fn if sym.active else None,
+                       post_step_fn=(post_step_fn if (sym.active or blob_init_pos
+                                                      is not None) else None),
                        final_step_fn=final_step_fn)
         # -- N036 --f_small/--f_strand: reject-and-regenerate ----------------
         # `eval_sym.py`'s design loop discards and redraws (fresh noise, same

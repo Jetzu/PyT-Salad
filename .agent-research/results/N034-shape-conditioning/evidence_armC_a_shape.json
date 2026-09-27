@@ -1,0 +1,86 @@
+{
+  "n_designs": 4,
+  "centroid_err_mean": 0.012966634024546751,
+  "centroid_err_max": 0.02543340519867506,
+  "placement_accuracy_mean": 0.9578125000000001,
+  "placement_accuracy_shuffled_control_mean": 0.00875,
+  "chance_accuracy": 0.125,
+  "rows": [
+    {
+      "n": 800,
+      "k": 8,
+      "centroid_err_mean": 0.015157227949785959,
+      "centroid_err_max": 0.023907162106781725,
+      "centroid_err_per_block": [
+        0.02039892399123915,
+        0.023907162106781725,
+        0.008234397367145431,
+        0.009979268510267475,
+        0.011897075270836062,
+        0.008683881620568913,
+        0.016683677652122048,
+        0.021473437079326863
+      ],
+      "placement_accuracy": 0.96125,
+      "placement_accuracy_shuffled_control": 0.00875,
+      "path": "/tmp/908578.helma/armC/design_0.pdb"
+    },
+    {
+      "n": 800,
+      "k": 8,
+      "centroid_err_mean": 0.008390214821968878,
+      "centroid_err_max": 0.01617445207727947,
+      "centroid_err_per_block": [
+        0.007510486002905404,
+        0.01103445512927575,
+        0.007256376506219489,
+        0.01617445207727947,
+        0.006062878854139255,
+        0.0019057019704018412,
+        0.011791293398095485,
+        0.0053860746374343425
+      ],
+      "placement_accuracy": 0.96375,
+      "placement_accuracy_shuffled_control": 0.00625,
+      "path": "/tmp/908578.helma/armC/design_1.pdb"
+    },
+    {
+      "n": 800,
+      "k": 8,
+      "centroid_err_mean": 0.014010106322404467,
+      "centroid_err_max": 0.02428920747988157,
+      "centroid_err_per_block": [
+        0.008664046398770327,
+        0.00902896450319483,
+        0.008862855070460788,
+        0.016477090155728458,
+        0.01046284856050546,
+        0.01916979133950454,
+        0.015126047071189773,
+        0.02428920747988157
+      ],
+      "placement_accuracy": 0.95375,
+      "placement_accuracy_shuffled_control": 0.01625,
+      "path": "/tmp/908578.helma/armC/design_2.pdb"
+    },
+    {
+      "n": 800,
+      "k": 8,
+      "centroid_err_mean": 0.014308987004027706,
+      "centroid_err_max": 0.02543340519867506,
+      "centroid_err_per_block": [
+        0.010145393043155744,
+        0.015608885290115278,
+        0.02543340519867506,
+        0.017989088359339427,
+        0.014038222821999074,
+        0.01414748034103598,
+        0.008691927289159658,
+        0.008417493688741423
+      ],
+      "placement_accuracy": 0.9525,
+      "placement_accuracy_shuffled_control": 0.00375,
+      "path": "/tmp/908578.helma/armC/design_3.pdb"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+/home/hpc/v181bb/v181bb10/miniforge3/envs/triad/lib/python3.11/site-packages/torch/_inductor/compile_fx.py:167: UserWarning: TensorFloat32 tensor cores for float32 matrix multiplication available but not enabled. Consider setting `torch.set_float32_matmul_precision('high')` for better performance.
+  warnings.warn(
+  --blobs '.agent-research/results/N034-shape-conditioning/l_shape.csv': num_aa=500 from the blob file (--num_aa is not used for shape conditioning)
+device: NVIDIA H100
+config default_ve_scaled  L=500  steps=20 out_steps=(19,)
+fast path (exact) compiled + captured in 414s (one-time)
+  design 0:    0.2s  CA-CA 4.216 A (min 1.795 max 40.714)  Rg 31.2 A  -> /tmp/908578.helma/bfast/design_0.pdb
+  design 1:    0.2s  CA-CA 4.208 A (min 0.879 max 34.310)  Rg 31.2 A  -> /tmp/908578.helma/bfast/design_1.pdb
+
+2 designs of 500 aa: median 0.2s, total 0.4s
