@@ -1,0 +1,287 @@
+--- /tmp/claude-215432/-home-hpc-v181bb-v181bb10/0eeb4a3c-fee2-4b4d-8ef9-9555175d051e/scratchpad/generate_HEAD.py	2026-09-27 19:55:39.386101781 +0200
++++ /tmp/claude-215432/-home-hpc-v181bb-v181bb10/0eeb4a3c-fee2-4b4d-8ef9-9555175d051e/scratchpad/generate_MINE.py	2026-09-27 19:58:49.101528052 +0200
+@@ -37,11 +37,20 @@
+ from salad_torch.diffusion.schedules import parse_num_aa, parse_timescale  # noqa: E402
+ from salad_torch.inference.options import decode_sequence, parse_dssp, parse_dssp_mean  # noqa: E402
+ from salad_torch.inference.postprocess import reorder_amino_acids  # noqa: E402
+-from salad_torch.inference.symmetry import parse_sym, screw_replicate  # noqa: E402
++from salad_torch.data.dssp import assign_dssp  # noqa: E402
++from salad_torch.inference.symmetry import (  # noqa: E402
++    compact_clash_update, parse_sym, screw_replicate)
+ from salad_torch.inference.template import parse_template  # noqa: E402
+ from salad_torch.io.pdb import snapshot_to_protein, to_pdb  # noqa: E402
+ from salad_torch.modules.model import StructureDiffusionInference, apply_diffusion  # noqa: E402
+ 
++#: N036 --f_small/--f_strand: upstream retries a rejected design attempt
++#: unboundedly (`while idx < opt.num_designs`, no cap). This port bounds it so
++#: an automated run can't hang forever; --f_small/--f_strand default to 1.0
++#: (never triggers), so the cap is inert unless a caller opts into a real
++#: threshold.
++_SYM_FILTER_MAX_RETRIES = 20
++
+ 
+ def build_arg_parser() -> argparse.ArgumentParser:
+     ap = argparse.ArgumentParser()
+@@ -148,6 +157,79 @@
+                      help="Rise per subunit along Y. 0 = plain cyclic (Cn) "
+                           "point-group symmetry; nonzero = true screw "
+                           "(helical) symmetry.")
++    # -- N036: salad/training/eval_sym.py's extra flags, see symmetry.py's
++    # module docstring for what each one does upstream and why. -----------
++    sym.add_argument("--mode", default="screw", choices=["screw", "rotation"],
++                     help="Symmetry-operation class (`eval_sym.py`). 'screw' "
++                          "(default) is exactly what --sym already "
++                          "implements above. 'rotation' selects upstream's "
++                          "ScrewVP, which is dead code (raises TypeError on "
++                          "step 0 of every invocation upstream, in every "
++                          "released version, per an argument-count mismatch "
++                          "at its own call site) - passing it here raises "
++                          "immediately with that citation instead of "
++                          "silently reinterpreting a mode upstream itself "
++                          "cannot run.")
++    sym.add_argument("--mix_output", default="", choices=["", "couple", "select"],
++                     help="Upstream's `eval_sym.py`-only name for the SAME "
++                          "couple/select choice --sym_mean already controls "
++                          "('couple' = --sym_mean True, anything else = "
++                          "False) - that script never had --sym_mean at "
++                          "all. '' (default) leaves --sym_mean in charge, "
++                          "unchanged from before this flag existed; a "
++                          "non-empty value overrides it for hooks A and C "
++                          "(hook B is always 'select' regardless, see "
++                          "--sym_mean's help).")
++    sym.add_argument("--sym_noise", default="True", choices=["True", "False"],
++                     help="Whether hook B (the noised-input symmetriser) "
++                          "runs at all. 'True' (default) reproduces this "
++                          "port's prior, unconditional hook B behaviour "
++                          "exactly - the trunk's noised input is forced "
++                          "perfectly symmetric every call. 'False' lets "
++                          "each subunit copy see independently-sampled "
++                          "noise; only the x0 prediction (hook C) still "
++                          "gets resynchronised every step.")
++    sym.add_argument("--fixcenter_threshold", type=float, default=0.0001,
++                     help="`eval_sym.py`'s `do_radius` gate for hooks B and "
++                          "C: only re-center the representative subunit and "
++                          "re-apply --screw_radius while the CURRENT step's "
++                          "SCALED noise level (data['t_pos'] after "
++                          "--timescale_pos, not the raw step fraction) is "
++                          "above this. The default (0.0001, upstream's own "
++                          "CLI default) is a no-op for every schedule this "
++                          "port runs end to end; raising it (to roughly the "
++                          "scale of your --timescale_pos, e.g. 0.5-5) lets "
++                          "late/low-noise refinement drift off the exact "
++                          "symmetric placement instead of being snapped "
++                          "back to it every step.")
++    sym.add_argument("--compact_lr", type=float, default=0.0,
++                     help="Learning rate for a per-subunit compacting "
++                          "gradient nudge in hook C, right after "
++                          "symmetrisation: every atom is pulled toward its "
++                          "OWN subunit's mean CA position, scaled by this "
++                          "rate and the current step's SCALED noise level. "
++                          "0.0 (default) is an exact no-op.")
++    sym.add_argument("--clash_lr", type=float, default=0.0,
++                     help="Learning rate for an inter-subunit clash-"
++                          "repulsion gradient nudge in hook C, alongside "
++                          "--compact_lr: CA-CA pairs from different chains "
++                          "(or the same chain >16 residues apart) closer "
++                          "than 8 A are pushed apart. A DIFFERENT clash "
++                          "formula than screw_replicate's own chain_center "
++                          "repulsion nudge - see symmetry.py. 0.0 (default) "
++                          "is an exact no-op.")
++    sym.add_argument("--f_small", type=float, default=1.0,
++                     help="Reject and regenerate a design (fresh noise, up "
++                          f"to {_SYM_FILTER_MAX_RETRIES} attempts, a "
++                          "port-side safety cap - upstream retries "
++                          "unboundedly) if its ALA+GLY fraction exceeds "
++                          "this at ANY requested out-step. 1.0 (default, "
++                          "matching upstream) never triggers.")
++    sym.add_argument("--f_strand", type=float, default=1.0,
++                     help="Reject and regenerate a design if its "
++                          "beta-strand DSSP fraction (assessed on one "
++                          "subunit) exceeds this at any out-step. 1.0 "
++                          "(default, matching upstream) never triggers.")
+ 
+     # -- §5.4 / §0: dssp, merge_chains ---------------------------------
+     ap.add_argument("--dssp", default="none",
+@@ -276,6 +358,39 @@
+ 
+ 
+ # ---------------------------------------------------------------------------
++# N036: --f_small / --f_strand (symmetry.py's module docstring has the rest)
++# ---------------------------------------------------------------------------
++def sym_filter_check(snaps: list[dict], replicate_count: int,
++                     f_small: float, f_strand: float) -> tuple[bool, str]:
++    """`eval_sym.py:392-394,384-390,531-539`'s design-quality gate.
++
++    Checked over every requested out-step snapshot IN ORDER, matching
++    upstream's per-out-step `break` inside its design loop: the first
++    snapshot that fails either check fails the WHOLE attempt - upstream
++    never gives partial credit for cleanly reaching some but not all
++    requested out-steps. Returns ``(True, "")`` iff every snapshot passes
++    both checks; the reject-and-retry itself lives in `main`'s per-design
++    loop, not here.
++    """
++    for snap in snaps:
++        seq = decode_sequence(snap["aatype"])
++        alagly = (seq.count("A") + seq.count("G")) / max(len(seq), 1)
++        if alagly > f_small:
++            return False, f"ALA/GLY {100 * alagly:.1f}% > f_small {100 * f_small:.1f}%"
++        if f_strand < 1.0:
++            pos = snap["pos"]
++            length = pos.shape[0] // replicate_count if replicate_count > 1 else pos.shape[0]
++            sub = pos[:length]
++            batch_index = torch.zeros((length,), dtype=torch.long, device=sub.device)
++            mask = torch.ones((length,), dtype=torch.bool, device=sub.device)
++            dssp, _, _ = assign_dssp(sub, batch_index, mask)
++            strand_frac = float((dssp == 2).float().mean())
++            if strand_frac > f_strand:
++                return False, f"strand {100 * strand_frac:.1f}% > f_strand {100 * f_strand:.1f}%"
++    return True, ""
++
++
++# ---------------------------------------------------------------------------
+ # §0: the precedence chain (num_aa / dssp / template / order_agnostic)
+ # ---------------------------------------------------------------------------
+ def apply_precedence_chain(args: argparse.Namespace) -> dict:
+@@ -680,7 +795,19 @@
+     sym = parse_sym(args.sym, replicate_count=args.replicate_count,
+                     screw_angle=args.screw_angle, screw_radius=args.screw_radius,
+                     screw_translation=args.screw_translation,
+-                    sym_mean=args.sym_mean, sym_threshold=args.sym_threshold)
++                    sym_mean=args.sym_mean, sym_threshold=args.sym_threshold,
++                    mode=args.mode, mix_output=args.mix_output,
++                    sym_noise=args.sym_noise,
++                    fixcenter_threshold=args.fixcenter_threshold,
++                    compact_lr=args.compact_lr, clash_lr=args.clash_lr,
++                    f_small=args.f_small, f_strand=args.f_strand)
++    # N036: the timescale function `sample()` uses internally, re-parsed here
++    # (pure/cached, semantically free - see `parse_timescale`'s docstring) so
++    # hook A/C can recompute the CURRENT step's *scaled* noise level from
++    # `raw_t` for --fixcenter_threshold/--compact_lr/--clash_lr, which key off
++    # upstream's `data["t_pos"][0]` (scaled), not the raw step fraction
++    # --sym_threshold already uses.
++    timescale_pos_fn = parse_timescale(args.timescale_pos)
+ 
+     # A preset may shorten the trajectory (N011's "fast" halves it). Scaling
+     # num_steps and out_steps TOGETHER is what makes that a coarsening rather
+@@ -763,10 +890,16 @@
+ 
+         # -- Hook A: init_pos symmetrisation (§1.4), once ------------------
+         if sym.active:
++            # N036: --fixcenter_threshold's do_radius at raw_t=1.0 (the
++            # trajectory's start, which is what hook A stands in for -
++            # upstream's eval_sym.py has no separate "once, before the loop"
++            # pass at all; the very first per-step call plays this role
++            # there, on the all-zero initial cloud).
++            do_radius0 = timescale_pos_fn(1.0) > sym.fixcenter_threshold
+             data["pos"] = screw_replicate(
+                 data["pos"], count=sym.replicate_count, angle=sym.angle_rad,
+                 radius=sym.radius, translation=sym.translation,
+-                chain_center=False, mean=sym.mean)
++                chain_center=False, mean=sym.mean, do_radius=do_radius0)
+ 
+         def step_fn(d, p, generator=None, *, need_aa=True,
+                     _sym=sym, _fast=fast_denoiser):
+@@ -789,22 +922,54 @@
+                 # inconsistency, see symmetry.py's module docstring.
+                 noised = apply_diffusion(config, d, generator=generator)
+                 d = dict(d, **noised)
+-                d["pos_noised"] = screw_replicate(
+-                    d["pos_noised"], count=_sym.replicate_count,
+-                    angle=_sym.angle_rad, radius=_sym.radius,
+-                    translation=_sym.translation, chain_center=False, mean=False)
++                # N036 --sym_noise: upstream's `config.replicate_noise` gate
++                # ("True" is this port's prior, unconditional behaviour).
++                # When off, skip the call outright - each subunit copy keeps
++                # apply_diffusion's independent per-residue noise.
++                if _sym.sym_noise:
++                    # N036 --fixcenter_threshold: upstream reads this off
++                    # `data["t_pos"][0]`, the CURRENT step's scaled noise
++                    # level, already sitting in `d` at this point (sample()
++                    # sets it before calling step_fn).
++                    scaled_t = float(d["t_pos"].reshape(-1)[0])
++                    do_radius = scaled_t > _sym.fixcenter_threshold
++                    d["pos_noised"] = screw_replicate(
++                        d["pos_noised"], count=_sym.replicate_count,
++                        angle=_sym.angle_rad, radius=_sym.radius,
++                        translation=_sym.translation, chain_center=False,
++                        mean=False, do_radius=do_radius)
+                 return model.predict(d, p)
+ 
+-        def post_step_fn(pos, raw_t, _sym=sym):
++        def post_step_fn(pos, raw_t, _sym=sym, _tsfn=timescale_pos_fn,
++                        _chain=data["chain_index"], _resi=data["residue_index"]):
+             # Hook C (§1.6): post-hoc per-step symmetrisation of the x0
+             # prediction, gated by --sym_threshold. The repulsion nudge
+             # (chain_center) only fires for raw_t > 0.5 and scales with raw_t.
+             if not _sym.active or raw_t <= _sym.threshold:
+                 return pos
+-            return screw_replicate(
++            # N036 --fixcenter_threshold: post_step_fn only gets raw_t, so
++            # recompute the SAME scaled value sample() already set on
++            # data["t_pos"] for this step (pure function of raw_t - see
++            # timescale_pos_fn's definition above).
++            scaled_t = _tsfn(raw_t)
++            do_radius = scaled_t > _sym.fixcenter_threshold
++            pos = screw_replicate(
+                 pos, count=_sym.replicate_count, angle=_sym.angle_rad,
+                 radius=_sym.radius, translation=_sym.translation,
+-                chain_center=(raw_t > 0.5), time=raw_t, mean=_sym.mean)
++                chain_center=(raw_t > 0.5), time=raw_t, mean=_sym.mean,
++                do_radius=do_radius)
++            # N036 --compact_lr/--clash_lr: additive guidance nudges on
++            # the just-symmetrised x0, applied right here in eval_sym.py
++            # (`model_step`'s steps 2-4, before the NEXT step's noising -
++            # exactly where this runs too, since whatever post_step_fn
++            # leaves in data["pos"] is what the next step_fn call noises).
++            if _sym.compact_lr or _sym.clash_lr:
++                pos = compact_clash_update(
++                    pos, replicate_count=_sym.replicate_count,
++                    chain_index=_chain, residue_index=_resi,
++                    compact_lr=_sym.compact_lr, clash_lr=_sym.clash_lr,
++                    t=scaled_t)
++            return pos
+ 
+         final_step_fn = None
+         if args.sample_final:
+@@ -843,6 +1008,41 @@
+         snaps = sample(step_fn, data, prev, cfg, generator=gen,
+                        post_step_fn=post_step_fn if sym.active else None,
+                        final_step_fn=final_step_fn)
++        # -- N036 --f_small/--f_strand: reject-and-regenerate ----------------
++        # `eval_sym.py`'s design loop discards and redraws (fresh noise, same
++        # design index - upstream never increments `idx` on failure) a whole
++        # attempt if ANY requested out-step fails either check; no partial
++        # credit. Both default to 1.0 (never triggers), so for every command
++        # line that doesn't opt in this loop's body runs 0 times - `gen`
++        # (the seeded generator) has already advanced past this design's
++        # steps either way, exactly like upstream's continuously-advancing
++        # `key`.
++        sym_retries = 0
++        while sym.active and (sym.f_small < 1.0 or sym.f_strand < 1.0):
++            ok, reason = sym_filter_check(snaps, sym.replicate_count,
++                                          sym.f_small, sym.f_strand)
++            if ok:
++                break
++            sym_retries += 1
++            if sym_retries > _SYM_FILTER_MAX_RETRIES:
++                print(f"  design {design}: giving up after {sym_retries - 1} "
++                      f"rejected attempt(s) ({reason}); keeping this one "
++                      f"anyway (port-side safety cap, upstream retries "
++                      f"unboundedly)")
++                break
++            print(f"  design {design}: rejected ({reason}), regenerating "
++                  f"(attempt {sym_retries + 1})")
++            if fast_denoiser is not None:
++                fast_denoiser.invalidate_condition_cache()
++            data, prev = make_design_data(args, pc, num_aa, resi, chain,
++                                          is_cyclic, cyclic_mask, device)
++            do_radius0 = timescale_pos_fn(1.0) > sym.fixcenter_threshold
++            data["pos"] = screw_replicate(
++                data["pos"], count=sym.replicate_count, angle=sym.angle_rad,
++                radius=sym.radius, translation=sym.translation,
++                chain_center=False, mean=sym.mean, do_radius=do_radius0)
++            snaps = sample(step_fn, data, prev, cfg, generator=gen,
++                           post_step_fn=post_step_fn, final_step_fn=final_step_fn)
+         if device.type == "cuda":
+             torch.cuda.synchronize()
+         elapsed = time.perf_counter() - t0
