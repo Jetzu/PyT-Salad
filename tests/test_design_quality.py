@@ -93,7 +93,7 @@ def main(argv=None) -> int:
     ap.add_argument("--no-fast", action="store_true", help="use the eager path")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--config", default="default_vp")
-    ap.add_argument("--params", default="params/default_vp-200k.jax")
+    ap.add_argument("--params", default="", help="empty = generate.py resolves it (the .jax pickle loader)")
     ap.add_argument("--out_path", default="")
     ap.add_argument("--keep", action="store_true", help="do not delete the PDBs")
     args = ap.parse_args(argv)
@@ -105,7 +105,10 @@ def main(argv=None) -> int:
 
     out = args.out_path or tempfile.mkdtemp(prefix="salad_quality_")
     cmd = [sys.executable, "scripts/generate.py",
-           "--config", args.config, "--params", args.params,
+           "--config", args.config]
+    if args.params:
+        cmd += ["--params", args.params]
+    cmd += [
            "--num_aa", str(args.length), "--num_designs", str(args.n),
            "--seed", str(args.seed), "--out_path", out]
     if not args.no_fast:

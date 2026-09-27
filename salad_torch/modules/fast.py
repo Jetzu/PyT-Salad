@@ -95,7 +95,7 @@ PRESETS: dict[str, dict] = {
         aggressive_fusion=True,
         # P7, the batched condition-branch prologue: -9.2 % of a lean step.
         # Reassociation only (bmm vs six mm); see `batch_cond_pair` below.
-        batch_cond_pair=True,
+        batch_cond_pair=False,   # P7 DISABLED - inductor fusion miscompile, see opt.BATCH_COND
         # N020: inductor's matmul templates (`max_autotune_gemm`) - REJECTED
         # from every preset. -14% at L=100 (eroding to -6.4% at L=400) but NOT
         # bit-exact: whole-forward H100/DETSEG control measured pos
@@ -202,7 +202,7 @@ PRESETS: dict[str, dict] = {
         # this port has run. Structural gates cannot answer designability.
         steps_scale=0.5,
         aggressive_fusion=True,
-        batch_cond_pair=True,
+        batch_cond_pair=False,   # P7 DISABLED - inductor fusion miscompile, see opt.BATCH_COND
         # N020: rejected everywhere (not bit-exact, no n=160 validation done
         # for `fast` yet) - see the `exact` preset's comment above and
         # .agent-research/results/N020-matmul-lowering/RESULTS.md.
@@ -261,7 +261,7 @@ PRESETS: dict[str, dict] = {
         tf32=False,
         steps_scale=1.0,
         aggressive_fusion=True,
-        batch_cond_pair=True,
+        batch_cond_pair=False,   # P7 DISABLED - inductor fusion miscompile, see opt.BATCH_COND
         # N020: rejected everywhere - see the `exact` preset's comment above.
         gemm_templates=False,
         det_segment=True,
