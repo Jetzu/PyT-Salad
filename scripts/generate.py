@@ -35,7 +35,9 @@ from salad_torch.diffusion.sampling import (  # noqa: E402
     SamplerConfig, StepFn, make_initial_data, pack_designs, sample,
     sample_group, split_packed_snapshot)
 from salad_torch.diffusion.schedules import parse_num_aa, parse_timescale  # noqa: E402
-from salad_torch.inference.options import decode_sequence, parse_dssp, parse_dssp_mean  # noqa: E402
+from salad_torch.inference.multistate import update_split_change  # noqa: E402
+from salad_torch.inference.options import (  # noqa: E402
+    decode_sequence, parse_dssp, parse_dssp_mean, parse_dssp_split)
 from salad_torch.inference.postprocess import reorder_amino_acids  # noqa: E402
 from salad_torch.data.dssp import assign_dssp  # noqa: E402
 from salad_torch.inference.symmetry import (  # noqa: E402
@@ -233,9 +235,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     # -- §5.4 / §0: dssp, merge_chains ---------------------------------
     ap.add_argument("--dssp", default="none",
-                    help="'none', 'random', or a literal 'LHE_' string. A "
-                         "literal string's length OVERRIDES --num_aa and "
-                         "discards --merge_chains/cyclic num_aa specs (§0).")
+                    help="'none', 'random', a literal 'LHE_' string, or "
+                         "'parent/child_1/child_2' for multi-state design "
+                         "(Lisanza et al. 2024) - three 'LHE_' strings "
+                         "separated by '/', uppercase in the PARENT marking "
+                         "residues constrained to the same TERTIARY "
+                         "structure in the matching child. A literal "
+                         "string's length OVERRIDES --num_aa and discards "
+                         "--merge_chains/cyclic num_aa specs (§0); the "
+                         "multi-state form additionally runs through its "
+                         "own generation loop (run_multistate) and rejects "
+                         "--template/--sym/--order_agnostic/--merge_chains/"
+                         "--group_size/--batch_size/--fast/--renoise/"
+                         "--sample_final - see notes/specs/07_multistate_dssp.md.")
     ap.add_argument("--dssp_mean", default="none",
                     help="'none', 'random', or 'loop,helix,sheet' (not "
                          "renormalised - must already sum to 1).")
@@ -388,6 +400,178 @@ def sym_filter_check(snaps: list[dict], replicate_count: int,
             if strand_frac > f_strand:
                 return False, f"strand {100 * strand_frac:.1f}% > f_strand {100 * f_strand:.1f}%"
     return True, ""
+
+
+# ---------------------------------------------------------------------------
+# multi-state design: --dssp "parent/child_1/child_2" (Lisanza et al. 2024)
+# ---------------------------------------------------------------------------
+#: Flags this loop shape cannot support or that upstream's own
+#: `eval_split_change.py` never wires (see `run_multistate`'s docstring for
+#: the per-flag reasoning). Checked by attribute name against its "inactive"
+#: default/sentinel value.
+_MULTISTATE_INCOMPATIBLE = (
+    ("template", ""), ("sym", ""), ("order_agnostic", False),
+    ("merge_chains", False), ("group_size", ""), ("batch_size", ""),
+    ("fast", False), ("renoise", False), ("sample_final", False),
+    ("cloud_std", ""),
+)
+
+
+def run_multistate(args: argparse.Namespace, config, model, device: torch.device) -> None:
+    """``--dssp "parent/child_1/child_2"``: Lisanza *et al.*, 2024 multi-state
+    design. `notes/specs/07_multistate_dssp.md`.
+
+    Three independent single-chain states (parent, child_1, child_2), each
+    its own length (from the DSSP string, which - like single-state
+    ``--dssp`` - overrides ``--num_aa`` entirely), advanced through the
+    ordinary denoising schedule in lockstep via `sample_group` (already
+    exactly "N independent designs, one shared clock, per-design state" -
+    nothing new needed there). The only genuinely new per-step behavior is
+    `update_split_change`, applied to all three states' incoming ``pos``
+    *before* each one is noised/denoised - reusing `sample_group`'s
+    `step_fn_group` seam, the same seam `run_grouped` already uses for its
+    own multi-design batching.
+
+    Secondary-structure conditioning (each state's own `dssp_condition`, from
+    its own case-folded substring) and the hard tertiary-structure coupling
+    (`same_mask`, parent-case-only) are two independent mechanisms - see
+    `options.py::MultiStateDSSP` and `multistate.py::update_split_change`.
+
+    **Incompatible flags, and why** (`_MULTISTATE_INCOMPATIBLE`, checked
+    below and rejected with `SystemExit` rather than silently ignored or
+    silently mis-combined - matching this port's existing convention for
+    flag combinations that would produce confusing, not just "unusual",
+    output, e.g. `run_grouped`'s own compatibility checks):
+
+    * `--template`, `--order_agnostic`, `--group_size`, `--batch_size`,
+      `--fast`, `--renoise`, `--sample_final`: **not in upstream's own
+      `eval_split_change.py` CLI at all** (its `parse_options` call lists
+      only `params, out_path, config, timescale_pos, timescale_seq, num_aa,
+      sym, merge_chains, variants, sym_mean, num_designs, num_steps,
+      out_steps, dssp, prev_threshold, cloud_std, sym_threshold, jax_seed`).
+      These are all port-side additions to the *single-state* path (spec
+      06); genuinely combining any of them with three coupled,
+      independently-lengthed trajectories is new design work this task does
+      not ask for (a 3-state renoise loop, a 3-state compiled/CUDA-graph
+      path, template conditioning applied to which of the three states,
+      etc.) - rejected outright rather than half-implemented.
+    * `--sym`, `--merge_chains`, `--cloud_std`: **are** in upstream's
+      `eval_split_change.py` CLI (`parse_options` declares `sym`,
+      `merge_chains`, `cloud_std` defaults), but the script's actual body
+      never reads `opt.sym`/`opt.merge_chains`/`opt.cloud_std` anywhere -
+      copy-pasted CLI surface from the shared de-novo script, left dead.
+      Upstream's true behavior is "silently do nothing"; this port instead
+      rejects them explicitly if passed non-default. A user who typed
+      `--merge_chains` expecting *something* to change is better served by a
+      clear error than by silent, upstream-faithful inertness that looks
+      like a bug in the port.
+
+    `--depth_adjust`/`--compile`/`--seed`/`--jax_seed`/`--sequence_only`
+    compose normally (the first two are already applied to `config`/`model`
+    before this function is called; the rest are read directly below) and
+    are not restricted.
+    """
+    for name, inactive in _MULTISTATE_INCOMPATIBLE:
+        value = getattr(args, name)
+        if value != inactive:
+            raise SystemExit(
+                f"multi-state --dssp 'parent/child_1/child_2' is "
+                f"incompatible with --{name}: see run_multistate's "
+                f"docstring in scripts/generate.py for why. Drop --{name} "
+                f"to run multi-state design.")
+
+    spec = parse_dssp_split(args.dssp.strip())
+    lengths = [int(spec.parent.shape[0]), int(spec.child_1.shape[0]),
+              int(spec.child_2.shape[0])]
+    names = ("parent", "child_1", "child_2")
+    dssp_conditions = [spec.parent, spec.child_1, spec.child_2]
+    same_mask = spec.same_mask.to(device)
+
+    num_steps = args.num_steps if args.num_steps is not None else 500
+    out_steps_s = args.out_steps if args.out_steps is not None else "400"
+    cfg = SamplerConfig(num_steps=num_steps,
+                        out_steps=tuple(int(x) for x in out_steps_s.split(",")),
+                        prev_threshold=args.prev_threshold,
+                        timescale_pos=args.timescale_pos)
+    print(f"multi-state design: parent={lengths[0]}aa child_1={lengths[1]}aa "
+          f"child_2={lengths[2]}aa (parent_split={spec.parent_split}, "
+          f"{int(same_mask.sum())} tertiary-coupled residues)  "
+          f"steps={num_steps} out_steps={cfg.out_steps}")
+
+    os.makedirs(args.out_path, exist_ok=True)
+    seq_path = os.path.join(args.out_path, "sequences.fa")
+
+    def step_fn_group(ds, ps, gs, *, need_aa=True):
+        del need_aa   # every step needs the full output here (no lean path)
+        with torch.no_grad():
+            ds[0]["pos"], ds[1]["pos"], ds[2]["pos"] = update_split_change(
+                ds[0]["pos"], ds[1]["pos"], ds[2]["pos"],
+                same_mask, spec.parent_split)
+            updates, new_prevs = [], []
+            for d, p, g in zip(ds, ps, gs):
+                noised = apply_diffusion(config, d, generator=g)
+                fed = dict(d, **noised)
+                u, new_p = model.predict(fed, p)
+                updates.append(u)
+                new_prevs.append(new_p)
+            return updates, new_prevs
+
+    times = []
+    for design in range(args.num_designs):
+        datas, prevs, gens = [], [], []
+        for i, length in enumerate(lengths):
+            resi = torch.arange(length, dtype=torch.long)
+            chain = torch.zeros(length, dtype=torch.long)
+            data, prev = make_initial_data(length, resi, chain, None, device=device)
+            data["dssp_condition"] = dssp_conditions[i].to(device)
+            datas.append(data)
+            prevs.append(prev)
+            # one independent, seed-derived stream per (design, state) - see
+            # design_generator's docstring for why sequential designs cannot
+            # share one generator once anything runs in lockstep.
+            gens.append(torch.Generator(device=device).manual_seed(
+                (args.seed * 1_000_003 + design * 3 + i) & 0x7FFF_FFFF_FFFF_FFFF))
+
+        if device.type == "cuda":
+            torch.cuda.synchronize()
+        t0 = time.perf_counter()
+        snaps_per_state = sample_group(step_fn_group, datas, prevs, cfg,
+                                       generators=gens)
+        if device.type == "cuda":
+            torch.cuda.synchronize()
+        elapsed = time.perf_counter() - t0
+        times.append(elapsed)
+
+        for i, name in enumerate(names):
+            for snap in snaps_per_state[i]:
+                step = snap["step"]
+                res = {k: (v.cpu() if torch.is_tensor(v) else v)
+                      for k, v in snap.items()}
+                if args.sequence_only:
+                    seq = decode_sequence(res["aatype"])
+                    with open(seq_path, "at") as fh:
+                        fh.write(f">design_{design}_{name}_{step}\n{seq}\n")
+                        fh.flush()
+                else:
+                    path = os.path.join(args.out_path,
+                                        f"design_{design}_{name}_{step}.pdb")
+                    write_result_pdb(path, res,
+                                     chain_index=torch.zeros(lengths[i], dtype=torch.long),
+                                     order_agnostic=False)
+        print(f"  design {design}: {elapsed:6.1f}s  {len(snaps_per_state[0])} "
+              f"out-step(s)  -> {args.out_path}")
+
+    t = np.array(times)
+    print(f"\n{args.num_designs} multi-state designs "
+          f"(parent {lengths[0]}aa / child_1 {lengths[1]}aa / "
+          f"child_2 {lengths[2]}aa): median {np.median(t):.1f}s, "
+          f"total {t.sum():.1f}s")
+    if args.timing_json:
+        with open(args.timing_json, "w") as fh:
+            json.dump(dict(backend="torch", config=args.config,
+                           num_aa=lengths, num_steps=cfg.num_steps,
+                           device=str(device), multistate=True,
+                           seconds=times), fh, indent=2)
 
 
 # ---------------------------------------------------------------------------
@@ -786,6 +970,15 @@ def main() -> None:
         blocks = model.predict.diffusion.diffusion_stack.blocks
         for i in range(len(blocks)):
             blocks[i] = torch.compile(blocks[i], mode=args.compile, dynamic=False)
+
+    # multi-state design (Lisanza et al. 2024): a literal --dssp value
+    # containing "/" is "parent/child_1/child_2", not a single-state string,
+    # and needs its own generation loop (three coupled, independently-lengthed
+    # trajectories) - dispatch before apply_precedence_chain's single-state
+    # --dssp handling, which would otherwise choke on the "/" characters.
+    if "/" in args.dssp.strip():
+        run_multistate(args, config, model, device)
+        return
 
     pc = apply_precedence_chain(args)
     num_aa = pc["num_aa"]

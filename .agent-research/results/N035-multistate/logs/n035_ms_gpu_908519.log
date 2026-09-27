@@ -1,0 +1,155 @@
+### Starting TaskPrologue of job 908519 on h11-24 at Sun Sep 27 07:28:38 PM CEST 2026
+Running on cores 96-127 with governor performance
+Sun Sep 27 19:28:38 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.57.04              KMD Version: 610.57.04     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:C6:00.0 Off |                    0 |
+| N/A   36C    P0             67W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== GATE 1/2: parity + design-quality (unchanged pipelines) ===
+EXIT 0 : model_parity default_vp
+EXIT 0 : model_parity default_vp_scaled
+EXIT 0 : model_parity default_ve_scaled
+EXIT 0 : model_parity multimotif_vp
+EXIT 0 : geometry_parity
+EXIT 0 : stack_parity
+EXIT 0 : encoder_parity
+EXIT 0 : sampling_parity
+=== quality n=160 preset=fast ===
+EXIT 0 : quality fast n=160
+GATE_SUITE_EXIT=0
+=== GATE 2/2: N035 multi-state --dssp smoke test on the eager path ===
+EXIT 0 : ordinary single-state (regression check)
+=== N035 EVIDENCE: Lisanza et al. 2024 multi-state construct ===
+-- coupled multi-state run --
+multi-state design: parent=101aa child_1=53aa child_2=48aa (parent_split=53, 52 tertiary-coupled residues)  steps=500 out_steps=(400,)
+  design 0:   76.8s  1 out-step(s)  -> /tmp/908519.helma/coupled
+  design 1:   75.1s  1 out-step(s)  -> /tmp/908519.helma/coupled
+  design 2:   74.9s  1 out-step(s)  -> /tmp/908519.helma/coupled
+  design 3:   74.8s  1 out-step(s)  -> /tmp/908519.helma/coupled
+  design 4:   74.8s  1 out-step(s)  -> /tmp/908519.helma/coupled
+  design 5:   74.9s  1 out-step(s)  -> /tmp/908519.helma/coupled
+
+6 multi-state designs (parent 101aa / child_1 53aa / child_2 48aa): median 74.9s, total 451.3s
+
+real	7m33.902s
+user	8m5.527s
+sys	0m5.611s
+EXIT 0 : coupled multi-state generation
+-- uncoupled control: three independent single-state runs --
+Traceback (most recent call last):
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 1440, in <module>
+    main()
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 1104, in main
+    pc = apply_precedence_chain(args)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/scripts/generate.py", line 619, in apply_precedence_chain
+    parsed = parse_dssp(dssp_text)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/inference/options.py", line 140, in parse_dssp
+    return torch.tensor([DSSP_CODE.index(c) for c in text], dtype=torch.long)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hpc/v181bb/v181bb10/SALAD_torch/salad_torch/inference/options.py", line 140, in <listcomp>
+    return torch.tensor([DSSP_CODE.index(c) for c in text], dtype=torch.long)
+                         ^^^^^^^^^^^^^^^^^^
+ValueError: substring not found
+
+real	0m2.649s
+user	0m7.372s
+sys	0m1.544s
+EXIT 1 : uncoupled parent
+device: NVIDIA H100
+config default_vp  L=53  steps=500 out_steps=(400,)
+  design 0:   25.7s  CA-CA 3.782 A (min 3.698 max 3.900)  Rg 10.2 A  -> /tmp/908519.helma/unc_child1/design_0.pdb
+  design 1:   24.3s  CA-CA 3.756 A (min 3.672 max 3.843)  Rg 9.9 A  -> /tmp/908519.helma/unc_child1/design_1.pdb
+  design 2:   24.3s  CA-CA 3.771 A (min 3.674 max 3.848)  Rg 10.2 A  -> /tmp/908519.helma/unc_child1/design_2.pdb
+  design 3:   24.3s  CA-CA 3.768 A (min 3.670 max 3.827)  Rg 10.3 A  -> /tmp/908519.helma/unc_child1/design_3.pdb
+  design 4:   24.3s  CA-CA 3.775 A (min 3.716 max 3.838)  Rg 10.3 A  -> /tmp/908519.helma/unc_child1/design_4.pdb
+  design 5:   24.2s  CA-CA 3.794 A (min 3.722 max 3.871)  Rg 10.6 A  -> /tmp/908519.helma/unc_child1/design_5.pdb
+
+6 designs of 53 aa: median 24.3s, total 147.2s
+
+real	2m29.701s
+user	3m7.348s
+sys	0m5.529s
+EXIT 0 : uncoupled child_1
+device: NVIDIA H100
+config default_vp  L=48  steps=500 out_steps=(400,)
+  design 0:   25.6s  CA-CA 3.772 A (min 3.688 max 3.837)  Rg 17.0 A  -> /tmp/908519.helma/unc_child2/design_0.pdb
+  design 1:   24.2s  CA-CA 3.772 A (min 3.711 max 3.846)  Rg 8.9 A  -> /tmp/908519.helma/unc_child2/design_1.pdb
+  design 2:   24.1s  CA-CA 3.769 A (min 3.681 max 3.844)  Rg 9.2 A  -> /tmp/908519.helma/unc_child2/design_2.pdb
+  design 3:   24.1s  CA-CA 3.785 A (min 3.676 max 3.867)  Rg 9.2 A  -> /tmp/908519.helma/unc_child2/design_3.pdb
+  design 4:   24.1s  CA-CA 3.766 A (min 3.679 max 3.848)  Rg 9.8 A  -> /tmp/908519.helma/unc_child2/design_4.pdb
+  design 5:   24.0s  CA-CA 3.783 A (min 3.618 max 3.872)  Rg 8.6 A  -> /tmp/908519.helma/unc_child2/design_5.pdb
+
+6 designs of 48 aa: median 24.1s, total 146.2s
+
+real	2m28.989s
+user	3m4.361s
+sys	0m5.607s
+EXIT 0 : uncoupled child_2
+-- analysis --
+[self-test] identity-under-rigid-transform RMSD=6.77e-16, unrelated-cloud RMSD=7.72  OK
+parent=101aa child_1=53aa child_2=48aa  split=53  tertiary-coupled: 26 (of child_1) + 26 (of child_2) = 52 total
+coupled run: 6 design(s) found in /tmp/908519.helma/coupled
+uncoupled control parent: 0 design(s) in /tmp/908519.helma/unc_parent
+uncoupled control child_1: 6 design(s) in /tmp/908519.helma/unc_child1
+uncoupled control child_2: 6 design(s) in /tmp/908519.helma/unc_child2
+
+=== PSEA secondary-structure agreement (vs requested string, '_' skipped) ===
+    parent: n=6  mean_frac=0.8206521739130435
+   child_1: n=6  mean_frac=0.9117647058823529
+   child_2: n=6  mean_frac=0.8985507246376812
+
+=== Tertiary-coupling RMSD at same_mask positions (Kabsch CA RMSD, Angstrom) ===
+  child_1: COUPLED   n=6  mean=0.4132187244827668  median=0.3705827455402632
+  child_1: UNCOUPLED n=0  mean=None  median=None
+  child_2: COUPLED   n=6  mean=0.4366984633614748  median=0.45102721175018434
+  child_2: UNCOUPLED n=0  mean=None  median=None
+
+wrote /home/hpc/v181bb/v181bb10/salad_jobs/n035_evidence_908519.json
+EXIT 0 : evidence analysis
+GPU_SUITE_EXIT=1
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 19:48:29 CEST 2026
+= Job-ID             : 908519 on helma
+= Job-Name           : n035_ms_gpu
+= Job-Command        : /home/hpc/v181bb/v181bb10/salad_jobs/n035_multistate_gpu.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/salad_jobs
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 02:00:00
+= Elapsed runtime    : 00:19:55
+= Total RAM usage    : 4.9 GiB of assigned 175 GiB (2.8%)
+= Node list          : h11-24
+= Subm/Elig/Start/End: 2026-09-27T19:28:33 / 2026-09-27T19:28:33 / 2026-09-27T19:28:34 / 2026-09-27T19:48:29
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.2G   104.9G   209.7G        N/A     463K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      73K      61K      81K  4d13h1m22s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:C6:00.0, 2751983, 24 %, 10 %, 1360 MiB, 367821 ms
+NVIDIA H100, 00000000:C6:00.0, 2757076, 32 %, 1 %, 1040 MiB, 27162 ms
+NVIDIA H100, 00000000:C6:00.0, 2757150, 34 %, 0 %, 1308 MiB, 452526 ms
+NVIDIA H100, 00000000:C6:00.0, 2758065, 0 %, 0 %, 580 MiB, 993 ms
+NVIDIA H100, 00000000:C6:00.0, 2758104, 33 %, 0 %, 906 MiB, 148312 ms
+NVIDIA H100, 00000000:C6:00.0, 2758428, 33 %, 0 %, 900 MiB, 147367 ms

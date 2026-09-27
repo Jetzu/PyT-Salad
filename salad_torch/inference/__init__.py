@@ -20,8 +20,11 @@ Deliberately NOT ported (see `notes/specs/06_generation_flags.md` for why):
 """
 from __future__ import annotations
 
-from .options import (DSSP_CODE, decode_sequence, parse_dssp, parse_dssp_mean,
-                      random_dssp, random_dssp_mean)
+from .blobs import parse_blobs, replace_to_blob_anchor
+from .multistate import couple_part, update_split_change
+from .options import (DSSP_CODE, MultiStateDSSP, decode_sequence, parse_dssp,
+                      parse_dssp_mean, parse_dssp_split, random_dssp,
+                      random_dssp_mean)
 from .postprocess import reorder_amino_acids
 from .symmetry import SymmetrySpec, cyclic_centering, parse_sym, rot_y, screw_replicate
 from .template import parse_constring, parse_template, read_pdb
@@ -32,4 +35,6 @@ __all__ = [
     "reorder_amino_acids",
     "DSSP_CODE", "parse_dssp", "parse_dssp_mean", "random_dssp",
     "random_dssp_mean", "decode_sequence",
+    "MultiStateDSSP", "parse_dssp_split", "couple_part", "update_split_change",
+    "parse_blobs", "replace_to_blob_anchor",
 ]

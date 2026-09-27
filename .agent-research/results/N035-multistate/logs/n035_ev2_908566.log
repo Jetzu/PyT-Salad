@@ -1,0 +1,133 @@
+### Starting TaskPrologue of job 908566 on h13-09 at Sun Sep 27 07:50:59 PM CEST 2026
+Running on cores 32-63 with governor performance
+Sun Sep 27 19:50:59 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100                    On  |   00000000:26:00.0 Off |                    0 |
+| N/A   35C    P0             68W /  500W |       0MiB /  95830MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== N035 EVIDENCE v2: Lisanza et al. 2024 multi-state construct ===
+-- coupled multi-state run --
+multi-state design: parent=101aa child_1=53aa child_2=48aa (parent_split=53, 52 tertiary-coupled residues)  steps=500 out_steps=(400,)
+  design 0:   76.8s  1 out-step(s)  -> /tmp/908566.helma/coupled
+  design 1:   74.3s  1 out-step(s)  -> /tmp/908566.helma/coupled
+  design 2:   74.5s  1 out-step(s)  -> /tmp/908566.helma/coupled
+  design 3:   74.5s  1 out-step(s)  -> /tmp/908566.helma/coupled
+  design 4:   74.5s  1 out-step(s)  -> /tmp/908566.helma/coupled
+  design 5:   74.2s  1 out-step(s)  -> /tmp/908566.helma/coupled
+
+6 multi-state designs (parent 101aa / child_1 53aa / child_2 48aa): median 74.5s, total 448.9s
+
+real	7m34.283s
+user	8m7.665s
+sys	0m6.783s
+EXIT 0 : coupled multi-state generation
+-- uncoupled control: three independent single-state runs (upper-folded) --
+device: NVIDIA H100
+config default_vp  L=101  steps=500 out_steps=(400,)
+  design 0:   25.7s  CA-CA 3.749 A (min 3.655 max 3.873)  Rg 12.2 A  -> /tmp/908566.helma/unc_parent/design_0.pdb
+  design 1:   24.3s  CA-CA 3.755 A (min 3.591 max 3.890)  Rg 12.7 A  -> /tmp/908566.helma/unc_parent/design_1.pdb
+  design 2:   24.2s  CA-CA 3.770 A (min 3.647 max 3.919)  Rg 13.5 A  -> /tmp/908566.helma/unc_parent/design_2.pdb
+  design 3:   24.2s  CA-CA 3.759 A (min 3.644 max 3.923)  Rg 12.3 A  -> /tmp/908566.helma/unc_parent/design_3.pdb
+  design 4:   24.3s  CA-CA 3.755 A (min 3.562 max 3.922)  Rg 12.3 A  -> /tmp/908566.helma/unc_parent/design_4.pdb
+  design 5:   24.2s  CA-CA 3.742 A (min 3.591 max 3.859)  Rg 11.9 A  -> /tmp/908566.helma/unc_parent/design_5.pdb
+
+6 designs of 101 aa: median 24.3s, total 146.9s
+
+real	2m30.123s
+user	2m54.175s
+sys	0m5.773s
+EXIT 0 : uncoupled parent
+device: NVIDIA H100
+config default_vp  L=53  steps=500 out_steps=(400,)
+  design 0:   25.8s  CA-CA 3.721 A (min 3.578 max 3.825)  Rg 10.7 A  -> /tmp/908566.helma/unc_child1/design_0.pdb
+  design 1:   24.4s  CA-CA 3.756 A (min 3.670 max 3.840)  Rg 9.9 A  -> /tmp/908566.helma/unc_child1/design_1.pdb
+  design 2:   24.4s  CA-CA 3.771 A (min 3.674 max 3.847)  Rg 10.2 A  -> /tmp/908566.helma/unc_child1/design_2.pdb
+  design 3:   24.4s  CA-CA 3.768 A (min 3.668 max 3.828)  Rg 10.3 A  -> /tmp/908566.helma/unc_child1/design_3.pdb
+  design 4:   24.4s  CA-CA 3.775 A (min 3.716 max 3.838)  Rg 10.3 A  -> /tmp/908566.helma/unc_child1/design_4.pdb
+  design 5:   24.4s  CA-CA 3.768 A (min 3.602 max 3.833)  Rg 10.5 A  -> /tmp/908566.helma/unc_child1/design_5.pdb
+
+6 designs of 53 aa: median 24.4s, total 147.8s
+
+real	2m30.955s
+user	3m7.480s
+sys	0m6.183s
+EXIT 0 : uncoupled child_1
+device: NVIDIA H100
+config default_vp  L=48  steps=500 out_steps=(400,)
+  design 0:   27.6s  CA-CA 3.772 A (min 3.688 max 3.837)  Rg 17.0 A  -> /tmp/908566.helma/unc_child2/design_0.pdb
+  design 1:   24.2s  CA-CA 3.772 A (min 3.711 max 3.847)  Rg 8.9 A  -> /tmp/908566.helma/unc_child2/design_1.pdb
+  design 2:   24.2s  CA-CA 3.769 A (min 3.681 max 3.844)  Rg 9.2 A  -> /tmp/908566.helma/unc_child2/design_2.pdb
+  design 3:   24.2s  CA-CA 3.785 A (min 3.676 max 3.867)  Rg 9.2 A  -> /tmp/908566.helma/unc_child2/design_3.pdb
+  design 4:   24.2s  CA-CA 3.766 A (min 3.679 max 3.848)  Rg 9.8 A  -> /tmp/908566.helma/unc_child2/design_4.pdb
+  design 5:   24.2s  CA-CA 3.783 A (min 3.618 max 3.872)  Rg 8.6 A  -> /tmp/908566.helma/unc_child2/design_5.pdb
+
+6 designs of 48 aa: median 24.2s, total 148.7s
+
+real	2m32.241s
+user	3m0.050s
+sys	0m5.711s
+EXIT 0 : uncoupled child_2
+-- analysis --
+[self-test] identity-under-rigid-transform RMSD=6.77e-16, unrelated-cloud RMSD=7.72  OK
+parent=101aa child_1=53aa child_2=48aa  split=53  tertiary-coupled: 26 (of child_1) + 26 (of child_2) = 52 total
+coupled run: 6 design(s) found in /tmp/908566.helma/coupled
+uncoupled control parent: 6 design(s) in /tmp/908566.helma/unc_parent
+uncoupled control child_1: 6 design(s) in /tmp/908566.helma/unc_child1
+uncoupled control child_2: 6 design(s) in /tmp/908566.helma/unc_child2
+
+=== PSEA secondary-structure agreement (vs requested string, '_' skipped) ===
+    parent: n=6  mean_frac=0.8369565217391304
+   child_1: n=6  mean_frac=0.8921568627450981
+   child_2: n=6  mean_frac=0.9130434782608696
+
+=== Tertiary-coupling RMSD at same_mask positions (Kabsch CA RMSD, Angstrom) ===
+  child_1: COUPLED   n=6  mean=0.3559373035377323  median=0.34551797234003534
+  child_1: UNCOUPLED n=6  mean=5.1322158529831885  median=5.296474186981247
+  child_2: COUPLED   n=6  mean=0.4114090967855293  median=0.39293074161062214
+  child_2: UNCOUPLED n=6  mean=5.40637725358626  median=4.295857789726136
+
+wrote /home/hpc/v181bb/v181bb10/salad_jobs/n035_evidence_v2_908566.json
+EXIT 0 : evidence analysis
+EVIDENCE_V2_EXIT=0
+=== JOB_STATISTICS ===
+=== current date     : Sun Sep 27 20:06:08 CEST 2026
+= Job-ID             : 908566 on helma
+= Job-Name           : n035_ev2
+= Job-Command        : /home/hpc/v181bb/v181bb10/salad_jobs/n035_evidence_v2.sbatch
+= Initial workdir    : /home/hpc/v181bb/v181bb10/salad_jobs
+= Queue/Partition    : h100
+= Slurm account      : v181bb with QOS=normal
+= Requested resources: cpu=32,mem=175G,node=1,billing=32,gres/gpu=1,gres/gpu:h100=1 for 01:00:00
+= Elapsed runtime    : 00:15:11
+= Total RAM usage    : 1.3 GiB of assigned 175 GiB (0.7%)
+= Node list          : h13-09
+= Subm/Elig/Start/End: 2026-09-27T19:50:56 / 2026-09-27T19:50:56 / 2026-09-27T19:50:57 / 2026-09-27T20:06:08
+======================
+=== Quota infos ======
+    Path                 Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/hpc              93.4G   104.9G   209.7G        N/A     463K     500K   1,000K        N/A    
+!!! /hnvme                  8.8T     0.0K     0.0K        N/A      73K      61K      81K  4d12h43m43s !!!
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA H100, 00000000:26:00.0, 475742, 34 %, 0 %, 1302 MiB, 450526 ms
+NVIDIA H100, 00000000:26:00.0, 477711, 35 %, 1 %, 1036 MiB, 148484 ms
+NVIDIA H100, 00000000:26:00.0, 478168, 33 %, 0 %, 902 MiB, 149356 ms
+NVIDIA H100, 00000000:26:00.0, 478530, 32 %, 0 %, 896 MiB, 150641 ms
